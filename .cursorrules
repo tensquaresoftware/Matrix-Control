@@ -1,0 +1,114 @@
+================================================================================
+# INSTRUCTIONS PERSONNELLES AGENT IA CURSOR - DÉVELOPPEMENT DE PLUGINS VST/AU
+================================================================================
+- Auteur : Guillaume DUPONT
+- Organisation : Ten Square Software
+- Dernière mise à jour : 2025-11-15
+
+================================================================================
+## COMMUNICATION
+================================================================================
+
+[Interactions avec moi]
+- Je m'appelle Guillaume, tu peux m'appeler par mon prénom
+- Utilise toujours le tutoiement dans tous nos échanges
+- Réponds-moi exclusivement en français
+- Sois franc, honnête et factuel, même si cela implique de me contredire
+- Priorité absolue : m'aider à trouver la solution la plus pertinente
+- Ne me flatte pas pour me faire plaisir au détriment de la qualité
+
+[Structure des réponses]
+- Structure claire et didactique
+- Objectif : m'aider à progresser
+- Garantir pérennité et maintenabilité du code généré
+- Solutions optimales et conformes aux standards professionnels
+
+================================================================================
+## ENVIRONNEMENT DE DÉVELOPPEMENT
+================================================================================
+
+[Système & Outils]
+- Plateforme : MacBook Pro M5 avec macOS Tahoe
+- IDE : Cursor 2 (avec Agent IA)
+- Compilateur : Xcode 26
+- Build system : CMake
+- Framework audio : JUCE 8.0.10
+
+[Référence JUCE]
+- Installation JUCE sur mon Mac : /Applications/JUCE
+- Documentation officielle : https://docs.juce.com
+- Modules : /Applications/JUCE/modules/
+- CMake : /Applications/JUCE/CMake/
+
+[Vérification du code généré]
+- Réfère-toi SYSTÉMATIQUEMENT à la documentation JUCE 8.0.10
+- Vérifie que chaque API, classe et méthode existe dans JUCE 8
+- Évite toute syntaxe obsolète (JUCE 7, JUCE 6, etc.)
+- Signale explicitement si tu n'es pas certain d'une API
+
+================================================================================
+## STANDARDS C++ & QUALITÉ
+================================================================================
+
+[Généralités C++]
+- Standard : C++17 minimum, compatible Xcode 26
+- Langage du code source : Anglais uniquement
+  * Noms de variables, fonctions, classes
+  * Tous les commentaires de code
+  * Pas d'accents, pas de français dans le code
+- Git Commits : Summary/Description en anglais uniquement
+
+[Conventions de nommage]
+- Variables & Méthodes : lowerCamelCase
+  * Exemple : audioBuffer, processMidiEvents(), getSampleRate()
+- Constantes : kConstantName (private par défaut)
+  * Exemple : kMaxBufferSize, kDefaultChannels
+- Classes : PascalCase
+  * Exemple : PluginProcessor, PluginEditor, AudioAnalyzer
+- Éviter les underscore_case sauf cas très particulier
+
+[Organisation des includes]
+1. Headers système C++ (ex : <vector>, <memory>)
+2. Headers JUCE (ex : <JuceHeader.h>)
+3. Headers du projet (ex : "PatchModel.h", "AudioEngine.h")
+
+[Principes SOLID & Clean Code]
+- Code lisible et compréhensible par un humain
+- Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
+- Pas de commentaires inutiles ou évidents
+- Fonctions courtes : 5-15 lignes idéalement
+- Un seul niveau d'abstraction par fonction
+- Une seule responsabilité (Single Responsibility)
+- Pas d'effets cachés, pas d'état global modifié
+- DRY (Don't Repeat Yourself)
+- Respecter la Loi de Demeter
+- Privilégier la délégation à l'héritage
+- Exceptions > null pointers
+- std::optional > null
+- Traiter les erreurs au niveau approprié
+
+[Gestion du code existant]
+- Ne JAMAIS supprimer les commentaires que j'ai moi-même placés
+- Préserver l'intégrité structurelle du code existant
+- Respecter les patterns déjà implémentés
+
+================================================================================
+## RÈGLES SPÉCIFIQUES JUCE
+================================================================================
+
+[Nommage des classes du plugin]
+- Classe du processeur : "PluginProcessor" (fichiers : PluginProcessor.h/.cpp)
+- Classe de l'éditeur UI : "PluginEditor" (fichiers : PluginEditor.h/.cpp)
+
+[APIs JUCE dépréciées - À ÉVITER]
+- ~~getCurrentPlaybackSampleRate()~~ → getSampleRate()
+- ~~setPlayConfigDetails()~~ → setBusesLayout()
+- ~~Timer avec callbacks~~ → juce::HighResolutionTimer
+- ~~AudioProcessorValueTreeState~~ → ValueTree moderne
+- ~~Legacy parameter handling~~ → juce::AudioProcessorParameter
+
+La liste est non exhaustive, je la complèterai au fil du temps...
+
+================================================================================
+# Fin des instructions
+================================================================================

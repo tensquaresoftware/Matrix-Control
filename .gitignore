@@ -1,0 +1,34 @@
+# Build artifacts
+build/
+*.o
+*.obj
+
+# IDE
+.vscode/.cmaketools.json
+.vscode/c_cpp_properties.json
+.DS_Store
+
+# Cache directories
+.cache/
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+DerivedData/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Binaries
+*.app
+*.component
+*.vst3
+*.exe
+*.dll
+*.dylib
+*.so
+
+# Tools
+Tools/

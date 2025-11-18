@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Standalone",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build: Standalone"
+        },
+        {
+            "name": "Debug: AU in Logic Pro",
+            "type": "lldb",
+            "request": "launch",
+            "program": "/Applications/Logic Pro.app/Contents/MacOS/Logic Pro",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build: AU"
+        },
+        {
+            "name": "Debug: VST3 in Reaper",
+            "type": "lldb",
+            "request": "launch",
+            "program": "/Applications/REAPER.app/Contents/MacOS/REAPER",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build: VST3"
+        },
+        {
+            "name": "Debug: AU in Ableton Live",
+            "type": "lldb",
+            "request": "launch",
+            "program": "/Applications/Ableton Live 12 Suite.app/Contents/MacOS/Live",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build: AU"
+        }
+    ]
+}
