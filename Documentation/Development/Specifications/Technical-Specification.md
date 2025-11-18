@@ -1,33 +1,33 @@
 # Matrix-Control
 
-## Cahier des Charges Technique
+## Technical Specification
 
-**Auteur :** Guillaume DUPONT  
-**Organisation :** Ten Square Software  
-**Date de modification :** 2025-11-18  
-**Version :** 1.0.0
+**Author:** Guillaume DUPONT  
+**Organization:** Ten Square Software  
+**Last modified:** 2025-11-18  
+**Version:** 1.0.0
 
 ---
 
-## Document complémentaire
+## Complementary document
 
-**Cahier des Charges Fonctionnel :**
+**Functional Specification:**
 
-- Généralités, contexte, exigences fonctionnelles
-- Exigences techniques pures
+- General information, context, functional requirements
+- Pure technical requirements
 - Validation, scope v1.0
 
-## 1. Architecture générale
+## 1. General architecture
 
-### 1.1 Principes directeurs
+### 1.1 Guiding principles
 
-- **Single Responsibility Principle (SRP)** : Chaque classe = 1 responsabilité
-- **Separation of Concerns (SoC)** : Métier, MIDI, GUI bien séparés
-- **Thread-safety** : APVTS ValueTree (listeners thread-safe)
-- **Clean Code** : Lisibilité, noms explicites, no magic numbers, exceptions
-- **Pragmatisme** : Classes concrètes plutôt que polymorphisme excessif
+- **Single Responsibility Principle (SRP):** Each class = 1 responsibility
+- **Separation of Concerns (SoC):** Business, MIDI, GUI well separated
+- **Thread-safety:** APVTS ValueTree (thread-safe listeners)
+- **Clean Code:** Readability, explicit names, no magic numbers, exceptions
+- **Pragmatism:** Concrete classes rather than excessive polymorphism
 
-### 1.2 Diagramme architecture
+### 1.2 Architecture diagram
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -89,45 +89,45 @@
 
 ---
 
-## 2. Factory et Descriptors
+## 2. Factory and Descriptors
 
-### 2.1 Conceptualisation
+### 2.1 Conceptualization
 
-**Descriptors = plans de la maison (statiques)**
+**Descriptors = house plans (static)**
 
-- Fichiers `.h` déclarant tous paramètres synthé + widgets UI
+- `.h` files declaring all synth parameters + UI widgets
 
-**Factory = bâtisseurs de la maison, à partir des plans**
+**Factory = house builders, from plans**
 
-- Lit les Descriptors
-- Construit APVTS ParameterLayout
-- Construit GUI (sections, modules, components)
-- Valide cohérence 1:1 (pas doublons, pas oublis)
+- Reads Descriptors
+- Builds APVTS ParameterLayout
+- Builds GUI (sections, modules, components)
+- Validates 1:1 consistency (no duplicates, no omissions)
 
-**Avantages :**
+**Advantages:**
 
-- Source unique de vérité
-- Validation au startup (exception si problème)
-- Facilite ajouts/modifications (1 ligne descriptors = auto GUI + APVTS)
+- Single source of truth
+- Validation at startup (exception if problem)
+- Facilitates additions/modifications (1 descriptor line = auto GUI + APVTS)
 
-### 2.2 Structures de descriptors
+### 2.2 Descriptor structures
 
 ```cpp
-// Data/Descriptors/*.h (statiques, inline const)
+// Data/Descriptors/*.h (static, inline const)
 
 struct ParameterDescriptor {
     std::string parameterId;         // "dco1Frequency"
     std::string parameterName;       // "DCO 1 Frequency"
     float minValue, maxValue, defaultValue;
-    uint8_t sysExOffset;             // Offset dans SysEx patch
-    int sysExParameterId;            // ID param SysEx (0x00, 0x01, etc.)
+    uint8_t sysExOffset;             // Offset in SysEx patch
+    int sysExParameterId;            // SysEx param ID (0x00, 0x01, etc.)
 };
 
 struct WidgetDescriptor {
     enum class Type { kSlider, kComboBox, kNumber, kButton, kLabel, kSeparator };
     Type type;
     std::string label;
-    std::string parameterId;  // "" si widget standalone
+    std::string parameterId;  // "" if standalone widget
 };
 
 struct ModuleDescriptor {
@@ -143,7 +143,7 @@ struct SectionDescriptor {
 };
 ```
 
-### 2.3 Organisation fichiers descriptors
+### 2.3 Descriptor file organization
 
 ```
 Data/Descriptors/
@@ -184,13 +184,13 @@ private:
 };
 ```
 
-**Note pour le développeur :** La Factory vérifie au startup qu'aucun ID paramètre ni offset SysEx n'est dupliqué. Exception lancée si problème détecté.
+**Note for developer:** Factory checks at startup that no parameter ID or SysEx offset is duplicated. Exception thrown if problem detected.
 
-## 3. Classes métier
+## 3. Business classes
 
 ### 3.1 PatchModel
 
-**Responsabilité :** Représentation en mémoire d'un patch Matrix-1000.
+**Responsibility:** In-memory representation of a Matrix-1000 patch.
 
 ```cpp
 class PatchModel {
@@ -214,11 +214,11 @@ private:
 };
 ```
 
-**Dépendances :** SysExSerializer (pour conversion bytes)
+**Dependencies:** SysExSerializer (for byte conversion)
 
 ### 3.2 SysExParser
 
-**Responsabilité :** Parser et valider messages SysEx Matrix-1000.
+**Responsibility:** Parse and validate Matrix-1000 SysEx messages.
 
 ```cpp
 class SysExParser {
@@ -243,7 +243,7 @@ private:
 };
 ```
 
-**Exceptions lancées :**
+**Exceptions thrown:**
 
 ```cpp
 class SysExException : public std::exception {
@@ -256,7 +256,7 @@ public:
 
 ### 3.3 MidiManager
 
-**Responsabilité :** Thread MIDI dédié pour I/O SysEx, gestion timeouts, parsing, mise à jour APVTS.
+**Responsibility:** Dedicated MIDI thread for SysEx I/O, timeout handling, parsing, APVTS updates.
 
 ```cpp
 class MidiManager : public juce::Thread {
@@ -299,11 +299,11 @@ private:
 };
 ```
 
-**Note pour le développeur :** MidiManager run() dans thread dédié → **pas de blocage audio thread**. Envoi/réception SysEx, gestion timeouts, parsing → update APVTS thread-safe (via ValueTree listeners).
+**Note for developer:** MidiManager run() in dedicated thread → **no audio thread blocking**. Send/receive SysEx, timeout handling, parsing → update APVTS thread-safe (via ValueTree listeners).
 
 ### 3.4 PatchManager
 
-**Responsabilité :** Chargement/sauvegarde fichiers .syx, validation, tri alphabétique.
+**Responsibility:** Load/save .syx files, validation, alphabetical sorting.
 
 ```cpp
 class PatchManager {
@@ -326,7 +326,7 @@ private:
 
 ### 3.5 MasterManager
 
-**Responsabilité :** Implémenter cycle Fetch-Update-Send pour paramètres MASTER.
+**Responsibility:** Implement Fetch-Update-Send cycle for MASTER parameters.
 
 ```cpp
 class MasterManager {
@@ -348,7 +348,7 @@ private:
 
 ### 3.6 ClipboardManager
 
-**Responsabilité :** Clipboard type-aware, validation compatibilité, persistance.
+**Responsibility:** Type-aware clipboard, compatibility validation, persistence.
 
 ```cpp
 class ClipboardManager {
@@ -372,43 +372,43 @@ private:
 };
 ```
 
-## 4. Threading et gestion MIDI
+## 4. Threading and MIDI management
 
-### 4.1 Stratégie threading
+### 4.1 Threading strategy
 
-**Trois threads distincts :**
+**Three distinct threads:**
 
-| Thread    | Responsabilités                       | Contraintes                                        |
-| --------- | ------------------------------------- | -------------------------------------------------- |
-| **Audio** | `processBlock()` DAW                  | NO blocking, NO I/O, updates APVTS only            |
-| **GUI**   | User events, component updates        | Listen APVTS, dispatch MIDI commands               |
-| **MIDI**  | Send/receive SysEx, parsing, timeouts | Blocking OK, I/O allowed, update APVTS thread-safe |
+| Thread   | Responsibilities                    | Constraints                                        |
+| -------- | ----------------------------------- | -------------------------------------------------- |
+| **Audio** | `processBlock()` DAW                | NO blocking, NO I/O, updates APVTS only           |
+| **GUI**  | User events, component updates      | Listen APVTS, dispatch MIDI commands              |
+| **MIDI** | Send/receive SysEx, parsing, timeouts | Blocking OK, I/O allowed, update APVTS thread-safe |
 
-### 4.2 Communication inter-threads
+### 4.2 Inter-thread communication
 
-**APVTS ValueTree = source unique de vérité thread-safe**
+**APVTS ValueTree = single thread-safe source of truth**
 
 ```
-User modifie paramètre GUI (slider, combobox)
+User modifies GUI parameter (slider, combobox)
     ↓
 Slider attachment → APVTS listener triggered
     ↓
 PluginProcessor notified (audio thread?)
     ↓
-Message envoyé à MidiThread (lock-free FIFO)
+Message sent to MidiThread (lock-free FIFO)
     ↓
-MidiThread envoie SysEx au synthé
+MidiThread sends SysEx to synth
     ↓
-Synthé répond SysEx
+Synth responds SysEx
     ↓
-MidiThread parse et update APVTS (thread-safe)
+MidiThread parses and updates APVTS (thread-safe)
     ↓
 GUI listeners triggered
     ↓
 GUI components update (thread-safe)
 ```
 
-### 4.3 Implémentation MidiThread
+### 4.3 MidiThread implementation
 
 ```cpp
 // Business/MidiManager.cpp (run() method)
@@ -432,11 +432,11 @@ void MidiManager::run() {
 }
 ```
 
-**Note pour le développeur :** Pas de locks directs thread audio ↔ MIDI. APVTS ValueTree listeners gèrent la synchronisation automatiquement (JUCE's internal locking).
+**Note for developer:** No direct locks audio thread ↔ MIDI. APVTS ValueTree listeners handle synchronization automatically (JUCE's internal locking).
 
-## 5. Gestion d'erreurs
+## 5. Error handling
 
-### 5.1 Exceptions métier
+### 5.1 Business exceptions
 
 ```cpp
 // Data/Exceptions.h
@@ -463,12 +463,12 @@ public:
 };
 ```
 
-### 5.2 Propagation vers GUI
+### 5.2 Propagation to GUI
 
 **MidiManager catch → APVTS → MessageBar display**
 
 ```cpp
-// Dans MidiManager
+// In MidiManager
 try {
     auto patch = sysExParser_.parsePatchSysEx(data);
     // ... process patch
@@ -477,7 +477,7 @@ try {
     apvts_.state.setProperty("errorType", "SysEx", nullptr);
 }
 
-// Dans PluginEditor
+// In PluginEditor
 apvts_.state.addListener(this);
 
 void valueTreePropertyChanged(juce::ValueTree& tree,
@@ -489,36 +489,36 @@ void valueTreePropertyChanged(juce::ValueTree& tree,
 }
 ```
 
-## 6. Protocole MIDI et SysEx - Détails techniques
+## 6. MIDI and SysEx protocol - Technical details
 
-### 6.1 Auto-détection du synthé (Device Inquiry / Device ID)
+### 6.1 Synth auto-detection (Device Inquiry / Device ID)
 
-Au démarrage du plugin, ou lors du changement de port MIDI, la détection automatique du synthé s'effectue en deux étapes :
+At plugin startup, or when changing MIDI port, automatic synth detection is performed in two steps:
 
-**Étape 1 : Envoi du Device Inquiry (commande MIDI universelle)**
+**Step 1: Send Device Inquiry (universal MIDI command)**
 
 ```
 F0H 7EH <chan> 06H 01H F7H
 ```
 
-où `<chan>` = 7FH (adresse globale pour "any device")
+where `<chan>` = 7FH (global address for "any device")
 
-**Étape 2 : Attente de la réponse Device ID**
+**Step 2: Wait for Device ID response**
 
 ```
 F0H 7EH <chan> 06H 02H 10H 06H 00H 02H 00H <rev-0> <rev-1> <rev-2> <rev-3> F7H
 ```
 
-**Critères de validation :**
+**Validation criteria:**
 
 - Manufacturer ID = 10H (Oberheim)
 - Family Low = 06H (Matrix-6/6R/1000)
 - Family High = 00H
 - Member Low = 02H (Matrix-1000)
 - Member High = 00H
-- `<rev-0>` à `<rev-3>` = version firmware (ex: 1.10 = 20H 31H 31H 30H, soit " 1.10")
+- `<rev-0>` to `<rev-3>` = firmware version (ex: 1.10 = 20H 31H 31H 30H, i.e., " 1.10")
 
-**Implémentation dans MidiManager :**
+**Implementation in MidiManager:**
 
 ```cpp
 bool MidiManager::detectSynthDevice() {
@@ -556,33 +556,33 @@ bool MidiManager::detectSynthDevice() {
 }
 ```
 
-### 6.2 Algorithme de checksum Oberheim
+### 6.2 Oberheim checksum algorithm
 
-Le checksum Oberheim valide l'intégrité des messages SysEx PATCH et MASTER.
+The Oberheim checksum validates the integrity of PATCH and MASTER SysEx messages.
 
-**Calcul du checksum (à la transmission) :**
+**Checksum calculation (at transmission):**
 
-1. Initialiser `checksum = 0`
-2. Pour chaque byte de données **packées** (avant unpacking en nibbles) :
+1. Initialize `checksum = 0`
+2. For each **packed** data byte (before unpacking to nibbles):
    - `checksum += byte`
-3. Transmettre `(checksum & 0x7F)` comme byte de checksum
-4. Transmettre 0xF7 (End of SysEx)
+3. Transmit `(checksum & 0x7F)` as checksum byte
+4. Transmit 0xF7 (End of SysEx)
 
-**Validation du checksum (à la réception) :**
+**Checksum validation (at reception):**
 
-1. Initialiser `checksum = 0`
-2. Pour chaque byte reçu (après unpacking des nibbles en bytes packés) :
+1. Initialize `checksum = 0`
+2. For each received byte (after unpacking nibbles to packed bytes):
    - `checksum += byte`
-3. Vérifier que `(checksum & 0x7F)` == checksum reçu
-4. Si égalité → OK, sinon → **message d'erreur**
+3. Verify that `(checksum & 0x7F)` == received checksum
+4. If equal → OK, otherwise → **error message**
 
-**Exemple concret :**
+**Concrete example:**
 
-Pour un patch 01H transmis : `F0H 10H 06H 01H NN DATA... CS F7H`
+For a transmitted patch 01H: `F0H 10H 06H 01H NN DATA... CS F7H`
 
-- Header : F0H 10H 06H 01H NN (5 bytes, pas inclus dans checksum)
-- DATA : 268 nibbles = 134 bytes packés
-- CS = (somme des 134 bytes packés) & 0x7F
+- Header: F0H 10H 06H 01H NN (5 bytes, not included in checksum)
+- DATA: 268 nibbles = 134 packed bytes
+- CS = (sum of 134 packed bytes) & 0x7F
 
 ```cpp
 uint8_t SysExParser::calculateChecksum(const juce::uint8* data, 
@@ -612,13 +612,13 @@ bool SysExParser::validateChecksum(const juce::MemoryBlock& sysEx) const {
 }
 ```
 
-### 6.3 Conversion de types et packing/unpacking des données
+### 6.3 Type conversion and data packing/unpacking
 
-Le format de patch du Matrix-1000 utilise des champs de tailles variables (1 à 7 bits) dans une structure binaire packed. Lors de la conversion entre représentation interne (APVTS) et représentation transmise (SysEx), deux opérations inverse sont nécessaires :
+The Matrix-1000 patch format uses variable-size fields (1 to 7 bits) in a packed binary structure. During conversion between internal representation (APVTS) and transmitted representation (SysEx), two inverse operations are necessary:
 
-**Unpacking (SysEx → représentation interne) :**
+**Unpacking (SysEx → internal representation):**
 
-Pour extraire un champ de N bits situé à la position START_BIT d'un buffer packed :
+To extract an N-bit field located at position START_BIT in a packed buffer:
 
 ```cpp
 uint8_t extractBitField(const juce::uint8* buffer, 
@@ -630,9 +630,9 @@ uint8_t extractBitField(const juce::uint8* buffer,
 }
 ```
 
-**Packing (représentation interne → SysEx) :**
+**Packing (internal representation → SysEx):**
 
-Pour insérer une valeur VALUE de N bits à la position START_BIT :
+To insert a VALUE of N bits at position START_BIT:
 
 ```cpp
 void insertBitField(juce::uint8* buffer, 
@@ -646,9 +646,9 @@ void insertBitField(juce::uint8* buffer,
 }
 ```
 
-**Gestion des valeurs signées :**
+**Signed value handling:**
 
-Pour tous les paramètres signés (sauf VCF Frequency), extension de signe depuis bit 6 vers bit 7 :
+For all signed parameters (except VCF Frequency), sign extension from bit 6 to bit 7:
 
 ```cpp
 int8_t signExtend7Bit(uint8_t value) {
@@ -664,11 +664,11 @@ uint8_t compressTo7Bit(int8_t value) {
     return static_cast<uint8_t>(value) & 0x7F;
 }
 
-// VCF Frequency (paramètre 121) : exception, pas d'extension de signe
-// Utiliser directement la plage 0-127 sans conversion
+// VCF Frequency (parameter 121): exception, no sign extension
+// Use directly the 0-127 range without conversion
 ```
 
-## 7. Structure projet
+## 7. Project structure
 
 ```
 Matrix-Control/
@@ -725,7 +725,7 @@ Matrix-Control/
 │   │   ├── Descriptors/
 │   │   │   ├── DcoModuleDescriptors.h
 │   │   │   ├── EnvModuleDescriptors.h
-│   │   │   ├── (... autres descriptors ...)
+│   │   │   ├── (... other descriptors ...)
 │   │   │   └── SettingsDescriptors.h
 │   │   ├── ParameterDescriptor.h
 │   │   ├── ModuleDescriptor.h
@@ -756,110 +756,110 @@ Matrix-Control/
 └── README.md
 ```
 
-## 8. Planning et phases
+## 8. Planning and phases
 
-### 8.1 Phase #1 : UI Components (briques élémentaires)
+### 8.1 Phase #1: UI Components (basic building blocks)
 
-**Durée :** 3-4 jours
+**Duration:** 3-4 days
 
-**Livrables :**
+**Deliverables:**
 
-- `MatrixSlider`, `MatrixComboBox`, `MatrixButton`, `MatrixNumber` (widgets personnalisés)
-- `MessageBar` (affichage messages temps réel)
-- Tests unitaires pour chaque component
+- `MatrixSlider`, `MatrixComboBox`, `MatrixButton`, `MatrixNumber` (custom widgets)
+- `MessageBar` (real-time message display)
+- Unit tests for each component
 
-**Objectif :** Components indépendants, testables, thématisables, scalables (zoom).
+**Objective:** Independent components, testable, themable, scalable (zoom).
 
-### 8.2 Phase #2 : Descriptors (plans)
+### 8.2 Phase #2: Descriptors (plans)
 
-**Durée :** 2-3 jours
+**Duration:** 2-3 days
 
-**Livrables :**
+**Deliverables:**
 
 - `DcoModuleDescriptors.h`, `EnvModuleDescriptors.h`, `LfoModuleDescriptors.h`, etc.
-- Tous les ParameterDescriptor + offsets SysEx exacts (consulter doc Matrix-1000)
-- Documentation des descriptors
+- All ParameterDescriptor + exact SysEx offsets (consult Matrix-1000 doc)
+- Descriptor documentation
 
-**Objectif :** Source unique de vérité complète et bien structurée.
+**Objective:** Complete and well-structured single source of truth.
 
-### 8.3 Phase #3 : Factory + Validation
+### 8.3 Phase #3: Factory + Validation
 
-**Durée :** 2-3 jours
+**Duration:** 2-3 days
 
-**Livrables :**
+**Deliverables:**
 
-- `PluginParameterFactory` (Factory qui lit Descriptors)
-- `validateParameterConsistency()` (test 1:1 APVTS ↔ GUI ↔ SysEx)
-- Intégration dans `PluginProcessor`
-- Tests unitaires Factory
+- `PluginParameterFactory` (Factory that reads Descriptors)
+- `validateParameterConsistency()` (1:1 test APVTS ↔ GUI ↔ SysEx)
+- Integration into `PluginProcessor`
+- Factory unit tests
 
-**Objectif :** APVTS layout complet construit et validé au startup.
+**Objective:** Complete APVTS layout built and validated at startup.
 
-### 8.4 Phase #4 : Business Logic (métier)
+### 8.4 Phase #4: Business Logic (business)
 
-**Durée :** 5-7 jours
+**Duration:** 5-7 days
 
-**Livrables :**
+**Deliverables:**
 
 - `PatchModel`, `SysExParser` (parsing, validation, checksum)
-- `MidiManager` (thread dédié, I/O MIDI, timeouts, Device Inquiry)
+- `MidiManager` (dedicated thread, MIDI I/O, timeouts, Device Inquiry)
 - `PatchManager`, `MasterManager`, `ClipboardManager`
 - `SysExSerializer`, `FileLoader`, `FileWriter`
-- Tests unitaires (SysExParser, PatchModel, MidiManager, ClipboardManager)
+- Unit tests (SysExParser, PatchModel, MidiManager, ClipboardManager)
 
-**Objectif :** Logique métier robuste, testée, thread-safe.
+**Objective:** Robust, tested, thread-safe business logic.
 
-### 8.5 Phase #5 : UI Modules (utilise Components + Descriptors)
+### 8.5 Phase #5: UI Modules (uses Components + Descriptors)
 
-**Durée :** 4-5 jours
+**Duration:** 4-5 days
 
-**Livrables :**
+**Deliverables:**
 
 - `DcoModule`, `EnvModule`, `LfoModule`, `VcfVcaModule`, `ModulationBus`
-- Lisent les Descriptors, créent Components (sliders, comboboxes, etc.)
-- Layout responsive
+- Read Descriptors, create Components (sliders, comboboxes, etc.)
+- Responsive layout
 
-**Objectif :** Modules UI complexes construits à partir de Components + Descriptors.
+**Objective:** Complex UI modules built from Components + Descriptors.
 
-### 8.6 Phase #6 : UI Sections (utilise Modules + Factory)
+### 8.6 Phase #6: UI Sections (uses Modules + Factory)
 
-**Durée :** 4-5 jours
+**Duration:** 4-5 days
 
-**Livrables :**
+**Deliverables:**
 
 - `PatchEditSection`, `MatrixModulationSection`, `PatchManagerSection`, `MasterEditSection`
-- Intègrent les modules, gèrent interactions utilisateur
-- Dispatch actions vers PluginProcessor/MidiManager
+- Integrate modules, handle user interactions
+- Dispatch actions to PluginProcessor/MidiManager
 
-**Objectif :** Sections complètes et interactives.
+**Objective:** Complete and interactive sections.
 
-### 8.7 Phase #7 : MainEditor + Thèmes
+### 8.7 Phase #7: MainEditor + Themes
 
-**Durée :** 2-3 jours
+**Duration:** 2-3 days
 
-**Livrables :**
+**Deliverables:**
 
-- `MainEditor` (assemble toutes sections)
+- `MainEditor` (assembles all sections)
 - `MatrixLookAndFeelBase`, `MatrixLookAndFeelBlack`, `MatrixLookAndFeelCream`
 - `ThemeManager` (switch Black/Cream)
-- UI scalable (zoom 50-200%)
+- Scalable UI (zoom 50-200%)
 
-**Objectif :** Interface complète, themable, resizable.
+**Objective:** Complete interface, themable, resizable.
 
-### 8.8 Phase #9 : Integration + Testing
+### 8.8 Phase #9: Integration + Testing
 
-**Durée :** 3-5 jours
+**Duration:** 3-5 days
 
-**Livrables :**
+**Deliverables:**
 
-- Tests d'intégration complets
-- Déboggage MIDI avec vrai Matrix-1000 (si possible)
-- Optimisations performances
-- Refinement UI/UX
+- Complete integration tests
+- MIDI debugging with real Matrix-1000 (if possible)
+- Performance optimizations
+- UI/UX refinement
 
-**Objectif :** Produit stable v1.0 prêt release.
+**Objective:** Stable v1.0 product ready for release.
 
-### 8.9 Dépendances entre phases
+### 8.9 Dependencies between phases
 
 ```
 Phase #1 (Components)
@@ -879,21 +879,22 @@ Phase #7 (MainEditor)
 Phase #8 (Integration + Testing)
 ```
 
-### 8.10 Timeline estimée
+### 8.10 Estimated timeline
 
-| Phase | Durée | Cumul  |
-| ----- | ----- | ------ |
-| 1     | 3-4j  | 3-4j   |
-| 2     | 2-3j  | 5-7j   |
-| 3     | 2-3j  | 7-10j  |
-| 4     | 5-7j  | 12-17j |
-| 5     | 4-5j  | 16-22j |
-| 6     | 4-5j  | 20-27j |
-| 7     | 2-3j  | 22-30j |
-| 8     | 3-5j  | 25-35j |
+| Phase | Duration | Cumulative |
+| ----- | -------- | ---------- |
+| 1     | 3-4d     | 3-4d       |
+| 2     | 2-3d     | 5-7d       |
+| 3     | 2-3d     | 7-10d      |
+| 4     | 5-7d     | 12-17d     |
+| 5     | 4-5d     | 16-22d     |
+| 6     | 4-5d     | 20-27d     |
+| 7     | 2-3d     | 22-30d     |
+| 8     | 3-5d     | 25-35d     |
 
-**Total estimé : 4-6 semaines (25-35 jours de dev complet)**
+**Total estimated: 4-6 weeks (25-35 full development days)**
 
 ---
 
-Copyright © 2025 Ten Square Software. Tous droits réservés.
+Copyright © 2025 Ten Square Software. All rights reserved.
+
