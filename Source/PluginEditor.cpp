@@ -17,7 +17,7 @@ void PluginEditor::paint(juce::Graphics& g)
     
     g.setColour(juce::Colours::white);
     g.setFont(20.0f);
-    g.drawFittedText("Matrix-Control", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText("Ten Square Software | Matrix-Control", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void PluginEditor::resized()
