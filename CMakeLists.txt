@@ -26,7 +26,18 @@ set(PLUGIN_SOURCES
     Source/PluginEditor.cpp
     Source/PluginFactory.cpp
     
-    # Add your new source files below
+    # Business - MIDI Communication Layer
+    Source/Business/MIDI/Ports/MidiInputPort.cpp
+    Source/Business/MIDI/Ports/MidiOutputPort.cpp
+    Source/Business/MIDI/Transport/MidiSender.cpp
+    Source/Business/MIDI/Transport/MidiReceiver.cpp
+    Source/Business/MIDI/MidiManager.cpp
+    Source/Business/MIDI/SysEx/SysExParser.cpp
+    Source/Business/MIDI/SysEx/SysExDecoder.cpp
+    Source/Business/MIDI/SysEx/SysExEncoder.cpp
+    
+    # Utilities
+    Source/Business/MIDI/Utilities/MidiLogger.cpp
 )
 
 # ============================================================================

@@ -5,7 +5,9 @@
     "cmake.configureEnvironment": {
         "JUCE_DIR": "/Applications/JUCE"
     },
-    
+    "cmake.configureArgs": [
+        "-DCMAKE_BUILD_TYPE=Debug"
+    ],
     "cmake.configureOnEdit": false,
     "cmake.buildBeforeRun": true,
     "cmake.saveBeforeBuild": true,

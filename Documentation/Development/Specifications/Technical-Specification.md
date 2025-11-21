@@ -378,11 +378,11 @@ private:
 
 **Three distinct threads:**
 
-| Thread   | Responsibilities                    | Constraints                                        |
-| -------- | ----------------------------------- | -------------------------------------------------- |
-| **Audio** | `processBlock()` DAW                | NO blocking, NO I/O, updates APVTS only           |
-| **GUI**  | User events, component updates      | Listen APVTS, dispatch MIDI commands              |
-| **MIDI** | Send/receive SysEx, parsing, timeouts | Blocking OK, I/O allowed, update APVTS thread-safe |
+| Thread    | Responsibilities                      | Constraints                                        |
+| --------- | ------------------------------------- | -------------------------------------------------- |
+| **Audio** | `processBlock()` DAW                  | NO blocking, NO I/O, updates APVTS only            |
+| **GUI**   | User events, component updates        | Listen APVTS, dispatch MIDI commands               |
+| **MIDI**  | Send/receive SysEx, parsing, timeouts | Blocking OK, I/O allowed, update APVTS thread-safe |
 
 ### 4.2 Inter-thread communication
 
@@ -897,4 +897,3 @@ Phase #8 (Integration + Testing)
 ---
 
 Copyright © 2025 Ten Square Software. All rights reserved.
-

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <memory>
+
+class MidiManager;
 
 class PluginProcessor : public juce::AudioProcessor
 {
@@ -8,6 +11,7 @@ public:
     PluginProcessor();
     ~PluginProcessor() override;
 
+    void extracted();
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
@@ -31,6 +35,23 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState& getApvts() noexcept { return apvts; }
+    const juce::AudioProcessorValueTreeState& getApvts() const noexcept { return apvts; }
+
+    void startMidiThread();
+    void stopMidiThread();
+
+    MidiManager& getMidiManager() noexcept { return *midiManager; }
+    const MidiManager& getMidiManager() const noexcept { return *midiManager; }
+
+    void setMidiInputPort(const juce::String& deviceId);
+    void setMidiOutputPort(const juce::String& deviceId);
+
 private:
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    juce::AudioProcessorValueTreeState apvts;
+    std::unique_ptr<MidiManager> midiManager;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };

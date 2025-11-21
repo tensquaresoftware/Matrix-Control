@@ -75,12 +75,12 @@ DCO 1, DCO 2, VCF/VCA, FM/TRACK, RAMP/PORTAMENTO, ENV 1, ENV 2, ENV 3, LFO 1, LF
 
 The plugin provides 4 initialization actions per module:
 
-| Action                      | Function                                                                   |
-| --------------------------- | -------------------------------------------------------------------------- |
-| Double-click on parameter  | Resets the individual parameter (from INIT.syx or default value)          |
-| Button `I` (Init Module)   | Resets all parameters of the module                                       |
-| Button `C` (Copy Module)   | Copies the module to clipboard (type-aware, persistent)                   |
-| Button `P` (Paste Module)  | Pastes compatible parameters from clipboard                                |
+| Action                    | Function                                                         |
+| ------------------------- | ---------------------------------------------------------------- |
+| Double-click on parameter | Resets the individual parameter (from INIT.syx or default value) |
+| Button `I` (Init Module)  | Resets all parameters of the module                              |
+| Button `C` (Copy Module)  | Copies the module to clipboard (type-aware, persistent)          |
+| Button `P` (Paste Module) | Pastes compatible parameters from clipboard                      |
 
 **Constraints:**
 
@@ -130,11 +130,11 @@ This distinction is necessary to ensure compatibility with the Matrix-1000 SysEx
 
 The modulation matrix complements synthesis parameters. It provides access to 10 identical modulation buses, numbered 0 to 9, each with 3 parameters: `Source` / `Amount` / `Destination`.
 
-| Parameter     | Type        | Range                         | Behavior      |
-| ------------- | ----------- | ----------------------------- | ------------- |
-| `Source`      | Enumeration | None, Env1-3, LFO1-2, ...    | Never grayed  |
-| `Amount`      | Signed      | -63 to +63                    | Never grayed  |
-| `Destination` | Enumeration | None, Dco1 Freq, Dco1 PW, ... | Never grayed  |
+| Parameter     | Type        | Range                         | Behavior     |
+| ------------- | ----------- | ----------------------------- | ------------ |
+| `Source`      | Enumeration | None, Env1-3, LFO1-2, ...     | Never grayed |
+| `Amount`      | Signed      | -63 to +63                    | Never grayed |
+| `Destination` | Enumeration | None, Dco1 Freq, Dco1 PW, ... | Never grayed |
 
 **Behavior:**
 
@@ -169,10 +169,10 @@ This section does not exist as such in the synth; it extends the Matrix-1000's c
 
 #### BANK UTILITY Module
 
-| Control                           | Function                                                                                                        |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| SELECT BANK :<br/>Buttons `0`-`9` | Selects and automatically locks the current bank<br/>Message displayed: `"Bank X selected and locked"`        |
-| Button `UNLOCK`                    | Unlocks the current bank<br/>Message displayed: `"Current bank unlocked"`                                      |
+| Control                           | Function                                                                                               |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| SELECT BANK :<br/>Buttons `0`-`9` | Selects and automatically locks the current bank<br/>Message displayed: `"Bank X selected and locked"` |
+| Button `UNLOCK`                   | Unlocks the current bank<br/>Message displayed: `"Current bank unlocked"`                              |
 
 **Technical implementation:**
 
@@ -188,9 +188,9 @@ Navigation through synth banks and patch memories.
 
 ##### BROWSER Group
 
-| Control                    | Description                                                                                                                                                                    |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Display<br/>`Bank Number` | Integer (0–9) read-only<br/>Modifiable via BANK UTILITY module                                                                                                                |
+| Control                    | Description                                                                                                                                                            |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display<br/>`Bank Number`  | Integer (0–9) read-only<br/>Modifiable via BANK UTILITY module                                                                                                         |
 | Display<br/>`Patch Number` | Integer (00–99) editable via double-click<br/>Sends Program Change if valid<br/>Error message if invalid: `"Patch number is invalid : it must be in the range 00–99."` |
 
 **Use cases:**
@@ -199,13 +199,13 @@ Navigation through synth banks and patch memories.
 
 ##### UTILITY Group
 
-| Control              | Function                                                                                                                                                              |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Buttons<br/>`<` `>` | Circular navigation through patches<br/>• Bank locked: navigation within this bank only<br/>• Bank unlocked: global navigation (1000 patches)                        |
-| Button<br/>`INIT`   | Loads patch from INIT.syx (or default values) and immediately sends it to the synth                                                                                  |
-| Button<br/>`COPY`   | Copies current patch to clipboard                                                                                                                                   |
-| Button<br/>`PASTE`  | Pastes patch from clipboard<br/>• Active if clipboard compatible AND bank 0-1 (RAM)<br/>• Grayed if bank 2–9 (ROM)                                                 |
-| Button<br/>`STORE`  | Saves patch to synth memory<br/>• Active if bank 0–1 (RAM)<br/>• Grayed if bank 2–9 (ROM)                                                                         |
+| Control             | Function                                                                                                                                      |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Buttons<br/>`<` `>` | Circular navigation through patches<br/>• Bank locked: navigation within this bank only<br/>• Bank unlocked: global navigation (1000 patches) |
+| Button<br/>`INIT`   | Loads patch from INIT.syx (or default values) and immediately sends it to the synth                                                           |
+| Button<br/>`COPY`   | Copies current patch to clipboard                                                                                                             |
+| Button<br/>`PASTE`  | Pastes patch from clipboard<br/>• Active if clipboard compatible AND bank 0-1 (RAM)<br/>• Grayed if bank 2–9 (ROM)                            |
+| Button<br/>`STORE`  | Saves patch to synth memory<br/>• Active if bank 0–1 (RAM)<br/>• Grayed if bank 2–9 (ROM)                                                     |
 
 **STORE button implementation:**
 
@@ -225,18 +225,18 @@ Navigation through a folder of computer patches, stored as local .syx files.
 
 ##### BROWSER Group
 
-| Control                 | Description                                                                                                                                    |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Buttons<br/>`<` `>`     | Circular navigation through valid patches in folder<br/>• Active if at least 2 valid patches<br/>• Grayed otherwise                            |
-| ComboBox<br/>`Patch File` | List of valid patches sorted alphabetically<br/>• Grayed if no folder open or no valid patches<br/>• Displays `"No Patch !"` if empty      |
+| Control                   | Description                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Buttons<br/>`<` `>`       | Circular navigation through valid patches in folder<br/>• Active if at least 2 valid patches<br/>• Grayed otherwise                   |
+| ComboBox<br/>`Patch File` | List of valid patches sorted alphabetically<br/>• Grayed if no folder open or no valid patches<br/>• Displays `"No Patch !"` if empty |
 
 ##### FOLDER & FILES Group
 
-| Control            | Function                                                                                                                                                                                              |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Button<br/>`OPEN`  | Opens a folder via system dialog<br/>Scans and validates .syx files (structure + checksum)<br/>Loads first valid patch<br/>Message displayed: `"Found X .syx files (Y valid, Z invalid)"` |
-| Button<br/>`SAVE AS` | Saves via system dialog<br/>Stores full file path in Preferences<br/>Activates `SAVE` button                                                                                                        |
-| Button<br/>`SAVE`  | Quick save (overwrites stored file without confirmation)<br/>Grayed by default at startup                                                                                                            |
+| Control              | Function                                                                                                                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button<br/>`OPEN`    | Opens a folder via system dialog<br/>Scans and validates .syx files (structure + checksum)<br/>Loads first valid patch<br/>Message displayed: `"Found X .syx files (Y valid, Z invalid)"` |
+| Button<br/>`SAVE AS` | Saves via system dialog<br/>Stores full file path in Preferences<br/>Activates `SAVE` button                                                                                              |
+| Button<br/>`SAVE`    | Quick save (overwrites stored file without confirmation)<br/>Grayed by default at startup                                                                                                 |
 
 **Constraints:**
 
@@ -288,15 +288,15 @@ All MASTER EDIT section parameters remain active; they are never grayed out.
 
 Persistence of plugin preferences in DAW session (via APVTS) or local preferences file (Example: `~/Music/Matrix-Control/Settings.json`).
 
-| Parameter                      | Type                                               | Default                          |
-| ------------------------------ | -------------------------------------------------- | -------------------------------- |
-| Graphical theme                | Black / Cream                                      | Black                            |
-| Zoom factor                    | 50%, 75%, 100%, 110%, 125%, 150%, 200%, 300%, 400% | 100%                             |
-| Manual resizing                | Zoom factor calculated by plugin in %               | -                                |
-| MIDI input port                | String                                             | Auto-detection                   |
-| MIDI output port               | String                                             | Auto-detection                   |
-| INIT.syx file path             | File path                                          | ~/Music/Matrix-Control/INIT.syx  |
-| Last saved patch file          | File path                                          | Empty                            |
+| Parameter             | Type                                               | Default                         |
+| --------------------- | -------------------------------------------------- | ------------------------------- |
+| Graphical theme       | Black / Cream                                      | Black                           |
+| Zoom factor           | 50%, 75%, 100%, 110%, 125%, 150%, 200%, 300%, 400% | 100%                            |
+| Manual resizing       | Zoom factor calculated by plugin in %              | -                               |
+| MIDI input port       | String                                             | Auto-detection                  |
+| MIDI output port      | String                                             | Auto-detection                  |
+| INIT.syx file path    | File path                                          | ~/Music/Matrix-Control/INIT.syx |
+| Last saved patch file | File path                                          | Empty                           |
 
 ### 2.6 Message bar
 
@@ -319,24 +319,24 @@ Error   : "MIDI device disconnected"
 
 ### 3.1 Platforms and versions
 
-| Aspect          | Specifications                                                                                      |
-| --------------- | --------------------------------------------------------------------------------------------------- |
-| **macOS**       | Tahoe 26 / Xcode 26                                                                                 |
-| **Windows**     | Windows 11 / Visual Studio 2026                                                                     |
-| **Plugin formats** | VST3 (macOS & Windows), AU2 (macOS)                                                                 |
-| **Framework**   | JUCE 8.0.10 (latest stable version)                                                                 |
-| **Language**    | C++17                                                                                                |
-| **Synth**       | • Matrix-1000 only (v1.0)<br/>• Secondary compatibility with Matrix-6/6R, without guarantee          |
+| Aspect             | Specifications                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| **macOS**          | Tahoe 26 / Xcode 26                                                                         |
+| **Windows**        | Windows 11 / Visual Studio 2026                                                             |
+| **Plugin formats** | VST3 (macOS & Windows), AU2 (macOS)                                                         |
+| **Framework**      | JUCE 8.0.10 (latest stable version)                                                         |
+| **Language**       | C++17                                                                                       |
+| **Synth**          | • Matrix-1000 only (v1.0)<br/>• Secondary compatibility with Matrix-6/6R, without guarantee |
 
 ### 3.2 Architectural constraints
 
 #### Threading
 
-| Thread         | Responsibilities                    | Constraints                                                                                        |
-| -------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| **Audio**      | `processBlock()` called by DAW      | • NON-blocking!<br/>• NO MIDI I/O!<br/>• Updates only via APVTS                                    |
-| **GUI**        | User events, APVTS listeners        | • Component updates<br/>• MIDI command dispatch                                                    |
-| **MIDI (dedicated)** | Send/receive SysEx, timeouts, parsing | • Blocking OK<br/>• MIDI I/O allowed<br/>• Thread-safe updates via APVTS                            |
+| Thread               | Responsibilities                      | Constraints                                                              |
+| -------------------- | ------------------------------------- | ------------------------------------------------------------------------ |
+| **Audio**            | `processBlock()` called by DAW        | • NON-blocking!<br/>• NO MIDI I/O!<br/>• Updates only via APVTS          |
+| **GUI**              | User events, APVTS listeners          | • Component updates<br/>• MIDI command dispatch                          |
+| **MIDI (dedicated)** | Send/receive SysEx, timeouts, parsing | • Blocking OK<br/>• MIDI I/O allowed<br/>• Thread-safe updates via APVTS |
 
 #### Inter-thread communication
 
@@ -420,12 +420,12 @@ At plugin startup, or when selecting a MIDI port, the plugin automatically execu
 
 #### Disconnection handling
 
-| Case                              | Behavior                                                                                                                                                  |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIDI input port unavailable       | Message displayed: `"MIDI device disconnected or not responding"`                                                                                            |
-| MIDI output port unavailable      | Message displayed: `"MIDI device disconnected"`                                                                                                            |
-| Synth not responding (2s timeout) | Message displayed: `"Matrix-1000 not responding. Check connection and try again."`<br/>Previous value restored (case of Patch Number editing)           |
-| Reconnection detected             | Message displayed: `"MIDI device / Matrix-1000 reconnected."`<br/>Automatic re-execution of initial synchronization                                         |
+| Case                              | Behavior                                                                                                                                      |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIDI input port unavailable       | Message displayed: `"MIDI device disconnected or not responding"`                                                                             |
+| MIDI output port unavailable      | Message displayed: `"MIDI device disconnected"`                                                                                               |
+| Synth not responding (2s timeout) | Message displayed: `"Matrix-1000 not responding. Check connection and try again."`<br/>Previous value restored (case of Patch Number editing) |
+| Reconnection detected             | Message displayed: `"MIDI device / Matrix-1000 reconnected."`<br/>Automatic re-execution of initial synchronization                           |
 
 **Constraints:**
 
@@ -528,20 +528,20 @@ Critical classes to test (JUCE Framework):
 
 The table below summarizes all SysEx messages used by the Matrix-Control plugin:
 
-| Opcode      | Name                            | Direction      | Usage                                  | Format                                 |
-| ----------- | ------------------------------- | -------------- | -------------------------------------- | --------------------------------------- |
-| 01H         | Single Patch Data               | Plugin → Synth | Load/store patch in memory             | F0H 10H 06H 01H NN DATA CS F7H          |
-| 03H         | Master Parameter Data           | Plugin ↔ Synth | Send/receive master parameters         | F0H 10H 06H 03H VER DATA CS F7H         |
-| 04H (type 3) | Request Data - Master            | Plugin → Synth | Request master parameters               | F0H 10H 06H 04H 03H 00H F7H             |
-| 04H (type 4) | Request Data - Edit Buffer       | Plugin → Synth | Request current patch                   | F0H 10H 06H 04H 04H 00H F7H             |
-| 06H         | Remote Parameter Edit           | Plugin → Synth | Edit individual patch parameter         | F0H 10H 06H 06H PP VV F7H               |
-| 0AH         | Set Bank                        | Plugin → Synth | Bank selection and locking              | F0H 10H 06H 0AH BB F7H                  |
-| 0BH         | Remote Parameter Edit (Matrix)  | Plugin → Synth | Edit matrix bus                        | F0H 10H 06H 0BH BB SS AM DD F7H         |
-| 0CH         | Unlock Bank                     | Plugin → Synth | Bank unlocking                          | F0H 10H 06H 0CH F7H                     |
-| 0DH         | Patch to Edit Buffer            | Plugin → Synth | Load patch to edit buffer               | F0H 10H 06H 0DH DATA CS F7H              |
-| 0EH         | Store Edit Buffer               | Plugin → Synth | Save edit buffer to memory              | F0H 10H 06H 0EH NN BB ID F7H            |
-| -           | Device Inquiry                  | Plugin → Synth | Synth auto-detection                   | F0H 7EH CC 06H 01H F7H                  |
-| -           | Device ID                       | Synth → Plugin | Identification response                 | F0H 7EH CC 06H 02H MFG FAM MEM REV F7H |
+| Opcode       | Name                           | Direction      | Usage                           | Format                                 |
+| ------------ | ------------------------------ | -------------- | ------------------------------- | -------------------------------------- |
+| 01H          | Single Patch Data              | Plugin → Synth | Load/store patch in memory      | F0H 10H 06H 01H NN DATA CS F7H         |
+| 03H          | Master Parameter Data          | Plugin ↔ Synth | Send/receive master parameters  | F0H 10H 06H 03H VER DATA CS F7H        |
+| 04H (type 3) | Request Data - Master          | Plugin → Synth | Request master parameters       | F0H 10H 06H 04H 03H 00H F7H            |
+| 04H (type 4) | Request Data - Edit Buffer     | Plugin → Synth | Request current patch           | F0H 10H 06H 04H 04H 00H F7H            |
+| 06H          | Remote Parameter Edit          | Plugin → Synth | Edit individual patch parameter | F0H 10H 06H 06H PP VV F7H              |
+| 0AH          | Set Bank                       | Plugin → Synth | Bank selection and locking      | F0H 10H 06H 0AH BB F7H                 |
+| 0BH          | Remote Parameter Edit (Matrix) | Plugin → Synth | Edit matrix bus                 | F0H 10H 06H 0BH BB SS AM DD F7H        |
+| 0CH          | Unlock Bank                    | Plugin → Synth | Bank unlocking                  | F0H 10H 06H 0CH F7H                    |
+| 0DH          | Patch to Edit Buffer           | Plugin → Synth | Load patch to edit buffer       | F0H 10H 06H 0DH DATA CS F7H            |
+| 0EH          | Store Edit Buffer              | Plugin → Synth | Save edit buffer to memory      | F0H 10H 06H 0EH NN BB ID F7H           |
+| -            | Device Inquiry                 | Plugin → Synth | Synth auto-detection            | F0H 7EH CC 06H 01H F7H                 |
+| -            | Device ID                      | Synth → Plugin | Identification response         | F0H 7EH CC 06H 02H MFG FAM MEM REV F7H |
 
 **Legend:**
 
@@ -599,4 +599,3 @@ The table below summarizes all SysEx messages used by the Matrix-Control plugin:
 ---
 
 Copyright © 2025 Ten Square Software. All rights reserved.
-

@@ -5,7 +5,7 @@
             "name": "Debug: Standalone",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
+            "program": "${workspaceFolder}/build/Matrix-Control_artefacts/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
             "args": [],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build: Standalone"

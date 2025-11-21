@@ -61,11 +61,13 @@
 [Conventions de nommage]
 - Variables & Méthodes : lowerCamelCase
   * Exemple : audioBuffer, processMidiEvents(), getSampleRate()
+- Variables privées : pas de préfixe ni suffixe (underscore ou autre)
+  * Exemple : apvts
 - Constantes : kConstantName (private par défaut)
   * Exemple : kMaxBufferSize, kDefaultChannels
 - Classes : PascalCase
   * Exemple : PluginProcessor, PluginEditor, AudioAnalyzer
-- Éviter les underscore_case sauf cas très particulier
+- Éviter les underscore_case, sauf cas très particulier
 
 [Organisation des includes]
 1. Headers système C++ (ex : <vector>, <memory>)
@@ -75,7 +77,7 @@
 [Principes SOLID & Clean Code]
 - Code lisible et compréhensible par un humain
 - Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
-- Pas de commentaires inutiles ou évidents
+- Pas de commentaires inutiles ou évidents : refactoriser avec un nom de fonction explicite !
 - Fonctions courtes : 5-15 lignes idéalement
 - Un seul niveau d'abstraction par fonction
 - Une seule responsabilité (Single Responsibility)
