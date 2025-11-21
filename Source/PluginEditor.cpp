@@ -7,26 +7,10 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     , midiInputLabel("MidiInputLabel", "MIDI Input:")
     , midiOutputLabel("MidiOutputLabel", "MIDI Output:")
 {
-    // Setup MIDI Input label and combo box
-    midiInputLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-    midiInputLabel.attachToComponent(&midiInputComboBox, true);
-    midiInputComboBox.addListener(this);
-    addAndMakeVisible(midiInputComboBox);
-    addAndMakeVisible(midiInputLabel);
-    
-    // Setup MIDI Output label and combo box
-    midiOutputLabel.setColour(juce::Label::textColourId, juce::Colours::white);
-    midiOutputLabel.attachToComponent(&midiOutputComboBox, true);
-    midiOutputComboBox.addListener(this);
-    addAndMakeVisible(midiOutputComboBox);
-    addAndMakeVisible(midiOutputLabel);
-    
-    // Populate combo boxes with available MIDI ports
+    setupMidiInputComponents();
+    setupMidiOutputComponents();
     populateMidiPorts();
-    
-    // Restore selected ports from APVTS
     updateMidiPorts();
-    
     setSize(400, 300);
 }
 
@@ -75,47 +59,129 @@ void PluginEditor::comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged)
 {
     if (comboBoxThatHasChanged == &midiInputComboBox)
     {
-        int selectedId = midiInputComboBox.getSelectedId();
-        if (selectedId == 1)
-        {
-            // "None" selected
-            pluginProcessor.getApvts().state.setProperty("midiInputPortId", juce::String(), nullptr);
-        }
-        else if (selectedId > 1)
-        {
-            juce::String deviceName = midiInputComboBox.getItemText(selectedId - 1);
-            // Find the actual device ID from the name
-            auto devices = juce::MidiInput::getAvailableDevices();
-            int deviceIndex = selectedId - 2; // selectedId 2 = device index 0
-            if (deviceIndex >= 0 && deviceIndex < devices.size())
-            {
-                pluginProcessor.setMidiInputPort(devices[deviceIndex].identifier);
-            }
-        }
+        handleMidiInputSelection(midiInputComboBox.getSelectedId());
     }
     else if (comboBoxThatHasChanged == &midiOutputComboBox)
     {
-        int selectedId = midiOutputComboBox.getSelectedId();
-        if (selectedId == 1)
-        {
-            // "None" selected
-            pluginProcessor.getApvts().state.setProperty("midiOutputPortId", juce::String(), nullptr);
-        }
-        else if (selectedId > 1)
-        {
-            juce::String deviceName = midiOutputComboBox.getItemText(selectedId - 1);
-            // Find the actual device ID from the name
-            auto devices = juce::MidiOutput::getAvailableDevices();
-            int deviceIndex = selectedId - 2; // selectedId 2 = device index 0
-            if (deviceIndex >= 0 && deviceIndex < devices.size())
-            {
-                pluginProcessor.setMidiOutputPort(devices[deviceIndex].identifier);
-            }
-        }
+        handleMidiOutputSelection(midiOutputComboBox.getSelectedId());
     }
 }
 
 void PluginEditor::populateMidiPorts()
+{
+    populateMidiInputPorts();
+    populateMidiOutputPorts();
+}
+
+void PluginEditor::updateMidiPorts()
+{
+    restoreMidiInputPort();
+    restoreMidiOutputPort();
+}
+
+void PluginEditor::setupMidiInputComponents()
+{
+    midiInputLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    midiInputLabel.attachToComponent(&midiInputComboBox, true);
+    midiInputComboBox.addListener(this);
+    addAndMakeVisible(midiInputComboBox);
+    addAndMakeVisible(midiInputLabel);
+}
+
+void PluginEditor::setupMidiOutputComponents()
+{
+    midiOutputLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    midiOutputLabel.attachToComponent(&midiOutputComboBox, true);
+    midiOutputComboBox.addListener(this);
+    addAndMakeVisible(midiOutputComboBox);
+    addAndMakeVisible(midiOutputLabel);
+}
+
+void PluginEditor::handleMidiInputSelection(int selectedId)
+{
+    if (selectedId == 1)
+    {
+        pluginProcessor.getApvts().state.setProperty("midiInputPortId", juce::String(), nullptr);
+        return;
+    }
+    
+    if (selectedId > 1)
+    {
+        auto devices = juce::MidiInput::getAvailableDevices();
+        int deviceIndex = selectedId - 2;
+        if (deviceIndex >= 0 && deviceIndex < devices.size())
+        {
+            pluginProcessor.setMidiInputPort(devices[deviceIndex].identifier);
+        }
+    }
+}
+
+void PluginEditor::handleMidiOutputSelection(int selectedId)
+{
+    if (selectedId == 1)
+    {
+        pluginProcessor.getApvts().state.setProperty("midiOutputPortId", juce::String(), nullptr);
+        return;
+    }
+    
+    if (selectedId > 1)
+    {
+        auto devices = juce::MidiOutput::getAvailableDevices();
+        int deviceIndex = selectedId - 2;
+        if (deviceIndex >= 0 && deviceIndex < devices.size())
+        {
+            pluginProcessor.setMidiOutputPort(devices[deviceIndex].identifier);
+        }
+    }
+}
+
+void PluginEditor::restoreMidiInputPort()
+{
+    auto inputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId").toString();
+    if (inputPortId.isEmpty())
+    {
+        midiInputComboBox.setSelectedId(1, juce::dontSendNotification);
+        return;
+    }
+    
+    auto devices = juce::MidiInput::getAvailableDevices();
+    for (int i = 0; i < devices.size(); ++i)
+    {
+        if (devices[i].identifier == inputPortId)
+        {
+            midiInputComboBox.setSelectedId(i + 2, juce::dontSendNotification);
+            pluginProcessor.setMidiInputPort(inputPortId);
+            return;
+        }
+    }
+    
+    midiInputComboBox.setSelectedId(1, juce::dontSendNotification);
+}
+
+void PluginEditor::restoreMidiOutputPort()
+{
+    auto outputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId").toString();
+    if (outputPortId.isEmpty())
+    {
+        midiOutputComboBox.setSelectedId(1, juce::dontSendNotification);
+        return;
+    }
+    
+    auto devices = juce::MidiOutput::getAvailableDevices();
+    for (int i = 0; i < devices.size(); ++i)
+    {
+        if (devices[i].identifier == outputPortId)
+        {
+            midiOutputComboBox.setSelectedId(i + 2, juce::dontSendNotification);
+            pluginProcessor.setMidiOutputPort(outputPortId);
+            return;
+        }
+    }
+    
+    midiOutputComboBox.setSelectedId(1, juce::dontSendNotification);
+}
+
+void PluginEditor::populateMidiInputPorts()
 {
     midiInputComboBox.clear();
     midiInputComboBox.addItem("None", 1);
@@ -127,64 +193,18 @@ void PluginEditor::populateMidiPorts()
     {
         midiInputComboBox.addItem(device.name, itemId++);
     }
-    
+}
+
+void PluginEditor::populateMidiOutputPorts()
+{
     midiOutputComboBox.clear();
     midiOutputComboBox.addItem("None", 1);
     midiOutputComboBox.setSelectedId(1, juce::dontSendNotification);
     
-    itemId = 2;
+    int itemId = 2;
     auto outputDevices = juce::MidiOutput::getAvailableDevices();
     for (const auto& device : outputDevices)
     {
         midiOutputComboBox.addItem(device.name, itemId++);
-    }
-}
-
-void PluginEditor::updateMidiPorts()
-{
-    // Restore MIDI Input selection
-    auto inputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId").toString();
-    bool inputFound = false;
-    if (inputPortId.isNotEmpty())
-    {
-        auto devices = juce::MidiInput::getAvailableDevices();
-        for (int i = 0; i < devices.size(); ++i)
-        {
-            if (devices[i].identifier == inputPortId)
-            {
-                midiInputComboBox.setSelectedId(i + 2, juce::dontSendNotification);
-                // Actually open the MIDI input port
-                pluginProcessor.setMidiInputPort(inputPortId);
-                inputFound = true;
-                break;
-            }
-        }
-    }
-    if (!inputFound)
-    {
-        midiInputComboBox.setSelectedId(1, juce::dontSendNotification); // "None"
-    }
-    
-    // Restore MIDI Output selection
-    auto outputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId").toString();
-    bool outputFound = false;
-    if (outputPortId.isNotEmpty())
-    {
-        auto devices = juce::MidiOutput::getAvailableDevices();
-        for (int i = 0; i < devices.size(); ++i)
-        {
-            if (devices[i].identifier == outputPortId)
-            {
-                midiOutputComboBox.setSelectedId(i + 2, juce::dontSendNotification);
-                // Actually open the MIDI output port
-                pluginProcessor.setMidiOutputPort(outputPortId);
-                outputFound = true;
-                break;
-            }
-        }
-    }
-    if (!outputFound)
-    {
-        midiOutputComboBox.setSelectedId(1, juce::dontSendNotification); // "None"
     }
 }

@@ -1,6 +1,7 @@
+#include <thread>
+
 #include "MidiReceiver.h"
 #include "../Utilities/MidiLogger.h"
-#include <thread>
 
 MidiReceiver::MidiReceiver()
     : midiInput(nullptr)

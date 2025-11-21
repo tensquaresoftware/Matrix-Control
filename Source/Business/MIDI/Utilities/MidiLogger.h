@@ -1,9 +1,12 @@
 #pragma once
 
-#include <juce_core/juce_core.h>
 #include <fstream>
 #include <memory>
 #include <mutex>
+
+#include <juce_core/juce_core.h>
+
+#include "../SysEx/SysExParser.h"
 
 class MidiLogger
 {
@@ -70,6 +73,9 @@ private:
     void appendHexByteWithSpace(juce::String& hexString, uint8_t byte, bool isLastByte) const;
     juce::String buildTimestampString() const;
     void createLogDirectoryIfNeeded(juce::File& logDir) const;
+    juce::String analyzeSysExMessage(const juce::MemoryBlock& sysEx) const;
+    uint8_t extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const;
+    juce::MemoryBlock addSysExDelimiters(const juce::MemoryBlock& sysEx) const;
     
     LogLevel currentLogLevel = LogLevel::kInfo;
     bool logToFile = false;

@@ -1,5 +1,8 @@
-#include "MidiLogger.h"
 #include <iostream>
+
+#include "MidiLogger.h"
+#include "../SysEx/SysExParser.h"
+#include "../SysEx/SysExConstants.h"
 
 MidiLogger& MidiLogger::getInstance()
 {
@@ -245,9 +248,16 @@ void MidiLogger::logSysExReceived(const juce::MemoryBlock& sysEx, const juce::St
     if (LogLevel::kDebug > currentLogLevel)
         return;
     
-    juce::String message = buildSysExHeaderMessage("RECEIVED", description, sysEx.getSize());
-    logMessage(LogLevel::kDebug, message);
+    juce::ignoreUnused(description);
+    
+    logMessage(LogLevel::kDebug, "Received SysEx data:");
     writeLogRaw(formatSysExMessage(sysEx));
+    
+    juce::String analysis = analyzeSysExMessage(sysEx);
+    if (analysis.isNotEmpty())
+    {
+        logMessage(LogLevel::kInfo, analysis);
+    }
 }
 
 void MidiLogger::logProgramChange(uint8_t programNumber, const juce::String& direction)
@@ -381,5 +391,95 @@ juce::String MidiLogger::buildTimestampString() const
 juce::String MidiLogger::getTimestamp() const
 {
     return buildTimestampString();
+}
+
+juce::String MidiLogger::analyzeSysExMessage(const juce::MemoryBlock& sysEx) const
+{
+    if (sysEx.getSize() < 2)
+    {
+        return {};
+    }
+    
+    juce::MemoryBlock completeSysEx = addSysExDelimiters(sysEx);
+    
+    SysExParser parser;
+    auto validation = parser.validateSysEx(completeSysEx);
+    
+    if (!validation.isValid)
+    {
+        return {};
+    }
+    
+    juce::String analysis;
+    
+    switch (validation.messageType)
+    {
+        case SysExParser::MessageType::kPatch:
+            analysis = "Valid Patch received";
+            break;
+        case SysExParser::MessageType::kMaster:
+            analysis = "Valid Master received";
+            break;
+        case SysExParser::MessageType::kDeviceId:
+        case SysExParser::MessageType::kSplitPatch:
+        case SysExParser::MessageType::kUnknown:
+        default:
+            return {};
+    }
+    
+    uint8_t checksum = extractChecksumFromSysEx(completeSysEx);
+    analysis += " | Checksum: 0x" + juce::String::toHexString(checksum).paddedLeft('0', 2).toUpperCase();
+    
+    return analysis;
+}
+
+uint8_t MidiLogger::extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const
+{
+    if (sysEx.getSize() < 2)
+    {
+        return 0;
+    }
+    
+    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    
+    if (data[0] == SysExConstants::kSysExStart && 
+        data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId)
+    {
+        return 0;
+    }
+    
+    if (sysEx.getSize() >= 2 && data[sysEx.getSize() - 1] == SysExConstants::kSysExEnd)
+    {
+        size_t checksumIndex = sysEx.getSize() - 2;
+        return data[checksumIndex];
+    }
+    
+    return 0;
+}
+
+juce::MemoryBlock MidiLogger::addSysExDelimiters(const juce::MemoryBlock& sysEx) const
+{
+    if (sysEx.getSize() == 0)
+    {
+        return sysEx;
+    }
+    
+    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    
+    if (data[0] == SysExConstants::kSysExStart && 
+        data[sysEx.getSize() - 1] == SysExConstants::kSysExEnd)
+    {
+        return sysEx;
+    }
+    
+    juce::MemoryBlock completeSysEx;
+    uint8_t startByte = SysExConstants::kSysExStart;
+    uint8_t endByte = SysExConstants::kSysExEnd;
+    
+    completeSysEx.append(&startByte, 1);
+    completeSysEx.append(sysEx.getData(), sysEx.getSize());
+    completeSysEx.append(&endByte, 1);
+    
+    return completeSysEx;
 }
 

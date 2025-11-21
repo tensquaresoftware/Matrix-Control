@@ -1,8 +1,9 @@
+#include <juce_audio_devices/juce_audio_devices.h>
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Business/MIDI/MidiManager.h"
 #include "Business/MIDI/Utilities/MidiLogger.h"
-#include <juce_audio_devices/juce_audio_devices.h>
 
 PluginProcessor::PluginProcessor()
     : AudioProcessor(BusesProperties()
@@ -94,22 +95,24 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
     juce::ignoreUnused(index, newName);
 }
 
-void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
-  juce::ignoreUnused(sampleRate, samplesPerBlock);
-  
-  // Enable file logging now that JUCE is fully initialized
-  // This creates a new timestamped log file for each session
-  MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
-  MidiLogger::getInstance().setLogToFile(true);
-  
-  startMidiThread();
+void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+{
+    juce::ignoreUnused(sampleRate, samplesPerBlock);
+    
+    // Enable file logging now that JUCE is fully initialized
+    // This creates a new timestamped log file for each session
+    MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
+    MidiLogger::getInstance().setLogToFile(true);
+    
+    startMidiThread();
 }
 
 void PluginProcessor::startMidiThread()
 {
-  if (midiManager != nullptr && !midiManager->isThreadRunning()) {
-    midiManager->startThread();
-  }
+    if (midiManager != nullptr && !midiManager->isThreadRunning())
+    {
+        midiManager->startThread();
+    }
 }
 
 void PluginProcessor::releaseResources()

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <juce_audio_processors/juce_audio_processors.h>
 #include <memory>
+
+#include <juce_audio_processors/juce_audio_processors.h>
 
 class MidiManager;
 
@@ -11,7 +12,6 @@ public:
     PluginProcessor();
     ~PluginProcessor() override;
 
-    void extracted();
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;

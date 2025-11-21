@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_core/juce_core.h>
+
 #include "../Exceptions/Exceptions.h"
 #include "SysExConstants.h"
 
@@ -46,6 +47,11 @@ public:
 private:
     bool validateManufacturerAndDevice(const juce::MemoryBlock& sysEx) const;
     static MessageType getMessageTypeFromOpcode(uint8_t opcode);
+    static bool isDeviceInquiryMessage(const uint8_t* data);
+    static std::vector<uint8_t> packNibblesToBytes(const uint8_t* nibbles, size_t numNibbles);
+    static bool isDeviceIdResponse(const uint8_t* data);
+    static bool isOberheimMatrix1000Message(const uint8_t* data);
+    static size_t getExpectedMessageLength(MessageType messageType);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SysExParser)
 };

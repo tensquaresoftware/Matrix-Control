@@ -20,6 +20,14 @@ public:
 private:
     void populateMidiPorts();
     void updateMidiPorts();
+    void setupMidiInputComponents();
+    void setupMidiOutputComponents();
+    void handleMidiInputSelection(int selectedId);
+    void handleMidiOutputSelection(int selectedId);
+    void restoreMidiInputPort();
+    void restoreMidiOutputPort();
+    void populateMidiInputPorts();
+    void populateMidiOutputPorts();
 
     PluginProcessor& pluginProcessor;
     

@@ -1,11 +1,13 @@
 #pragma once
 
-#include <juce_audio_devices/juce_audio_devices.h>
-#include <juce_core/juce_core.h>
 #include <atomic>
 #include <mutex>
 #include <vector>
 #include <chrono>
+
+#include <juce_audio_devices/juce_audio_devices.h>
+#include <juce_core/juce_core.h>
+
 #include "../Exceptions/Exceptions.h"
 #include "../SysEx/SysExConstants.h"
 

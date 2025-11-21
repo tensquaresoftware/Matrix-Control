@@ -70,14 +70,19 @@
 - Éviter les underscore_case, sauf cas très particulier
 
 [Organisation des includes]
-1. Headers système C++ (ex : <vector>, <memory>)
-2. Headers JUCE (ex : <JuceHeader.h>)
-3. Headers du projet (ex : "PatchModel.h", "AudioEngine.h")
+1. Headers système C++ (ex : <vector>, <memory>, etc. puis sauter une ligne)
+2. Headers JUCE (ex : <JuceHeader.h>, etc. puis sauter une ligne)
+3. Headers du projet (ex : "PatchModel.h", etc. puis sauter une ligne)
 
-[Principes SOLID & Clean Code]
+[Organisation des classes]
+- Regroupe les membres et les méthodes de façon logique dans les .h
+- Regrouper les méthodes de façon logique dans les .cpp, en faisant en sorte qu'une méthode appelée dans une autre méthode se trouvent proches dans le code, pour faciliter la relecture
+
+[Principes SOLID & Clean Code / Clean Architecture (Robert C. Martin)]
 - Code lisible et compréhensible par un humain
 - Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
-- Pas de commentaires inutiles ou évidents : refactoriser avec un nom de fonction explicite !
+- Pas de commentaires lorsque ceux-ci sont évidents ou inutiles
+- Toujours préférer la refactorisation d'un bloc de code avec un nom de fonction très explicite, à un commentaire qui pourrait à la longue mentir... (le code a toujours raison)
 - Fonctions courtes : 5-15 lignes idéalement
 - Un seul niveau d'abstraction par fonction
 - Une seule responsabilité (Single Responsibility)
@@ -90,7 +95,7 @@
 - Traiter les erreurs au niveau approprié
 
 [Gestion du code existant]
-- Ne JAMAIS supprimer les commentaires que j'ai moi-même placés
+- Ne JAMAIS supprimer les commentaires que j'ai moi-même placés dans le code
 - Préserver l'intégrité structurelle du code existant
 - Respecter les patterns déjà implémentés
 

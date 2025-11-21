@@ -144,9 +144,9 @@ size_t SysExDecoder::packNibbles(const uint8_t* nibbles, size_t numNibbles, uint
 }
 
 bool SysExDecoder::extractPackedData(const juce::MemoryBlock& sysEx,
-                                    size_t dataStartIndex,
-                                    size_t expectedPackedSize,
-                                    uint8_t* output) const
+                                     size_t dataStartIndex,
+                                     size_t expectedPackedSize,
+                                     uint8_t* output) const
 {
     if (output == nullptr || sysEx.getSize() < dataStartIndex + expectedPackedSize * 2 + 2)
     {

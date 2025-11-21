@@ -1,7 +1,9 @@
 #pragma once
 
-#include <juce_core/juce_core.h>
 #include <vector>
+
+#include <juce_core/juce_core.h>
+
 #include "SysExParser.h"
 
 struct DeviceIdInfo

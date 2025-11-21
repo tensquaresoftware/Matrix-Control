@@ -1,6 +1,7 @@
+#include <cstring>
+
 #include "SysExEncoder.h"
 #include "../Utilities/MidiLogger.h"
-#include <cstring>
 
 juce::MemoryBlock SysExEncoder::encodePatchSysEx(uint8_t patchNumber, const uint8_t* packedData) const
 {

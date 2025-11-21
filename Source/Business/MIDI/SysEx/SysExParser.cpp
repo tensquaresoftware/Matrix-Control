@@ -1,25 +1,23 @@
+#include <vector>
+
 #include "SysExParser.h"
 #include "SysExConstants.h"
 #include "../Utilities/MidiLogger.h"
-#include <vector>
 
 SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock& sysEx) const
 {
-    // Step 1: Validate structure
     if (!validateStructure(sysEx))
     {
         MidiLogger::getInstance().logError("Invalid SysEx structure: missing F0 or F7");
         return ValidationResult::failure("Invalid SysEx structure: missing F0 or F7");
     }
 
-    // Step 2: Validate Manufacturer and Device ID
     if (!validateManufacturerAndDevice(sysEx))
     {
         MidiLogger::getInstance().logError("Invalid Manufacturer ID or Device ID");
         return ValidationResult::failure("Invalid Manufacturer ID or Device ID");
     }
 
-    // Step 3: Validate message type and length
     auto typeResult = validateMessageType(sysEx);
     if (!typeResult.isValid)
     {
@@ -27,15 +25,12 @@ SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock
         return typeResult;
     }
 
-    // Step 4: Validate checksum
     if (!validateChecksum(sysEx))
     {
         MidiLogger::getInstance().logError("Invalid SysEx checksum");
         return ValidationResult::failure("Invalid checksum");
     }
 
-    MidiLogger::getInstance().logInfo("SysEx validation successful: " + 
-                                       juce::String(static_cast<int>(typeResult.messageType)));
     return ValidationResult::success(typeResult.messageType);
 }
 
@@ -48,13 +43,11 @@ bool SysExParser::validateStructure(const juce::MemoryBlock& sysEx) const
 
     const auto* data = static_cast<const uint8_t*>(sysEx.getData());
     
-    // Check start byte
     if (data[0] != SysExConstants::kSysExStart)
     {
         return false;
     }
 
-    // Check end byte
     if (data[sysEx.getSize() - 1] != SysExConstants::kSysExEnd)
     {
         return false;
@@ -71,49 +64,30 @@ bool SysExParser::validateChecksum(const juce::MemoryBlock& sysEx) const
     }
 
     const auto* data = static_cast<const uint8_t*>(sysEx.getData());
-    size_t totalSize = sysEx.getSize();
-
-    // Device ID messages don't have Oberheim checksum
-    if (data[0] == SysExConstants::kSysExStart &&
-        data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId)
+    
+    if (isDeviceInquiryMessage(data))
     {
-        return true;  // Device ID messages don't use Oberheim checksum
+        return true;
     }
 
-    // Standard Oberheim messages: F0 10 06 <opcode> [optional data]
-    // For patch/master messages: F0 10 06 01/03 <patch_number or version> <nibbles...> <checksum> F7
-    // Checksum is calculated on packed data (before unpacking to nibbles)
+    size_t dataStartIndex = 5;
+    size_t checksumIndex = sysEx.getSize() - 2;
     
-    // Find where data starts (after header)
-    size_t headerSize = 4;  // F0 10 06 <opcode>
-    if (totalSize <= headerSize + 2)  // Need at least checksum + F7
+    if (sysEx.getSize() <= dataStartIndex + 2)
     {
         return false;
     }
 
-    // For patch messages: header is F0 10 06 01 <patch_number>
-    // For master messages: header is F0 10 06 03 <version>
-    // So data starts at index 5
-    size_t dataStartIndex = 5;
-    
-    // Checksum is second-to-last byte (before F7)
-    size_t checksumIndex = totalSize - 2;
     uint8_t receivedChecksum = data[checksumIndex];
-
-    // Extract nibbles (between header and checksum)
     size_t numNibbles = checksumIndex - dataStartIndex;
+    
     if (numNibbles == 0 || (numNibbles % 2 != 0))
     {
-        return false;  // Must have even number of nibbles
+        return false;
     }
 
-    // Pack nibbles back to bytes for checksum calculation
-    size_t numPackedBytes = numNibbles / 2;
-    std::vector<uint8_t> packedData(numPackedBytes);
-    packNibbles(&data[dataStartIndex], numNibbles, packedData.data());
-
-    // Calculate checksum
-    uint8_t calculatedChecksum = calculateChecksum(packedData.data(), numPackedBytes);
+    std::vector<uint8_t> packedData = packNibblesToBytes(&data[dataStartIndex], numNibbles);
+    uint8_t calculatedChecksum = calculateChecksum(packedData.data(), packedData.size());
 
     return (calculatedChecksum & 0x7F) == receivedChecksum;
 }
@@ -127,23 +101,16 @@ SysExParser::ValidationResult SysExParser::validateMessageType(const juce::Memor
 
     const auto* data = static_cast<const uint8_t*>(sysEx.getData());
 
-    // Check for Device ID response (Universal SysEx: F0 7E <chan> 06 02)
-    if (data[0] == SysExConstants::kSysExStart &&
-        data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId &&
-        data[3] == SysExConstants::DeviceInquiry::kSubIdGeneralInfo &&
-        data[4] == SysExConstants::DeviceInquiry::kSubIdDeviceIdReply)
+    if (isDeviceIdResponse(data))
     {
-        // Device ID response: variable length, minimum check
-        if (sysEx.getSize() < 15)  // Minimum expected length
+        if (sysEx.getSize() < 15)
         {
             return ValidationResult::failure("Device ID message too short");
         }
         return ValidationResult::success(MessageType::kDeviceId);
     }
 
-    // Standard Oberheim messages: F0 10 06 <opcode>
-    if (data[1] != SysExConstants::kManufacturerIdOberheim ||
-        data[2] != SysExConstants::kDeviceIdMatrix1000)
+    if (!isOberheimMatrix1000Message(data))
     {
         return ValidationResult::failure("Not an Oberheim Matrix-1000 message");
     }
@@ -151,26 +118,12 @@ SysExParser::ValidationResult SysExParser::validateMessageType(const juce::Memor
     uint8_t opcode = data[3];
     MessageType messageType = getMessageTypeFromOpcode(opcode);
 
-    // Validate length according to message type
-    size_t expectedLength = 0;
-    switch (messageType)
+    if (messageType == MessageType::kUnknown)
     {
-        case MessageType::kPatch:
-            expectedLength = SysExConstants::kPatchMessageLength;
-            break;
-        case MessageType::kMaster:
-            expectedLength = SysExConstants::kMasterMessageLength;
-            break;
-        case MessageType::kSplitPatch:
-            expectedLength = SysExConstants::kSplitPatchMessageLength;
-            break;
-        case MessageType::kUnknown:
-            return ValidationResult::failure("Unknown message type");
-        case MessageType::kDeviceId:
-            // Already handled above
-            break;
+        return ValidationResult::failure("Unknown message type");
     }
 
+    size_t expectedLength = getExpectedMessageLength(messageType);
     if (sysEx.getSize() != expectedLength)
     {
         return ValidationResult::failure(
@@ -213,21 +166,16 @@ bool SysExParser::validateManufacturerAndDevice(const juce::MemoryBlock& sysEx) 
 
     const auto* data = static_cast<const uint8_t*>(sysEx.getData());
 
-    // Device ID messages (Universal SysEx) don't have Oberheim manufacturer ID
-    if (data[0] == SysExConstants::kSysExStart &&
-        data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId)
+    if (isDeviceInquiryMessage(data))
     {
-        // For Device ID, validate later in validateMessageType
         return true;
     }
 
-    // Check Manufacturer ID (byte 1)
     if (data[1] != SysExConstants::kManufacturerIdOberheim)
     {
         return false;
     }
 
-    // Check Device ID (byte 2)
     if (data[2] != SysExConstants::kDeviceIdMatrix1000)
     {
         return false;
@@ -249,5 +197,50 @@ SysExParser::MessageType SysExParser::getMessageTypeFromOpcode(uint8_t opcode)
         default:
             return MessageType::kUnknown;
     }
+}
+
+bool SysExParser::isDeviceInquiryMessage(const uint8_t* data)
+{
+    return data[0] == SysExConstants::kSysExStart &&
+           data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId;
+}
+
+std::vector<uint8_t> SysExParser::packNibblesToBytes(const uint8_t* nibbles, size_t numNibbles)
+{
+    size_t numBytes = numNibbles / 2;
+    std::vector<uint8_t> packedData(numBytes);
+    packNibbles(nibbles, numNibbles, packedData.data());
+    return packedData;
+}
+
+bool SysExParser::isDeviceIdResponse(const uint8_t* data)
+{
+    return data[0] == SysExConstants::kSysExStart &&
+           data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId &&
+           data[3] == SysExConstants::DeviceInquiry::kSubIdGeneralInfo &&
+           data[4] == SysExConstants::DeviceInquiry::kSubIdDeviceIdReply;
+}
+
+bool SysExParser::isOberheimMatrix1000Message(const uint8_t* data)
+{
+    return data[1] == SysExConstants::kManufacturerIdOberheim &&
+           data[2] == SysExConstants::kDeviceIdMatrix1000;
+}
+
+size_t SysExParser::getExpectedMessageLength(MessageType messageType)
+{
+    switch (messageType)
+    {
+        case MessageType::kPatch:
+            return SysExConstants::kPatchMessageLength;
+        case MessageType::kMaster:
+            return SysExConstants::kMasterMessageLength;
+        case MessageType::kSplitPatch:
+            return SysExConstants::kSplitPatchMessageLength;
+        case MessageType::kDeviceId:
+        case MessageType::kUnknown:
+            return 0;
+    }
+    return 0;
 }
 
