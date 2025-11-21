@@ -153,6 +153,8 @@ void PluginEditor::updateMidiPorts()
             if (devices[i].identifier == inputPortId)
             {
                 midiInputComboBox.setSelectedId(i + 2, juce::dontSendNotification);
+                // Actually open the MIDI input port
+                pluginProcessor.setMidiInputPort(inputPortId);
                 inputFound = true;
                 break;
             }
@@ -174,6 +176,8 @@ void PluginEditor::updateMidiPorts()
             if (devices[i].identifier == outputPortId)
             {
                 midiOutputComboBox.setSelectedId(i + 2, juce::dontSendNotification);
+                // Actually open the MIDI output port
+                pluginProcessor.setMidiOutputPort(outputPortId);
                 outputFound = true;
                 break;
             }

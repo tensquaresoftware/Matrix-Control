@@ -8,13 +8,19 @@
 class MidiLogger
 {
 public:
+    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Tools/Logs/MIDI";
+    static constexpr const char* kLogFilenamePrefix = "midi-log";
+    
+    static constexpr int kMinLogLineWidth = 60;
+    static constexpr int kLogLineWidth = 80;
+    
     enum class LogLevel
     {
-        kNone = 0,
-        kError = 1,
+        kNone    = 0,
+        kError   = 1,
         kWarning = 2,
-        kInfo = 3,
-        kDebug = 4,
+        kInfo    = 3,
+        kDebug   = 4,
         kVerbose = 5
     };
 
@@ -41,9 +47,29 @@ private:
     MidiLogger& operator=(const MidiLogger&) = delete;
     
     void writeLog(const juce::String& formattedMessage);
+    void writeLogRaw(const juce::String& message);
+
     juce::String getTimestamp() const;
     juce::File getDefaultLogDirectory() const;
-    juce::String generateTimestampedFilename() const;  // Returns "midi-log.txt" for now
+    
+    juce::String generateTimestampedFilename() const;
+    juce::String generateSeparatorLine() const;
+    
+    int getEffectiveLineWidth() const;
+    void closeExistingLogFile();
+    void writeSessionEndedFooter();
+    juce::File determineLogFilePath(const juce::File& filePath);
+    void ensureLogDirectoryExists(const juce::File& targetLogFile);
+    void openNewLogFile();
+    void writeSessionStartedHeader();
+    juce::String formatLogLevelColumn(LogLevel level) const;
+    juce::String buildSysExHeaderMessage(const juce::String& direction, const juce::String& description, size_t byteCount) const;
+    int calculateBytesPerLine() const;
+    juce::String formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const;
+    void insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const;
+    void appendHexByteWithSpace(juce::String& hexString, uint8_t byte, bool isLastByte) const;
+    juce::String buildTimestampString() const;
+    void createLogDirectoryIfNeeded(juce::File& logDir) const;
     
     LogLevel currentLogLevel = LogLevel::kInfo;
     bool logToFile = false;
@@ -55,5 +81,7 @@ private:
     static constexpr const char* kLogLevelNames[] = {
         "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
     };
+    
+    static constexpr int kLogLevelColumnWidth = 9;
 };
 

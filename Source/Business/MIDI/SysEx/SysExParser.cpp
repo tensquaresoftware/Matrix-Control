@@ -1,5 +1,6 @@
 #include "SysExParser.h"
 #include "SysExConstants.h"
+#include "../Utilities/MidiLogger.h"
 #include <vector>
 
 SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock& sysEx) const
@@ -7,12 +8,14 @@ SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock
     // Step 1: Validate structure
     if (!validateStructure(sysEx))
     {
+        MidiLogger::getInstance().logError("Invalid SysEx structure: missing F0 or F7");
         return ValidationResult::failure("Invalid SysEx structure: missing F0 or F7");
     }
 
     // Step 2: Validate Manufacturer and Device ID
     if (!validateManufacturerAndDevice(sysEx))
     {
+        MidiLogger::getInstance().logError("Invalid Manufacturer ID or Device ID");
         return ValidationResult::failure("Invalid Manufacturer ID or Device ID");
     }
 
@@ -20,15 +23,19 @@ SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock
     auto typeResult = validateMessageType(sysEx);
     if (!typeResult.isValid)
     {
+        MidiLogger::getInstance().logError("SysEx validation failed: " + typeResult.errorMessage);
         return typeResult;
     }
 
     // Step 4: Validate checksum
     if (!validateChecksum(sysEx))
     {
+        MidiLogger::getInstance().logError("Invalid SysEx checksum");
         return ValidationResult::failure("Invalid checksum");
     }
 
+    MidiLogger::getInstance().logInfo("SysEx validation successful: " + 
+                                       juce::String(static_cast<int>(typeResult.messageType)));
     return ValidationResult::success(typeResult.messageType);
 }
 

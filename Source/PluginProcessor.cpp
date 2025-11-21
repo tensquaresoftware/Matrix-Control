@@ -1,6 +1,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Business/MIDI/MidiManager.h"
+#include "Business/MIDI/Utilities/MidiLogger.h"
 #include <juce_audio_devices/juce_audio_devices.h>
 
 PluginProcessor::PluginProcessor()
@@ -95,6 +96,12 @@ void PluginProcessor::changeProgramName(int index, const juce::String& newName)
 
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
   juce::ignoreUnused(sampleRate, samplesPerBlock);
+  
+  // Enable file logging now that JUCE is fully initialized
+  // This creates a new timestamped log file for each session
+  MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
+  MidiLogger::getInstance().setLogToFile(true);
+  
   startMidiThread();
 }
 
@@ -107,7 +114,11 @@ void PluginProcessor::startMidiThread()
 
 void PluginProcessor::releaseResources()
 {
-    stopMidiThread();    
+    stopMidiThread();
+    
+    // Close log file when releasing resources
+    // This ensures the "Session Ended" message is written
+    MidiLogger::getInstance().setLogToFile(false);
 }
 
 void PluginProcessor::stopMidiThread()

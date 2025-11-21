@@ -1,10 +1,12 @@
 #include "SysExEncoder.h"
+#include "../Utilities/MidiLogger.h"
 #include <cstring>
 
 juce::MemoryBlock SysExEncoder::encodePatchSysEx(uint8_t patchNumber, const uint8_t* packedData) const
 {
     if (packedData == nullptr)
     {
+        MidiLogger::getInstance().logError("encodePatchSysEx: null packedData pointer");
         return {};
     }
 
@@ -32,6 +34,7 @@ juce::MemoryBlock SysExEncoder::encodeMasterSysEx(uint8_t version, const uint8_t
 {
     if (packedData == nullptr)
     {
+        MidiLogger::getInstance().logError("encodeMasterSysEx: null packedData pointer");
         return {};
     }
 

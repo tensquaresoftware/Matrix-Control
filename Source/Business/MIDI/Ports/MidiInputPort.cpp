@@ -1,4 +1,5 @@
 #include "MidiInputPort.h"
+#include "../Utilities/MidiLogger.h"
 #include <thread>
 #include <chrono>
 
@@ -18,6 +19,7 @@ bool MidiInputPort::openPort(const juce::String& deviceId, juce::MidiInputCallba
 
     if (deviceId.isEmpty())
     {
+        MidiLogger::getInstance().logWarning("MidiInputPort::openPort: empty device ID");
         return false;
     }
 
@@ -34,12 +36,18 @@ bool MidiInputPort::openPort(const juce::String& deviceId, juce::MidiInputCallba
                     midiInput->start();
                 }
                 portIsOpen = true;
+                MidiLogger::getInstance().logInfo("MIDI input port opened: " + device.name);
                 return true;
+            }
+            else
+            {
+                MidiLogger::getInstance().logError("Failed to open MIDI input device: " + device.name);
             }
             break;
         }
     }
 
+    MidiLogger::getInstance().logError("MIDI input device not found: " + deviceId);
     return false;
 }
 
@@ -50,6 +58,7 @@ void MidiInputPort::closePort()
         midiInput->stop();
         // Give time for any in-flight callbacks to complete
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        MidiLogger::getInstance().logInfo("MIDI input port closed");
         midiInput.reset();
     }
     portIsOpen = false;

@@ -1,9 +1,5 @@
 #include "MidiLogger.h"
 #include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <chrono>
-#include <ctime>
 
 MidiLogger& MidiLogger::getInstance()
 {
@@ -19,59 +15,183 @@ void MidiLogger::setLogLevel(LogLevel level)
 
 juce::File MidiLogger::getDefaultLogDirectory() const
 {
-    // Use absolute path: /Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Tools/Logs/MIDI
-    // This is more reliable than searching from current working directory
-    return juce::File("/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Tools/Logs/MIDI");
+    juce::File logDir(kLogDirectoryPath);
+    createLogDirectoryIfNeeded(logDir);
+    return logDir;
+}
+
+void MidiLogger::createLogDirectoryIfNeeded(juce::File& logDir) const
+{
+    if (!logDir.exists())
+    {
+        logDir.createDirectory();
+    }
 }
 
 juce::String MidiLogger::generateTimestampedFilename() const
 {
-    // Simple fixed filename for now
-    return juce::String("midi-log.txt");
+    juce::Time now = juce::Time::getCurrentTime();
+    
+    int year = now.getYear();
+    int month = now.getMonth() + 1;
+    int day = now.getDayOfMonth();
+    int hour = now.getHours();
+    int minute = now.getMinutes();
+    int second = now.getSeconds();
+    
+    juce::String filename = kLogFilenamePrefix;
+    
+    filename += "-";
+    filename += juce::String(year).paddedLeft('0', 4);
+    filename += "-";
+    filename += juce::String(month).paddedLeft('0', 2);
+    filename += "-";
+    filename += juce::String(day).paddedLeft('0', 2);
+    filename += "-";
+    filename += juce::String(hour).paddedLeft('0', 2);
+    filename += "-";
+    filename += juce::String(minute).paddedLeft('0', 2);
+    filename += "-";
+    filename += juce::String(second).paddedLeft('0', 2);
+    filename += ".txt";
+    
+    return filename;
+}
+
+int MidiLogger::getEffectiveLineWidth() const
+{
+    return (kLogLineWidth >= kMinLogLineWidth) ? kLogLineWidth : kMinLogLineWidth;
+}
+
+juce::String MidiLogger::generateSeparatorLine() const
+{
+    int lineWidth = getEffectiveLineWidth();
+    
+    juce::String separator;
+    for (int i = 0; i < lineWidth; ++i)
+    {
+        separator += "=";
+    }
+    
+    return separator;
+}
+
+void MidiLogger::closeExistingLogFile()
+{
+    if (fileStream && fileStream->is_open())
+    {
+        writeSessionEndedFooter();
+        fileStream->flush();
+        fileStream->close();
+    }
+    fileStream.reset();
 }
 
 void MidiLogger::setLogToFile(bool enabled, const juce::File& filePath)
 {
     std::lock_guard<std::mutex> lock(logMutex);
     
+    closeExistingLogFile();
+    
     logToFile = enabled;
     if (enabled)
     {
-        if (filePath.getFullPathName().isNotEmpty())
+        logFile = determineLogFilePath(filePath);
+        ensureLogDirectoryExists(logFile);
+        
+        if (!logToFile)
         {
-            logFile = filePath;
+            return;
+        }
+        
+        openNewLogFile();
+        
+        if (fileStream && fileStream->is_open())
+        {
+            writeSessionStartedHeader();
         }
         else
         {
-            // Use simple path: Tools/Logs/MIDI/midi-log.txt relative to current working directory
-            juce::File logDir = getDefaultLogDirectory();
-            juce::String filename = generateTimestampedFilename();
-            logFile = logDir.getChildFile(filename);
+            logToFile = false;
+            fileStream.reset();
         }
-        
-        // Create parent directory if it doesn't exist
-        juce::File parentDir = logFile.getParentDirectory();
-        parentDir.createDirectory();
-        
-        fileStream = std::make_unique<std::ofstream>(logFile.getFullPathName().toRawUTF8(), 
-                                                       std::ios::app);
-        
-        if (fileStream && fileStream->is_open())
-        {
-            *fileStream << "\n=== MIDI Log Session Started ===\n";
-            fileStream->flush();
-        }
+    }
+}
+
+void MidiLogger::writeSessionEndedFooter()
+{
+    juce::String separator = generateSeparatorLine();
+    juce::String footerText = "=== MIDI Log Session Ended ";
+    int remainingChars = getEffectiveLineWidth() - footerText.length();
+    
+    if (remainingChars > 0)
+    {
+        *fileStream << "\n" << footerText.toRawUTF8() 
+                    << separator.substring(separator.length() - remainingChars).toRawUTF8() << "\n";
     }
     else
     {
-        if (fileStream && fileStream->is_open())
-        {
-            *fileStream << "=== MIDI Log Session Ended ===\n\n";
-            fileStream->flush();
-            fileStream->close();
-        }
-        fileStream.reset();
+        *fileStream << "\n" << footerText.toRawUTF8() << "\n";
     }
+}
+
+juce::File MidiLogger::determineLogFilePath(const juce::File& filePath)
+{
+    if (filePath.getFullPathName().isNotEmpty())
+    {
+        return filePath;
+    }
+    
+    juce::File logDir = getDefaultLogDirectory();
+    juce::String filename = generateTimestampedFilename();
+    return logDir.getChildFile(filename);
+}
+
+void MidiLogger::ensureLogDirectoryExists(const juce::File& targetLogFile)
+{
+    juce::File parentDir = targetLogFile.getParentDirectory();
+    juce::Result createResult = parentDir.createDirectory();
+    
+    if (!createResult.wasOk())
+    {
+        if (logToConsole)
+        {
+            std::cout << "[ERROR] Failed to create log directory: " 
+                      << parentDir.getFullPathName().toRawUTF8() 
+                      << " - " << createResult.getErrorMessage().toRawUTF8() << std::endl;
+        }
+        logToFile = false;
+    }
+}
+
+void MidiLogger::openNewLogFile()
+{
+    fileStream = std::make_unique<std::ofstream>(logFile.getFullPathName().toRawUTF8(), 
+                                                   std::ios::out);
+}
+
+void MidiLogger::writeSessionStartedHeader()
+{
+    juce::Time now = juce::Time::getCurrentTime();
+    juce::String separator = generateSeparatorLine();
+    
+    juce::String headerText = "=== MIDI Log Session Started ";
+    int remainingChars = getEffectiveLineWidth() - headerText.length();
+    
+    if (remainingChars > 0)
+    {
+        *fileStream << headerText.toRawUTF8() 
+                    << separator.substring(separator.length() - remainingChars).toRawUTF8() << "\n";
+    }
+    else
+    {
+        *fileStream << headerText.toRawUTF8() << "\n";
+    }
+    
+    *fileStream << "Date: " << now.toString(true, true, false, true).toRawUTF8() << "\n";
+    *fileStream << "Log file: " << logFile.getFileName().toRawUTF8() << "\n";
+    *fileStream << separator.toRawUTF8() << "\n\n";
+    fileStream->flush();
 }
 
 void MidiLogger::setLogToConsole(bool enabled)
@@ -80,15 +200,34 @@ void MidiLogger::setLogToConsole(bool enabled)
     logToConsole = enabled;
 }
 
+juce::String MidiLogger::formatLogLevelColumn(LogLevel level) const
+{
+    juce::String levelName = kLogLevelNames[static_cast<int>(level)];
+    juce::String levelColumn = "[" + levelName + "]";
+    return levelColumn.paddedRight(' ', kLogLevelColumnWidth);
+}
+
 void MidiLogger::logMessage(LogLevel level, const juce::String& message)
 {
     if (level > currentLogLevel)
         return;
     
-    juce::String formattedMessage = juce::String("[") + kLogLevelNames[static_cast<int>(level)] + "] "
-                                    + getTimestamp() + " - " + message;
+    juce::String levelColumn = formatLogLevelColumn(level);
+    juce::String formattedMessage = levelColumn + " " + getTimestamp() + " - " + message;
     
     writeLog(formattedMessage);
+}
+
+juce::String MidiLogger::buildSysExHeaderMessage(const juce::String& direction, const juce::String& description, size_t byteCount) const
+{
+    juce::String message = direction + " SysEx";
+    if (description.isNotEmpty())
+    {
+        message += " (" + description + ")";
+    }
+    message += " (" + juce::String(byteCount) + " bytes)";
+    message += ":";
+    return message;
 }
 
 void MidiLogger::logSysExSent(const juce::MemoryBlock& sysEx, const juce::String& description)
@@ -96,12 +235,9 @@ void MidiLogger::logSysExSent(const juce::MemoryBlock& sysEx, const juce::String
     if (LogLevel::kDebug > currentLogLevel)
         return;
     
-    juce::String message = "SENT SysEx";
-    if (description.isNotEmpty())
-        message += " (" + description + ")";
-    message += ": " + formatSysExMessage(sysEx);
-    
+    juce::String message = buildSysExHeaderMessage("SENT", description, sysEx.getSize());
     logMessage(LogLevel::kDebug, message);
+    writeLogRaw(formatSysExMessage(sysEx));
 }
 
 void MidiLogger::logSysExReceived(const juce::MemoryBlock& sysEx, const juce::String& description)
@@ -109,12 +245,9 @@ void MidiLogger::logSysExReceived(const juce::MemoryBlock& sysEx, const juce::St
     if (LogLevel::kDebug > currentLogLevel)
         return;
     
-    juce::String message = "RECEIVED SysEx";
-    if (description.isNotEmpty())
-        message += " (" + description + ")";
-    message += ": " + formatSysExMessage(sysEx);
-    
+    juce::String message = buildSysExHeaderMessage("RECEIVED", description, sysEx.getSize());
     logMessage(LogLevel::kDebug, message);
+    writeLogRaw(formatSysExMessage(sysEx));
 }
 
 void MidiLogger::logProgramChange(uint8_t programNumber, const juce::String& direction)
@@ -145,25 +278,51 @@ void MidiLogger::logInfo(const juce::String& infoMessage)
     logMessage(LogLevel::kInfo, infoMessage);
 }
 
+int MidiLogger::calculateBytesPerLine() const
+{
+    int lineWidth = getEffectiveLineWidth();
+    return (lineWidth - 1) / 3;
+}
+
+void MidiLogger::insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const
+{
+    if (currentIndex > 0 && currentIndex % static_cast<size_t>(bytesPerLine) == 0)
+    {
+        hexString += "\n";
+    }
+}
+
+void MidiLogger::appendHexByteWithSpace(juce::String& hexString, uint8_t byte, bool isLastByte) const
+{
+    hexString += juce::String::toHexString(byte).paddedLeft('0', 2).toUpperCase();
+    if (!isLastByte)
+    {
+        hexString += " ";
+    }
+}
+
+juce::String MidiLogger::formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const
+{
+    juce::String hexString;
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
+    int bytesPerLine = calculateBytesPerLine();
+    
+    for (size_t i = 0; i < sysEx.getSize(); ++i)
+    {
+        insertNewlineIfNeeded(hexString, i, bytesPerLine);
+        bool isLastByte = (i == sysEx.getSize() - 1);
+        appendHexByteWithSpace(hexString, data[i], isLastByte);
+    }
+    
+    return hexString;
+}
+
 juce::String MidiLogger::formatSysExMessage(const juce::MemoryBlock& sysEx) const
 {
     if (sysEx.getSize() == 0)
         return "empty";
     
-    juce::String hexString;
-    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
-    
-    for (size_t i = 0; i < sysEx.getSize() && i < 256; ++i) // Limit display
-    {
-        hexString += juce::String::toHexString(data[i]).paddedLeft('0', 2).toUpperCase();
-        if (i < sysEx.getSize() - 1)
-            hexString += " ";
-    }
-    
-    if (sysEx.getSize() > 256)
-        hexString += " ... (truncated)";
-    
-    return hexString + " (" + juce::String(sysEx.getSize()) + " bytes)";
+    return formatHexBytesWithLineWrapping(sysEx);
 }
 
 void MidiLogger::writeLog(const juce::String& formattedMessage)
@@ -182,33 +341,45 @@ void MidiLogger::writeLog(const juce::String& formattedMessage)
     }
 }
 
+void MidiLogger::writeLogRaw(const juce::String& message)
+{
+    std::lock_guard<std::mutex> lock(logMutex);
+    
+    if (logToConsole)
+    {
+        std::cout << message.toRawUTF8() << std::endl;
+    }
+    
+    if (logToFile && fileStream && fileStream->is_open())
+    {
+        *fileStream << message.toRawUTF8() << std::endl;
+        fileStream->flush();
+    }
+}
+
+juce::String MidiLogger::buildTimestampString() const
+{
+    juce::Time now = juce::Time::getCurrentTime();
+    
+    int hour = now.getHours();
+    int minute = now.getMinutes();
+    int second = now.getSeconds();
+    int millisecond = now.getMilliseconds();
+    
+    juce::String timestamp;
+    timestamp += juce::String(hour).paddedLeft('0', 2);
+    timestamp += ":";
+    timestamp += juce::String(minute).paddedLeft('0', 2);
+    timestamp += ":";
+    timestamp += juce::String(second).paddedLeft('0', 2);
+    timestamp += ".";
+    timestamp += juce::String(millisecond).paddedLeft('0', 3);
+    
+    return timestamp;
+}
+
 juce::String MidiLogger::getTimestamp() const
 {
-    auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::system_clock::to_time_t(now);
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        now.time_since_epoch()) % 1000;
-    
-    std::tm timeInfo = {};
-    
-    // Use thread-safe localtime_r on macOS/Linux (POSIX)
-    #if defined(__APPLE__) || defined(__linux__) || defined(__unix__)
-        localtime_r(&time, &timeInfo);
-    #elif defined(_WIN32)
-        localtime_s(&timeInfo, &time);
-    #else
-        // Fallback: use localtime (protected by mutex in writeLog)
-        std::tm* tmPtr = std::localtime(&time);
-        if (tmPtr != nullptr)
-        {
-            timeInfo = *tmPtr;
-        }
-    #endif
-    
-    std::stringstream ss;
-    ss << std::put_time(&timeInfo, "%H:%M:%S");
-    ss << "." << std::setfill('0') << std::setw(3) << ms.count();
-    
-    return juce::String(ss.str());
+    return buildTimestampString();
 }
 

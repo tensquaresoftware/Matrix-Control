@@ -1,4 +1,5 @@
 #include "MidiManager.h"
+#include "Utilities/MidiLogger.h"
 #include <thread>
 
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
@@ -18,6 +19,8 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
     this->apvts.state.setProperty("lastError", juce::String(), nullptr);
     this->apvts.state.setProperty("errorType", juce::String(), nullptr);
     this->apvts.state.setProperty("lastPatchLoaded", juce::String(), nullptr);
+    
+    MidiLogger::getInstance().logInfo("MidiManager initialized");
 }
 
 MidiManager::~MidiManager()
@@ -48,21 +51,27 @@ MidiManager::~MidiManager()
 
 bool MidiManager::setMidiInputPort(const juce::String& deviceId)
 {
+    MidiLogger::getInstance().logInfo("Setting MIDI input port: " + deviceId);
     if (inputMidiPort->openPort(deviceId, midiReceiver.get()))
     {
         midiReceiver->setMidiInput(inputMidiPort->getMidiInput());
+        MidiLogger::getInstance().logInfo("MIDI input port successfully set");
         return true;
     }
+    MidiLogger::getInstance().logError("Failed to set MIDI input port");
     return false;
 }
 
 bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
 {
+    MidiLogger::getInstance().logInfo("Setting MIDI output port: " + deviceId);
     if (outputMidiPort->openPort(deviceId))
     {
         midiSender->setMidiOutput(outputMidiPort->getMidiOutput());
+        MidiLogger::getInstance().logInfo("MIDI output port successfully set");
         return true;
     }
+    MidiLogger::getInstance().logError("Failed to set MIDI output port");
     return false;
 }
 
@@ -78,6 +87,9 @@ void MidiManager::sendPatch(uint8_t patchNumber, const uint8_t* packedData)
     {
         auto sysExMessage = sysExEncoder->encodePatchSysEx(patchNumber, packedData);
         midiSender->sendSysEx(sysExMessage);
+        
+        MidiLogger::getInstance().logSysExSent(sysExMessage, 
+            "Patch #" + juce::String(patchNumber));
         
         // Minimum delay between SysEx messages
         std::this_thread::sleep_for(std::chrono::milliseconds(SysExConstants::kMinSysExDelayMs));
@@ -105,6 +117,8 @@ void MidiManager::sendMaster(uint8_t version, const uint8_t* packedData)
         auto sysExMessage = sysExEncoder->encodeMasterSysEx(version, packedData);
         midiSender->sendSysEx(sysExMessage);
         
+        MidiLogger::getInstance().logSysExSent(sysExMessage, "Master parameters");
+        
         // Minimum delay between SysEx messages
         std::this_thread::sleep_for(std::chrono::milliseconds(SysExConstants::kMinSysExDelayMs));
     }
@@ -123,6 +137,7 @@ void MidiManager::sendProgramChange(uint8_t programNumber, int channel)
     try
     {
         midiSender->sendProgramChange(programNumber, channel);
+        MidiLogger::getInstance().logProgramChange(programNumber, "SENT");
     }
     catch (const MidiConnectionException& e)
     {
@@ -147,6 +162,8 @@ std::vector<uint8_t> MidiManager::requestCurrentPatch()
             updateErrorState("Timeout waiting for patch response", "Timeout");
             return {};
         }
+
+        MidiLogger::getInstance().logSysExReceived(response, "Patch response");
 
         // Decode response
         std::vector<uint8_t> packedData(SysExConstants::kPatchPackedDataSize);
@@ -190,6 +207,8 @@ std::vector<uint8_t> MidiManager::requestMasterData()
             return {};
         }
 
+        MidiLogger::getInstance().logSysExReceived(response, "Master response");
+
         // Decode response
         std::vector<uint8_t> packedData(SysExConstants::kMasterPackedDataSize);
         if (sysExDecoder->decodeMasterSysEx(response, packedData.data()))
@@ -231,6 +250,8 @@ bool MidiManager::performDeviceInquiry()
             updateErrorState("Timeout waiting for Device ID response", "Timeout");
             return false;
         }
+
+        MidiLogger::getInstance().logSysExReceived(response, "Device ID response");
 
         // Decode Device ID
         DeviceIdInfo deviceInfo = sysExDecoder->decodeDeviceId(response);
@@ -278,12 +299,23 @@ void MidiManager::updateErrorState(const juce::String& errorMessage, const juce:
 {
     apvts.state.setProperty("lastError", errorMessage, nullptr);
     apvts.state.setProperty("errorType", errorType, nullptr);
+    
+    MidiLogger::getInstance().logError(errorMessage);
 }
 
 void MidiManager::updateDeviceStatus(bool detected, const juce::String& version)
 {
     apvts.state.setProperty("deviceDetected", detected, nullptr);
     apvts.state.setProperty("deviceVersion", version, nullptr);
+    
+    if (detected)
+    {
+        MidiLogger::getInstance().logInfo("Matrix-1000 detected. Version: " + version);
+    }
+    else
+    {
+        MidiLogger::getInstance().logWarning("Matrix-1000 not detected");
+    }
 }
 
 void MidiManager::handleIncomingSysEx(const juce::MemoryBlock& sysEx)

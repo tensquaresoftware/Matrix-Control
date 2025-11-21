@@ -1,4 +1,5 @@
 #include "MidiOutputPort.h"
+#include "../Utilities/MidiLogger.h"
 
 MidiOutputPort::MidiOutputPort()
     : portIsOpen(false)
@@ -16,6 +17,7 @@ bool MidiOutputPort::openPort(const juce::String& deviceId)
 
     if (deviceId.isEmpty())
     {
+        MidiLogger::getInstance().logWarning("MidiOutputPort::openPort: empty device ID");
         return false;
     }
 
@@ -28,12 +30,18 @@ bool MidiOutputPort::openPort(const juce::String& deviceId)
             if (midiOutput != nullptr)
             {
                 portIsOpen = true;
+                MidiLogger::getInstance().logInfo("MIDI output port opened: " + device.name);
                 return true;
+            }
+            else
+            {
+                MidiLogger::getInstance().logError("Failed to open MIDI output device: " + device.name);
             }
             break;
         }
     }
 
+    MidiLogger::getInstance().logError("MIDI output device not found: " + deviceId);
     return false;
 }
 
@@ -41,6 +49,7 @@ void MidiOutputPort::closePort()
 {
     if (midiOutput != nullptr)
     {
+        MidiLogger::getInstance().logInfo("MIDI output port closed");
         midiOutput.reset();
     }
     portIsOpen = false;

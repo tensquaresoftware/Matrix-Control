@@ -1,5 +1,6 @@
 #include "MidiSender.h"
 #include "../Exceptions/Exceptions.h"
+#include "../Utilities/MidiLogger.h"
 
 MidiSender::MidiSender()
     : midiOutput(nullptr)
@@ -19,6 +20,7 @@ void MidiSender::sendSysEx(const juce::MemoryBlock& sysExData)
         sysExData.getData(), static_cast<int>(sysExData.getSize()));
     
     midiOutput->sendMessageNow(message);
+    MidiLogger::getInstance().logSysExSent(sysExData);
 }
 
 void MidiSender::sendProgramChange(uint8_t programNumber, int channel)
@@ -27,6 +29,7 @@ void MidiSender::sendProgramChange(uint8_t programNumber, int channel)
 
     juce::MidiMessage message = juce::MidiMessage::programChange(channel, programNumber);
     midiOutput->sendMessageNow(message);
+    MidiLogger::getInstance().logProgramChange(programNumber, "SENT");
 }
 
 void MidiSender::sendNoteOn(uint8_t noteNumber, uint8_t velocity, int channel)
@@ -62,6 +65,7 @@ void MidiSender::ensureOutputAvailable() const
 {
     if (midiOutput == nullptr)
     {
+        MidiLogger::getInstance().logError("MIDI output port not available");
         throw MidiConnectionException("MIDI output port not available");
     }
 }

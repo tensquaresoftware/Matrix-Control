@@ -1,5 +1,6 @@
 #include "SysExDecoder.h"
 #include "SysExConstants.h"
+#include "../Utilities/MidiLogger.h"
 
 SysExDecoder::SysExDecoder(SysExParser& parserRef)
     : parser(parserRef)
@@ -10,6 +11,7 @@ bool SysExDecoder::decodePatchSysEx(const juce::MemoryBlock& sysEx, uint8_t* out
 {
     if (output == nullptr)
     {
+        MidiLogger::getInstance().logError("decodePatchSysEx: null output pointer");
         return false;
     }
 
@@ -17,18 +19,29 @@ bool SysExDecoder::decodePatchSysEx(const juce::MemoryBlock& sysEx, uint8_t* out
     auto validation = parser.validateSysEx(sysEx);
     if (!validation.isValid || validation.messageType != SysExParser::MessageType::kPatch)
     {
+        MidiLogger::getInstance().logError("decodePatchSysEx: validation failed");
         return false;
     }
 
     // Extract packed data: F0 10 06 01 <patch_number> <nibbles...> <checksum> F7
     // Data starts at index 5 (after F0 10 06 01 <patch_number>)
-    return extractPackedData(sysEx, 5, SysExConstants::kPatchPackedDataSize, output);
+    bool success = extractPackedData(sysEx, 5, SysExConstants::kPatchPackedDataSize, output);
+    if (success)
+    {
+        MidiLogger::getInstance().logInfo("Successfully decoded patch SysEx");
+    }
+    else
+    {
+        MidiLogger::getInstance().logError("Failed to extract packed data from patch SysEx");
+    }
+    return success;
 }
 
 bool SysExDecoder::decodeMasterSysEx(const juce::MemoryBlock& sysEx, uint8_t* output) const
 {
     if (output == nullptr)
     {
+        MidiLogger::getInstance().logError("decodeMasterSysEx: null output pointer");
         return false;
     }
 
@@ -36,12 +49,22 @@ bool SysExDecoder::decodeMasterSysEx(const juce::MemoryBlock& sysEx, uint8_t* ou
     auto validation = parser.validateSysEx(sysEx);
     if (!validation.isValid || validation.messageType != SysExParser::MessageType::kMaster)
     {
+        MidiLogger::getInstance().logError("decodeMasterSysEx: validation failed");
         return false;
     }
 
     // Extract packed data: F0 10 06 03 <version> <nibbles...> <checksum> F7
     // Data starts at index 5 (after F0 10 06 03 <version>)
-    return extractPackedData(sysEx, 5, SysExConstants::kMasterPackedDataSize, output);
+    bool success = extractPackedData(sysEx, 5, SysExConstants::kMasterPackedDataSize, output);
+    if (success)
+    {
+        MidiLogger::getInstance().logInfo("Successfully decoded master SysEx");
+    }
+    else
+    {
+        MidiLogger::getInstance().logError("Failed to extract packed data from master SysEx");
+    }
+    return success;
 }
 
 DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
@@ -51,6 +74,7 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
 
     if (sysEx.getSize() < 15)
     {
+        MidiLogger::getInstance().logError("decodeDeviceId: message too short");
         return info;
     }
 
@@ -88,6 +112,15 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
                     info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily &&
                     info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow &&
                     info.memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh);
+
+    if (info.isValid)
+    {
+        MidiLogger::getInstance().logInfo("Device ID decoded: Matrix-1000, version: " + info.version);
+    }
+    else
+    {
+        MidiLogger::getInstance().logWarning("Device ID validation failed - not a Matrix-1000");
+    }
 
     return info;
 }
