@@ -11,7 +11,7 @@
 class MidiLogger
 {
 public:
-    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Tools/Logs/MIDI";
+    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Logs/MIDI";
     static constexpr const char* kLogFilenamePrefix = "midi-log";
     
     static constexpr int kMinLogLineWidth = 60;

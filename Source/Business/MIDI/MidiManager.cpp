@@ -36,20 +36,54 @@ MidiManager::~MidiManager()
 
 bool MidiManager::setMidiInputPort(const juce::String& deviceId)
 {
+    if (deviceId.isEmpty())
+    {
+        MidiLogger::getInstance().logInfo("Clearing MIDI input port selection");
+        stopMidiInputCallbacks();
+        return true;
+    }
+
     MidiLogger::getInstance().logInfo("Setting MIDI input port: " + deviceId);
+
+    if (midiReceiver != nullptr)
+    {
+        midiReceiver->setMidiInput(nullptr);
+    }
+
     if (inputMidiPort->openPort(deviceId, midiReceiver.get()))
     {
         midiReceiver->setMidiInput(inputMidiPort->getMidiInput());
         MidiLogger::getInstance().logInfo("MIDI input port successfully set");
         return true;
     }
+
     MidiLogger::getInstance().logError("Failed to set MIDI input port");
     return false;
 }
 
 bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
 {
+    if (deviceId.isEmpty())
+    {
+        MidiLogger::getInstance().logInfo("Clearing MIDI output port selection");
+        if (midiSender != nullptr)
+        {
+            midiSender->setMidiOutput(nullptr);
+        }
+        if (outputMidiPort != nullptr)
+        {
+            outputMidiPort->closePort();
+        }
+        return true;
+    }
+
     MidiLogger::getInstance().logInfo("Setting MIDI output port: " + deviceId);
+
+    if (midiSender != nullptr)
+    {
+        midiSender->setMidiOutput(nullptr);
+    }
+
     if (outputMidiPort->openPort(deviceId))
     {
         midiSender->setMidiOutput(outputMidiPort->getMidiOutput());

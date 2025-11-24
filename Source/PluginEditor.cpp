@@ -101,7 +101,7 @@ void PluginEditor::handleMidiInputSelection(int selectedId)
 {
     if (selectedId == 1)
     {
-        pluginProcessor.getApvts().state.setProperty("midiInputPortId", juce::String(), nullptr);
+        pluginProcessor.setMidiInputPort(juce::String());
         return;
     }
     
@@ -120,7 +120,7 @@ void PluginEditor::handleMidiOutputSelection(int selectedId)
 {
     if (selectedId == 1)
     {
-        pluginProcessor.getApvts().state.setProperty("midiOutputPortId", juce::String(), nullptr);
+        pluginProcessor.setMidiOutputPort(juce::String());
         return;
     }
     
@@ -140,6 +140,7 @@ void PluginEditor::restoreMidiInputPort()
     auto inputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId").toString();
     if (inputPortId.isEmpty())
     {
+        pluginProcessor.setMidiInputPort(juce::String());
         midiInputComboBox.setSelectedId(1, juce::dontSendNotification);
         return;
     }
@@ -156,6 +157,7 @@ void PluginEditor::restoreMidiInputPort()
     }
     
     midiInputComboBox.setSelectedId(1, juce::dontSendNotification);
+    pluginProcessor.setMidiInputPort(juce::String());
 }
 
 void PluginEditor::restoreMidiOutputPort()
@@ -163,6 +165,7 @@ void PluginEditor::restoreMidiOutputPort()
     auto outputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId").toString();
     if (outputPortId.isEmpty())
     {
+        pluginProcessor.setMidiOutputPort(juce::String());
         midiOutputComboBox.setSelectedId(1, juce::dontSendNotification);
         return;
     }
@@ -179,6 +182,7 @@ void PluginEditor::restoreMidiOutputPort()
     }
     
     midiOutputComboBox.setSelectedId(1, juce::dontSendNotification);
+    pluginProcessor.setMidiOutputPort(juce::String());
 }
 
 void PluginEditor::populateMidiInputPorts()
