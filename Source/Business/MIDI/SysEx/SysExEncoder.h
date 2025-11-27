@@ -12,15 +12,15 @@ public:
     SysExEncoder() = default;
     ~SysExEncoder() = default;
 
-    juce::MemoryBlock encodePatchSysEx(uint8_t patchNumber, const uint8_t* packedData) const;
-    juce::MemoryBlock encodeMasterSysEx(uint8_t version, const uint8_t* packedData) const;
+    juce::MemoryBlock encodePatchSysEx(juce::uint8 patchNumber, const juce::uint8* packedData) const;
+    juce::MemoryBlock encodeMasterSysEx(juce::uint8 version, const juce::uint8* packedData) const;
     static juce::MemoryBlock encodeDeviceInquiry();
-    juce::MemoryBlock encodeRequestMessage(uint8_t requestType, uint8_t patchNumber = 0) const;
-    static size_t unpackBytes(const uint8_t* bytes, size_t numBytes, uint8_t* output);
-    static uint8_t calculateChecksum(const uint8_t* data, size_t length);
+    juce::MemoryBlock encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber = 0) const;
+    static size_t unpackBytes(const juce::uint8* bytes, size_t numBytes, juce::uint8* output);
+    static juce::uint8 calculateChecksum(const juce::uint8* data, size_t length);
 
 private:
-    std::vector<uint8_t> buildHeader(uint8_t opcode, uint8_t headerData = 0) const;
+    std::vector<juce::uint8> buildHeader(juce::uint8 opcode, juce::uint8 headerData = 0) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SysExEncoder)
 };

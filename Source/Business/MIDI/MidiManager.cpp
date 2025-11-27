@@ -1,6 +1,7 @@
 #include <thread>
 
 #include "MidiManager.h"
+
 #include "Utilities/MidiLogger.h"
 
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
@@ -43,7 +44,17 @@ bool MidiManager::setMidiInputPort(const juce::String& deviceId)
         return true;
     }
 
-    MidiLogger::getInstance().logInfo("Setting MIDI input port: " + deviceId);
+    juce::String deviceName = deviceId;
+    auto devices = juce::MidiInput::getAvailableDevices();
+    for (const auto& device : devices)
+    {
+        if (device.identifier == deviceId)
+        {
+            deviceName = device.name;
+            break;
+        }
+    }
+    MidiLogger::getInstance().logInfo("Setting MIDI input port: [" + deviceName + "]");
 
     if (midiReceiver != nullptr)
     {
@@ -77,7 +88,17 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
         return true;
     }
 
-    MidiLogger::getInstance().logInfo("Setting MIDI output port: " + deviceId);
+    juce::String deviceName = deviceId;
+    auto devices = juce::MidiOutput::getAvailableDevices();
+    for (const auto& device : devices)
+    {
+        if (device.identifier == deviceId)
+        {
+            deviceName = device.name;
+            break;
+        }
+    }
+    MidiLogger::getInstance().logInfo("Setting MIDI output port: [" + deviceName + "]");
 
     if (midiSender != nullptr)
     {
@@ -94,7 +115,7 @@ bool MidiManager::setMidiOutputPort(const juce::String& deviceId)
     return false;
 }
 
-void MidiManager::sendPatch(uint8_t patchNumber, const uint8_t* packedData)
+void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData)
 {
     if (packedData == nullptr)
     {
@@ -117,7 +138,7 @@ void MidiManager::sendPatch(uint8_t patchNumber, const uint8_t* packedData)
     }
 }
 
-void MidiManager::sendMaster(uint8_t version, const uint8_t* packedData)
+void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
 {
     if (packedData == nullptr)
     {
@@ -140,12 +161,12 @@ void MidiManager::sendMaster(uint8_t version, const uint8_t* packedData)
     }
 }
 
-void MidiManager::sendProgramChange(uint8_t programNumber, int channel)
+void MidiManager::sendProgramChange(int programNumber, int channel)
 {
     try
     {
         midiSender->sendProgramChange(programNumber, channel);
-        MidiLogger::getInstance().logProgramChange(programNumber, "SENT");
+        MidiLogger::getInstance().logProgramChange(static_cast<juce::uint8>(programNumber), "SENT");
     }
     catch (const MidiConnectionException& e)
     {
@@ -160,14 +181,14 @@ void MidiManager::sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, cons
     std::this_thread::sleep_for(std::chrono::milliseconds(SysExConstants::kMinSysExDelayMs));
 }
 
-std::vector<uint8_t> MidiManager::requestCurrentPatch()
+std::vector<juce::uint8> MidiManager::requestCurrentPatch()
 {
     return requestSysExData(SysExConstants::RequestType::kRequestEditBuffer,
                            SysExConstants::kPatchPackedDataSize,
                            "patch");
 }
 
-std::vector<uint8_t> MidiManager::requestMasterData()
+std::vector<juce::uint8> MidiManager::requestMasterData()
 {
     return requestSysExData(SysExConstants::RequestType::kRequestMasterParameters,
                            SysExConstants::kMasterPackedDataSize,
@@ -220,7 +241,7 @@ bool MidiManager::performDeviceInquiry()
     }
 }
 
-std::vector<uint8_t> MidiManager::requestSysExData(uint8_t requestType, size_t expectedPackedSize, 
+std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType, size_t expectedPackedSize, 
                                                     const juce::String& requestDescription)
 {
     try
@@ -238,7 +259,7 @@ std::vector<uint8_t> MidiManager::requestSysExData(uint8_t requestType, size_t e
 
         MidiLogger::getInstance().logSysExReceived(response, requestDescription + " response");
 
-        std::vector<uint8_t> packedData(expectedPackedSize);
+        std::vector<juce::uint8> packedData(expectedPackedSize);
         bool decodeSuccess = false;
         
         if (requestType == SysExConstants::RequestType::kRequestEditBuffer)

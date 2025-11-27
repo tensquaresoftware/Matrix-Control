@@ -29,7 +29,7 @@ private:
     std::atomic<bool> isDestroying;
     
     std::atomic<bool> isReceivingSysEx;
-    std::vector<uint8_t> sysExBuffer;
+    std::vector<juce::uint8> sysExBuffer;
     std::mutex bufferMutex;
     
     std::atomic<bool> responseReceived;

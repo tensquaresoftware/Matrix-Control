@@ -1,7 +1,8 @@
-#include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "../Source/Business/MIDI/SysEx/SysExEncoder.h"
+#include <juce_core/juce_core.h>
+
 #include "../Source/Business/MIDI/SysEx/SysExConstants.h"
+#include "../Source/Business/MIDI/SysEx/SysExEncoder.h"
 
 /**
  * Unit tests for SysExEncoder
@@ -21,7 +22,7 @@ public:
             expect(inquiry.getSize() == SysExConstants::DeviceInquiry::kRequestMessageLength,
                    "Device Inquiry should have correct length");
             
-            const auto* data = static_cast<const uint8_t*>(inquiry.getData());
+            const auto* data = static_cast<const juce::uint8*>(inquiry.getData());
             for (size_t i = 0; i < SysExConstants::DeviceInquiry::kRequestMessageLength; ++i)
             {
                 expect(data[i] == SysExConstants::DeviceInquiry::kRequestMessage[i],
@@ -36,7 +37,7 @@ public:
             
             expect(request.getSize() >= 7, "Request message should have minimum length");
             
-            const auto* data = static_cast<const uint8_t*>(request.getData());
+            const auto* data = static_cast<const juce::uint8*>(request.getData());
             expect(data[0] == SysExConstants::kSysExStart, "Should start with F0");
             expect(data[1] == SysExConstants::kManufacturerIdOberheim, "Should have Oberheim ID");
             expect(data[2] == SysExConstants::kDeviceIdMatrix1000, "Should have Matrix-1000 ID");
@@ -48,16 +49,16 @@ public:
         
         beginTest("Checksum calculation");
         {
-            uint8_t testData[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
-            uint8_t checksum = SysExEncoder::calculateChecksum(testData, 5);
+            juce::uint8 testData[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
+            juce::uint8 checksum = SysExEncoder::calculateChecksum(testData, 5);
             expect(checksum <= 0x7F, "Checksum should be 7-bit");
             expect(checksum == 0x0F, "Checksum should be sum & 0x7F (1+2+3+4+5=15=0x0F)");
         }
         
         beginTest("Unpack bytes to nibbles");
         {
-            uint8_t packedBytes[] = { 0x12, 0x34, 0x56 };
-            uint8_t nibbles[6];
+            juce::uint8 packedBytes[] = { 0x12, 0x34, 0x56 };
+            juce::uint8 nibbles[6];
             size_t numNibbles = SysExEncoder::unpackBytes(packedBytes, 3, nibbles);
             
             expect(numNibbles == 6, "Should produce 6 nibbles from 3 bytes");

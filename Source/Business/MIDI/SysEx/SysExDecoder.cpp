@@ -1,13 +1,14 @@
 #include "SysExDecoder.h"
-#include "SysExConstants.h"
+
 #include "../Utilities/MidiLogger.h"
+#include "SysExConstants.h"
 
 SysExDecoder::SysExDecoder(SysExParser& parserRef)
     : parser(parserRef)
 {
 }
 
-bool SysExDecoder::decodePatchSysEx(const juce::MemoryBlock& sysEx, uint8_t* output) const
+bool SysExDecoder::decodePatchSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const
 {
     if (output == nullptr)
     {
@@ -37,7 +38,7 @@ bool SysExDecoder::decodePatchSysEx(const juce::MemoryBlock& sysEx, uint8_t* out
     return success;
 }
 
-bool SysExDecoder::decodeMasterSysEx(const juce::MemoryBlock& sysEx, uint8_t* output) const
+bool SysExDecoder::decodeMasterSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const
 {
     if (output == nullptr)
     {
@@ -78,7 +79,7 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
         return info;
     }
 
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
 
     // Validate structure: F0 7E <chan> 06 02 10 06 00 02 00 <rev-0> <rev-1> <rev-2> <rev-3> F7
     if (data[0] != SysExConstants::kSysExStart ||
@@ -125,7 +126,7 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
     return info;
 }
 
-size_t SysExDecoder::packNibbles(const uint8_t* nibbles, size_t numNibbles, uint8_t* output)
+size_t SysExDecoder::packNibbles(const juce::uint8* nibbles, size_t numNibbles, juce::uint8* output)
 {
     if (nibbles == nullptr || output == nullptr || numNibbles % 2 != 0)
     {
@@ -136,9 +137,9 @@ size_t SysExDecoder::packNibbles(const uint8_t* nibbles, size_t numNibbles, uint
     for (size_t i = 0; i < numBytes; ++i)
     {
         // Low nibble first, then high nibble (Oberheim format)
-        uint8_t lowNibble = nibbles[i * 2] & 0x0F;
-        uint8_t highNibble = nibbles[i * 2 + 1] & 0x0F;
-        output[i] = static_cast<uint8_t>(lowNibble | (highNibble << 4));
+        juce::uint8 lowNibble = nibbles[i * 2] & 0x0F;
+        juce::uint8 highNibble = nibbles[i * 2 + 1] & 0x0F;
+        output[i] = static_cast<juce::uint8>(lowNibble | (highNibble << 4));
     }
     return numBytes;
 }
@@ -146,14 +147,14 @@ size_t SysExDecoder::packNibbles(const uint8_t* nibbles, size_t numNibbles, uint
 bool SysExDecoder::extractPackedData(const juce::MemoryBlock& sysEx,
                                      size_t dataStartIndex,
                                      size_t expectedPackedSize,
-                                     uint8_t* output) const
+                                     juce::uint8* output) const
 {
     if (output == nullptr || sysEx.getSize() < dataStartIndex + expectedPackedSize * 2 + 2)
     {
         return false;
     }
 
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
     size_t totalSize = sysEx.getSize();
 
     // Checksum is second-to-last byte (before F7)

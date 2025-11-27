@@ -1,8 +1,9 @@
 #include <iostream>
 
 #include "MidiLogger.h"
-#include "../SysEx/SysExParser.h"
+
 #include "../SysEx/SysExConstants.h"
+#include "../SysEx/SysExParser.h"
 
 MidiLogger& MidiLogger::getInstance()
 {
@@ -210,15 +211,123 @@ juce::String MidiLogger::formatLogLevelColumn(LogLevel level) const
     return levelColumn.paddedRight(' ', kLogLevelColumnWidth);
 }
 
+juce::String MidiLogger::wrapLogMessage(const juce::String& prefix, const juce::String& message) const
+{
+    int maxLineWidth = getEffectiveLineWidth();
+    int prefixLength = prefix.length();
+    int availableWidth = maxLineWidth - prefixLength;
+    
+    if (prefixLength + message.length() <= maxLineWidth)
+    {
+        return prefix + message;
+    }
+    
+    juce::String wrappedMessage;
+    int messageStart = 0;
+    bool isFirstLine = true;
+    
+    while (messageStart < message.length())
+    {
+        if (isFirstLine)
+        {
+            int firstLineEnd = messageStart + availableWidth;
+            
+            if (firstLineEnd >= message.length())
+            {
+                wrappedMessage += prefix + message.substring(messageStart);
+                break;
+            }
+            
+            int breakPoint = firstLineEnd;
+            
+            for (int i = firstLineEnd; i > messageStart && i > firstLineEnd - 30; --i)
+            {
+                juce::juce_wchar ch = message[i];
+                if (ch == '.' || ch == ':')
+                {
+                    breakPoint = i + 1;
+                    break;
+                }
+            }
+            
+            if (breakPoint == firstLineEnd)
+            {
+                for (int i = firstLineEnd; i > messageStart && i > firstLineEnd - 30; --i)
+                {
+                    if (message[i] == ' ')
+                    {
+                        breakPoint = i + 1;
+                        break;
+                    }
+                }
+            }
+            
+            juce::String firstLineContent = message.substring(messageStart, breakPoint).trimEnd();
+            wrappedMessage += prefix + firstLineContent + "\n";
+            
+            messageStart = breakPoint;
+            while (messageStart < message.length() && message[messageStart] == ' ')
+            {
+                ++messageStart;
+            }
+            
+            isFirstLine = false;
+        }
+        else
+        {
+            int lineEnd = messageStart + maxLineWidth;
+            
+            if (lineEnd >= message.length())
+            {
+                wrappedMessage += message.substring(messageStart);
+                break;
+            }
+            
+            int breakPoint = lineEnd;
+            
+            for (int i = lineEnd; i > messageStart && i > lineEnd - 30; --i)
+            {
+                if (message[i] == ' ')
+                {
+                    breakPoint = i;
+                    break;
+                }
+            }
+            
+            juce::String lineContent = message.substring(messageStart, breakPoint);
+            wrappedMessage += lineContent + "\n";
+            
+            messageStart = breakPoint;
+            while (messageStart < message.length() && message[messageStart] == ' ')
+            {
+                ++messageStart;
+            }
+        }
+    }
+    
+    return wrappedMessage.trimEnd();
+}
+
 void MidiLogger::logMessage(LogLevel level, const juce::String& message)
 {
     if (level > currentLogLevel)
         return;
     
     juce::String levelColumn = formatLogLevelColumn(level);
-    juce::String formattedMessage = levelColumn + " " + getTimestamp() + " - " + message;
+    juce::String prefix = levelColumn + " " + getTimestamp() + " - ";
+    juce::String wrappedMessage = wrapLogMessage(prefix, message);
     
-    writeLog(formattedMessage);
+    juce::StringArray lines;
+    lines.addLines(wrappedMessage);
+    
+    for (int i = 0; i < lines.size(); ++i)
+    {
+        juce::String line = lines[i];
+        if (line.isNotEmpty())
+        {
+            writeLog(line);
+        }
+    }
 }
 
 juce::String MidiLogger::buildSysExHeaderMessage(const juce::String& direction, const juce::String& description, size_t byteCount) const
@@ -260,7 +369,7 @@ void MidiLogger::logSysExReceived(const juce::MemoryBlock& sysEx, const juce::St
     }
 }
 
-void MidiLogger::logProgramChange(uint8_t programNumber, const juce::String& direction)
+void MidiLogger::logProgramChange(juce::uint8 programNumber, const juce::String& direction)
 {
     if (LogLevel::kInfo > currentLogLevel)
         return;
@@ -302,7 +411,7 @@ void MidiLogger::insertNewlineIfNeeded(juce::String& hexString, size_t currentIn
     }
 }
 
-void MidiLogger::appendHexByteWithSpace(juce::String& hexString, uint8_t byte, bool isLastByte) const
+void MidiLogger::appendHexByteWithSpace(juce::String& hexString, juce::uint8 byte, bool isLastByte) const
 {
     hexString += juce::String::toHexString(byte).paddedLeft('0', 2).toUpperCase();
     if (!isLastByte)
@@ -427,20 +536,20 @@ juce::String MidiLogger::analyzeSysExMessage(const juce::MemoryBlock& sysEx) con
             return {};
     }
     
-    uint8_t checksum = extractChecksumFromSysEx(completeSysEx);
+    juce::uint8 checksum = extractChecksumFromSysEx(completeSysEx);
     analysis += " | Checksum: 0x" + juce::String::toHexString(checksum).paddedLeft('0', 2).toUpperCase();
     
     return analysis;
 }
 
-uint8_t MidiLogger::extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const
+juce::uint8 MidiLogger::extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const
 {
     if (sysEx.getSize() < 2)
     {
         return 0;
     }
     
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
     
     if (data[0] == SysExConstants::kSysExStart && 
         data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId)
@@ -464,7 +573,7 @@ juce::MemoryBlock MidiLogger::addSysExDelimiters(const juce::MemoryBlock& sysEx)
         return sysEx;
     }
     
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
     
     if (data[0] == SysExConstants::kSysExStart && 
         data[sysEx.getSize() - 1] == SysExConstants::kSysExEnd)
@@ -473,8 +582,8 @@ juce::MemoryBlock MidiLogger::addSysExDelimiters(const juce::MemoryBlock& sysEx)
     }
     
     juce::MemoryBlock completeSysEx;
-    uint8_t startByte = SysExConstants::kSysExStart;
-    uint8_t endByte = SysExConstants::kSysExEnd;
+    juce::uint8 startByte = SysExConstants::kSysExStart;
+    juce::uint8 endByte = SysExConstants::kSysExEnd;
     
     completeSysEx.append(&startByte, 1);
     completeSysEx.append(sysEx.getData(), sysEx.getSize());

@@ -41,16 +41,16 @@ public:
     bool validateStructure(const juce::MemoryBlock& sysEx) const;
     bool validateChecksum(const juce::MemoryBlock& sysEx) const;
     ValidationResult validateMessageType(const juce::MemoryBlock& sysEx) const;
-    static uint8_t calculateChecksum(const uint8_t* data, size_t length);
-    static size_t packNibbles(const uint8_t* nibbles, size_t numNibbles, uint8_t* output);
+    static juce::uint8 calculateChecksum(const juce::uint8* data, size_t length);
+    static size_t packNibbles(const juce::uint8* nibbles, size_t numNibbles, juce::uint8* output);
 
 private:
     bool validateManufacturerAndDevice(const juce::MemoryBlock& sysEx) const;
-    static MessageType getMessageTypeFromOpcode(uint8_t opcode);
-    static bool isDeviceInquiryMessage(const uint8_t* data);
-    static std::vector<uint8_t> packNibblesToBytes(const uint8_t* nibbles, size_t numNibbles);
-    static bool isDeviceIdResponse(const uint8_t* data);
-    static bool isOberheimMatrix1000Message(const uint8_t* data);
+    static MessageType getMessageTypeFromOpcode(juce::uint8 opcode);
+    static bool isDeviceInquiryMessage(const juce::uint8* data);
+    static std::vector<juce::uint8> packNibblesToBytes(const juce::uint8* nibbles, size_t numNibbles);
+    static bool isDeviceIdResponse(const juce::uint8* data);
+    static bool isOberheimMatrix1000Message(const juce::uint8* data);
     static size_t getExpectedMessageLength(MessageType messageType);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SysExParser)

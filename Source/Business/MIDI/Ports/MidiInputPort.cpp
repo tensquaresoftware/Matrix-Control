@@ -37,12 +37,12 @@ bool MidiInputPort::openPort(const juce::String& deviceId, juce::MidiInputCallba
                     midiInput->start();
                 }
                 portIsOpen = true;
-                MidiLogger::getInstance().logInfo("MIDI input port opened: " + device.name);
+                MidiLogger::getInstance().logInfo("MIDI input port opened: [" + device.name + "]");
                 return true;
             }
             else
             {
-                MidiLogger::getInstance().logError("Failed to open MIDI input device: " + device.name);
+                MidiLogger::getInstance().logError("Failed to open MIDI input device: [" + device.name + "]");
             }
             break;
         }

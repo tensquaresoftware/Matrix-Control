@@ -14,10 +14,10 @@ public:
     void setMidiOutput(juce::MidiOutput* output) noexcept;
 
     void sendSysEx(const juce::MemoryBlock& sysExData);
-    void sendProgramChange(uint8_t programNumber, int channel = 1);
-    void sendNoteOn(uint8_t noteNumber, uint8_t velocity, int channel = 1);
-    void sendNoteOff(uint8_t noteNumber, uint8_t velocity = 64, int channel = 1);
-    void sendControlChange(uint8_t controllerNumber, uint8_t value, int channel = 1);
+    void sendProgramChange(int programNumber, int channel = 1);
+    void sendNoteOn(juce::uint8 noteNumber, juce::uint8 velocity, int channel = 1);
+    void sendNoteOff(juce::uint8 noteNumber, juce::uint8 velocity = 64, int channel = 1);
+    void sendControlChange(int controllerNumber, int value, int channel = 1);
     
     bool isOutputAvailable() const noexcept;
 

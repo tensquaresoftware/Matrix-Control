@@ -1,9 +1,10 @@
 #include <cstring>
 
 #include "SysExEncoder.h"
+
 #include "../Utilities/MidiLogger.h"
 
-juce::MemoryBlock SysExEncoder::encodePatchSysEx(uint8_t patchNumber, const uint8_t* packedData) const
+juce::MemoryBlock SysExEncoder::encodePatchSysEx(juce::uint8 patchNumber, const juce::uint8* packedData) const
 {
     if (packedData == nullptr)
     {
@@ -15,11 +16,11 @@ juce::MemoryBlock SysExEncoder::encodePatchSysEx(uint8_t patchNumber, const uint
     auto header = buildHeader(SysExConstants::Opcode::kSinglePatchData, patchNumber);
 
     // Unpack bytes to nibbles
-    std::vector<uint8_t> nibbles(SysExConstants::kPatchPackedDataSize * 2);
+    std::vector<juce::uint8> nibbles(SysExConstants::kPatchPackedDataSize * 2);
     size_t numNibbles = unpackBytes(packedData, SysExConstants::kPatchPackedDataSize, nibbles.data());
 
     // Calculate checksum on packed data
-    uint8_t checksum = calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize);
+    juce::uint8 checksum = calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize);
 
     // Build complete message
     juce::MemoryBlock message;
@@ -31,7 +32,7 @@ juce::MemoryBlock SysExEncoder::encodePatchSysEx(uint8_t patchNumber, const uint
     return message;
 }
 
-juce::MemoryBlock SysExEncoder::encodeMasterSysEx(uint8_t version, const uint8_t* packedData) const
+juce::MemoryBlock SysExEncoder::encodeMasterSysEx(juce::uint8 version, const juce::uint8* packedData) const
 {
     if (packedData == nullptr)
     {
@@ -43,11 +44,11 @@ juce::MemoryBlock SysExEncoder::encodeMasterSysEx(uint8_t version, const uint8_t
     auto header = buildHeader(SysExConstants::Opcode::kMasterParameterData, version);
 
     // Unpack bytes to nibbles
-    std::vector<uint8_t> nibbles(SysExConstants::kMasterPackedDataSize * 2);
+    std::vector<juce::uint8> nibbles(SysExConstants::kMasterPackedDataSize * 2);
     size_t numNibbles = unpackBytes(packedData, SysExConstants::kMasterPackedDataSize, nibbles.data());
 
     // Calculate checksum on packed data
-    uint8_t checksum = calculateChecksum(packedData, SysExConstants::kMasterPackedDataSize);
+    juce::uint8 checksum = calculateChecksum(packedData, SysExConstants::kMasterPackedDataSize);
 
     // Build complete message
     juce::MemoryBlock message;
@@ -67,9 +68,8 @@ juce::MemoryBlock SysExEncoder::encodeDeviceInquiry()
     return message;
 }
 
-juce::MemoryBlock SysExEncoder::encodeRequestMessage(uint8_t requestType, uint8_t patchNumber) const
+juce::MemoryBlock SysExEncoder::encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber) const
 {
-    // Build header: F0 10 06 04 <request_type> <patch_number> F7
     auto header = buildHeader(SysExConstants::Opcode::kRequestData, requestType);
 
     juce::MemoryBlock message;
@@ -80,7 +80,7 @@ juce::MemoryBlock SysExEncoder::encodeRequestMessage(uint8_t requestType, uint8_
     return message;
 }
 
-size_t SysExEncoder::unpackBytes(const uint8_t* bytes, size_t numBytes, uint8_t* output)
+size_t SysExEncoder::unpackBytes(const juce::uint8* bytes, size_t numBytes, juce::uint8* output)
 {
     for (size_t i = 0; i < numBytes; ++i)
     {
@@ -91,9 +91,9 @@ size_t SysExEncoder::unpackBytes(const uint8_t* bytes, size_t numBytes, uint8_t*
     return numBytes * 2;
 }
 
-uint8_t SysExEncoder::calculateChecksum(const uint8_t* data, size_t length)
+juce::uint8 SysExEncoder::calculateChecksum(const juce::uint8* data, size_t length)
 {
-    uint8_t checksum = 0;
+    juce::uint8 checksum = 0;
     for (size_t i = 0; i < length; ++i)
     {
         checksum += data[i];
@@ -101,9 +101,9 @@ uint8_t SysExEncoder::calculateChecksum(const uint8_t* data, size_t length)
     return checksum & 0x7F;
 }
 
-std::vector<uint8_t> SysExEncoder::buildHeader(uint8_t opcode, uint8_t headerData) const
+std::vector<juce::uint8> SysExEncoder::buildHeader(juce::uint8 opcode, juce::uint8 headerData) const
 {
-    std::vector<uint8_t> header;
+    std::vector<juce::uint8> header;
     header.push_back(SysExConstants::kSysExStart);
     header.push_back(SysExConstants::kManufacturerIdOberheim);
     header.push_back(SysExConstants::kDeviceIdMatrix1000);

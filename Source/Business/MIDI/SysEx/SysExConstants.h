@@ -1,38 +1,38 @@
 #pragma once
 
-#include <cstdint>
+#include <juce_core/juce_core.h>
 
 namespace SysExConstants
 {
     // SysEx message delimiters
-    constexpr uint8_t kSysExStart = 0xF0;
-    constexpr uint8_t kSysExEnd = 0xF7;
+    constexpr juce::uint8 kSysExStart = 0xF0;
+    constexpr juce::uint8 kSysExEnd = 0xF7;
 
     // Manufacturer and Device IDs
-    constexpr uint8_t kManufacturerIdOberheim = 0x10;
-    constexpr uint8_t kDeviceIdMatrix1000 = 0x06;
+    constexpr juce::uint8 kManufacturerIdOberheim = 0x10;
+    constexpr juce::uint8 kDeviceIdMatrix1000 = 0x06;
 
     // SysEx opcodes for Matrix-1000
     namespace Opcode
     {
-        constexpr uint8_t kSinglePatchData = 0x01;
-        constexpr uint8_t kSplitPatchData = 0x02;  // Matrix-6 compatibility
-        constexpr uint8_t kMasterParameterData = 0x03;
-        constexpr uint8_t kRequestData = 0x04;
-        constexpr uint8_t kRemoteParameterEdit = 0x06;
-        constexpr uint8_t kSetGroupMode = 0x07;
-        constexpr uint8_t kSetBank = 0x0A;
-        constexpr uint8_t kRemoteParameterEditMatrix = 0x0B;
+        constexpr juce::uint8 kSinglePatchData = 0x01;
+        constexpr juce::uint8 kSplitPatchData = 0x02;  // Matrix-6 compatibility
+        constexpr juce::uint8 kMasterParameterData = 0x03;
+        constexpr juce::uint8 kRequestData = 0x04;
+        constexpr juce::uint8 kRemoteParameterEdit = 0x06;
+        constexpr juce::uint8 kSetGroupMode = 0x07;
+        constexpr juce::uint8 kSetBank = 0x0A;
+        constexpr juce::uint8 kRemoteParameterEditMatrix = 0x0B;
     }
 
     // Request types (for opcode 0x04)
     namespace RequestType
     {
-        constexpr uint8_t kRequestAllBank = 0x00;  // Not implemented in v1.0
-        constexpr uint8_t kRequestSinglePatch = 0x01;
-        constexpr uint8_t kRequestSplitPatch = 0x02;  // Matrix-6 compatibility
-        constexpr uint8_t kRequestMasterParameters = 0x03;
-        constexpr uint8_t kRequestEditBuffer = 0x04;
+        constexpr juce::uint8 kRequestAllBank = 0x00;  // Not implemented in v1.0
+        constexpr juce::uint8 kRequestSinglePatch = 0x01;
+        constexpr juce::uint8 kRequestSplitPatch = 0x02;  // Matrix-6 compatibility
+        constexpr juce::uint8 kRequestMasterParameters = 0x03;
+        constexpr juce::uint8 kRequestEditBuffer = 0x04;
     }
 
     // SysEx message lengths (total transmitted bytes)
@@ -54,24 +54,24 @@ namespace SysExConstants
     // Device Inquiry (Universal SysEx)
     namespace DeviceInquiry
     {
-        constexpr uint8_t kUniversalNonRealtimeId = 0x7E;
-        constexpr uint8_t kDeviceIdAll = 0x7F;
-        constexpr uint8_t kSubIdGeneralInfo = 0x06;
-        constexpr uint8_t kSubIdDeviceIdRequest = 0x01;
-        constexpr uint8_t kSubIdDeviceIdReply = 0x02;
+        constexpr juce::uint8 kUniversalNonRealtimeId = 0x7E;
+        constexpr juce::uint8 kDeviceIdAll = 0x7F;
+        constexpr juce::uint8 kSubIdGeneralInfo = 0x06;
+        constexpr juce::uint8 kSubIdDeviceIdRequest = 0x01;
+        constexpr juce::uint8 kSubIdDeviceIdReply = 0x02;
 
         // Device Inquiry request message: F0 7E 7F 06 01 F7
-        constexpr uint8_t kRequestMessage[] = { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7 };
+        constexpr juce::uint8 kRequestMessage[] = { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7 };
         constexpr size_t kRequestMessageLength = 6;
 
         // Expected response format: F0 7E <chan> 06 02 10 06 00 02 00 <rev-0> <rev-1> <rev-2> <rev-3> F7
         // Manufacturer: 0x10 (Oberheim)
         // Family: 0x06 (Matrix series)
-        // Member: 0x00 0x02 (Matrix-1000)
-        constexpr uint8_t kExpectedManufacturer = 0x10;
-        constexpr uint8_t kExpectedFamily = 0x06;
-        constexpr uint8_t kExpectedMemberLow = 0x00;
-        constexpr uint8_t kExpectedMemberHigh = 0x02;
+        // Member: 0x10 0x02 (Matrix-1000)
+        constexpr juce::uint8 kExpectedManufacturer = 0x10;
+        constexpr juce::uint8 kExpectedFamily = 0x06;
+        constexpr juce::uint8 kExpectedMemberLow = 0x00;
+        constexpr juce::uint8 kExpectedMemberHigh = 0x02;
     }
 }
 

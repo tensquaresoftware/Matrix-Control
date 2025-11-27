@@ -8,11 +8,11 @@
 
 struct DeviceIdInfo
 {
-    uint8_t manufacturerId;
-    uint8_t familyLow;
-    uint8_t familyHigh;
-    uint8_t memberLow;
-    uint8_t memberHigh;
+    juce::uint8 manufacturerId;
+    juce::uint8 familyLow;
+    juce::uint8 familyHigh;
+    juce::uint8 memberLow;
+    juce::uint8 memberHigh;
     juce::String version;
     bool isValid;
 };
@@ -23,10 +23,10 @@ public:
     explicit SysExDecoder(SysExParser& parserRef);
     ~SysExDecoder() = default;
 
-    bool decodePatchSysEx(const juce::MemoryBlock& sysEx, uint8_t* output) const;
-    bool decodeMasterSysEx(const juce::MemoryBlock& sysEx, uint8_t* output) const;
+    bool decodePatchSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const;
+    bool decodeMasterSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const;
     DeviceIdInfo decodeDeviceId(const juce::MemoryBlock& sysEx) const;
-    static size_t packNibbles(const uint8_t* nibbles, size_t numNibbles, uint8_t* output);
+    static size_t packNibbles(const juce::uint8* nibbles, size_t numNibbles, juce::uint8* output);
 
 private:
     SysExParser& parser;
@@ -34,7 +34,7 @@ private:
     bool extractPackedData(const juce::MemoryBlock& sysEx,
                           size_t dataStartIndex,
                           size_t expectedPackedSize,
-                          uint8_t* output) const;
+                          juce::uint8* output) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SysExDecoder)
 };

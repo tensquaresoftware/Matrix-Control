@@ -25,12 +25,12 @@ public:
     bool setMidiInputPort(const juce::String& deviceId);
     bool setMidiOutputPort(const juce::String& deviceId);
 
-    void sendPatch(uint8_t patchNumber, const uint8_t* packedData);
-    void sendMaster(uint8_t version, const uint8_t* packedData);
-    void sendProgramChange(uint8_t programNumber, int channel = 1);
+    void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
+    void sendMaster(juce::uint8 version, const juce::uint8* packedData);
+    void sendProgramChange(int programNumber, int channel = 1);
 
-    std::vector<uint8_t> requestCurrentPatch();
-    std::vector<uint8_t> requestMasterData();
+    std::vector<juce::uint8> requestCurrentPatch();
+    std::vector<juce::uint8> requestMasterData();
     
     bool performDeviceInquiry();
     void run() override;
@@ -52,7 +52,7 @@ private:
     
     void stopMidiInputCallbacks();
     void sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, const juce::String& description);
-    std::vector<uint8_t> requestSysExData(uint8_t requestType, size_t expectedPackedSize, 
+    std::vector<juce::uint8> requestSysExData(juce::uint8 requestType, size_t expectedPackedSize, 
                                          const juce::String& requestDescription);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)

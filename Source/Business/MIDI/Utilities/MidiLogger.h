@@ -36,7 +36,7 @@ public:
     void logMessage(LogLevel level, const juce::String& message);
     void logSysExSent(const juce::MemoryBlock& sysEx, const juce::String& description = "");
     void logSysExReceived(const juce::MemoryBlock& sysEx, const juce::String& description = "");
-    void logProgramChange(uint8_t programNumber, const juce::String& direction = "");
+    void logProgramChange(juce::uint8 programNumber, const juce::String& direction = "");
     void logError(const juce::String& errorMessage);
     void logWarning(const juce::String& warningMessage);
     void logInfo(const juce::String& infoMessage);
@@ -66,15 +66,16 @@ private:
     void openNewLogFile();
     void writeSessionStartedHeader();
     juce::String formatLogLevelColumn(LogLevel level) const;
+    juce::String wrapLogMessage(const juce::String& prefix, const juce::String& message) const;
     juce::String buildSysExHeaderMessage(const juce::String& direction, const juce::String& description, size_t byteCount) const;
     int calculateBytesPerLine() const;
     juce::String formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const;
     void insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const;
-    void appendHexByteWithSpace(juce::String& hexString, uint8_t byte, bool isLastByte) const;
+    void appendHexByteWithSpace(juce::String& hexString, juce::uint8 byte, bool isLastByte) const;
     juce::String buildTimestampString() const;
     void createLogDirectoryIfNeeded(juce::File& logDir) const;
     juce::String analyzeSysExMessage(const juce::MemoryBlock& sysEx) const;
-    uint8_t extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const;
+    juce::uint8 extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const;
     juce::MemoryBlock addSysExDelimiters(const juce::MemoryBlock& sysEx) const;
     
     LogLevel currentLogLevel = LogLevel::kInfo;

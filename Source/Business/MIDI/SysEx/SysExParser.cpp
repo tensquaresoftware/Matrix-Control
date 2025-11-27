@@ -1,8 +1,9 @@
 #include <vector>
 
 #include "SysExParser.h"
-#include "SysExConstants.h"
+
 #include "../Utilities/MidiLogger.h"
+#include "SysExConstants.h"
 
 SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock& sysEx) const
 {
@@ -21,7 +22,7 @@ SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock
     auto typeResult = validateMessageType(sysEx);
     if (!typeResult.isValid)
     {
-        MidiLogger::getInstance().logError("SysEx validation failed: " + typeResult.errorMessage);
+        MidiLogger::getInstance().logError("SysEx validation failed! " + typeResult.errorMessage);
         return typeResult;
     }
 
@@ -41,7 +42,7 @@ bool SysExParser::validateStructure(const juce::MemoryBlock& sysEx) const
         return false;
     }
 
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
     
     if (data[0] != SysExConstants::kSysExStart)
     {
@@ -63,7 +64,7 @@ bool SysExParser::validateChecksum(const juce::MemoryBlock& sysEx) const
         return false;
     }
 
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
     
     if (isDeviceInquiryMessage(data))
     {
@@ -78,7 +79,7 @@ bool SysExParser::validateChecksum(const juce::MemoryBlock& sysEx) const
         return false;
     }
 
-    uint8_t receivedChecksum = data[checksumIndex];
+    juce::uint8 receivedChecksum = data[checksumIndex];
     size_t numNibbles = checksumIndex - dataStartIndex;
     
     if (numNibbles == 0 || (numNibbles % 2 != 0))
@@ -86,8 +87,8 @@ bool SysExParser::validateChecksum(const juce::MemoryBlock& sysEx) const
         return false;
     }
 
-    std::vector<uint8_t> packedData = packNibblesToBytes(&data[dataStartIndex], numNibbles);
-    uint8_t calculatedChecksum = calculateChecksum(packedData.data(), packedData.size());
+    std::vector<juce::uint8> packedData = packNibblesToBytes(&data[dataStartIndex], numNibbles);
+    juce::uint8 calculatedChecksum = calculateChecksum(packedData.data(), packedData.size());
 
     return (calculatedChecksum & 0x7F) == receivedChecksum;
 }
@@ -99,7 +100,7 @@ SysExParser::ValidationResult SysExParser::validateMessageType(const juce::Memor
         return ValidationResult::failure("Message too short");
     }
 
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
 
     if (isDeviceIdResponse(data))
     {
@@ -115,7 +116,7 @@ SysExParser::ValidationResult SysExParser::validateMessageType(const juce::Memor
         return ValidationResult::failure("Not an Oberheim Matrix-1000 message");
     }
 
-    uint8_t opcode = data[3];
+    juce::uint8 opcode = data[3];
     MessageType messageType = getMessageTypeFromOpcode(opcode);
 
     if (messageType == MessageType::kUnknown)
@@ -134,9 +135,9 @@ SysExParser::ValidationResult SysExParser::validateMessageType(const juce::Memor
     return ValidationResult::success(messageType);
 }
 
-uint8_t SysExParser::calculateChecksum(const uint8_t* data, size_t length)
+juce::uint8 SysExParser::calculateChecksum(const juce::uint8* data, size_t length)
 {
-    uint8_t checksum = 0;
+    juce::uint8 checksum = 0;
     for (size_t i = 0; i < length; ++i)
     {
         checksum += data[i];
@@ -144,15 +145,15 @@ uint8_t SysExParser::calculateChecksum(const uint8_t* data, size_t length)
     return checksum & 0x7F;
 }
 
-size_t SysExParser::packNibbles(const uint8_t* nibbles, size_t numNibbles, uint8_t* output)
+size_t SysExParser::packNibbles(const juce::uint8* nibbles, size_t numNibbles, juce::uint8* output)
 {
     size_t numBytes = numNibbles / 2;
     for (size_t i = 0; i < numBytes; ++i)
     {
         // Low nibble first, then high nibble (Oberheim format)
-        uint8_t lowNibble = nibbles[i * 2] & 0x0F;
-        uint8_t highNibble = nibbles[i * 2 + 1] & 0x0F;
-        output[i] = static_cast<uint8_t>(lowNibble | (highNibble << 4));
+        juce::uint8 lowNibble = nibbles[i * 2] & 0x0F;
+        juce::uint8 highNibble = nibbles[i * 2 + 1] & 0x0F;
+        output[i] = static_cast<juce::uint8>(lowNibble | (highNibble << 4));
     }
     return numBytes;
 }
@@ -164,7 +165,7 @@ bool SysExParser::validateManufacturerAndDevice(const juce::MemoryBlock& sysEx) 
         return false;
     }
 
-    const auto* data = static_cast<const uint8_t*>(sysEx.getData());
+    const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
 
     if (isDeviceInquiryMessage(data))
     {
@@ -184,7 +185,7 @@ bool SysExParser::validateManufacturerAndDevice(const juce::MemoryBlock& sysEx) 
     return true;
 }
 
-SysExParser::MessageType SysExParser::getMessageTypeFromOpcode(uint8_t opcode)
+SysExParser::MessageType SysExParser::getMessageTypeFromOpcode(juce::uint8 opcode)
 {
     switch (opcode)
     {
@@ -199,21 +200,21 @@ SysExParser::MessageType SysExParser::getMessageTypeFromOpcode(uint8_t opcode)
     }
 }
 
-bool SysExParser::isDeviceInquiryMessage(const uint8_t* data)
+bool SysExParser::isDeviceInquiryMessage(const juce::uint8* data)
 {
     return data[0] == SysExConstants::kSysExStart &&
            data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId;
 }
 
-std::vector<uint8_t> SysExParser::packNibblesToBytes(const uint8_t* nibbles, size_t numNibbles)
+std::vector<juce::uint8> SysExParser::packNibblesToBytes(const juce::uint8* nibbles, size_t numNibbles)
 {
     size_t numBytes = numNibbles / 2;
-    std::vector<uint8_t> packedData(numBytes);
+    std::vector<juce::uint8> packedData(numBytes);
     packNibbles(nibbles, numNibbles, packedData.data());
     return packedData;
 }
 
-bool SysExParser::isDeviceIdResponse(const uint8_t* data)
+bool SysExParser::isDeviceIdResponse(const juce::uint8* data)
 {
     return data[0] == SysExConstants::kSysExStart &&
            data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId &&
@@ -221,7 +222,7 @@ bool SysExParser::isDeviceIdResponse(const uint8_t* data)
            data[4] == SysExConstants::DeviceInquiry::kSubIdDeviceIdReply;
 }
 
-bool SysExParser::isOberheimMatrix1000Message(const uint8_t* data)
+bool SysExParser::isOberheimMatrix1000Message(const juce::uint8* data)
 {
     return data[1] == SysExConstants::kManufacturerIdOberheim &&
            data[2] == SysExConstants::kDeviceIdMatrix1000;

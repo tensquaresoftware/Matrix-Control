@@ -1,4 +1,5 @@
 #include "MidiSender.h"
+
 #include "../Exceptions/Exceptions.h"
 #include "../Utilities/MidiLogger.h"
 
@@ -23,16 +24,16 @@ void MidiSender::sendSysEx(const juce::MemoryBlock& sysExData)
     MidiLogger::getInstance().logSysExSent(sysExData);
 }
 
-void MidiSender::sendProgramChange(uint8_t programNumber, int channel)
+void MidiSender::sendProgramChange(int programNumber, int channel)
 {
     ensureOutputAvailable();
 
     juce::MidiMessage message = juce::MidiMessage::programChange(channel, programNumber);
     midiOutput->sendMessageNow(message);
-    MidiLogger::getInstance().logProgramChange(programNumber, "SENT");
+    MidiLogger::getInstance().logProgramChange(static_cast<juce::uint8>(programNumber), "SENT");
 }
 
-void MidiSender::sendNoteOn(uint8_t noteNumber, uint8_t velocity, int channel)
+void MidiSender::sendNoteOn(juce::uint8 noteNumber, juce::uint8 velocity, int channel)
 {
     ensureOutputAvailable();
 
@@ -40,7 +41,7 @@ void MidiSender::sendNoteOn(uint8_t noteNumber, uint8_t velocity, int channel)
     midiOutput->sendMessageNow(message);
 }
 
-void MidiSender::sendNoteOff(uint8_t noteNumber, uint8_t velocity, int channel)
+void MidiSender::sendNoteOff(juce::uint8 noteNumber, juce::uint8 velocity, int channel)
 {
     ensureOutputAvailable();
 
@@ -48,7 +49,7 @@ void MidiSender::sendNoteOff(uint8_t noteNumber, uint8_t velocity, int channel)
     midiOutput->sendMessageNow(message);
 }
 
-void MidiSender::sendControlChange(uint8_t controllerNumber, uint8_t value, int channel)
+void MidiSender::sendControlChange(int controllerNumber, int value, int channel)
 {
     ensureOutputAvailable();
 

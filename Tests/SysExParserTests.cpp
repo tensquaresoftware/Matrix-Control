@@ -1,7 +1,8 @@
-#include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "../Source/Business/MIDI/SysEx/SysExParser.h"
+#include <juce_core/juce_core.h>
+
 #include "../Source/Business/MIDI/SysEx/SysExConstants.h"
+#include "../Source/Business/MIDI/SysEx/SysExParser.h"
 
 /**
  * Unit tests for SysExParser
@@ -26,9 +27,9 @@ public:
             validPatch.append(&SysExConstants::kSysExStart, 1);
             validPatch.append(&SysExConstants::kManufacturerIdOberheim, 1);
             validPatch.append(&SysExConstants::kDeviceIdMatrix1000, 1);
-            uint8_t opcode = SysExConstants::Opcode::kSinglePatchData;
+            juce::uint8 opcode = SysExConstants::Opcode::kSinglePatchData;
             validPatch.append(&opcode, 1);
-            uint8_t patchNum = 5;
+            juce::uint8 patchNum = 5;
             validPatch.append(&patchNum, 1);
             
             // Add minimal nibbles (need at least some data for checksum calculation)
@@ -56,7 +57,7 @@ public:
             juce::MemoryBlock invalidSysEx;
             invalidSysEx.append(&SysExConstants::kManufacturerIdOberheim, 1);
             invalidSysEx.append(&SysExConstants::kDeviceIdMatrix1000, 1);
-            uint8_t f7 = SysExConstants::kSysExEnd;
+            juce::uint8 f7 = SysExConstants::kSysExEnd;
             invalidSysEx.append(&f7, 1);
             
             auto result = parser.validateStructure(invalidSysEx);
@@ -67,14 +68,14 @@ public:
         {
             juce::MemoryBlock wrongManufacturer;
             wrongManufacturer.append(&SysExConstants::kSysExStart, 1);
-            uint8_t wrongManuf = 0x20;  // Wrong manufacturer
+            juce::uint8 wrongManuf = 0x20;  // Wrong manufacturer
             wrongManufacturer.append(&wrongManuf, 1);
             wrongManufacturer.append(&SysExConstants::kDeviceIdMatrix1000, 1);
-            uint8_t opcode = SysExConstants::Opcode::kSinglePatchData;
+            juce::uint8 opcode = SysExConstants::Opcode::kSinglePatchData;
             wrongManufacturer.append(&opcode, 1);
-            uint8_t patchNum = 5;
+            juce::uint8 patchNum = 5;
             wrongManufacturer.append(&patchNum, 1);
-            uint8_t f7 = SysExConstants::kSysExEnd;
+            juce::uint8 f7 = SysExConstants::kSysExEnd;
             wrongManufacturer.append(&f7, 1);
             
             // validateSysEx calls validateManufacturerAndDevice internally
@@ -90,27 +91,27 @@ public:
             // Device ID response: F0 7E <chan> 06 02 10 06 00 02 00 <rev...> F7
             juce::MemoryBlock deviceId;
             deviceId.append(&SysExConstants::kSysExStart, 1);
-            uint8_t universalId = SysExConstants::DeviceInquiry::kUniversalNonRealtimeId;
+            juce::uint8 universalId = SysExConstants::DeviceInquiry::kUniversalNonRealtimeId;
             deviceId.append(&universalId, 1);
-            uint8_t channel = 0x7F;
+            juce::uint8 channel = 0x7F;
             deviceId.append(&channel, 1);
-            uint8_t subId1 = SysExConstants::DeviceInquiry::kSubIdGeneralInfo;
+            juce::uint8 subId1 = SysExConstants::DeviceInquiry::kSubIdGeneralInfo;
             deviceId.append(&subId1, 1);
-            uint8_t subId2 = SysExConstants::DeviceInquiry::kSubIdDeviceIdReply;
+            juce::uint8 subId2 = SysExConstants::DeviceInquiry::kSubIdDeviceIdReply;
             deviceId.append(&subId2, 1);
-            uint8_t manuf = SysExConstants::DeviceInquiry::kExpectedManufacturer;
+            juce::uint8 manuf = SysExConstants::DeviceInquiry::kExpectedManufacturer;
             deviceId.append(&manuf, 1);
-            uint8_t family = SysExConstants::DeviceInquiry::kExpectedFamily;
+            juce::uint8 family = SysExConstants::DeviceInquiry::kExpectedFamily;
             deviceId.append(&family, 1);
-            uint8_t familyHigh = 0x00;
+            juce::uint8 familyHigh = 0x00;
             deviceId.append(&familyHigh, 1);
-            uint8_t memberLow = SysExConstants::DeviceInquiry::kExpectedMemberLow;
+            juce::uint8 memberLow = SysExConstants::DeviceInquiry::kExpectedMemberLow;
             deviceId.append(&memberLow, 1);
-            uint8_t memberHigh = SysExConstants::DeviceInquiry::kExpectedMemberHigh;
+            juce::uint8 memberHigh = SysExConstants::DeviceInquiry::kExpectedMemberHigh;
             deviceId.append(&memberHigh, 1);
-            uint8_t rev[4] = {0x20, 0x31, 0x31, 0x30};  // " 1.10"
+            juce::uint8 rev[4] = {0x20, 0x31, 0x31, 0x30};  // " 1.10"
             deviceId.append(rev, 4);
-            uint8_t f7 = SysExConstants::kSysExEnd;
+            juce::uint8 f7 = SysExConstants::kSysExEnd;
             deviceId.append(&f7, 1);
             
             auto result = parser.validateMessageType(deviceId);

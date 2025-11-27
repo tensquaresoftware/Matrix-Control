@@ -1,6 +1,7 @@
 #include <thread>
 
 #include "MidiReceiver.h"
+
 #include "../Utilities/MidiLogger.h"
 
 MidiReceiver::MidiReceiver()
@@ -55,7 +56,7 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput* source,
 
     if (message.isSysEx())
     {
-        const uint8_t* sysExData = message.getSysExData();
+        const juce::uint8* sysExData = message.getSysExData();
         int sysExSize = message.getSysExDataSize();
 
         MidiLogger::getInstance().logInfo("SysEx message detected: " + 
@@ -75,7 +76,7 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput* source,
     else if (message.isProgramChange())
     {
         MidiLogger::getInstance().logProgramChange(
-            static_cast<uint8_t>(message.getProgramChangeNumber()), "RECEIVED");
+            static_cast<juce::uint8>(message.getProgramChangeNumber()), "RECEIVED");
     }
     else
     {
