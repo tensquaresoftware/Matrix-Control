@@ -3,7 +3,8 @@
 ================================================================================
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
-- Dernière mise à jour : 2025-11-15
+- Dernière mise à jour : 2025-11-27
+
 
 ================================================================================
 ## COMMUNICATION
@@ -23,13 +24,14 @@
 - Garantir pérennité et maintenabilité du code généré
 - Solutions optimales et conformes aux standards professionnels
 
+
 ================================================================================
 ## ENVIRONNEMENT DE DÉVELOPPEMENT
 ================================================================================
 
 [Système & Outils]
 - Plateforme : MacBook Pro M5 avec macOS Tahoe
-- IDE : Cursor 2 (avec Agent IA)
+- IDE : Cursor (avec abonnement mensuel Agent IA)
 - Compilateur : Xcode 26
 - Build system : CMake
 - Framework audio : JUCE 8.0.10
@@ -45,6 +47,7 @@
 - Vérifie que chaque API, classe et méthode existe dans JUCE 8
 - Évite toute syntaxe obsolète (JUCE 7, JUCE 6, etc.)
 - Signale explicitement si tu n'es pas certain d'une API
+
 
 ================================================================================
 ## STANDARDS C++ & QUALITÉ
@@ -71,18 +74,22 @@
 
 [Organisation des includes]
 1. Headers système C++ (ex : <vector>, <memory>, etc. puis sauter une ligne)
-2. Headers JUCE (ex : <JuceHeader.h>, etc. puis sauter une ligne)
+2. Headers JUCE (ex : <juce_core/juce_core.h>, etc. puis sauter une ligne)
 3. Headers du projet (ex : "PatchModel.h", etc. puis sauter une ligne)
 
 [Organisation des classes]
-- Regroupe les membres et les méthodes de façon logique dans les .h
-- Regrouper les méthodes de façon logique dans les .cpp, en faisant en sorte qu'une méthode appelée dans une autre méthode se trouvent proches dans le code, pour faciliter la relecture
+- Regroupe les membres et les méthodes de façon logique dans les .h (exemple : paires de getter/setter, etc.)
+- Mettre les variables membres (qui doivent presque toujours être privées) après toutes les déclarations de méthodes publiques et protégées
+- Les méthodes privées doivent aller vers la fin de la classe, après les variables membres
+- Si la classe n'a pas de sémantique de copie par valeur, utiliser `JUCE_DECLARE_NON_COPYABLE` (dernier élément de la déclaration)
+- Les constructeurs qui prennent un seul paramètre doivent généralement être marqués `explicit`
+- Regrouper les méthodes de façon logique dans les .cpp, en faisant en sorte qu'une méthode appelée dans une autre méthode se trouvent proches dans le code, afin de faciliter la relecture
 
 [Principes SOLID & Clean Code / Clean Architecture (Robert C. Martin)]
 - Code lisible et compréhensible par un humain
 - Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
-- Pas de commentaires lorsque ceux-ci sont évidents ou inutiles
-- Toujours préférer la refactorisation d'un bloc de code avec un nom de fonction très explicite, à un commentaire qui pourrait à la longue mentir... (le code a toujours raison)
+- Éviter au maximum les commentaires, ne les utiliser que lorsque c'est absolument nécessaire
+- Toujours préférer la refactorisation d'un bloc de code avec un nom de fonction très explicite, à la place d'un commentaire qui pourrait à la longue mentir... (le code a toujours raison)
 - Fonctions courtes : 5-15 lignes idéalement
 - Un seul niveau d'abstraction par fonction
 - Une seule responsabilité (Single Responsibility)
@@ -94,10 +101,126 @@
 - std::optional > null
 - Traiter les erreurs au niveau approprié
 
-[Gestion du code existant]
-- Ne JAMAIS supprimer les commentaires que j'ai moi-même placés dans le code
-- Préserver l'intégrité structurelle du code existant
-- Respecter les patterns déjà implémentés
+
+================================================================================
+## FORMATAGE & STYLE JUCE
+================================================================================
+
+[Formatage et espacement]
+- Pas de caractères de tabulation ! Utiliser 4 espaces pour l'indentation
+- Style Allman pour les accolades (accolade ouvrante sur nouvelle ligne) :
+  ```cpp
+  if (x == 0)        // Oui !
+  {
+      foobar();
+      return "zero";
+  }
+  ```
+- Toujours mettre un espace avant et après les opérateurs binaires : `x = 1 + y - 2 * z / 3;`
+- L'opérateur `!` doit toujours être suivi d'un espace : `if (! foo)`
+- L'opérateur `~` doit être précédé d'un espace, mais pas suivi
+- Les opérateurs `++` et `--` n'ont pas d'espace entre l'opérateur et l'opérande : `++i`, `--j`
+- Jamais d'espace avant une virgule, toujours un espace après : `foo (x, y);`
+- Toujours un espace avant une parenthèse ouvrante contenant du texte : `foo (123);`
+- Jamais d'espace avant une paire de parenthèses vides : `foo();`
+- Pas d'espace avant un crochet ouvrant utilisé comme index de tableau : `foo[1]`
+- Ligne vide avant `if`, `for`, `while`, `do` quand précédés d'une autre instruction
+- Ligne vide après une accolade fermante `}` (sauf si la ligne suivante est juste une autre accolade fermante)
+- Ne pas écrire les `if` sur une seule ligne... sauf pour des séries de `if` similaires alignés verticalement pour montrer un pattern :
+  ```cpp
+  if (x == 1) return "one";
+  if (x == 2) return "two";
+  if (x == 3) return "three";
+  ```
+- Oublier les accolades pour des instructions `if` trivialement simples d'une ligne
+- Dans un `if-else` avec plusieurs branches, toutes les branches doivent être formatées de la même manière (toutes avec ou toutes sans accolades)
+- Ne JAMAIS mettre un `else` après un `return` ! Utiliser plutôt :
+  ```cpp
+  if (foobar())
+      return doSomething();
+  doSomethingElse();  // Mieux !
+  ```
+
+[Déclarations de pointeurs et références]
+- Toujours mettre un espace après le type, jamais avant : `SomeObject* myObject`, `SomeObject& myObject`
+- Ne jamais déclarer plusieurs pointeurs/références du même type dans une seule déclaration
+- Préférer les smart pointers ou typedef pour éviter les astérisques multiples
+
+[Modificateur const]
+- Mettre `const` avant le nom du type : `const Thing& t;` (pas `Thing const& t;`)
+
+[Opérateurs et expressions multi-lignes]
+- Quand on divise une expression contenant des opérateurs sur plusieurs lignes, chaque nouvelle ligne doit commencer par l'opérateur :
+  ```cpp
+  auto xyz = foo + bar
+              + func (123)
+              - def + 4321;
+  ```
+- Même principe pour l'opérateur point (méthodes chaînées) :
+  ```cpp
+  auto t = AffineTransform::translation (x, y)
+                         .scaled (2.0f)
+                         .rotated (0.5f);
+  ```
+
+[Lambdas]
+- Style préféré :
+  ```cpp
+  auto myLambda = [] { return 123; };
+  auto myLambda = [this, &x] (int z) -> float { return x + z; };
+  auto longerLambda = [] (int x, int y) -> int
+  {
+      // ...multiple lines of stuff...
+  };
+  ```
+
+[Valeurs nulles et pointeurs]
+- Ne JAMAIS utiliser `NULL`, `null`, ou `0` pour un pointeur nul ! Toujours utiliser `nullptr`
+- Quand on obtient un pointeur possiblement nul et qu'on l'utilise seulement s'il est non-nul, limiter la portée du pointeur autant que possible :
+  ```cpp
+  if (auto* f = getFoo())
+      f->doSomething();
+  // f est hors de portée ici, impossible d'utiliser un pointeur nul par erreur
+  ```
+
+[Passage de paramètres]
+- Pour les petits objets POD, toujours passer par valeur, pas par référence
+- Utiliser `const Foo&` seulement pour les objets complexes (Array, String, etc.)
+- Classes JUCE à toujours passer par valeur : Point, Time, RelativeTime, Colour, Identifier, ModifierKeys, JustificationType, Range, PixelRGB, PixelARGB, Rectangle
+
+[Opérateurs d'incrémentation]
+- Toujours préférer pré-incrémentation à post-incrémentation : `for (int i = 0; i < 10; ++i)`
+
+[Bibliothèque standard]
+- Toujours préférer les versions std des fonctions plutôt que les équivalents C anciens
+- Utiliser `std::abs`, `std::sqrt`, `std::sin`, `std::cos`, `std::pow` plutôt que `fabs`, `sqrtf`, `powf`, etc.
+
+[Types]
+- Ne jamais utiliser `unsigned` seul - toujours écrire `unsigned int`
+- Utiliser les types JUCE : `int8`, `uint8`, `int16`, `uint16`, `int32`, `uint32`, `int64`, `uint64`
+- Préférer les boucles range-based-for pour itérer sur les conteneurs plutôt que les boucles for brutes
+
+[Auto]
+- Style "almost-always-auto" mais éviter dans certains cas :
+  - `auto x = 0;` → pas OK (pas évident que c'est un int signé)
+  - `for (int i = 0; i < someNumber; ++i)` → OK (clair que c'est un int signé)
+  - `bool someCondition = false;` → OK (plus clair que auto)
+  - `auto someResult = thisReturnsABool();` → OK (utiliser auto si le RHS est une expression)
+
+[Commentaires]
+- Pour les commentaires courts d'une ou deux lignes, préférer `//` plutôt que `/* */`
+- Toujours laisser un espace avant le texte dans un commentaire `//` : `// oui !` pas `//non !`
+
+[Macros]
+- Ne pas utiliser de macros ! Traiter les macros comme un dernier recours
+- Ne jamais utiliser une macro juste pour contenir une valeur constante ou pour effectuer une fonction qui pourrait être faite comme une vraie fonction inline
+- Si des macros sont utilisées, leur donner des noms qui ne vont pas entrer en conflit avec d'autres codes
+- `#undef` les macros après les avoir utilisées, si possible
+
+[Template]
+- Les paramètres de template doivent suivre leur type sans espace : `vector<int>`
+- Dans une déclaration template, laisser un espace avant le crochet ouvrant : `template <typename Type1, typename Type2>`
+
 
 ================================================================================
 ## RÈGLES SPÉCIFIQUES JUCE
@@ -114,8 +237,8 @@
 - ~~AudioProcessorValueTreeState~~ → ValueTree moderne
 - ~~Legacy parameter handling~~ → juce::AudioProcessorParameter
 
-La liste est non exhaustive, je la complèterai au fil du temps...
+La liste est non exhaustive, propose-moi de la compléter le cas échéant.
 
 ================================================================================
-# Fin des instructions
+# FIN DES INSTRUCTIONS PERSONNELLES AGENT IA CURSOR
 ================================================================================
