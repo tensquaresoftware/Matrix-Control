@@ -17,10 +17,9 @@ void MidiSender::sendSysEx(const juce::MemoryBlock& sysExData)
 {
     ensureOutputAvailable();
 
-    juce::MidiMessage message = juce::MidiMessage::createSysExMessage(
-        sysExData.getData(), static_cast<int>(sysExData.getSize()));
-    
-    midiOutput->sendMessageNow(message);
+    // The sysExData already contains F0 and F7 delimiters, so we send it directly
+    // without using createSysExMessage() which would add them again
+    midiOutput->sendMessageNow(juce::MidiMessage(sysExData.getData(), static_cast<int>(sysExData.getSize())));
     MidiLogger::getInstance().logSysExSent(sysExData);
 }
 

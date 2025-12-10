@@ -397,6 +397,53 @@ void MidiLogger::logInfo(const juce::String& infoMessage)
     logMessage(LogLevel::kInfo, infoMessage);
 }
 
+void MidiLogger::logSysExDataDecimal(const juce::uint8* data, size_t size, const juce::String& description)
+{
+    if (LogLevel::kInfo > currentLogLevel)
+        return;
+
+    if (data == nullptr || size == 0)
+    {
+        logMessage(LogLevel::kWarning, "Cannot log decimal data: null pointer or zero size");
+        return;
+    }
+
+    juce::String message = "Data";
+    if (description.isNotEmpty())
+    {
+        message += " (" + description + ")";
+    }
+    message += " (" + juce::String(size) + " bytes)";
+    message += ": ";
+
+    juce::String dataString;
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (i > 0)
+        {
+            dataString += ", ";
+        }
+        dataString += juce::String(static_cast<int>(data[i]));
+    }
+
+    juce::String fullMessage = message + dataString;
+    juce::String levelColumn = formatLogLevelColumn(LogLevel::kInfo);
+    juce::String prefix = levelColumn + " " + getTimestamp() + " - ";
+    juce::String wrappedMessage = wrapLogMessage(prefix, fullMessage);
+
+    juce::StringArray lines;
+    lines.addLines(wrappedMessage);
+
+    for (int i = 0; i < lines.size(); ++i)
+    {
+        juce::String line = lines[i];
+        if (line.isNotEmpty())
+        {
+            writeLog(line);
+        }
+    }
+}
+
 int MidiLogger::calculateBytesPerLine() const
 {
     int lineWidth = getEffectiveLineWidth();

@@ -36,6 +36,7 @@ public:
     void logMessage(LogLevel level, const juce::String& message);
     void logSysExSent(const juce::MemoryBlock& sysEx, const juce::String& description = "");
     void logSysExReceived(const juce::MemoryBlock& sysEx, const juce::String& description = "");
+    void logSysExDataDecimal(const juce::uint8* data, size_t size, const juce::String& description = "");
     void logProgramChange(juce::uint8 programNumber, const juce::String& direction = "");
     void logError(const juce::String& errorMessage);
     void logWarning(const juce::String& warningMessage);
