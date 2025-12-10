@@ -45,7 +45,7 @@ juce::Colour McLookAndFeel::getParameterLabelBackgroundColour(bool isEnabled) co
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF000000);
+        auto colour = juce::Colour(kParameterLabelBackgroundColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -56,7 +56,7 @@ juce::Colour McLookAndFeel::getParameterLabelTextColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFFC4C4C4);
+        auto colour = juce::Colour(kParameterLabelTextColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -67,7 +67,7 @@ juce::Colour McLookAndFeel::getButtonBackgroundColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF101010);
+        auto colour = juce::Colour(kButtonBackgroundColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -78,7 +78,7 @@ juce::Colour McLookAndFeel::getButtonBorderColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF303030);
+        auto colour = juce::Colour(kButtonBorderColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -91,11 +91,11 @@ juce::Colour McLookAndFeel::getButtonTextColour(bool isEnabled, bool isClicked) 
     {
         if (isClicked)
         {
-            auto colour = juce::Colour(0xFFD80000);
+            auto colour = juce::Colour(kButtonTextColourClicked);
             return isEnabled ? colour : makeDisabledColour(colour);
         }
         
-        auto colour = juce::Colour(0xFFC4C4C4);
+        auto colour = juce::Colour(kButtonTextColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -106,8 +106,11 @@ juce::Colour McLookAndFeel::getSliderBackgroundColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF002D0F);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        if (isEnabled)
+        {
+            return juce::Colour(kSliderBackgroundColour);
+        }
+        return juce::Colour(kSliderBackgroundColourDisabled);
     }
     
     return juce::Colours::darkgreen;
@@ -117,8 +120,11 @@ juce::Colour McLookAndFeel::getSliderTrackColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF00785E);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        if (isEnabled)
+        {
+            return juce::Colour(kSliderTrackColour);
+        }
+        return juce::Colour(kSliderTrackColourDisabled);
     }
     
     return juce::Colours::green;
@@ -128,18 +134,31 @@ juce::Colour McLookAndFeel::getSliderTextColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF00DDAD);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        if (isEnabled)
+        {
+            return juce::Colour(kSliderTextColour);
+        }
+        return juce::Colour(kSliderTextColourDisabled);
     }
     
     return juce::Colours::lightgreen;
+}
+
+juce::Colour McLookAndFeel::getSliderFocusBorderColour() const
+{
+    if (currentTheme == Theme::Black)
+    {
+        return juce::Colour(kSliderFocusBorderColour);
+    }
+    
+    return juce::Colours::green;
 }
 
 juce::Colour McLookAndFeel::getComboBoxBackgroundColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF002D0F);
+        auto colour = juce::Colour(kComboBoxBackgroundColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -150,7 +169,7 @@ juce::Colour McLookAndFeel::getComboBoxTextColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF00DDAD);
+        auto colour = juce::Colour(kComboBoxTextColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -161,7 +180,7 @@ juce::Colour McLookAndFeel::getComboBoxTriangleColour(bool isEnabled) const
 {
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(0xFF06471C);
+        auto colour = juce::Colour(kComboBoxTriangleColour);
         return isEnabled ? colour : makeDisabledColour(colour);
     }
     
@@ -172,7 +191,7 @@ juce::Colour McLookAndFeel::getPopupMenuBackgroundColour() const
 {
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(0xFF002D0F);
+        return juce::Colour(kPopupMenuBackgroundColour);
     }
     
     return juce::Colours::darkgrey;
@@ -182,7 +201,7 @@ juce::Colour McLookAndFeel::getPopupMenuTextColour() const
 {
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(0xFF00DDAD);
+        return juce::Colour(kPopupMenuTextColour);
     }
     
     return juce::Colours::white;
@@ -192,7 +211,7 @@ juce::Colour McLookAndFeel::getPopupMenuHighlightColour() const
 {
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(0xFF00785E);
+        return juce::Colour(kPopupMenuHighlightColour);
     }
     
     return juce::Colours::lightblue;
@@ -202,7 +221,7 @@ juce::Colour McLookAndFeel::getPopupMenuBorderColour() const
 {
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(0xFF06471C);
+        return juce::Colour(kPopupMenuBorderColour);
     }
     
     return juce::Colours::darkgrey;
