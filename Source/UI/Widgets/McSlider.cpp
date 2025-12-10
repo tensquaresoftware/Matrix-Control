@@ -96,7 +96,11 @@ void McSlider::drawValueText(juce::Graphics& g, const juce::Rectangle<float>& bo
 {
     auto valueText = juce::String(static_cast<int>(std::round(getValue())));
     auto textColour = mcLookAndFeel->getSliderTextColour(enabled);
-    auto font = mcLookAndFeel->getDefaultFont();
+    
+    auto baseFont = mcLookAndFeel->getDefaultFont();
+    auto scaleFactor = static_cast<float>(getHeight()) / static_cast<float>(kDefaultHeight);
+    auto scaledFontHeight = baseFont.getHeight() * scaleFactor;
+    auto font = baseFont.withHeight(scaledFontHeight);
 
     g.setColour(textColour);
     g.setFont(font);

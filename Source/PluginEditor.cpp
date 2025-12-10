@@ -11,6 +11,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     , testSlider4(50.0)
     , testSlider5(31.0)
     , testSlider6(77.0)
+    , testSlider7(99.0)
 {
     lookAndFeel = std::make_unique<McLookAndFeel>();
     
@@ -55,6 +56,12 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     testSlider6.setLookAndFeel(lookAndFeel.get());
     addAndMakeVisible(testSlider6);
     
+    testSlider7.setRange(0.0, 127.0, 1.0);
+    testSlider7.setValue(99.0);
+    testSlider7.setSize(40, 10);
+    testSlider7.setLookAndFeel(lookAndFeel.get());
+    addAndMakeVisible(testSlider7);
+    
     setSize(500, 400);
 }
 
@@ -83,4 +90,6 @@ void PluginEditor::resized()
     
     testSlider5.setBounds(startX, centreY + verticalSpacing, sliderWidth, sliderHeight);
     testSlider6.setBounds(startX + sliderWidth + spacing, centreY + verticalSpacing, 200, 50);
+    
+    testSlider7.setBounds(startX, centreY + 2 * verticalSpacing, 40, 10);
 }

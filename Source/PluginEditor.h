@@ -28,6 +28,7 @@ private:
     McSlider testSlider4;
     McSlider testSlider5;
     McSlider testSlider6;
+    McSlider testSlider7;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };
