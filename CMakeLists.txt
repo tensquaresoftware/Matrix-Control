@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.22)
 
-# Force arm64 for Apple Silicon
-set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS")
-
 project(Matrix-Control VERSION 0.0.0)
+
+# Platform-specific configurations
+if(APPLE)
+    # Force arm64 for Apple Silicon
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS")
+endif()
+
+if(WIN32)
+    # Windows-specific settings
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

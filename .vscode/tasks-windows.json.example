@@ -1,0 +1,69 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B", "build",
+                "-G", "Visual Studio 17 2022",
+                "-A", "x64",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build: Standalone",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "build",
+                "--target", "Matrix-Control_Standalone",
+                "--config", "Debug"
+            ],
+            "group": "build",
+            "dependsOn": ["CMake: Configure"],
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "Build: VST3",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "build",
+                "--target", "Matrix-Control_VST3",
+                "--config", "Debug"
+            ],
+            "group": "build",
+            "dependsOn": ["CMake: Configure"],
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "Build: All",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", "build",
+                "--config", "Debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": ["CMake: Configure"],
+            "problemMatcher": ["$msCompile"]
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Remove-Item -Recurse -Force build"
+            ],
+            "group": "build"
+        }
+    ]
+}
