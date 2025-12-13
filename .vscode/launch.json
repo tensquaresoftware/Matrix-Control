@@ -5,10 +5,19 @@
             "name": "Debug: Standalone",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Matrix-Control_artefacts/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
+            "program": "${workspaceFolder}/build-macos/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build: Standalone"
+            "preLaunchTask": "Build: Standalone",
+            "osx": {
+                "type": "lldb",
+                "program": "${workspaceFolder}/build-macos/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control"
+            },
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build-windows/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.exe",
+                "MIMode": "windows"
+            }
         },
         {
             "name": "Debug: AU in Logic Pro",
@@ -17,7 +26,10 @@
             "program": "/Applications/Logic Pro.app/Contents/MacOS/Logic Pro",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build: AU"
+            "preLaunchTask": "Build: AU",
+            "osx": {
+                "type": "lldb"
+            }
         },
         {
             "name": "Debug: VST3 in Reaper",
@@ -26,7 +38,15 @@
             "program": "/Applications/REAPER.app/Contents/MacOS/REAPER",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build: VST3"
+            "preLaunchTask": "Build: VST3",
+            "osx": {
+                "type": "lldb"
+            },
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "C:\\Program Files\\REAPER (x64)\\reaper.exe",
+                "MIMode": "windows"
+            }
         },
         {
             "name": "Debug: AU in Ableton Live",
@@ -35,7 +55,10 @@
             "program": "/Applications/Ableton Live 12 Suite.app/Contents/MacOS/Live",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build: AU"
+            "preLaunchTask": "Build: AU",
+            "osx": {
+                "type": "lldb"
+            }
         }
     ]
 }

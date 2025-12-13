@@ -1,13 +1,9 @@
 {
     "cmake.configureOnOpen": true,
-    "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/build-macos",
     "cmake.configureEnvironment": {
-        "JUCE_DIR": "/Applications/JUCE"
+        "JUCE_DIR": "${env:JUCE_DIR}"
     },
-    "cmake.configureArgs": [
-        "-DCMAKE_BUILD_TYPE=Debug"
-    ],
     "cmake.configureOnEdit": false,
     "cmake.buildBeforeRun": true,
     "cmake.saveBeforeBuild": true,
@@ -21,6 +17,7 @@
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
-        "**/build": true
+        "**/build-macos": true,
+        "**/build-windows": true
     }
 }

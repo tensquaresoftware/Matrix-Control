@@ -1,9 +1,10 @@
 ================================================================================
-# INSTRUCTIONS PERSONNELLES AGENT IA CURSOR - DÉVELOPPEMENT DE PLUGINS VST/AU
+# INSTRUCTIONS PERSONNELLES POUR L'AGENT IA CURSOR
 ================================================================================
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
-- Dernière mise à jour : 2025-11-27
+- Contexte : Développement de plugins VST/AU avec JUCE
+- Dernière mise à jour : 2025-12-11
 
 
 ================================================================================
@@ -240,5 +241,5 @@
 La liste est non exhaustive, propose-moi de la compléter le cas échéant.
 
 ================================================================================
-# FIN DES INSTRUCTIONS PERSONNELLES AGENT IA CURSOR
+# FIN DE MES INSTRUCTIONS PERSONNELLES
 ================================================================================
