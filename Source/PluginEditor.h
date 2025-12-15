@@ -6,6 +6,9 @@
 #include "PluginProcessor.h"
 #include "UI/LookAndFeel/McLookAndFeel.h"
 #include "UI/Widgets/McSlider.h"
+#include "UI/Widgets/McButton.h"
+#include "UI/Widgets/McComboBox.h"
+#include "UI/Widgets/McParameterLabel.h"
 
 class PluginEditor : public juce::AudioProcessorEditor
 {
@@ -26,9 +29,28 @@ private:
     McSlider testSlider2;
     McSlider testSlider3;
     McSlider testSlider4;
-    McSlider testSlider5;
-    McSlider testSlider6;
-    McSlider testSlider7;
+    
+    McButton buttonI;
+    McButton buttonC;
+    McButton buttonP;
+    McButton buttonUnlock;
+    McButton buttonInit;
+    McButton buttonStore;
+    
+    McComboBox comboBox1;
+    McComboBox comboBox2;
+    
+    McParameterLabel frequencyLabel;
+    McSlider frequencySlider;
+    
+    McParameterLabel syncLabel;
+    McComboBox syncComboBox;
+    
+    McParameterLabel themeLabel;
+    McComboBox themeComboBox;
+
+    void updateTheme();
+    void updateAllWidgetsLookAndFeel();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

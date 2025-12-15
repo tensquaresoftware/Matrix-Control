@@ -2,6 +2,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "McFocusableWidget.h"
+
 class McLookAndFeel;
 
 class McSlider : public juce::Slider
@@ -29,7 +31,6 @@ private:
     static constexpr int kDefaultHeight = 20;
     static constexpr double kDragSensitivity = 0.5;
     static constexpr double kShiftKeyStep = 10.0;
-    static constexpr double kFocusBorderThickness = 1.0f;
     static constexpr int kBorderMargin = 1;
     static constexpr int kTrackAreaMargin = 1;
 
@@ -49,11 +50,11 @@ private:
     void resetToDefaultValue();
 
     McLookAndFeel* mcLookAndFeel = nullptr;
+    McFocusableWidget focusableWidget;
     
     double defaultValue = 0.0;
     double dragStartValue = 0.0;
     juce::Point<int> dragStartPosition;
-    bool hasFocus = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(McSlider)
 };

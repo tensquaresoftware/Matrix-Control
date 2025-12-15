@@ -41,188 +41,369 @@ juce::Font McLookAndFeel::getDefaultFont() const
     return font;
 }
 
-juce::Colour McLookAndFeel::getParameterLabelBackgroundColour(bool isEnabled) const
+juce::Colour McLookAndFeel::getGuiBackgroundColour() const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kParameterLabelBackgroundColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kGuiBackgroundColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kGuiBackgroundColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kGuiBackgroundColour;
     }
     
-    return juce::Colours::transparentBlack;
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McLookAndFeel::getParameterLabelBackgroundColour(bool isEnabled) const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = ThemeBlack::kParameterLabelBackgroundColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kParameterLabelBackgroundColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kParameterLabelBackgroundColour;
+    }
+    
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getParameterLabelTextColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kParameterLabelTextColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kParameterLabelTextColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kParameterLabelTextColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kParameterLabelTextColour;
     }
     
-    return juce::Colours::white;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getButtonBackgroundColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kButtonBackgroundColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kButtonBackgroundColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kButtonBackgroundColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kButtonBackgroundColour;
     }
     
-    return juce::Colours::grey;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getButtonBorderColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kButtonBorderColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kButtonBorderColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kButtonBorderColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kButtonBorderColour;
     }
     
-    return juce::Colours::darkgrey;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getButtonTextColour(bool isEnabled, bool isClicked) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        if (isClicked)
-        {
-            auto colour = juce::Colour(kButtonTextColourClicked);
-            return isEnabled ? colour : makeDisabledColour(colour);
-        }
-        
-        auto colour = juce::Colour(kButtonTextColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = isClicked ? ThemeBlack::kButtonTextColourClicked : ThemeBlack::kButtonTextColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isClicked ? ThemeCream::kButtonTextColourClicked : ThemeCream::kButtonTextColour;
+    }
+    else
+    {
+        colourValue = isClicked ? ThemeDebug::kButtonTextColourClicked : ThemeDebug::kButtonTextColour;
     }
     
-    return juce::Colours::white;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getSliderBackgroundColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        if (isEnabled)
-        {
-            return juce::Colour(kSliderBackgroundColour);
-        }
-        return juce::Colour(kSliderBackgroundColourDisabled);
+        colourValue = isEnabled ? ThemeBlack::kSliderBackgroundColour : ThemeBlack::kSliderBackgroundColourDisabled;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isEnabled ? ThemeCream::kSliderBackgroundColour : ThemeCream::kSliderBackgroundColourDisabled;
+    }
+    else
+    {
+        colourValue = isEnabled ? ThemeDebug::kSliderBackgroundColour : ThemeDebug::kSliderBackgroundColourDisabled;
     }
     
-    return juce::Colours::darkgreen;
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getSliderTrackColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        if (isEnabled)
-        {
-            return juce::Colour(kSliderTrackColour);
-        }
-        return juce::Colour(kSliderTrackColourDisabled);
+        colourValue = isEnabled ? ThemeBlack::kSliderTrackColour : ThemeBlack::kSliderTrackColourDisabled;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isEnabled ? ThemeCream::kSliderTrackColour : ThemeCream::kSliderTrackColourDisabled;
+    }
+    else
+    {
+        colourValue = isEnabled ? ThemeDebug::kSliderTrackColour : ThemeDebug::kSliderTrackColourDisabled;
     }
     
-    return juce::Colours::green;
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getSliderTextColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        if (isEnabled)
-        {
-            return juce::Colour(kSliderTextColour);
-        }
-        return juce::Colour(kSliderTextColourDisabled);
+        colourValue = isEnabled ? ThemeBlack::kSliderTextColour : ThemeBlack::kSliderTextColourDisabled;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isEnabled ? ThemeCream::kSliderTextColour : ThemeCream::kSliderTextColourDisabled;
+    }
+    else
+    {
+        colourValue = isEnabled ? ThemeDebug::kSliderTextColour : ThemeDebug::kSliderTextColourDisabled;
     }
     
-    return juce::Colours::lightgreen;
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getSliderFocusBorderColour() const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(kSliderFocusBorderColour);
+        colourValue = ThemeBlack::kSliderFocusBorderColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kSliderFocusBorderColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kSliderFocusBorderColour;
     }
     
-    return juce::Colours::green;
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getComboBoxBackgroundColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kComboBoxBackgroundColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kComboBoxBackgroundColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kComboBoxBackgroundColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kComboBoxBackgroundColour;
     }
     
-    return juce::Colours::darkgreen;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getComboBoxTextColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kComboBoxTextColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kComboBoxTextColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kComboBoxTextColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kComboBoxTextColour;
     }
     
-    return juce::Colours::lightgreen;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getComboBoxTriangleColour(bool isEnabled) const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        auto colour = juce::Colour(kComboBoxTriangleColour);
-        return isEnabled ? colour : makeDisabledColour(colour);
+        colourValue = ThemeBlack::kComboBoxTriangleColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kComboBoxTriangleColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kComboBoxTriangleColour;
     }
     
-    return juce::Colours::green;
+    auto colour = juce::Colour(colourValue);
+    return isEnabled ? colour : makeDisabledColour(colour);
 }
 
 juce::Colour McLookAndFeel::getPopupMenuBackgroundColour() const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(kPopupMenuBackgroundColour);
+        colourValue = ThemeBlack::kPopupMenuBackgroundColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kPopupMenuBackgroundColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kPopupMenuBackgroundColour;
     }
     
-    return juce::Colours::darkgrey;
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getPopupMenuTextColour() const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(kPopupMenuTextColour);
+        colourValue = ThemeBlack::kPopupMenuTextColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kPopupMenuTextColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kPopupMenuTextColour;
     }
     
-    return juce::Colours::white;
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McLookAndFeel::getPopupMenuTextColourHighlighted() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = ThemeBlack::kPopupMenuTextColourHighlighted;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kPopupMenuTextColourHighlighted;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kPopupMenuTextColourHighlighted;
+    }
+    
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getPopupMenuHighlightColour() const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(kPopupMenuHighlightColour);
+        colourValue = ThemeBlack::kPopupMenuHighlightColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kPopupMenuHighlightColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kPopupMenuHighlightColour;
     }
     
-    return juce::Colours::lightblue;
+    return juce::Colour(colourValue);
 }
 
 juce::Colour McLookAndFeel::getPopupMenuBorderColour() const
 {
+    juce::uint32 colourValue;
+    
     if (currentTheme == Theme::Black)
     {
-        return juce::Colour(kPopupMenuBorderColour);
+        colourValue = ThemeBlack::kPopupMenuBorderColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kPopupMenuBorderColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kPopupMenuBorderColour;
     }
     
-    return juce::Colours::darkgrey;
+    return juce::Colour(colourValue);
 }

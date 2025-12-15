@@ -55,6 +55,11 @@ set(PLUGIN_SOURCES
     Source/UI/LookAndFeel/McLookAndFeel.cpp
     
     # UI - Widgets
+    Source/UI/Widgets/McButton.cpp
+    Source/UI/Widgets/McComboBox.cpp
+    Source/UI/Widgets/McFocusableWidget.cpp
+    Source/UI/Widgets/McParameterLabel.cpp
+    Source/UI/Widgets/McPopupMenu.cpp
     Source/UI/Widgets/McSlider.cpp
     
     # Utilities
@@ -106,6 +111,7 @@ target_link_libraries(Matrix-Control
     PRIVATE
         juce::juce_audio_utils
         juce::juce_dsp
+        juce::juce_gui_basics
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

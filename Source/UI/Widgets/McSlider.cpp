@@ -52,15 +52,7 @@ juce::Rectangle<float> McSlider::getTrackAreaBounds(const juce::Rectangle<float>
 
 void McSlider::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
 {
-    if (hasFocus && mcLookAndFeel != nullptr)
-    {
-        g.setColour(mcLookAndFeel->getSliderFocusBorderColour());
-    }
-    else
-    {
-        g.setColour(juce::Colours::transparentBlack);
-    }
-    g.drawRect(bounds, kFocusBorderThickness);
+    focusableWidget.drawFocusBorder(g, bounds, mcLookAndFeel);
 }
 
 void McSlider::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
@@ -96,11 +88,7 @@ void McSlider::drawValueText(juce::Graphics& g, const juce::Rectangle<float>& bo
 {
     auto valueText = juce::String(static_cast<int>(std::round(getValue())));
     auto textColour = mcLookAndFeel->getSliderTextColour(enabled);
-    
-    auto baseFont = mcLookAndFeel->getDefaultFont();
-    auto scaleFactor = static_cast<float>(getHeight()) / static_cast<float>(kDefaultHeight);
-    auto scaledFontHeight = baseFont.getHeight() * scaleFactor;
-    auto font = baseFont.withHeight(scaledFontHeight);
+    auto font = mcLookAndFeel->getDefaultFont();
 
     g.setColour(textColour);
     g.setFont(font);
@@ -114,8 +102,6 @@ void McSlider::mouseDown(const juce::MouseEvent& e)
         return;
     }
     
-    hasFocus = true;
-    repaint();
     grabKeyboardFocus();
     dragStartValue = getValue();
     dragStartPosition = e.getPosition();
@@ -140,11 +126,7 @@ void McSlider::mouseDrag(const juce::MouseEvent& e)
 
 void McSlider::mouseUp(const juce::MouseEvent&)
 {
-    if (! hasKeyboardFocus(true))
-    {
-        hasFocus = false;
-        repaint();
-    }
+    // Focus is handled by focusGained/focusLost callbacks
 }
 
 void McSlider::mouseDoubleClick(const juce::MouseEvent&)
@@ -164,19 +146,12 @@ void McSlider::resetToDefaultValue()
 
 void McSlider::focusGained(juce::Component::FocusChangeType)
 {
-    if (! isEnabled())
-    {
-        return;
-    }
-    
-    hasFocus = true;
-    repaint();
+    focusableWidget.handleFocusGained(this);
 }
 
 void McSlider::focusLost(juce::Component::FocusChangeType)
 {
-    hasFocus = false;
-    repaint();
+    focusableWidget.handleFocusLost(this);
 }
 
 bool McSlider::keyPressed(const juce::KeyPress& key)
