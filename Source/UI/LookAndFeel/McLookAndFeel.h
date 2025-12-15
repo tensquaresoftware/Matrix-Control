@@ -41,6 +41,7 @@ public:
         static constexpr juce::uint32 kPopupMenuTextColourHighlighted = 0xFF151515;
         static constexpr juce::uint32 kPopupMenuHighlightColour       = 0xFF00DDAD;
         static constexpr juce::uint32 kPopupMenuBorderColour          = 0xFF00DDAD;
+        static constexpr juce::uint32 kPopupMenuSeparatorColour       = 0xFF00DDAD;
     };
 
     struct ThemeCream
@@ -48,30 +49,31 @@ public:
         static constexpr juce::uint32 kGuiBackgroundColour            = 0xFFE9E8D5;
         
         static constexpr juce::uint32 kParameterLabelBackgroundColour = 0x00000000;
-        static constexpr juce::uint32 kParameterLabelTextColour       = 0xFFFFFFFF;
+        static constexpr juce::uint32 kParameterLabelTextColour       = 0xFF202020;
         
-        static constexpr juce::uint32 kButtonBackgroundColour         = 0xFF808080;
-        static constexpr juce::uint32 kButtonBorderColour             = 0xFF696969;
-        static constexpr juce::uint32 kButtonTextColour               = 0xFFFFFFFF;
-        static constexpr juce::uint32 kButtonTextColourClicked        = 0xFFFFFFFF;
+        static constexpr juce::uint32 kButtonBackgroundColour         = 0xFF101010;
+        static constexpr juce::uint32 kButtonBorderColour               = 0xFF303030;
+        static constexpr juce::uint32 kButtonTextColour               = 0xFFC4C4C4;
+        static constexpr juce::uint32 kButtonTextColourClicked        = 0xFFD80000;
         
-        static constexpr juce::uint32 kSliderFocusBorderColour        = 0xFF1C1C64;
-        static constexpr juce::uint32 kSliderBackgroundColour         = 0xFF0F0F40;
-        static constexpr juce::uint32 kSliderBackgroundColourDisabled = 0xFF808080;
-        static constexpr juce::uint32 kSliderTrackColour              = 0xFF5E5E90;
-        static constexpr juce::uint32 kSliderTrackColourDisabled      = 0xFF808080;
-        static constexpr juce::uint32 kSliderTextColour               = 0xFFADADFF;
+        static constexpr juce::uint32 kSliderFocusBorderColour        = 0xFF06471C;
+        static constexpr juce::uint32 kSliderBackgroundColour         = 0xFF002D0F;
+        static constexpr juce::uint32 kSliderBackgroundColourDisabled = 0xFF303030;
+        static constexpr juce::uint32 kSliderTrackColour              = 0xFF00785E;
+        static constexpr juce::uint32 kSliderTrackColourDisabled      = 0xFF505050;
+        static constexpr juce::uint32 kSliderTextColour               = 0xFF00DDAD;
         static constexpr juce::uint32 kSliderTextColourDisabled       = 0xFF808080;
         
-        static constexpr juce::uint32 kComboBoxBackgroundColour       = 0xFF0F0F40;
-        static constexpr juce::uint32 kComboBoxTextColour             = 0xFFADADFF;
-        static constexpr juce::uint32 kComboBoxTriangleColour         = 0xFF1C1C64;
+        static constexpr juce::uint32 kComboBoxBackgroundColour       = 0xFF002D0F;
+        static constexpr juce::uint32 kComboBoxTextColour             = 0xFF00DDAD;
+        static constexpr juce::uint32 kComboBoxTriangleColour         = 0xFF06471C;
         
-        static constexpr juce::uint32 kPopupMenuBackgroundColour      = 0xFF696969;
-        static constexpr juce::uint32 kPopupMenuTextColour            = 0xFFFFFFFF;
-        static constexpr juce::uint32 kPopupMenuTextColourHighlighted = 0xFF000000;
-        static constexpr juce::uint32 kPopupMenuHighlightColour       = 0xFFADD8E6;
-        static constexpr juce::uint32 kPopupMenuBorderColour          = 0xFF696969;
+        static constexpr juce::uint32 kPopupMenuBackgroundColour      = 0xFF002D0F;
+        static constexpr juce::uint32 kPopupMenuTextColour            = 0xFF00DDAD;
+        static constexpr juce::uint32 kPopupMenuTextColourHighlighted = 0xFF151515;
+        static constexpr juce::uint32 kPopupMenuHighlightColour       = 0xFF00DDAD;
+        static constexpr juce::uint32 kPopupMenuBorderColour          = 0xFF00DDAD;
+        static constexpr juce::uint32 kPopupMenuSeparatorColour       = 0xFF00DDAD;
     };
 
     struct ThemeDebug
@@ -103,6 +105,7 @@ public:
         static constexpr juce::uint32 kPopupMenuTextColourHighlighted = 0xFF151515;
         static constexpr juce::uint32 kPopupMenuHighlightColour       = 0xFF00DDAD;
         static constexpr juce::uint32 kPopupMenuBorderColour          = 0xFF00DDAD;
+        static constexpr juce::uint32 kPopupMenuSeparatorColour       = 0xFF06471C;
     };
 
     McLookAndFeel();
@@ -135,6 +138,7 @@ public:
     juce::Colour getPopupMenuTextColourHighlighted() const;
     juce::Colour getPopupMenuHighlightColour() const;
     juce::Colour getPopupMenuBorderColour() const;
+    juce::Colour getPopupMenuSeparatorColour() const;
 
     juce::Font getDefaultFont() const;
 

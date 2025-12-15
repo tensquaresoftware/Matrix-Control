@@ -15,10 +15,18 @@ public:
         Large
     };
 
+    enum class PopupDisplayMode
+    {
+        SingleColumn,
+        MultiColumn
+    };
+
     explicit McComboBox(Size size = Size::Normal);
     ~McComboBox() override = default;
 
     void setLookAndFeel(McLookAndFeel* lookAndFeel);
+    void setPopupDisplayMode(PopupDisplayMode mode);
+    PopupDisplayMode getPopupDisplayMode() const { return popupDisplayMode; }
 
     void paint(juce::Graphics& g) override;
 
@@ -48,6 +56,7 @@ private:
     McLookAndFeel* mcLookAndFeel = nullptr;
     McFocusableWidget focusableWidget;
     Size comboSize;
+    PopupDisplayMode popupDisplayMode = PopupDisplayMode::SingleColumn;
 
     friend class McPopupMenu;
 

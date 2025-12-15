@@ -407,3 +407,23 @@ juce::Colour McLookAndFeel::getPopupMenuBorderColour() const
     
     return juce::Colour(colourValue);
 }
+
+juce::Colour McLookAndFeel::getPopupMenuSeparatorColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = ThemeBlack::kPopupMenuSeparatorColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = ThemeCream::kPopupMenuSeparatorColour;
+    }
+    else
+    {
+        colourValue = ThemeDebug::kPopupMenuSeparatorColour;
+    }
+    
+    return juce::Colour(colourValue);
+}

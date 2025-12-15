@@ -23,6 +23,11 @@ void McComboBox::setLookAndFeel(McLookAndFeel* lookAndFeel)
     setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
 }
 
+void McComboBox::setPopupDisplayMode(PopupDisplayMode mode)
+{
+    popupDisplayMode = mode;
+}
+
 void McComboBox::paint(juce::Graphics& g)
 {
     if (mcLookAndFeel == nullptr)

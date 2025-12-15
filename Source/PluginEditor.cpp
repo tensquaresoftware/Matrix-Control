@@ -91,6 +91,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     comboBox1.addItem("LEVER 2", 20);
     comboBox1.addItem("LEVER 3", 21);
     comboBox1.setSelectedId(1);
+    comboBox1.setPopupDisplayMode(McComboBox::PopupDisplayMode::MultiColumn);
     comboBox1.setLookAndFeel(lookAndFeel.get());
     addAndMakeVisible(comboBox1);
     
@@ -128,6 +129,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     comboBox2.addItem("LFO 2 AMPLITUDE", 32);
     comboBox2.addItem("PORTAMENTO RATE", 33);
     comboBox2.setSelectedId(1);
+    comboBox2.setPopupDisplayMode(McComboBox::PopupDisplayMode::MultiColumn);
     comboBox2.setLookAndFeel(lookAndFeel.get());
     addAndMakeVisible(comboBox2);
     
@@ -161,6 +163,14 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     themeComboBox.setLookAndFeel(lookAndFeel.get());
     themeComboBox.onChange = [this] { updateTheme(); };
     addAndMakeVisible(themeComboBox);
+    
+    for (int i = 1; i <= 33; ++i)
+    {
+        nativeComboBoxTest.addItem("Item " + juce::String(i), i);
+    }
+    nativeComboBoxTest.setSelectedId(1);
+    nativeComboBoxTest.setLookAndFeel(lookAndFeel.get());
+    addAndMakeVisible(nativeComboBoxTest);
     
     setSize(500, 400);
 }
@@ -209,6 +219,7 @@ void PluginEditor::resized()
     auto combosStartY = buttonsStartY + buttonHeight + buttonSpacing + 10;
     comboBox1.setBounds(startX, combosStartY, 60, 20);
     comboBox2.setBounds(startX + 60 + buttonSpacing, combosStartY, 105, 20);
+    nativeComboBoxTest.setBounds(startX + 60 + buttonSpacing + 105 + buttonSpacing, combosStartY, 60, 20);
     
     auto frequencyStartY = combosStartY + 20 + 5;
     auto labelWidth = 90;

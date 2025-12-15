@@ -48,6 +48,8 @@ private:
     
     McParameterLabel themeLabel;
     McComboBox themeComboBox;
+    
+    juce::ComboBox nativeComboBoxTest;
 
     void updateTheme();
     void updateAllWidgetsLookAndFeel();
