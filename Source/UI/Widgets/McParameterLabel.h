@@ -18,8 +18,8 @@ public:
     void paint(juce::Graphics& g) override;
 
 private:
-    static constexpr int kDefaultWidth = 90;
-    static constexpr int kDefaultHeight = 20;
+    static constexpr int kWidth = 90;
+    static constexpr int kHeight = 20;
     static constexpr int kBackgroundMargin = 1;
     static constexpr int kTextLeftPadding = 2;
 

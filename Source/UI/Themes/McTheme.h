@@ -14,29 +14,31 @@ public:
 
     struct ColourPalette
     {
-        static constexpr juce::uint32 kTransparent   = 0x00112233;
-        static constexpr juce::uint32 kBlack         = 0xFF000000;
-        static constexpr juce::uint32 kWhite         = 0xFFFFFFFF;
-        static constexpr juce::uint32 kCream         = 0xFFE9E8D5;
-        static constexpr juce::uint32 kRed           = 0xFFFF0000;
-        static constexpr juce::uint32 kOrange        = 0xFFFF9900;
-        static constexpr juce::uint32 kYellow        = 0xFFFFFF00;
-        
-        static constexpr juce::uint32 kDarkGrey1     = 0xFF101010;
-        static constexpr juce::uint32 kDarkGrey2     = 0xFF202020;
-        static constexpr juce::uint32 kDarkGrey3     = 0xFF303030;
-        static constexpr juce::uint32 kDarkGrey4     = 0xFF404040;
-        
-        static constexpr juce::uint32 kLightGrey1    = 0xFFC4C4C4;
-        
-        static constexpr juce::uint32 kGreen1        = 0xFF002D0F;
-        static constexpr juce::uint32 kGreen2        = 0xFF06471C;
-        static constexpr juce::uint32 kGreen3        = 0xFF00785E;
-        static constexpr juce::uint32 kGreen4        = 0xFF00DDAD;
+        static constexpr juce::uint32 kTransparent        = 0x00112233;
+        static constexpr juce::uint32 kBlack              = 0xFF000000;
+        static constexpr juce::uint32 kWhite              = 0xFFFFFFFF;
 
-        static constexpr juce::uint32 kBackgroundOff = 0xFF303030;
-        static constexpr juce::uint32 kBorderOff     = 0xFF404040;
-        static constexpr juce::uint32 kContentOff    = 0xFF505050;
+        static constexpr juce::uint32 kCream              = 0xFFE9E8D5;
+        static constexpr juce::uint32 kRed                = 0xFFFF0000;
+        static constexpr juce::uint32 kOrange             = 0xFFFF9900;
+        static constexpr juce::uint32 kYellow             = 0xFFFFFF00;
+        
+        static constexpr juce::uint32 kDarkGrey1          = 0xFF101010;
+        static constexpr juce::uint32 kDarkGrey2          = 0xFF202020;
+        static constexpr juce::uint32 kDarkGrey3          = 0xFF303030;
+        static constexpr juce::uint32 kDarkGrey4          = 0xFF404040;
+        
+        static constexpr juce::uint32 kLightGrey1         = 0xFFC4C4C4;
+        
+        static constexpr juce::uint32 kGreen1             = 0xFF002D0F;
+        static constexpr juce::uint32 kGreen2             = 0xFF06471C;
+        static constexpr juce::uint32 kGreen3             = 0xFF00785E;
+        static constexpr juce::uint32 kGreen4             = 0xFF00DDAD;
+
+        static constexpr juce::uint32 kBackgroundDisabled = 0xFF303030;
+        static constexpr juce::uint32 kBorderDisabled     = 0xFF404040;
+        static constexpr juce::uint32 kDecorationDisabled = 0xFF505050;
+        static constexpr juce::uint32 kContentDisabled    = 0xFF505050;
     };
 
     struct BlackTheme
@@ -47,13 +49,13 @@ public:
         // McButton
         static constexpr juce::uint32 kButtonBaseColour               = ColourPalette::kTransparent;
         
-        static constexpr juce::uint32 kButtonBackgroundColourOff      = ColourPalette::kBackgroundOff;
-        static constexpr juce::uint32 kButtonBorderColourOff          = ColourPalette::kBorderOff;
-        static constexpr juce::uint32 kButtonTextColourOff            = ColourPalette::kContentOff;
+        static constexpr juce::uint32 kButtonBackgroundColourDisabled = ColourPalette::kBackgroundDisabled;
+        static constexpr juce::uint32 kButtonBorderColourDisabled     = ColourPalette::kBorderDisabled;
+        static constexpr juce::uint32 kButtonTextColourDisabled       = ColourPalette::kContentDisabled;
         
-        static constexpr juce::uint32 kButtonBackgroundColourOn       = ColourPalette::kBlack;
-        static constexpr juce::uint32 kButtonBorderColourOn           = ColourPalette::kDarkGrey3;
-        static constexpr juce::uint32 kButtonTextColourOn             = ColourPalette::kLightGrey1;
+        static constexpr juce::uint32 kButtonBackgroundColour         = ColourPalette::kBlack;
+        static constexpr juce::uint32 kButtonBorderColour             = ColourPalette::kDarkGrey3;
+        static constexpr juce::uint32 kButtonTextColour               = ColourPalette::kLightGrey1;
         
         static constexpr juce::uint32 kButtonBackgroundColourHoover   = ColourPalette::kDarkGrey1;
         static constexpr juce::uint32 kButtonTextColourHoover         = ColourPalette::kLightGrey1;
@@ -63,18 +65,23 @@ public:
 
         // McParameterLabel
         static constexpr juce::uint32 kParameterLabelBaseColour       = ColourPalette::kTransparent;
-        static constexpr juce::uint32 kParameterLabelBackgroundColour = ColourPalette::kDarkGrey3;
+        static constexpr juce::uint32 kParameterLabelBackgroundColour = ColourPalette::kTransparent;
         static constexpr juce::uint32 kParameterLabelTextColour       = ColourPalette::kLightGrey1;
         
         // McSlider
-        static constexpr juce::uint32 kSliderFocusBorderColour        = 0xFF06471C;
-        static constexpr juce::uint32 kSliderBackgroundColour         = 0xFF002D0F;
-        static constexpr juce::uint32 kSliderBackgroundColourDisabled = 0xFF303030;
-        static constexpr juce::uint32 kSliderTrackColour              = 0xFF00785E;
-        static constexpr juce::uint32 kSliderTrackColourDisabled      = 0xFF505050;
-        static constexpr juce::uint32 kSliderTextColour               = 0xFF00DDAD;
-        static constexpr juce::uint32 kSliderTextColourDisabled       = 0xFF808080;
-        static constexpr juce::uint32 kSliderBaseColour               = 0xFFFFFFFF;
+        static constexpr juce::uint32 kSliderBaseColour               = ColourPalette::kTransparent;
+        
+        static constexpr juce::uint32 kSliderBackgroundColourDisabled = ColourPalette::kBackgroundDisabled;
+        static constexpr juce::uint32 kSliderBorderColourDisabled     = ColourPalette::kBorderDisabled;
+        static constexpr juce::uint32 kSliderTrackColourDisabled      = ColourPalette::kDecorationDisabled;
+        static constexpr juce::uint32 kSliderTextColourDisabled       = ColourPalette::kContentDisabled;
+        
+        static constexpr juce::uint32 kSliderBackgroundColour         = ColourPalette::kGreen1;
+        static constexpr juce::uint32 kSliderBorderColour             = ColourPalette::kGreen2;
+        static constexpr juce::uint32 kSliderTrackColour              = ColourPalette::kGreen3;
+        static constexpr juce::uint32 kSliderTextColour               = ColourPalette::kGreen4;
+        
+        static constexpr juce::uint32 kSliderBorderColourFocus        = ColourPalette::kGreen4;
         
         // McComboBox
         static constexpr juce::uint32 kComboBoxBackgroundColour       = 0xFF002D0F;
@@ -99,9 +106,9 @@ public:
         // McButton
         static constexpr juce::uint32 kButtonBaseColour               = ColourPalette::kTransparent;
         
-        static constexpr juce::uint32 kButtonBackgroundColourOff      = ColourPalette::kBackgroundOff;
-        static constexpr juce::uint32 kButtonBorderColourOff          = ColourPalette::kBorderOff;
-        static constexpr juce::uint32 kButtonTextColourOff            = ColourPalette::kContentOff;
+        static constexpr juce::uint32 kButtonBackgroundColourOff      = ColourPalette::kBackgroundDisabled;
+        static constexpr juce::uint32 kButtonBorderColourOff          = ColourPalette::kBorderDisabled;
+        static constexpr juce::uint32 kButtonTextColourOff            = ColourPalette::kContentDisabled;
         
         static constexpr juce::uint32 kButtonBackgroundColourOn       = ColourPalette::kLightGrey1;
         static constexpr juce::uint32 kButtonBorderColourOn           = ColourPalette::kDarkGrey4;
@@ -119,14 +126,19 @@ public:
         static constexpr juce::uint32 kParameterLabelTextColour       = ColourPalette::kDarkGrey1;
         
         // McSlider
-        static constexpr juce::uint32 kSliderFocusBorderColour        = 0xFF06471C;
-        static constexpr juce::uint32 kSliderBackgroundColour         = 0xFF002D0F;
-        static constexpr juce::uint32 kSliderBackgroundColourDisabled = 0xFF303030;
-        static constexpr juce::uint32 kSliderTrackColour              = 0xFF00785E;
-        static constexpr juce::uint32 kSliderTrackColourDisabled      = 0xFF505050;
-        static constexpr juce::uint32 kSliderTextColour               = 0xFF00DDAD;
-        static constexpr juce::uint32 kSliderTextColourDisabled       = 0xFF808080;
-        static constexpr juce::uint32 kSliderBaseColour               = 0xFF000000;
+        static constexpr juce::uint32 kSliderBaseColour               = ColourPalette::kTransparent;
+        
+        static constexpr juce::uint32 kSliderBackgroundColourDisabled = ColourPalette::kBackgroundDisabled;
+        static constexpr juce::uint32 kSliderBorderColourDisabled     = ColourPalette::kBorderDisabled;
+        static constexpr juce::uint32 kSliderTrackColourDisabled      = ColourPalette::kDecorationDisabled;
+        static constexpr juce::uint32 kSliderTextColourDisabled       = ColourPalette::kContentDisabled;
+        
+        static constexpr juce::uint32 kSliderBackgroundColour         = ColourPalette::kGreen1;
+        static constexpr juce::uint32 kSliderBorderColour             = ColourPalette::kGreen2;
+        static constexpr juce::uint32 kSliderTrackColour              = ColourPalette::kGreen3;
+        static constexpr juce::uint32 kSliderTextColour               = ColourPalette::kGreen4;
+        
+        static constexpr juce::uint32 kSliderBorderColourFocus        = ColourPalette::kGreen4;
         
         // McComboBox
         static constexpr juce::uint32 kComboBoxBackgroundColour       = 0xFF002D0F;
@@ -171,14 +183,19 @@ public:
         static constexpr juce::uint32 kParameterLabelTextColour       = ColourPalette::kTransparent;
         
         // McSlider
-        static constexpr juce::uint32 kSliderFocusBorderColour        = 0xFF06471C;
-        static constexpr juce::uint32 kSliderBackgroundColour         = 0xFF002D0F;
-        static constexpr juce::uint32 kSliderBackgroundColourDisabled = 0xFF303030;
-        static constexpr juce::uint32 kSliderTrackColour              = 0xFF00785E;
-        static constexpr juce::uint32 kSliderTrackColourDisabled      = 0xFF505050;
-        static constexpr juce::uint32 kSliderTextColour               = 0xFF00DDAD;
-        static constexpr juce::uint32 kSliderTextColourDisabled       = 0xFF808080;
-        static constexpr juce::uint32 kSliderBaseColour               = 0xFFFF0000;
+        static constexpr juce::uint32 kSliderBaseColour               = ColourPalette::kRed;
+        
+        static constexpr juce::uint32 kSliderBackgroundColourDisabled = ColourPalette::kRed;
+        static constexpr juce::uint32 kSliderBorderColourDisabled     = ColourPalette::kOrange;
+        static constexpr juce::uint32 kSliderTrackColourDisabled      = ColourPalette::kYellow;
+        static constexpr juce::uint32 kSliderTextColourDisabled       = ColourPalette::kTransparent;
+        
+        static constexpr juce::uint32 kSliderBackgroundColour         = ColourPalette::kRed;
+        static constexpr juce::uint32 kSliderBorderColour             = ColourPalette::kOrange;
+        static constexpr juce::uint32 kSliderTrackColour              = ColourPalette::kYellow;
+        static constexpr juce::uint32 kSliderTextColour               = ColourPalette::kTransparent;
+        
+        static constexpr juce::uint32 kSliderBorderColourFocus        = ColourPalette::kOrange;
         
         // McComboBox
         static constexpr juce::uint32 kComboBoxBackgroundColour       = 0xFF002D0F;
@@ -225,11 +242,12 @@ public:
     juce::Colour getButtonBackgroundColourClicked() const;
     juce::Colour getButtonTextColourClicked() const;
 
+    juce::Colour getSliderBaseColour() const;
     juce::Colour getSliderBackgroundColour(bool isEnabled = true) const;
+    juce::Colour getSliderBorderColour(bool isEnabled = true, bool hasFocus = false) const;
     juce::Colour getSliderTrackColour(bool isEnabled = true) const;
     juce::Colour getSliderTextColour(bool isEnabled = true) const;
     juce::Colour getSliderFocusBorderColour() const;
-    juce::Colour getSliderBaseColour() const;
 
     juce::Colour getComboBoxBackgroundColour(bool isEnabled = true) const;
     juce::Colour getComboBoxBaseColour() const;

@@ -4,7 +4,7 @@
 McParameterLabel::McParameterLabel(const juce::String& text)
     : labelText(text)
 {
-    setSize(kDefaultWidth, kDefaultHeight);
+    setSize(kWidth, kHeight);
 }
 
 void McParameterLabel::setTheme(McTheme* theme)

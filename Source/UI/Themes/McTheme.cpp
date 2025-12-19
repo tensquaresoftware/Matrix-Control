@@ -147,7 +147,7 @@ juce::Colour McTheme::getButtonBackgroundColourOff() const
     
     if (currentTheme == Theme::Black)
     {
-        colourValue = BlackTheme::kButtonBackgroundColourOff;
+        colourValue = BlackTheme::kButtonBackgroundColourDisabled;
     }
     else if (currentTheme == Theme::Cream)
     {
@@ -167,7 +167,7 @@ juce::Colour McTheme::getButtonBorderColourOff() const
     
     if (currentTheme == Theme::Black)
     {
-        colourValue = BlackTheme::kButtonBorderColourOff;
+        colourValue = BlackTheme::kButtonBorderColourDisabled;
     }
     else if (currentTheme == Theme::Cream)
     {
@@ -187,7 +187,7 @@ juce::Colour McTheme::getButtonTextColourOff() const
     
     if (currentTheme == Theme::Black)
     {
-        colourValue = BlackTheme::kButtonTextColourOff;
+        colourValue = BlackTheme::kButtonTextColourDisabled;
     }
     else if (currentTheme == Theme::Cream)
     {
@@ -207,7 +207,7 @@ juce::Colour McTheme::getButtonBackgroundColourOn() const
     
     if (currentTheme == Theme::Black)
     {
-        colourValue = BlackTheme::kButtonBackgroundColourOn;
+        colourValue = BlackTheme::kButtonBackgroundColour;
     }
     else if (currentTheme == Theme::Cream)
     {
@@ -227,7 +227,7 @@ juce::Colour McTheme::getButtonBorderColourOn() const
     
     if (currentTheme == Theme::Black)
     {
-        colourValue = BlackTheme::kButtonBorderColourOn;
+        colourValue = BlackTheme::kButtonBorderColour;
     }
     else if (currentTheme == Theme::Cream)
     {
@@ -247,7 +247,7 @@ juce::Colour McTheme::getButtonTextColourOn() const
     
     if (currentTheme == Theme::Black)
     {
-        colourValue = BlackTheme::kButtonTextColourOn;
+        colourValue = BlackTheme::kButtonTextColour;
     }
     else if (currentTheme == Theme::Cream)
     {
@@ -341,6 +341,26 @@ juce::Colour McTheme::getButtonTextColourClicked() const
     return juce::Colour(colourValue);
 }
 
+juce::Colour McTheme::getSliderBaseColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kSliderBaseColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kSliderBaseColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kSliderBaseColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
 juce::Colour McTheme::getSliderBackgroundColour(bool isEnabled) const
 {
     juce::uint32 colourValue;
@@ -356,6 +376,47 @@ juce::Colour McTheme::getSliderBackgroundColour(bool isEnabled) const
     else
     {
         colourValue = isEnabled ? DebugTheme::kSliderBackgroundColour : DebugTheme::kSliderBackgroundColourDisabled;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getSliderBorderColour(bool isEnabled, bool hasFocus) const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        if (hasFocus)
+        {
+            colourValue = BlackTheme::kSliderBorderColourFocus;
+        }
+        else
+        {
+            colourValue = isEnabled ? BlackTheme::kSliderBorderColour : BlackTheme::kSliderBorderColourDisabled;
+        }
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        if (hasFocus)
+        {
+            colourValue = CreamTheme::kSliderBorderColourFocus;
+        }
+        else
+        {
+            colourValue = isEnabled ? CreamTheme::kSliderBorderColour : CreamTheme::kSliderBorderColourDisabled;
+        }
+    }
+    else
+    {
+        if (hasFocus)
+        {
+            colourValue = DebugTheme::kSliderBorderColourFocus;
+        }
+        else
+        {
+            colourValue = isEnabled ? DebugTheme::kSliderBorderColour : DebugTheme::kSliderBorderColourDisabled;
+        }
     }
     
     return juce::Colour(colourValue);
@@ -403,42 +464,7 @@ juce::Colour McTheme::getSliderTextColour(bool isEnabled) const
 
 juce::Colour McTheme::getSliderFocusBorderColour() const
 {
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kSliderFocusBorderColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kSliderFocusBorderColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kSliderFocusBorderColour;
-    }
-    
-    return juce::Colour(colourValue);
-}
-
-juce::Colour McTheme::getSliderBaseColour() const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kSliderBaseColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kSliderBaseColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kSliderBaseColour;
-    }
-    
-    return juce::Colour(colourValue);
+    return getSliderBorderColour(true, true);
 }
 
 juce::Colour McTheme::getComboBoxBackgroundColour(bool isEnabled) const

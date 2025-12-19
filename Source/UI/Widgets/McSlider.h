@@ -12,14 +12,14 @@ public:
     explicit McSlider(double defaultValueValue = 0.0);
     ~McSlider() override = default;
 
-    void setLookAndFeel(McTheme* themes);
+    void setTheme(McTheme* theme);
 
     void paint(juce::Graphics& g) override;
 
     void mouseDown(const juce::MouseEvent& e) override;
     void mouseDrag(const juce::MouseEvent& e) override;
-    void mouseUp(const juce::MouseEvent& e) override;
-    void mouseDoubleClick(const juce::MouseEvent& e) override;
+    void mouseUp(const juce::MouseEvent&) override;
+    void mouseDoubleClick(const juce::MouseEvent&) override;
 
     void focusGained(juce::Component::FocusChangeType cause) override;
     void focusLost(juce::Component::FocusChangeType cause) override;
@@ -27,22 +27,18 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    static constexpr int kDefaultWidth       = 60;
-    static constexpr int kDefaultHeight      = 20;
+    static constexpr int kWidth              = 60;
+    static constexpr int kHeight             = 20;
     static constexpr double kDragSensitivity = 0.5;
     static constexpr double kShiftKeyStep    = 10.0;
-    static constexpr int kBorderMargin       = 1;
-    static constexpr int kTrackAreaMargin    = 1;
 
     void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-    void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
     void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-    void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& trackAreaBounds, bool enabled);
-    void drawValueText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
+    void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus);
+    void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
+    void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     
-    juce::Rectangle<float> getBorderBounds(const juce::Rectangle<float>& bounds) const;
-    juce::Rectangle<float> getBackgroundBounds(const juce::Rectangle<float>& borderBounds) const;
-    juce::Rectangle<float> getTrackAreaBounds(const juce::Rectangle<float>& backgroundBounds) const;
+    juce::Rectangle<float> calculateTrackBounds(const juce::Rectangle<float>& backgroundBounds, bool enabled) const;
     
     double calculateStepForRange(double rangeLength, bool isShiftPressed) const;
     bool isIncrementKey(int keyCode) const;

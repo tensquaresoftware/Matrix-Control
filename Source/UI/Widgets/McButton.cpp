@@ -4,7 +4,7 @@
 McButton::McButton(int width, const juce::String& buttonText)
     : juce::Button(buttonText)
 {
-    setSize(width, kDefaultHeight);
+    setSize(width, kHeight);
 }
 
 void McButton::setTheme(McTheme* theme)

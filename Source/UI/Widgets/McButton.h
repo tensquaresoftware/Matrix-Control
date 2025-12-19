@@ -11,10 +11,11 @@ public:
     ~McButton() override = default;
 
     void setTheme(McTheme* theme);
+    
     void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
 private:
-    static constexpr int kDefaultHeight = 20;
+    static constexpr int kHeight = 20;
     static constexpr int kBorderThickness = 2;
 
     void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);

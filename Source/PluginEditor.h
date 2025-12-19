@@ -7,6 +7,7 @@
 #include "UI/Themes/McTheme.h"
 #include "UI/Widgets/McButton.h"
 #include "UI/Widgets/McParameterLabel.h"
+#include "UI/Widgets/McSlider.h"
 
 class PluginEditor : public juce::AudioProcessorEditor
 {
@@ -16,6 +17,7 @@ public:
 
     void paint(juce::Graphics&) override;
     void resized() override;
+    void mouseDown(const juce::MouseEvent& e) override;
 
 private:
     PluginProcessor& pluginProcessor;
@@ -28,6 +30,13 @@ private:
     McButton buttonDisabled;
     
     McParameterLabel labelPortamentoRate;
+    McSlider sliderPortamentoRate;
+    
+    McParameterLabel labelPortaVelocity;
+    McSlider sliderPortaVelocity;
+    
+    McParameterLabel labelFrequency;
+    McSlider sliderFrequency;
     
     void updateTheme();
 

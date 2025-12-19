@@ -9,6 +9,11 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     , buttonDebug(70, "DEBUG")
     , buttonDisabled(70, "DISABLED")
     , labelPortamentoRate("PORTAMENTO RATE")
+    , sliderPortamentoRate(40.0)
+    , labelPortaVelocity("PORTA < VELOCITY")
+    , sliderPortaVelocity(0.0)
+    , labelFrequency("FREQUENCY")
+    , sliderFrequency(100.0)
 {
     theme = std::make_unique<McTheme>();
     
@@ -43,6 +48,31 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     labelPortamentoRate.setTheme(theme.get());
     addAndMakeVisible(labelPortamentoRate);
     
+    sliderPortamentoRate.setRange(0.0, 63.0, 1.0);
+    sliderPortamentoRate.setValue(40.0);
+    sliderPortamentoRate.setTheme(theme.get());
+    addAndMakeVisible(sliderPortamentoRate);
+    
+    labelPortaVelocity.setTheme(theme.get());
+    addAndMakeVisible(labelPortaVelocity);
+    
+    sliderPortaVelocity.setRange(-63.0, 63.0, 1.0);
+    sliderPortaVelocity.setValue(0.0);
+    sliderPortaVelocity.setTheme(theme.get());
+    addAndMakeVisible(sliderPortaVelocity);
+    
+    labelFrequency.setTheme(theme.get());
+    addAndMakeVisible(labelFrequency);
+    
+    sliderFrequency.setRange(0.0, 127.0, 1.0);
+    sliderFrequency.setValue(100.0);
+    sliderFrequency.setEnabled(false);
+    sliderFrequency.setTheme(theme.get());
+    addAndMakeVisible(sliderFrequency);
+    
+    setWantsKeyboardFocus(false);
+    setInterceptsMouseClicks(true, true);
+    
     setSize(500, 400);
 }
 
@@ -70,6 +100,24 @@ void PluginEditor::resized()
     
     auto labelY = centerY + buttonHeight / 2 + 10;
     labelPortamentoRate.setBounds(startX, labelY, labelPortamentoRate.getWidth(), labelPortamentoRate.getHeight());
+    
+    auto sliderX = startX + labelPortamentoRate.getWidth();
+    sliderPortamentoRate.setBounds(sliderX, labelY, sliderPortamentoRate.getWidth(), sliderPortamentoRate.getHeight());
+    
+    auto labelPortaVelocityY = labelY + labelPortamentoRate.getHeight() + 5;
+    labelPortaVelocity.setBounds(startX, labelPortaVelocityY, labelPortaVelocity.getWidth(), labelPortaVelocity.getHeight());
+    
+    sliderPortaVelocity.setBounds(sliderX, labelPortaVelocityY, sliderPortaVelocity.getWidth(), sliderPortaVelocity.getHeight());
+    
+    auto labelFrequencyY = labelPortaVelocityY + labelPortaVelocity.getHeight() + 5;
+    labelFrequency.setBounds(startX, labelFrequencyY, labelFrequency.getWidth(), labelFrequency.getHeight());
+    
+    sliderFrequency.setBounds(sliderX, labelFrequencyY, sliderFrequency.getWidth(), sliderFrequency.getHeight());
+}
+
+void PluginEditor::mouseDown(const juce::MouseEvent&)
+{
+    unfocusAllComponents();
 }
 
 void PluginEditor::updateTheme()
@@ -79,6 +127,11 @@ void PluginEditor::updateTheme()
     buttonDebug.repaint();
     buttonDisabled.repaint();
     labelPortamentoRate.repaint();
+    sliderPortamentoRate.repaint();
+    labelPortaVelocity.repaint();
+    sliderPortaVelocity.repaint();
+    labelFrequency.repaint();
+    sliderFrequency.repaint();
     repaint();
 }
 
