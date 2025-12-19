@@ -1,6 +1,6 @@
 #include "McComboBox.h"
 #include "McPopupMenu.h"
-#include "../LookAndFeel/McLookAndFeel.h"
+#include "../Themes/McTheme.h"
 
 McComboBox::McComboBox(Size size)
     : juce::ComboBox()
@@ -14,10 +14,9 @@ McComboBox::McComboBox(Size size)
     setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
 }
 
-void McComboBox::setLookAndFeel(McLookAndFeel* lookAndFeel)
+void McComboBox::setLookAndFeel(McTheme* theme)
 {
-    mcLookAndFeel = lookAndFeel;
-    juce::ComboBox::setLookAndFeel(lookAndFeel);
+    mcTheme = theme;
     
     // Ensure the internal label remains hidden
     setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
@@ -30,7 +29,7 @@ void McComboBox::setPopupDisplayMode(PopupDisplayMode mode)
 
 void McComboBox::paint(juce::Graphics& g)
 {
-    if (mcLookAndFeel == nullptr)
+    if (mcTheme == nullptr)
     {
         return;
     }
@@ -38,6 +37,8 @@ void McComboBox::paint(juce::Graphics& g)
     auto bounds = getLocalBounds().toFloat();
     auto enabled = isEnabled();
 
+    drawBase(g, bounds);
+    
     auto borderBounds = bounds;
     auto backgroundBounds = borderBounds.reduced(static_cast<float>(kBorderMargin));
 
@@ -47,9 +48,16 @@ void McComboBox::paint(juce::Graphics& g)
     drawTriangle(g, bounds, enabled);
 }
 
+void McComboBox::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+{
+    auto baseColour = mcTheme->getComboBoxBaseColour();
+    g.setColour(baseColour);
+    g.fillRect(bounds);
+}
+
 void McComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
 {
-    auto backgroundColour = mcLookAndFeel->getComboBoxBackgroundColour(enabled);
+    auto backgroundColour = mcTheme->getComboBoxBackgroundColour(enabled);
     g.setColour(backgroundColour);
     g.fillRect(bounds);
 }
@@ -64,8 +72,8 @@ void McComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bound
         text = getItemText(selectedIndex);
     }
 
-    auto textColour = mcLookAndFeel->getComboBoxTextColour(enabled);
-    auto font = mcLookAndFeel->getDefaultFont();
+    auto textColour = mcTheme->getComboBoxTextColour(enabled);
+    auto font = mcTheme->getDefaultFont();
 
     auto textBounds = bounds;
     textBounds.removeFromLeft(kTextLeftMargin);
@@ -78,7 +86,7 @@ void McComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bound
 
 void McComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
 {
-    auto triangleColour = mcLookAndFeel->getComboBoxTriangleColour(enabled);
+    auto triangleColour = mcTheme->getComboBoxTriangleColour(enabled);
     g.setColour(triangleColour);
 
     auto triangleHeight = kTriangleSideSize * 0.866f;
@@ -130,7 +138,7 @@ void McComboBox::mouseDown(const juce::MouseEvent& e)
 
 void McComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
 {
-    focusableWidget.drawFocusBorder(g, bounds, mcLookAndFeel);
+    focusableWidget.drawFocusBorder(g, bounds, mcTheme);
 }
 
 void McComboBox::focusGained(juce::Component::FocusChangeType)

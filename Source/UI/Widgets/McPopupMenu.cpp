@@ -1,6 +1,6 @@
 #include "McPopupMenu.h"
 #include "McComboBox.h"
-#include "../LookAndFeel/McLookAndFeel.h"
+#include "../Themes/McTheme.h"
 
 McPopupMenu::McPopupMenu(McComboBox& comboBoxRef)
     : comboBox(comboBoxRef)
@@ -35,7 +35,7 @@ void McPopupMenu::paint(juce::Graphics& g)
     }
 
     auto bounds = getLocalBounds();
-    auto backgroundColour = mcLookAndFeel->getPopupMenuBackgroundColour();
+    auto backgroundColour = mcTheme->getPopupMenuBackgroundColour();
 
     g.setColour(backgroundColour);
     g.fillRect(bounds);
@@ -165,7 +165,7 @@ void McPopupMenu::show(McComboBox& comboBoxRef)
         return;
     }
 
-    auto* lookAndFeel = comboBoxRef.mcLookAndFeel;
+    auto* lookAndFeel = comboBoxRef.mcTheme;
     if (lookAndFeel == nullptr)
     {
         return;
@@ -178,12 +178,14 @@ void McPopupMenu::show(McComboBox& comboBoxRef)
     }
 
     auto popupMenu = std::make_unique<McPopupMenu>(comboBoxRef);
-    popupMenu->mcLookAndFeel = lookAndFeel;
+    popupMenu->mcTheme = lookAndFeel;
     popupMenu->cachedFont = lookAndFeel->getDefaultFont();
     
     if (popupMenu->useMultiColumn)
     {
-        auto availableWidth = parent->getWidth() - comboBoxRef.getX();
+        auto spaceRight = parent->getWidth() - (comboBoxRef.getX() + comboBoxRef.getWidth());
+        auto spaceLeft = comboBoxRef.getX();
+        auto availableWidth = juce::jmax(spaceRight, spaceLeft);
         popupMenu->columnCount = popupMenu->calculateOptimalColumnCount(comboBoxRef.getNumItems(), availableWidth);
         popupMenu->itemsPerColumn = popupMenu->calculateCeilingDivision(comboBoxRef.getNumItems(), popupMenu->columnCount);
         popupMenu->totalPopupWidth = popupMenu->columnCount * popupMenu->columnWidth + (popupMenu->columnCount - 1) * kColumnSpacing + kBorderSize * 2;
@@ -254,7 +256,7 @@ bool McPopupMenu::keyPressed(const juce::KeyPress& key)
 
 void McPopupMenu::calculateColumnLayout()
 {
-    if (! useMultiColumn || mcLookAndFeel == nullptr)
+    if (! useMultiColumn || mcTheme == nullptr)
     {
         return;
     }
@@ -402,11 +404,11 @@ void McPopupMenu::drawItem(juce::Graphics& g, int itemIndex, const juce::Rectang
     juce::Colour textColour;
     if (isHighlighted && isActive)
     {
-        textColour = mcLookAndFeel->getPopupMenuTextColourHighlighted();
+        textColour = mcTheme->getPopupMenuTextColourHighlighted();
     }
     else
     {
-        textColour = mcLookAndFeel->getPopupMenuTextColour();
+        textColour = mcTheme->getPopupMenuTextColour();
         if (! isActive)
         {
             textColour = textColour.withAlpha(0.5f);
@@ -424,7 +426,7 @@ void McPopupMenu::drawItem(juce::Graphics& g, int itemIndex, const juce::Rectang
 
 void McPopupMenu::drawItemHighlight(juce::Graphics& g, const juce::Rectangle<int>& itemBounds, int column) const
 {
-    auto highlightColour = mcLookAndFeel->getPopupMenuHighlightColour();
+    auto highlightColour = mcTheme->getPopupMenuHighlightColour();
     g.setColour(highlightColour);
     
     auto highlightBounds = calculateHighlightBoundsForItem(itemBounds, column);
@@ -433,7 +435,7 @@ void McPopupMenu::drawItemHighlight(juce::Graphics& g, const juce::Rectangle<int
 
 void McPopupMenu::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds) const
 {
-    auto separatorColour = mcLookAndFeel->getPopupMenuSeparatorColour();
+    auto separatorColour = mcTheme->getPopupMenuSeparatorColour();
     g.setColour(separatorColour);
     
     auto separatorY = contentBounds.getY();
@@ -448,7 +450,7 @@ void McPopupMenu::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangl
 
 void McPopupMenu::drawPopupBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
 {
-    auto borderColour = mcLookAndFeel->getPopupMenuBorderColour();
+    auto borderColour = mcTheme->getPopupMenuBorderColour();
     g.setColour(borderColour);
     g.drawRect(bounds, kBorderSize);
 }
@@ -491,31 +493,46 @@ int McPopupMenu::findItemIndexInSingleColumn(int relativeY) const
 
 int McPopupMenu::calculatePopupXPosition(McComboBox&, int popupWidth, const juce::Rectangle<int>& parentBounds, const juce::Point<int>& comboBoxPosition, const juce::Rectangle<int>& comboBoxBounds)
 {
-    auto spaceRight = parentBounds.getRight() - (comboBoxPosition.x + comboBoxBounds.getWidth());
-    auto spaceLeft = comboBoxPosition.x - parentBounds.getX();
+    auto xCC = comboBoxPosition.x;
+    auto wCC = comboBoxBounds.getWidth();
+    auto wPM = popupWidth;
     
-    if (spaceRight >= popupWidth || spaceRight >= spaceLeft)
+    auto spaceRight = parentBounds.getRight() - (xCC + wCC);
+    auto spaceLeft = xCC - parentBounds.getX();
+    
+    if (spaceRight >= wPM || spaceRight >= spaceLeft)
     {
-        return comboBoxPosition.x;
+        return xCC;
     }
     else
     {
-        return comboBoxPosition.x + comboBoxBounds.getWidth() - popupWidth;
+        return xCC + wCC - wPM;
     }
 }
 
 int McPopupMenu::calculatePopupYPosition(McComboBox&, int popupHeight, const juce::Rectangle<int>& parentBounds, const juce::Point<int>& comboBoxPosition, const juce::Rectangle<int>& comboBoxBounds)
 {
-    auto spaceBelow = parentBounds.getBottom() - (comboBoxPosition.y + comboBoxBounds.getHeight());
-    auto spaceAbove = comboBoxPosition.y - parentBounds.getY();
+    auto yCC = comboBoxPosition.y;
+    auto hCC = comboBoxBounds.getHeight();
+    auto hPM = popupHeight;
     
-    if (spaceBelow >= popupHeight || spaceBelow >= spaceAbove)
+    auto spaceBelow = parentBounds.getBottom() - (yCC + hCC);
+    auto spaceAbove = yCC - parentBounds.getY();
+    
+    auto requiredSpaceBelow = hPM + kVerticalSpacing;
+    auto requiredSpaceAbove = hPM + kVerticalSpacing;
+    
+    if (spaceBelow >= requiredSpaceBelow || spaceBelow >= spaceAbove)
     {
-        return comboBoxPosition.y + comboBoxBounds.getHeight();
+        return yCC + hCC + kVerticalSpacing;
+    }
+    else if (spaceAbove >= requiredSpaceAbove)
+    {
+        return yCC - hPM - kVerticalSpacing;
     }
     else
     {
-        return comboBoxPosition.y - popupHeight;
+        return yCC + hCC + kVerticalSpacing;
     }
 }
 
@@ -653,7 +670,7 @@ void McPopupMenu::navigateDownInSingleColumn()
 
 void McPopupMenu::recalculateColumnLayoutIfNeeded()
 {
-    if (useMultiColumn && mcLookAndFeel != nullptr)
+    if (useMultiColumn && mcTheme != nullptr)
     {
         columnWidth = comboBox.getWidth();
         totalPopupWidth = columnCount * columnWidth + (columnCount - 1) * kColumnSpacing + kBorderSize * 2;
@@ -674,7 +691,7 @@ bool McPopupMenu::isValidItemIndex(int itemIndex) const
 
 bool McPopupMenu::hasValidLookAndFeel() const
 {
-    return mcLookAndFeel != nullptr;
+    return mcTheme != nullptr;
 }
 
 bool McPopupMenu::hasValidParent() const

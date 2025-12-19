@@ -1,5 +1,5 @@
 #include "McParameterLabel.h"
-#include "../LookAndFeel/McLookAndFeel.h"
+#include "../Themes/McTheme.h"
 
 McParameterLabel::McParameterLabel(const juce::String& text)
     : labelText(text)
@@ -7,9 +7,9 @@ McParameterLabel::McParameterLabel(const juce::String& text)
     setSize(kDefaultWidth, kDefaultHeight);
 }
 
-void McParameterLabel::setLookAndFeel(McLookAndFeel* lookAndFeel)
+void McParameterLabel::setTheme(McTheme* theme)
 {
-    mcLookAndFeel = lookAndFeel;
+    mcTheme = theme;
 }
 
 void McParameterLabel::setText(const juce::String& newText)
@@ -23,37 +23,46 @@ void McParameterLabel::setText(const juce::String& newText)
 
 void McParameterLabel::paint(juce::Graphics& g)
 {
-    if (mcLookAndFeel == nullptr)
+    if (mcTheme == nullptr)
     {
         return;
     }
 
     auto bounds = getLocalBounds().toFloat();
-    auto enabled = isEnabled();
 
-    drawBackground(g, bounds, enabled);
-    drawText(g, bounds, enabled);
+    drawBase(g, bounds);
+    drawBackground(g, bounds);
+    drawText(g, bounds);
 }
 
-void McParameterLabel::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+void McParameterLabel::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
 {
-    auto backgroundColour = mcLookAndFeel->getParameterLabelBackgroundColour(enabled);
-    g.setColour(backgroundColour);
+    auto baseColour = mcTheme->getParameterLabelBaseColour();
+    g.setColour(baseColour);
     g.fillRect(bounds);
 }
 
-void McParameterLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+void McParameterLabel::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+{
+    auto backgroundColour = mcTheme->getParameterLabelBackgroundColour();
+    auto backgroundBounds = bounds.reduced(kBackgroundMargin);
+    
+    g.setColour(backgroundColour);
+    g.fillRect(backgroundBounds);
+}
+
+void McParameterLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
 {
     if (labelText.isEmpty())
     {
         return;
     }
 
-    auto textColour = mcLookAndFeel->getParameterLabelTextColour(enabled);
-    auto font = mcLookAndFeel->getDefaultFont();
+    auto textColour = mcTheme->getParameterLabelTextColour();
+    auto font = mcTheme->getDefaultFont();
 
-    auto textBounds = bounds;
-    textBounds.removeFromLeft(kTextLeftMargin);
+    auto textBounds = bounds.reduced(kBackgroundMargin);
+    textBounds.removeFromLeft(kTextLeftPadding);
 
     g.setColour(textColour);
     g.setFont(font);

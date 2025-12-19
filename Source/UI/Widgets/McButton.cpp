@@ -1,5 +1,5 @@
 #include "McButton.h"
-#include "../LookAndFeel/McLookAndFeel.h"
+#include "../Themes/McTheme.h"
 
 McButton::McButton(int width, const juce::String& buttonText)
     : juce::Button(buttonText)
@@ -7,16 +7,14 @@ McButton::McButton(int width, const juce::String& buttonText)
     setSize(width, kDefaultHeight);
 }
 
-void McButton::setLookAndFeel(McLookAndFeel* lookAndFeel)
+void McButton::setTheme(McTheme* theme)
 {
-    mcLookAndFeel = lookAndFeel;
+    mcTheme = theme;
 }
 
 void McButton::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
-    juce::ignoreUnused(shouldDrawButtonAsHighlighted);
-    
-    if (mcLookAndFeel == nullptr)
+    if (mcTheme == nullptr)
     {
         return;
     }
@@ -24,42 +22,73 @@ void McButton::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted
     auto bounds = getLocalBounds().toFloat();
     auto enabled = isEnabled();
 
+    drawBase(g, bounds);
+    drawBackground(g, bounds, enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
     drawBorder(g, bounds, enabled);
-    drawBackground(g, bounds.reduced(kBorderThickness), enabled);
-    drawText(g, bounds, enabled, shouldDrawButtonAsDown);
+    drawText(g, bounds, enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+}
+
+void McButton::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+{
+    auto baseColour = mcTheme->getButtonBaseColour();
+    g.setColour(baseColour);
+    g.fillRect(bounds);
+}
+
+void McButton::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown)
+{
+    juce::Colour backgroundColour;
+    
+    if (!enabled)
+    {
+        backgroundColour = mcTheme->getButtonBackgroundColourOff();
+    }
+    else if (isDown)
+    {
+        backgroundColour = mcTheme->getButtonBackgroundColourClicked();
+    }
+    else if (isHighlighted)
+    {
+        backgroundColour = mcTheme->getButtonBackgroundColourHoover();
+    }
+    else
+    {
+        backgroundColour = mcTheme->getButtonBackgroundColourOn();
+    }
+    
+    g.setColour(backgroundColour);
+    g.fillRect(bounds);
 }
 
 void McButton::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
 {
-    if (enabled)
+    juce::Colour borderColour;
+    
+    if (!enabled)
     {
-        auto borderColour = mcLookAndFeel->getButtonBorderColour(true);
-        g.setColour(borderColour);
+        borderColour = mcTheme->getButtonBorderColourOff();
     }
     else
     {
-        auto borderColour = mcLookAndFeel->getSliderBackgroundColour(false);
-        g.setColour(borderColour);
+        borderColour = mcTheme->getButtonBorderColourOn();
     }
-    g.drawRect(bounds, kBorderThickness);
+    
+    g.setColour(borderColour);
+    
+    auto borderThickness = static_cast<float>(kBorderThickness);
+    
+    auto topBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY(), bounds.getWidth(), borderThickness);
+    auto bottomBorder = juce::Rectangle<float>(bounds.getX(), bounds.getBottom() - borderThickness, bounds.getWidth(), borderThickness);
+    auto leftBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
+    auto rightBorder = juce::Rectangle<float>(bounds.getRight() - borderThickness, bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
+    
+    g.fillRect(topBorder);
+    g.fillRect(bottomBorder);
+    g.fillRect(leftBorder);
+    g.fillRect(rightBorder);
 }
 
-void McButton::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
-{
-    if (enabled)
-    {
-        auto backgroundColour = mcLookAndFeel->getButtonBackgroundColour(true);
-        g.setColour(backgroundColour);
-    }
-    else
-    {
-        auto backgroundColour = mcLookAndFeel->getSliderBackgroundColour(false);
-        g.setColour(backgroundColour);
-    }
-    g.fillRect(bounds);
-}
-
-void McButton::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isDown)
+void McButton::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown)
 {
     auto buttonText = getButtonText();
     if (buttonText.isEmpty())
@@ -68,16 +97,25 @@ void McButton::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds,
     }
 
     juce::Colour textColour;
-    if (enabled)
+    
+    if (!enabled)
     {
-        textColour = mcLookAndFeel->getButtonTextColour(true, isDown);
+        textColour = mcTheme->getButtonTextColourOff();
+    }
+    else if (isDown)
+    {
+        textColour = mcTheme->getButtonTextColourClicked();
+    }
+    else if (isHighlighted)
+    {
+        textColour = mcTheme->getButtonTextColourHoover();
     }
     else
     {
-        textColour = mcLookAndFeel->getSliderTextColour(false);
+        textColour = mcTheme->getButtonTextColourOn();
     }
 
-    auto font = mcLookAndFeel->getDefaultFont();
+    auto font = mcTheme->getDefaultFont();
 
     g.setColour(textColour);
     g.setFont(font);

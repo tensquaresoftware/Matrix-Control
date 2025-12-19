@@ -51,8 +51,8 @@ set(PLUGIN_SOURCES
     Source/Business/MIDI/SysEx/SysExDecoder.cpp
     Source/Business/MIDI/SysEx/SysExEncoder.cpp
     
-    # UI - LookAndFeel
-    Source/UI/LookAndFeel/McLookAndFeel.cpp
+    # UI - Themes
+    Source/UI/Themes/McTheme.cpp
     
     # UI - Widgets
     Source/UI/Widgets/McButton.cpp

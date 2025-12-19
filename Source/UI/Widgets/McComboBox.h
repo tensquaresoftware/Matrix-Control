@@ -4,7 +4,7 @@
 
 #include "McFocusableWidget.h"
 
-class McLookAndFeel;
+class McTheme;
 
 class McComboBox : public juce::ComboBox
 {
@@ -24,7 +24,7 @@ public:
     explicit McComboBox(Size size = Size::Normal);
     ~McComboBox() override = default;
 
-    void setLookAndFeel(McLookAndFeel* lookAndFeel);
+    void setLookAndFeel(McTheme* themes);
     void setPopupDisplayMode(PopupDisplayMode mode);
     PopupDisplayMode getPopupDisplayMode() const { return popupDisplayMode; }
 
@@ -38,22 +38,23 @@ public:
     void focusLost(juce::Component::FocusChangeType cause) override;
 
 private:
-    static constexpr int kDefaultHeight = 20;
-    static constexpr int kNormalWidth = 60;
-    static constexpr int kLargeWidth = 105;
-    static constexpr float kTriangleSideSize = 7.0f;
-    static constexpr int kTextLeftMargin = 3;
-    static constexpr int kTextRightMargin = 3;
+    static constexpr int kDefaultHeight       = 20;
+    static constexpr int kNormalWidth         = 60;
+    static constexpr int kLargeWidth          = 105;
+    static constexpr float kTriangleSideSize  = 7.0f;
+    static constexpr int kTextLeftMargin      = 3;
+    static constexpr int kTextRightMargin     = 3;
     static constexpr int kTriangleRightMargin = 3;
-    static constexpr int kBorderMargin = 1;
+    static constexpr int kBorderMargin        = 1;
 
+    void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
     void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
     void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     juce::Path createTrianglePath(float x, float y, float sideSize) const;
 
-    McLookAndFeel* mcLookAndFeel = nullptr;
+    McTheme* mcTheme = nullptr;
     McFocusableWidget focusableWidget;
     Size comboSize;
     PopupDisplayMode popupDisplayMode = PopupDisplayMode::SingleColumn;

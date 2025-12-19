@@ -4,7 +4,7 @@
 
 #include "McFocusableWidget.h"
 
-class McLookAndFeel;
+class McTheme;
 
 class McSlider : public juce::Slider
 {
@@ -12,7 +12,7 @@ public:
     explicit McSlider(double defaultValueValue = 0.0);
     ~McSlider() override = default;
 
-    void setLookAndFeel(McLookAndFeel* lookAndFeel);
+    void setLookAndFeel(McTheme* themes);
 
     void paint(juce::Graphics& g) override;
 
@@ -27,13 +27,14 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    static constexpr int kDefaultWidth = 60;
-    static constexpr int kDefaultHeight = 20;
+    static constexpr int kDefaultWidth       = 60;
+    static constexpr int kDefaultHeight      = 20;
     static constexpr double kDragSensitivity = 0.5;
-    static constexpr double kShiftKeyStep = 10.0;
-    static constexpr int kBorderMargin = 1;
-    static constexpr int kTrackAreaMargin = 1;
+    static constexpr double kShiftKeyStep    = 10.0;
+    static constexpr int kBorderMargin       = 1;
+    static constexpr int kTrackAreaMargin    = 1;
 
+    void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
     void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
     void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& trackAreaBounds, bool enabled);
@@ -49,7 +50,7 @@ private:
     void updateValueWithStep(double step, bool increment);
     void resetToDefaultValue();
 
-    McLookAndFeel* mcLookAndFeel = nullptr;
+    McTheme* mcTheme = nullptr;
     McFocusableWidget focusableWidget;
     
     double defaultValue = 0.0;

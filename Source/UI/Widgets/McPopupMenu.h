@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class McLookAndFeel;
+class McTheme;
 class McComboBox;
 
 class McPopupMenu : public juce::Component
@@ -24,11 +24,12 @@ public:
     static void show(McComboBox& comboBox);
 
 private:
-    static constexpr int kItemHeight = 20;
-    static constexpr int kBorderSize = 1;
-    static constexpr int kTextLeftMargin = 4;
-    static constexpr int kMaxVisibleRows = 12;
-    static constexpr int kColumnSpacing = 2;
+    static constexpr int kItemHeight      = 20;
+    static constexpr int kBorderSize      = 1;
+    static constexpr int kTextLeftMargin  = 4;
+    static constexpr int kMaxVisibleRows  = 12;
+    static constexpr int kColumnSpacing   = 2;
+    static constexpr int kVerticalSpacing = 2;
 
     void updateHighlightedItem(int itemIndex);
     int getItemIndexAt(int x, int y) const;
@@ -89,7 +90,7 @@ private:
     juce::Rectangle<int> calculateHighlightBoundsForItem(const juce::Rectangle<int>& itemBounds, int column) const;
 
     McComboBox& comboBox;
-    McLookAndFeel* mcLookAndFeel = nullptr;
+    McTheme* mcTheme = nullptr;
     int highlightedItemIndex = -1;
     juce::Font cachedFont;
     

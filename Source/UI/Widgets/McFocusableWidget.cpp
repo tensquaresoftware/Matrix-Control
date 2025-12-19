@@ -1,5 +1,5 @@
 #include "McFocusableWidget.h"
-#include "../LookAndFeel/McLookAndFeel.h"
+#include "../Themes/McTheme.h"
 
 McFocusableWidget::McFocusableWidget()
 {
@@ -23,11 +23,11 @@ void McFocusableWidget::handleFocusLost(juce::Component* component)
     }
 }
 
-void McFocusableWidget::drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, McLookAndFeel* lookAndFeel) const
+void McFocusableWidget::drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, McTheme* theme) const
 {
-    if (hasFocusFlag && lookAndFeel != nullptr)
+    if (hasFocusFlag && theme != nullptr)
     {
-        g.setColour(lookAndFeel->getSliderFocusBorderColour());
+        g.setColour(theme->getSliderFocusBorderColour());
     }
     else
     {

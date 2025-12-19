@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-class McLookAndFeel;
+class McTheme;
 
 class McFocusableWidget
 {
@@ -13,7 +13,7 @@ public:
     void handleFocusGained(juce::Component* component);
     void handleFocusLost(juce::Component* component);
     
-    void drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, McLookAndFeel* lookAndFeel) const;
+    void drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, McTheme* theme) const;
     
     bool hasFocus() const { return hasFocusFlag; }
 

@@ -1,5 +1,5 @@
 #include "McSlider.h"
-#include "../LookAndFeel/McLookAndFeel.h"
+#include "../Themes/McTheme.h"
 
 McSlider::McSlider(double defaultValueValue)
     : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
@@ -10,14 +10,14 @@ McSlider::McSlider(double defaultValueValue)
     setInterceptsMouseClicks(true, false);
 }
 
-void McSlider::setLookAndFeel(McLookAndFeel* lookAndFeel)
+void McSlider::setLookAndFeel(McTheme* theme)
 {
-    mcLookAndFeel = lookAndFeel;
+    mcTheme = theme;
 }
 
 void McSlider::paint(juce::Graphics& g)
 {
-    if (mcLookAndFeel == nullptr)
+    if (mcTheme == nullptr)
     {
         return;
     }
@@ -25,6 +25,8 @@ void McSlider::paint(juce::Graphics& g)
     auto bounds = getLocalBounds().toFloat();
     auto enabled = isEnabled();
 
+    drawBase(g, bounds);
+    
     auto borderBounds = getBorderBounds(bounds);
     auto backgroundBounds = getBackgroundBounds(borderBounds);
     auto trackAreaBounds = getTrackAreaBounds(backgroundBounds);
@@ -33,6 +35,13 @@ void McSlider::paint(juce::Graphics& g)
     drawBackground(g, backgroundBounds, enabled);
     drawTrack(g, trackAreaBounds, enabled);
     drawValueText(g, bounds, enabled);
+}
+
+void McSlider::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+{
+    auto baseColour = mcTheme->getSliderBaseColour();
+    g.setColour(baseColour);
+    g.fillRect(bounds);
 }
 
 juce::Rectangle<float> McSlider::getBorderBounds(const juce::Rectangle<float>& bounds) const
@@ -52,12 +61,12 @@ juce::Rectangle<float> McSlider::getTrackAreaBounds(const juce::Rectangle<float>
 
 void McSlider::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
 {
-    focusableWidget.drawFocusBorder(g, bounds, mcLookAndFeel);
+    focusableWidget.drawFocusBorder(g, bounds, mcTheme);
 }
 
 void McSlider::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
 {
-    auto backgroundColour = mcLookAndFeel->getSliderBackgroundColour(enabled);
+    auto backgroundColour = mcTheme->getSliderBackgroundColour(enabled);
     g.setColour(backgroundColour);
     g.fillRect(bounds);
 }
@@ -79,7 +88,7 @@ void McSlider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& trackA
     auto trackWidth = trackAreaBounds.getWidth() * normalizedValue;
     auto trackBounds = trackAreaBounds.withWidth(trackWidth);
 
-    auto trackColour = mcLookAndFeel->getSliderTrackColour(enabled);
+    auto trackColour = mcTheme->getSliderTrackColour(enabled);
     g.setColour(trackColour);
     g.fillRect(trackBounds);
 }
@@ -87,8 +96,8 @@ void McSlider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& trackA
 void McSlider::drawValueText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
 {
     auto valueText = juce::String(static_cast<int>(std::round(getValue())));
-    auto textColour = mcLookAndFeel->getSliderTextColour(enabled);
-    auto font = mcLookAndFeel->getDefaultFont();
+    auto textColour = mcTheme->getSliderTextColour(enabled);
+    auto font = mcTheme->getDefaultFont();
 
     g.setColour(textColour);
     g.setFont(font);
