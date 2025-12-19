@@ -4,7 +4,7 @@
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
 - Contexte : Développement de plugins VST/AU avec JUCE
-- Dernière mise à jour : 2025-12-11
+- Dernière mise à jour : 2025-12-19
 
 
 ================================================================================
@@ -61,6 +61,21 @@
   * Tous les commentaires de code
   * Pas d'accents, pas de français dans le code
 - Git Commits : Summary/Description en anglais uniquement
+
+[Git Tags]
+- Lors de la création d'un tag annoté, utiliser le format suivant :
+  * Une phrase de description principale (titre du tag)
+  * Une petite liste à puces des points les plus importants qui ont été retravaillés dans le code
+- Exemple de format :
+  ```
+  Refactor McSlider and improve focus management
+
+  - Refactor McSlider: simplify drawing code by removing unnecessary constants and helper methods
+  - Use reduced() for bounds calculations directly in paint() method
+  - Improve focus management: add ability to remove focus by clicking on background
+  ```
+- Ne pas inclure les détails d'implémentation ni les widgets de test temporaires
+- Se concentrer sur les améliorations architecturales et les changements significatifs du code
 
 [Conventions de nommage]
 - Variables & Méthodes : lowerCamelCase

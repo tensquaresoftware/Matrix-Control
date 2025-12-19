@@ -7,24 +7,16 @@ McComboBox::McComboBox(Size size)
     , comboSize(size)
 {
     auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
-    setSize(width, kDefaultHeight);
+    setSize(width, kHeight);
     setWantsKeyboardFocus(true);
     
-    // Hide the internal label since we draw the text manually
     setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
 }
 
-void McComboBox::setLookAndFeel(McTheme* theme)
+void McComboBox::setTheme(McTheme* theme)
 {
     mcTheme = theme;
-    
-    // Ensure the internal label remains hidden
     setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
-}
-
-void McComboBox::setPopupDisplayMode(PopupDisplayMode mode)
-{
-    popupDisplayMode = mode;
 }
 
 void McComboBox::paint(juce::Graphics& g)
@@ -36,14 +28,14 @@ void McComboBox::paint(juce::Graphics& g)
 
     auto bounds = getLocalBounds().toFloat();
     auto enabled = isEnabled();
+    auto hasFocus = focusableWidget.hasFocus() || isPopupOpen;
 
     drawBase(g, bounds);
     
-    auto borderBounds = bounds;
-    auto backgroundBounds = borderBounds.reduced(static_cast<float>(kBorderMargin));
-
-    drawBorder(g, borderBounds);
+    auto backgroundBounds = bounds.reduced(static_cast<float>(kBorderThickness));
+   
     drawBackground(g, backgroundBounds, enabled);
+    drawBorder(g, bounds, enabled, hasFocus);
     drawText(g, bounds, enabled);
     drawTriangle(g, bounds, enabled);
 }
@@ -62,6 +54,13 @@ void McComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>&
     g.fillRect(bounds);
 }
 
+void McComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus)
+{
+    auto borderColour = mcTheme->getComboBoxBorderColour(enabled, hasFocus);
+    g.setColour(borderColour);
+    g.drawRect(bounds, static_cast<float>(kBorderThickness));
+}
+
 void McComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
 {
     juce::String text;
@@ -76,8 +75,8 @@ void McComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bound
     auto font = mcTheme->getDefaultFont();
 
     auto textBounds = bounds;
-    textBounds.removeFromLeft(kTextLeftMargin);
-    textBounds.removeFromRight(kTriangleSideSize + kTextRightMargin + kTriangleRightMargin);
+    textBounds.removeFromLeft(static_cast<float>(kLeftPadding));
+    textBounds.removeFromRight(kTriangleSideSize + static_cast<float>(kRightPadding));
 
     g.setColour(textColour);
     g.setFont(font);
@@ -90,7 +89,7 @@ void McComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& b
     g.setColour(triangleColour);
 
     auto triangleHeight = kTriangleSideSize * 0.866f;
-    auto triangleX = bounds.getRight() - kTriangleSideSize - kTriangleRightMargin;
+    auto triangleX = bounds.getRight() - kTriangleSideSize - static_cast<float>(kRightPadding);
     auto triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
 
     auto trianglePath = createTrianglePath(triangleX, triangleY, kTriangleSideSize);
@@ -115,7 +114,7 @@ void McComboBox::showPopup()
 {
     if (isEnabled() && getNumItems() > 0)
     {
-        grabKeyboardFocus();
+        isPopupOpen = true;
         repaint();
         McPopupMenu::show(*this);
     }
@@ -126,8 +125,7 @@ void McComboBox::mouseDown(const juce::MouseEvent& e)
     if (isEnabled())
     {
         grabKeyboardFocus();
-        // Force repaint to show focus border before popup opens
-        repaint();
+        focusableWidget.handleFocusGained(this);
         
         if (e.mods.isLeftButtonDown())
         {
@@ -136,20 +134,15 @@ void McComboBox::mouseDown(const juce::MouseEvent& e)
     }
 }
 
-void McComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-{
-    focusableWidget.drawFocusBorder(g, bounds, mcTheme);
-}
-
 void McComboBox::focusGained(juce::Component::FocusChangeType)
 {
-    focusableWidget.handleFocusGained(this);
+    if (! focusableWidget.hasFocus())
+    {
+        focusableWidget.handleFocusGained(this);
+    }
 }
 
 void McComboBox::focusLost(juce::Component::FocusChangeType)
 {
     focusableWidget.handleFocusLost(this);
 }
-
-
-

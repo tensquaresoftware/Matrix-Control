@@ -6,6 +6,7 @@
 #include "PluginProcessor.h"
 #include "UI/Themes/McTheme.h"
 #include "UI/Widgets/McButton.h"
+#include "UI/Widgets/McComboBox.h"
 #include "UI/Widgets/McParameterLabel.h"
 #include "UI/Widgets/McSlider.h"
 
@@ -37,6 +38,17 @@ private:
     
     McParameterLabel labelFrequency;
     McSlider sliderFrequency;
+    
+    McParameterLabel labelTrackInput;
+    McComboBox comboBoxTrackInput;
+    
+    McParameterLabel labelLegatoPorta;
+    McComboBox comboBoxLegatoPorta;
+    
+    McComboBox comboBoxTopLeft;
+    McComboBox comboBoxTopRight;
+    McComboBox comboBoxBottomLeft;
+    McComboBox comboBoxBottomRight;
     
     void updateTheme();
 

@@ -15,21 +15,12 @@ public:
         Large
     };
 
-    enum class PopupDisplayMode
-    {
-        SingleColumn,
-        MultiColumn
-    };
-
     explicit McComboBox(Size size = Size::Normal);
     ~McComboBox() override = default;
 
-    void setLookAndFeel(McTheme* themes);
-    void setPopupDisplayMode(PopupDisplayMode mode);
-    PopupDisplayMode getPopupDisplayMode() const { return popupDisplayMode; }
+    void setTheme(McTheme* theme);
 
     void paint(juce::Graphics& g) override;
-
     void showPopup() override;
 
     void mouseDown(const juce::MouseEvent& e) override;
@@ -38,18 +29,18 @@ public:
     void focusLost(juce::Component::FocusChangeType cause) override;
 
 private:
-    static constexpr int kDefaultHeight       = 20;
-    static constexpr int kNormalWidth         = 60;
-    static constexpr int kLargeWidth          = 105;
-    static constexpr float kTriangleSideSize  = 7.0f;
-    static constexpr int kTextLeftMargin      = 3;
-    static constexpr int kTextRightMargin     = 3;
-    static constexpr int kTriangleRightMargin = 3;
-    static constexpr int kBorderMargin        = 1;
+    static constexpr int kNormalWidth        = 60;
+    static constexpr int kLargeWidth         = 105;
+    static constexpr int kHeight             = 20;
+    static constexpr int kLeftPadding        = 3;
+    static constexpr int kRightPadding       = 3;
+    static constexpr int kBorderThickness    = 1;
+    static constexpr int kVerticalMargin     = 4;
+    static constexpr float kTriangleSideSize = 7.0f;
 
     void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-    void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
     void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
+    void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus);
     void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
     juce::Path createTrianglePath(float x, float y, float sideSize) const;
@@ -57,12 +48,9 @@ private:
     McTheme* mcTheme = nullptr;
     McFocusableWidget focusableWidget;
     Size comboSize;
-    PopupDisplayMode popupDisplayMode = PopupDisplayMode::SingleColumn;
+    bool isPopupOpen = false;
 
     friend class McPopupMenu;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(McComboBox)
 };
-
-
-

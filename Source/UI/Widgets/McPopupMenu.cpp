@@ -10,21 +10,27 @@ McPopupMenu::McPopupMenu(McComboBox& comboBoxRef)
     setInterceptsMouseClicks(true, true);
     setOpaque(true);
     
-    auto numItems = comboBox.getNumItems();
-    auto comboWidth = comboBox.getWidth();
-    
-    useMultiColumn = (comboBox.getPopupDisplayMode() == McComboBox::PopupDisplayMode::MultiColumn);
-    
-    if (useMultiColumn)
+    auto* parent = comboBox.getParentComponent();
+    if (parent != nullptr)
     {
-        initializeMultiColumnLayout(numItems, comboWidth);
-    }
-    else
-    {
-        initializeSingleColumnLayout(numItems, comboWidth);
+        mcTheme = comboBox.mcTheme;
+        if (mcTheme != nullptr)
+        {
+            cachedFont = mcTheme->getDefaultFont();
+        }
     }
     
-    initializeHighlightedItem(comboBox.getSelectedItemIndex());
+    calculateColumnLayout();
+    
+    auto selectedIndex = comboBox.getSelectedItemIndex();
+    if (isValidItemIndex(selectedIndex))
+    {
+        highlightedItemIndex = selectedIndex;
+    }
+    else if (comboBox.getNumItems() > 0)
+    {
+        highlightedItemIndex = 0;
+    }
 }
 
 void McPopupMenu::paint(juce::Graphics& g)
@@ -35,20 +41,19 @@ void McPopupMenu::paint(juce::Graphics& g)
     }
 
     auto bounds = getLocalBounds();
-    auto backgroundColour = mcTheme->getPopupMenuBackgroundColour();
-
-    g.setColour(backgroundColour);
-    g.fillRect(bounds);
-
-    auto contentBounds = bounds.reduced(kBorderSize);
-    drawAllItems(g, contentBounds);
-
-    if (useMultiColumn && columnCount > 1)
+    
+    drawBase(g, bounds);
+    drawBackground(g, bounds.reduced(kBorderThickness));
+    
+    auto contentBounds = bounds.reduced(kBorderThickness);
+    drawItems(g, contentBounds);
+    
+    if (columnCount > 1)
     {
         drawVerticalSeparators(g, contentBounds);
     }
-
-    drawPopupBorder(g, bounds);
+    
+    drawBorder(g, bounds);
 }
 
 void McPopupMenu::resized()
@@ -75,6 +80,266 @@ void McPopupMenu::mouseUp(const juce::MouseEvent& e)
     }
 }
 
+void McPopupMenu::inputAttemptWhenModal()
+{
+    exitModalState(0);
+    
+    comboBox.isPopupOpen = false;
+    comboBox.repaint();
+    
+    comboBox.grabKeyboardFocus();
+    
+    if (hasValidParent())
+    {
+        getParentComponent()->removeChildComponent(this);
+    }
+    delete this;
+}
+
+bool McPopupMenu::keyPressed(const juce::KeyPress& key)
+{
+    if (key.getKeyCode() == juce::KeyPress::escapeKey)
+    {
+        exitModalState(0);
+        
+        comboBox.isPopupOpen = false;
+        comboBox.repaint();
+        
+        comboBox.grabKeyboardFocus();
+        
+        if (hasValidParent())
+        {
+            getParentComponent()->removeChildComponent(this);
+        }
+        delete this;
+        return true;
+    }
+    
+    if (key.getKeyCode() == juce::KeyPress::returnKey)
+    {
+        if (highlightedItemIndex >= 0)
+        {
+            selectItem(highlightedItemIndex);
+        }
+        return true;
+    }
+    
+    handleKeyboardNavigation(key);
+    
+    return false;
+}
+
+void McPopupMenu::calculateColumnLayout()
+{
+    auto numItems = comboBox.getNumItems();
+    if (numItems == 0)
+    {
+        return;
+    }
+    
+    columnCount = calculateColumnCount(numItems);
+    itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
+    columnWidth = comboBox.getWidth();
+    
+    auto totalWidth = columnCount * columnWidth + (columnCount - 1) * kSeparatorWidth;
+    auto totalHeight = itemsPerColumn * kItemHeight;
+    
+    setSize(totalWidth + kBorderThickness * 2, totalHeight + kBorderThickness * 2);
+}
+
+int McPopupMenu::calculateColumnCount(int totalItems) const
+{
+    if (totalItems <= kColumnThreshold)
+    {
+        return 1;
+    }
+    
+    auto minColumns = (totalItems + kColumnThreshold - 1) / kColumnThreshold;
+    return minColumns;
+}
+
+int McPopupMenu::calculateItemsPerColumn(int totalItems, int numColumns) const
+{
+    return (totalItems + numColumns - 1) / numColumns;
+}
+
+juce::Point<int> McPopupMenu::calculatePopupPosition() const
+{
+    auto popupWidth = getWidth();
+    auto popupHeight = getHeight();
+    
+    auto x = calculatePopupX(popupWidth);
+    auto y = calculatePopupY(popupHeight);
+    
+    return juce::Point<int>(x, y);
+}
+
+int McPopupMenu::calculatePopupX(int popupWidth) const
+{
+    auto* parent = comboBox.getParentComponent();
+    if (parent == nullptr)
+    {
+        return comboBox.getX();
+    }
+    
+    auto comboBounds = comboBox.getBounds();
+    auto comboX = comboBox.getX();
+    auto comboWidth = comboBounds.getWidth();
+    auto parentBounds = parent->getBounds();
+    
+    auto spaceRight = parentBounds.getRight() - (comboX + comboWidth);
+    auto spaceLeft = comboX - parentBounds.getX();
+    
+    if (spaceRight >= popupWidth || spaceRight >= spaceLeft)
+    {
+        return comboX;
+    }
+    else
+    {
+        return comboX + comboWidth - popupWidth;
+    }
+}
+
+int McPopupMenu::calculatePopupY(int popupHeight) const
+{
+    auto* parent = comboBox.getParentComponent();
+    if (parent == nullptr)
+    {
+        return comboBox.getBottom();
+    }
+    
+    auto comboBounds = comboBox.getBounds();
+    auto comboY = comboBox.getY();
+    auto comboHeight = comboBounds.getHeight();
+    auto parentBounds = parent->getBounds();
+    
+    auto spaceBelow = parentBounds.getBottom() - (comboY + comboHeight);
+    auto spaceAbove = comboY - parentBounds.getY();
+    
+    auto requiredSpaceBelow = popupHeight + McComboBox::kVerticalMargin;
+    auto requiredSpaceAbove = popupHeight + McComboBox::kVerticalMargin;
+    
+    if (spaceBelow >= requiredSpaceBelow || spaceBelow >= spaceAbove)
+    {
+        return comboY + comboHeight + McComboBox::kVerticalMargin;
+    }
+    else if (spaceAbove >= requiredSpaceAbove)
+    {
+        return comboY - popupHeight - McComboBox::kVerticalMargin;
+    }
+    else
+    {
+        return comboY + comboHeight + McComboBox::kVerticalMargin;
+    }
+}
+
+juce::Rectangle<int> McPopupMenu::getItemBounds(int itemIndex) const
+{
+    if (! isValidItemIndex(itemIndex))
+    {
+        return juce::Rectangle<int>();
+    }
+    
+    auto contentBounds = getLocalBounds().reduced(kBorderThickness);
+    
+    if (columnCount == 1)
+    {
+        auto y = contentBounds.getY() + itemIndex * kItemHeight;
+        return juce::Rectangle<int>(contentBounds.getX(), y, contentBounds.getWidth(), kItemHeight);
+    }
+    else
+    {
+        auto column = itemIndex / itemsPerColumn;
+        auto row = itemIndex % itemsPerColumn;
+        
+        auto x = contentBounds.getX() + column * columnWidth + column * kSeparatorWidth;
+        auto y = contentBounds.getY() + row * kItemHeight;
+        
+        return juce::Rectangle<int>(x, y, columnWidth, kItemHeight);
+    }
+}
+
+int McPopupMenu::getItemIndexAt(int x, int y) const
+{
+    auto contentBounds = getLocalBounds().reduced(kBorderThickness);
+    
+    if (! contentBounds.contains(x, y))
+    {
+        return -1;
+    }
+    
+    auto relativeX = x - contentBounds.getX();
+    auto relativeY = y - contentBounds.getY();
+    
+    auto column = getColumnFromX(relativeX);
+    auto row = getRowFromY(relativeY);
+    
+    if (column < 0 || column >= columnCount || row < 0 || row >= itemsPerColumn)
+    {
+        return -1;
+    }
+    
+    auto itemIndex = getItemIndexFromColumnAndRow(column, row);
+    
+    if (isValidItemIndex(itemIndex))
+    {
+        return itemIndex;
+    }
+    
+    return -1;
+}
+
+int McPopupMenu::getColumnFromX(int x) const
+{
+    if (columnCount == 1)
+    {
+        return 0;
+    }
+    
+    auto relativeX = x;
+    
+    if (relativeX < columnWidth)
+    {
+        return 0;
+    }
+    
+    relativeX -= columnWidth;
+    
+    for (int column = 1; column < columnCount; ++column)
+    {
+        if (relativeX < kSeparatorWidth)
+        {
+            return column - 1;
+        }
+        
+        relativeX -= kSeparatorWidth;
+        
+        if (relativeX < columnWidth)
+        {
+            return column;
+        }
+        
+        relativeX -= columnWidth;
+    }
+    
+    return columnCount - 1;
+}
+
+int McPopupMenu::getRowFromY(int y) const
+{
+    return y / kItemHeight;
+}
+
+int McPopupMenu::getItemIndexFromColumnAndRow(int column, int row) const
+{
+    if (columnCount == 1)
+    {
+        return row;
+    }
+    
+    return column * itemsPerColumn + row;
+}
+
 void McPopupMenu::updateHighlightedItem(int itemIndex)
 {
     if (highlightedItemIndex != itemIndex)
@@ -84,50 +349,20 @@ void McPopupMenu::updateHighlightedItem(int itemIndex)
     }
 }
 
-int McPopupMenu::getItemIndexAt(int x, int y) const
-{
-    auto bounds = getLocalBounds().reduced(kBorderSize);
-    auto relativeX = x - bounds.getX();
-    auto relativeY = y - bounds.getY();
-    
-    if (! isPositionInsideBounds(relativeX, relativeY, bounds))
-    {
-        return -1;
-    }
-    
-    if (useMultiColumn)
-    {
-        auto column = findColumnFromXPosition(relativeX);
-        auto row = findRowFromYPosition(relativeY);
-        
-        if (! isValidRow(row))
-        {
-            return -1;
-        }
-        
-        auto itemIndex = calculateItemIndexFromColumnAndRow(column, row);
-        if (isValidItemIndex(itemIndex))
-        {
-            return itemIndex;
-        }
-    }
-    else
-    {
-        return findItemIndexInSingleColumn(relativeY);
-    }
-    
-    return -1;
-}
-
 void McPopupMenu::selectItem(int itemIndex)
 {
     exitModalState(0);
+    
+    comboBox.isPopupOpen = false;
+    comboBox.repaint();
     
     if (isValidItemIndex(itemIndex))
     {
         auto itemId = comboBox.getItemId(itemIndex);
         comboBox.setSelectedId(itemId, juce::sendNotificationSync);
     }
+    
+    comboBox.grabKeyboardFocus();
     
     if (hasValidParent())
     {
@@ -137,25 +372,254 @@ void McPopupMenu::selectItem(int itemIndex)
     delete this;
 }
 
-juce::Point<int> McPopupMenu::calculatePopupPosition(McComboBox& comboBox, int popupWidth, int popupHeight)
+void McPopupMenu::drawBase(juce::Graphics& g, const juce::Rectangle<int>& bounds)
 {
-    auto* parent = comboBox.getParentComponent();
-    if (parent == nullptr)
+    if (! hasValidLookAndFeel())
     {
-        return comboBox.getPosition();
+        return;
     }
+    
+    auto baseColour = mcTheme->getPopupMenuBaseColour();
+    g.setColour(baseColour);
+    g.fillRect(bounds);
+}
 
-    auto comboBoxBounds = comboBox.getBounds();
-    auto comboBoxPosition = comboBox.getPosition();
-    auto parentBounds = parent->getBounds();
+void McPopupMenu::drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds)
+{
+    if (! hasValidLookAndFeel())
+    {
+        return;
+    }
     
-    auto x = calculatePopupXPosition(comboBox, popupWidth, parentBounds, comboBoxPosition, comboBoxBounds);
-    x = clampPopupXToParentBounds(x, popupWidth, parentBounds);
+    auto backgroundColour = mcTheme->getPopupMenuBackgroundColour();
+    g.setColour(backgroundColour);
+    g.fillRect(bounds);
+}
+
+void McPopupMenu::drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds)
+{
+    if (! hasValidLookAndFeel())
+    {
+        return;
+    }
     
-    auto y = calculatePopupYPosition(comboBox, popupHeight, parentBounds, comboBoxPosition, comboBoxBounds);
-    y = clampPopupYToParentBounds(y, popupHeight, parentBounds);
+    auto borderColour = mcTheme->getPopupMenuBorderColour();
+    g.setColour(borderColour);
+    g.drawRect(bounds.toFloat(), static_cast<float>(kBorderThickness));
+}
+
+void McPopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<int>&)
+{
+    auto numItems = comboBox.getNumItems();
     
-    return juce::Point<int>(x, y);
+    for (int i = 0; i < numItems; ++i)
+    {
+        auto itemBounds = getItemBounds(i);
+        if (itemBounds.isEmpty())
+        {
+            continue;
+        }
+        
+        drawItem(g, i, itemBounds);
+    }
+}
+
+void McPopupMenu::drawItem(juce::Graphics& g, int itemIndex, const juce::Rectangle<int>& itemBounds)
+{
+    if (! hasValidLookAndFeel())
+    {
+        return;
+    }
+    
+    auto isHighlighted = (highlightedItemIndex == itemIndex);
+    auto isActive = comboBox.getItemId(itemIndex) != 0;
+    
+    if (isHighlighted && isActive)
+    {
+        auto hooverBackgroundColour = mcTheme->getPopupMenuBackgroundHooverColour();
+        auto hooverBounds = itemBounds.reduced(1);
+        g.setColour(hooverBackgroundColour);
+        g.fillRect(hooverBounds);
+        
+        auto hooverTextColour = mcTheme->getPopupMenuTextHooverColour();
+        g.setColour(hooverTextColour);
+        g.setFont(cachedFont);
+        
+        auto textBounds = itemBounds;
+        textBounds.removeFromLeft(kTextLeftPadding);
+        g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
+    }
+    else
+    {
+        auto textColour = mcTheme->getPopupMenuTextColour();
+        if (! isActive)
+        {
+            textColour = textColour.withAlpha(0.5f);
+        }
+        
+        g.setColour(textColour);
+        g.setFont(cachedFont);
+        
+        auto textBounds = itemBounds;
+        textBounds.removeFromLeft(kTextLeftPadding);
+        g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
+    }
+}
+
+void McPopupMenu::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds)
+{
+    if (! hasValidLookAndFeel() || columnCount <= 1)
+    {
+        return;
+    }
+    
+    auto separatorColour = mcTheme->getPopupMenuSeparatorColour();
+    g.setColour(separatorColour);
+    
+    for (int i = 1; i < columnCount; ++i)
+    {
+        auto separatorX = contentBounds.getX() + i * columnWidth + (i - 1) * kSeparatorWidth;
+        g.fillRect(separatorX, contentBounds.getY(), kSeparatorWidth, contentBounds.getHeight());
+    }
+}
+
+void McPopupMenu::handleKeyboardNavigation(const juce::KeyPress& key)
+{
+    if (key.getKeyCode() == juce::KeyPress::upKey)
+    {
+        navigateUp();
+    }
+    else if (key.getKeyCode() == juce::KeyPress::downKey)
+    {
+        navigateDown();
+    }
+    else if (key.getKeyCode() == juce::KeyPress::leftKey)
+    {
+        navigateLeft();
+    }
+    else if (key.getKeyCode() == juce::KeyPress::rightKey)
+    {
+        navigateRight();
+    }
+}
+
+void McPopupMenu::navigateUp()
+{
+    if (highlightedItemIndex < 0)
+    {
+        if (comboBox.getNumItems() > 0)
+        {
+            updateHighlightedItem(0);
+        }
+        return;
+    }
+    
+    if (columnCount == 1)
+    {
+        if (highlightedItemIndex > 0)
+        {
+            updateHighlightedItem(highlightedItemIndex - 1);
+        }
+    }
+    else
+    {
+        auto column = highlightedItemIndex / itemsPerColumn;
+        auto row = highlightedItemIndex % itemsPerColumn;
+        
+        if (row > 0)
+        {
+            auto newIndex = column * itemsPerColumn + (row - 1);
+            if (isValidItemIndex(newIndex))
+            {
+                updateHighlightedItem(newIndex);
+            }
+        }
+    }
+}
+
+void McPopupMenu::navigateDown()
+{
+    if (highlightedItemIndex < 0)
+    {
+        if (comboBox.getNumItems() > 0)
+        {
+            updateHighlightedItem(0);
+        }
+        return;
+    }
+    
+    if (columnCount == 1)
+    {
+        if (highlightedItemIndex < comboBox.getNumItems() - 1)
+        {
+            updateHighlightedItem(highlightedItemIndex + 1);
+        }
+    }
+    else
+    {
+        auto column = highlightedItemIndex / itemsPerColumn;
+        auto lastItemInColumn = juce::jmin((column + 1) * itemsPerColumn - 1, comboBox.getNumItems() - 1);
+        
+        if (highlightedItemIndex < lastItemInColumn)
+        {
+            updateHighlightedItem(highlightedItemIndex + 1);
+        }
+    }
+}
+
+void McPopupMenu::navigateLeft()
+{
+    if (columnCount <= 1 || highlightedItemIndex < 0)
+    {
+        return;
+    }
+    
+    auto column = highlightedItemIndex / itemsPerColumn;
+    auto row = highlightedItemIndex % itemsPerColumn;
+    
+    if (column > 0)
+    {
+        auto newIndex = (column - 1) * itemsPerColumn + row;
+        if (isValidItemIndex(newIndex))
+        {
+            updateHighlightedItem(newIndex);
+        }
+    }
+}
+
+void McPopupMenu::navigateRight()
+{
+    if (columnCount <= 1 || highlightedItemIndex < 0)
+    {
+        return;
+    }
+    
+    auto column = highlightedItemIndex / itemsPerColumn;
+    auto row = highlightedItemIndex % itemsPerColumn;
+    
+    if (column < columnCount - 1)
+    {
+        auto newIndex = (column + 1) * itemsPerColumn + row;
+        if (isValidItemIndex(newIndex))
+        {
+            updateHighlightedItem(newIndex);
+        }
+    }
+}
+
+bool McPopupMenu::isValidItemIndex(int itemIndex) const
+{
+    return itemIndex >= 0 && itemIndex < comboBox.getNumItems();
+}
+
+bool McPopupMenu::hasValidLookAndFeel() const
+{
+    return mcTheme != nullptr;
+}
+
+bool McPopupMenu::hasValidParent() const
+{
+    return getParentComponent() != nullptr;
 }
 
 void McPopupMenu::show(McComboBox& comboBoxRef)
@@ -178,24 +642,8 @@ void McPopupMenu::show(McComboBox& comboBoxRef)
     }
 
     auto popupMenu = std::make_unique<McPopupMenu>(comboBoxRef);
-    popupMenu->mcTheme = lookAndFeel;
-    popupMenu->cachedFont = lookAndFeel->getDefaultFont();
     
-    if (popupMenu->useMultiColumn)
-    {
-        auto spaceRight = parent->getWidth() - (comboBoxRef.getX() + comboBoxRef.getWidth());
-        auto spaceLeft = comboBoxRef.getX();
-        auto availableWidth = juce::jmax(spaceRight, spaceLeft);
-        popupMenu->columnCount = popupMenu->calculateOptimalColumnCount(comboBoxRef.getNumItems(), availableWidth);
-        popupMenu->itemsPerColumn = popupMenu->calculateCeilingDivision(comboBoxRef.getNumItems(), popupMenu->columnCount);
-        popupMenu->totalPopupWidth = popupMenu->columnCount * popupMenu->columnWidth + (popupMenu->columnCount - 1) * kColumnSpacing + kBorderSize * 2;
-        auto totalHeight = popupMenu->itemsPerColumn * kItemHeight + kBorderSize * 2;
-        popupMenu->setSize(popupMenu->totalPopupWidth, totalHeight);
-    }
-
-    auto popupWidth = popupMenu->getWidth();
-    auto popupHeight = popupMenu->getHeight();
-    auto popupPosition = calculatePopupPosition(comboBoxRef, popupWidth, popupHeight);
+    auto popupPosition = popupMenu->calculatePopupPosition();
     
     auto* rawPtr = popupMenu.get();
     parent->addAndMakeVisible(popupMenu.release());
@@ -205,571 +653,4 @@ void McPopupMenu::show(McComboBox& comboBoxRef)
     rawPtr->grabKeyboardFocus();
     
     rawPtr->enterModalState(false, nullptr, true);
-}
-
-
-void McPopupMenu::inputAttemptWhenModal()
-{
-    exitModalState(0);
-    
-    if (hasValidParent())
-    {
-        getParentComponent()->removeChildComponent(this);
-    }
-    delete this;
-}
-
-bool McPopupMenu::keyPressed(const juce::KeyPress& key)
-{
-    if (key.getKeyCode() == juce::KeyPress::escapeKey)
-    {
-        exitModalState(0);
-        
-        if (hasValidParent())
-        {
-            getParentComponent()->removeChildComponent(this);
-        }
-        delete this;
-        return true;
-    }
-    
-    if (key.getKeyCode() == juce::KeyPress::returnKey)
-    {
-        if (hasHighlightedItem())
-        {
-            selectItem(highlightedItemIndex);
-        }
-        return true;
-    }
-    
-    if (useMultiColumn)
-    {
-        handleMultiColumnNavigation(key);
-    }
-    else
-    {
-        handleSingleColumnNavigation(key);
-    }
-    
-    return false;
-}
-
-void McPopupMenu::calculateColumnLayout()
-{
-    if (! useMultiColumn || mcTheme == nullptr)
-    {
-        return;
-    }
-    
-    columnWidth = comboBox.getWidth();
-    totalPopupWidth = columnCount * columnWidth + (columnCount - 1) * kColumnSpacing + kBorderSize * 2;
-    auto totalHeight = itemsPerColumn * kItemHeight + kBorderSize * 2;
-    setSize(totalPopupWidth, totalHeight);
-}
-
-int McPopupMenu::calculateOptimalColumnCount(int totalItems, int availableWidth) const
-{
-    if (totalItems <= kMaxVisibleRows)
-    {
-        return 1;
-    }
-    
-    auto minColumns = calculateCeilingDivision(totalItems, kMaxVisibleRows);
-    
-    auto comboBoxWidth = comboBox.getWidth();
-    auto maxColumnsByWidth = (availableWidth - kBorderSize * 2) / (comboBoxWidth + kColumnSpacing);
-    if (maxColumnsByWidth < 1)
-    {
-        maxColumnsByWidth = 1;
-    }
-    
-    return juce::jlimit(1, maxColumnsByWidth, minColumns);
-}
-
-int McPopupMenu::getItemColumn(int itemIndex) const
-{
-    if (! isValidItemIndex(itemIndex))
-    {
-        return 0;
-    }
-    return itemIndex / itemsPerColumn;
-}
-
-int McPopupMenu::getItemRowInColumn(int itemIndex) const
-{
-    if (! isValidItemIndex(itemIndex))
-    {
-        return 0;
-    }
-    return itemIndex % itemsPerColumn;
-}
-
-juce::Rectangle<int> McPopupMenu::getItemBounds(int itemIndex) const
-{
-    auto bounds = getLocalBounds().reduced(kBorderSize);
-    
-    if (useMultiColumn)
-    {
-        auto column = getItemColumn(itemIndex);
-        auto row = getItemRowInColumn(itemIndex);
-        
-        auto x = bounds.getX() + column * (columnWidth + kColumnSpacing);
-        auto y = bounds.getY() + row * kItemHeight;
-        
-        return juce::Rectangle<int>(x, y, columnWidth, kItemHeight);
-    }
-    else
-    {
-        auto y = bounds.getY() + itemIndex * kItemHeight;
-        return juce::Rectangle<int>(bounds.getX(), y, bounds.getWidth(), kItemHeight);
-    }
-}
-
-void McPopupMenu::initializeMultiColumnLayout(int numItems, int comboWidth)
-{
-    columnWidth = comboWidth;
-    
-    auto estimatedAvailableWidth = comboWidth * 4;
-    columnCount = calculateOptimalColumnCount(numItems, estimatedAvailableWidth);
-    itemsPerColumn = calculateCeilingDivision(numItems, columnCount);
-    
-    totalPopupWidth = columnCount * columnWidth + (columnCount - 1) * kColumnSpacing + kBorderSize * 2;
-    auto totalHeight = itemsPerColumn * kItemHeight + kBorderSize * 2;
-    
-    setSize(totalPopupWidth, totalHeight);
-}
-
-void McPopupMenu::initializeSingleColumnLayout(int numItems, int comboWidth)
-{
-    columnCount = 1;
-    itemsPerColumn = numItems;
-    columnWidth = comboWidth;
-    totalPopupWidth = comboWidth;
-    auto totalHeight = numItems * kItemHeight + kBorderSize * 2;
-    
-    setSize(totalPopupWidth, totalHeight);
-}
-
-void McPopupMenu::initializeHighlightedItem(int selectedIndex)
-{
-    if (isValidItemIndex(selectedIndex))
-    {
-        highlightedItemIndex = selectedIndex;
-    }
-}
-
-void McPopupMenu::drawAllItems(juce::Graphics& g, const juce::Rectangle<int>& contentBounds) const
-{
-    auto numItems = comboBox.getNumItems();
-    
-    if (useMultiColumn)
-    {
-        for (int i = 0; i < numItems; ++i)
-        {
-            auto column = getItemColumn(i);
-            auto row = getItemRowInColumn(i);
-            auto x = contentBounds.getX() + column * (columnWidth + kColumnSpacing);
-            auto y = contentBounds.getY() + row * kItemHeight;
-            auto itemBounds = juce::Rectangle<int>(x, y, columnWidth, kItemHeight);
-            drawItem(g, i, itemBounds);
-        }
-    }
-    else
-    {
-        for (int i = 0; i < numItems; ++i)
-        {
-            auto y = contentBounds.getY() + i * kItemHeight;
-            auto itemBounds = juce::Rectangle<int>(contentBounds.getX(), y, contentBounds.getWidth(), kItemHeight);
-            drawItem(g, i, itemBounds);
-        }
-    }
-}
-
-void McPopupMenu::drawItem(juce::Graphics& g, int itemIndex, const juce::Rectangle<int>& itemBounds) const
-{
-    if (! hasValidLookAndFeel())
-    {
-        return;
-    }
-    
-    auto isActive = comboBox.getItemId(itemIndex) != 0;
-    auto isHighlighted = (highlightedItemIndex == itemIndex);
-    
-    if (isHighlighted && isActive)
-    {
-        auto column = useMultiColumn ? getItemColumn(itemIndex) : 0;
-        drawItemHighlight(g, itemBounds, column);
-    }
-    
-    juce::Colour textColour;
-    if (isHighlighted && isActive)
-    {
-        textColour = mcTheme->getPopupMenuTextColourHighlighted();
-    }
-    else
-    {
-        textColour = mcTheme->getPopupMenuTextColour();
-        if (! isActive)
-        {
-            textColour = textColour.withAlpha(0.5f);
-        }
-    }
-    
-    auto text = comboBox.getItemText(itemIndex);
-    
-    g.setColour(textColour);
-    g.setFont(cachedFont);
-    
-    auto textArea = itemBounds.reduced(kTextLeftMargin, 0);
-    g.drawText(text, textArea, juce::Justification::centredLeft, false);
-}
-
-void McPopupMenu::drawItemHighlight(juce::Graphics& g, const juce::Rectangle<int>& itemBounds, int column) const
-{
-    auto highlightColour = mcTheme->getPopupMenuHighlightColour();
-    g.setColour(highlightColour);
-    
-    auto highlightBounds = calculateHighlightBoundsForItem(itemBounds, column);
-    g.fillRect(highlightBounds);
-}
-
-void McPopupMenu::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds) const
-{
-    auto separatorColour = mcTheme->getPopupMenuSeparatorColour();
-    g.setColour(separatorColour);
-    
-    auto separatorY = contentBounds.getY();
-    auto separatorHeight = contentBounds.getHeight();
-    
-    for (int i = 0; i < columnCount - 1; ++i)
-    {
-        auto separatorX = contentBounds.getX() + (i + 1) * columnWidth + i * kColumnSpacing;
-        g.fillRect(separatorX, separatorY, 1, separatorHeight);
-    }
-}
-
-void McPopupMenu::drawPopupBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
-{
-    auto borderColour = mcTheme->getPopupMenuBorderColour();
-    g.setColour(borderColour);
-    g.drawRect(bounds, kBorderSize);
-}
-
-int McPopupMenu::findColumnFromXPosition(int relativeX) const
-{
-    int currentX = 0;
-    int column = 0;
-    for (int c = 0; c < columnCount; ++c)
-    {
-        if (relativeX >= currentX && relativeX < currentX + columnWidth)
-        {
-            column = c;
-            break;
-        }
-        currentX += columnWidth + kColumnSpacing;
-    }
-    return column;
-}
-
-int McPopupMenu::findRowFromYPosition(int relativeY) const
-{
-    return relativeY / kItemHeight;
-}
-
-int McPopupMenu::calculateItemIndexFromColumnAndRow(int column, int row) const
-{
-    return column * itemsPerColumn + row;
-}
-
-int McPopupMenu::findItemIndexInSingleColumn(int relativeY) const
-{
-    auto itemIndex = relativeY / kItemHeight;
-    if (isValidItemIndex(itemIndex))
-    {
-        return itemIndex;
-    }
-    return -1;
-}
-
-int McPopupMenu::calculatePopupXPosition(McComboBox&, int popupWidth, const juce::Rectangle<int>& parentBounds, const juce::Point<int>& comboBoxPosition, const juce::Rectangle<int>& comboBoxBounds)
-{
-    auto xCC = comboBoxPosition.x;
-    auto wCC = comboBoxBounds.getWidth();
-    auto wPM = popupWidth;
-    
-    auto spaceRight = parentBounds.getRight() - (xCC + wCC);
-    auto spaceLeft = xCC - parentBounds.getX();
-    
-    if (spaceRight >= wPM || spaceRight >= spaceLeft)
-    {
-        return xCC;
-    }
-    else
-    {
-        return xCC + wCC - wPM;
-    }
-}
-
-int McPopupMenu::calculatePopupYPosition(McComboBox&, int popupHeight, const juce::Rectangle<int>& parentBounds, const juce::Point<int>& comboBoxPosition, const juce::Rectangle<int>& comboBoxBounds)
-{
-    auto yCC = comboBoxPosition.y;
-    auto hCC = comboBoxBounds.getHeight();
-    auto hPM = popupHeight;
-    
-    auto spaceBelow = parentBounds.getBottom() - (yCC + hCC);
-    auto spaceAbove = yCC - parentBounds.getY();
-    
-    auto requiredSpaceBelow = hPM + kVerticalSpacing;
-    auto requiredSpaceAbove = hPM + kVerticalSpacing;
-    
-    if (spaceBelow >= requiredSpaceBelow || spaceBelow >= spaceAbove)
-    {
-        return yCC + hCC + kVerticalSpacing;
-    }
-    else if (spaceAbove >= requiredSpaceAbove)
-    {
-        return yCC - hPM - kVerticalSpacing;
-    }
-    else
-    {
-        return yCC + hCC + kVerticalSpacing;
-    }
-}
-
-int McPopupMenu::clampPopupXToParentBounds(int x, int popupWidth, const juce::Rectangle<int>& parentBounds)
-{
-    return juce::jlimit(parentBounds.getX(), parentBounds.getRight() - popupWidth, x);
-}
-
-int McPopupMenu::clampPopupYToParentBounds(int y, int popupHeight, const juce::Rectangle<int>& parentBounds)
-{
-    return juce::jlimit(parentBounds.getY(), parentBounds.getBottom() - popupHeight, y);
-}
-
-void McPopupMenu::handleMultiColumnNavigation(const juce::KeyPress& key)
-{
-    if (key.getKeyCode() == juce::KeyPress::upKey)
-    {
-        navigateUpInColumn();
-    }
-    else if (key.getKeyCode() == juce::KeyPress::downKey)
-    {
-        navigateDownInColumn();
-    }
-    else if (key.getKeyCode() == juce::KeyPress::leftKey)
-    {
-        navigateToPreviousColumn();
-    }
-    else if (key.getKeyCode() == juce::KeyPress::rightKey)
-    {
-        navigateToNextColumn();
-    }
-}
-
-void McPopupMenu::handleSingleColumnNavigation(const juce::KeyPress& key)
-{
-    if (key.getKeyCode() == juce::KeyPress::upKey)
-    {
-        navigateUpInSingleColumn();
-    }
-    else if (key.getKeyCode() == juce::KeyPress::downKey)
-    {
-        navigateDownInSingleColumn();
-    }
-}
-
-void McPopupMenu::navigateUpInColumn()
-{
-    if (hasHighlightedItem())
-    {
-        auto currentColumn = getItemColumn(highlightedItemIndex);
-        auto currentRow = getItemRowInColumn(highlightedItemIndex);
-        
-        if (currentRow > 0)
-        {
-            auto newIndex = (currentColumn * itemsPerColumn) + (currentRow - 1);
-            if (isValidItemIndex(newIndex))
-            {
-                updateHighlightedItem(newIndex);
-            }
-        }
-    }
-    else if (hasItems())
-    {
-        updateHighlightedItem(0);
-    }
-}
-
-void McPopupMenu::navigateDownInColumn()
-{
-    if (hasHighlightedItem())
-    {
-        auto currentColumn = getItemColumn(highlightedItemIndex);
-        auto lastItemInColumn = juce::jmin((currentColumn + 1) * itemsPerColumn - 1, comboBox.getNumItems() - 1);
-        
-        if (highlightedItemIndex < lastItemInColumn)
-        {
-            updateHighlightedItem(highlightedItemIndex + 1);
-        }
-    }
-    else if (hasItems())
-    {
-        updateHighlightedItem(0);
-    }
-}
-
-void McPopupMenu::navigateToPreviousColumn()
-{
-    if (! canNavigateToPreviousColumn())
-    {
-        return;
-    }
-    
-    auto currentColumn = getItemColumn(highlightedItemIndex);
-    auto currentRow = getItemRowInColumn(highlightedItemIndex);
-    auto newIndex = ((currentColumn - 1) * itemsPerColumn) + currentRow;
-    
-    if (isValidItemIndex(newIndex))
-    {
-        updateHighlightedItem(newIndex);
-    }
-}
-
-void McPopupMenu::navigateToNextColumn()
-{
-    if (! canNavigateToNextColumn())
-    {
-        return;
-    }
-    
-    auto currentColumn = getItemColumn(highlightedItemIndex);
-    auto currentRow = getItemRowInColumn(highlightedItemIndex);
-    auto newIndex = ((currentColumn + 1) * itemsPerColumn) + currentRow;
-    
-    if (isValidItemIndex(newIndex))
-    {
-        updateHighlightedItem(newIndex);
-    }
-}
-
-void McPopupMenu::navigateUpInSingleColumn()
-{
-    if (canNavigateUp())
-    {
-        updateHighlightedItem(highlightedItemIndex - 1);
-    }
-}
-
-void McPopupMenu::navigateDownInSingleColumn()
-{
-    if (canNavigateDown())
-    {
-        updateHighlightedItem(highlightedItemIndex + 1);
-    }
-}
-
-void McPopupMenu::recalculateColumnLayoutIfNeeded()
-{
-    if (useMultiColumn && mcTheme != nullptr)
-    {
-        columnWidth = comboBox.getWidth();
-        totalPopupWidth = columnCount * columnWidth + (columnCount - 1) * kColumnSpacing + kBorderSize * 2;
-        auto totalHeight = itemsPerColumn * kItemHeight + kBorderSize * 2;
-        setSize(totalPopupWidth, totalHeight);
-    }
-}
-
-int McPopupMenu::calculateCeilingDivision(int dividend, int divisor)
-{
-    return (dividend + divisor - 1) / divisor;
-}
-
-bool McPopupMenu::isValidItemIndex(int itemIndex) const
-{
-    return itemIndex >= 0 && itemIndex < comboBox.getNumItems();
-}
-
-bool McPopupMenu::hasValidLookAndFeel() const
-{
-    return mcTheme != nullptr;
-}
-
-bool McPopupMenu::hasValidParent() const
-{
-    return getParentComponent() != nullptr;
-}
-
-bool McPopupMenu::isPositionInsideBounds(int relativeX, int relativeY, const juce::Rectangle<int>& bounds) const
-{
-    return relativeX >= 0 && relativeY >= 0 && relativeX < bounds.getWidth() && relativeY < bounds.getHeight();
-}
-
-bool McPopupMenu::isValidRow(int row) const
-{
-    return row >= 0 && row < itemsPerColumn;
-}
-
-bool McPopupMenu::hasItems() const
-{
-    return comboBox.getNumItems() > 0;
-}
-
-bool McPopupMenu::hasHighlightedItem() const
-{
-    return highlightedItemIndex >= 0;
-}
-
-bool McPopupMenu::canNavigateUp() const
-{
-    return highlightedItemIndex > 0;
-}
-
-bool McPopupMenu::canNavigateDown() const
-{
-    return highlightedItemIndex < comboBox.getNumItems() - 1;
-}
-
-bool McPopupMenu::canNavigateToPreviousColumn() const
-{
-    if (! hasHighlightedItem())
-    {
-        return false;
-    }
-    
-    auto currentColumn = getItemColumn(highlightedItemIndex);
-    return currentColumn > 0;
-}
-
-bool McPopupMenu::canNavigateToNextColumn() const
-{
-    if (! hasHighlightedItem())
-    {
-        return false;
-    }
-    
-    auto currentColumn = getItemColumn(highlightedItemIndex);
-    return currentColumn < columnCount - 1;
-}
-
-juce::Rectangle<int> McPopupMenu::calculateHighlightBoundsForItem(const juce::Rectangle<int>& itemBounds, int column) const
-{
-    if (useMultiColumn)
-    {
-        if (column == 0)
-        {
-            return itemBounds.reduced(1);
-        }
-        else
-        {
-            auto highlightBounds = itemBounds;
-            highlightBounds.removeFromTop(1);
-            highlightBounds.removeFromRight(1);
-            highlightBounds.removeFromBottom(1);
-            return highlightBounds;
-        }
-    }
-    else
-    {
-        return itemBounds.reduced(1);
-    }
 }

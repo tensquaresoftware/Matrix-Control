@@ -467,69 +467,6 @@ juce::Colour McTheme::getSliderFocusBorderColour() const
     return getSliderBorderColour(true, true);
 }
 
-juce::Colour McTheme::getComboBoxBackgroundColour(bool isEnabled) const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kComboBoxBackgroundColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kComboBoxBackgroundColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kComboBoxBackgroundColour;
-    }
-    
-    auto colour = juce::Colour(colourValue);
-    return isEnabled ? colour : makeDisabledColour(colour);
-}
-
-juce::Colour McTheme::getComboBoxTextColour(bool isEnabled) const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kComboBoxTextColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kComboBoxTextColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kComboBoxTextColour;
-    }
-    
-    auto colour = juce::Colour(colourValue);
-    return isEnabled ? colour : makeDisabledColour(colour);
-}
-
-juce::Colour McTheme::getComboBoxTriangleColour(bool isEnabled) const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kComboBoxTriangleColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kComboBoxTriangleColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kComboBoxTriangleColour;
-    }
-    
-    auto colour = juce::Colour(colourValue);
-    return isEnabled ? colour : makeDisabledColour(colour);
-}
-
 juce::Colour McTheme::getComboBoxBaseColour() const
 {
     juce::uint32 colourValue;
@@ -550,6 +487,127 @@ juce::Colour McTheme::getComboBoxBaseColour() const
     return juce::Colour(colourValue);
 }
 
+juce::Colour McTheme::getComboBoxBackgroundColour(bool isEnabled) const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = isEnabled ? BlackTheme::kComboBoxBackgroundColour : BlackTheme::kComboBoxBackgroundColourDisabled;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isEnabled ? CreamTheme::kComboBoxBackgroundColour : CreamTheme::kComboBoxBackgroundColourDisabled;
+    }
+    else
+    {
+        colourValue = isEnabled ? DebugTheme::kComboBoxBackgroundColour : DebugTheme::kComboBoxBackgroundColourDisabled;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getComboBoxBorderColour(bool isEnabled, bool hasFocus) const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        if (hasFocus)
+        {
+            colourValue = BlackTheme::kComboBoxBorderColourFocus;
+        }
+        else
+        {
+            colourValue = isEnabled ? BlackTheme::kComboBoxBorderColour : BlackTheme::kComboBoxBorderColourDisabled;
+        }
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        if (hasFocus)
+        {
+            colourValue = CreamTheme::kComboBoxBorderColourFocus;
+        }
+        else
+        {
+            colourValue = isEnabled ? CreamTheme::kComboBoxBorderColour : CreamTheme::kComboBoxBorderColourDisabled;
+        }
+    }
+    else
+    {
+        if (hasFocus)
+        {
+            colourValue = DebugTheme::kComboBoxBorderColourFocus;
+        }
+        else
+        {
+            colourValue = isEnabled ? DebugTheme::kComboBoxBorderColour : DebugTheme::kComboBoxBorderColourDisabled;
+        }
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getComboBoxTriangleColour(bool isEnabled) const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = isEnabled ? BlackTheme::kComboBoxTriangleColour : BlackTheme::kComboBoxTriangleColourDisabled;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isEnabled ? CreamTheme::kComboBoxTriangleColour : CreamTheme::kComboBoxTriangleColourDisabled;
+    }
+    else
+    {
+        colourValue = isEnabled ? DebugTheme::kComboBoxTriangleColour : DebugTheme::kComboBoxTriangleColourDisabled;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getComboBoxTextColour(bool isEnabled) const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = isEnabled ? BlackTheme::kComboBoxTextColour : BlackTheme::kComboBoxTextColourDisabled;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = isEnabled ? CreamTheme::kComboBoxTextColour : CreamTheme::kComboBoxTextColourDisabled;
+    }
+    else
+    {
+        colourValue = isEnabled ? DebugTheme::kComboBoxTextColour : DebugTheme::kComboBoxTextColourDisabled;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getPopupMenuBaseColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kPopupMenuBaseColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kPopupMenuBaseColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kPopupMenuBaseColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
 juce::Colour McTheme::getPopupMenuBackgroundColour() const
 {
     juce::uint32 colourValue;
@@ -565,66 +623,6 @@ juce::Colour McTheme::getPopupMenuBackgroundColour() const
     else
     {
         colourValue = DebugTheme::kPopupMenuBackgroundColour;
-    }
-    
-    return juce::Colour(colourValue);
-}
-
-juce::Colour McTheme::getPopupMenuTextColour() const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kPopupMenuTextColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kPopupMenuTextColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kPopupMenuTextColour;
-    }
-    
-    return juce::Colour(colourValue);
-}
-
-juce::Colour McTheme::getPopupMenuTextColourHighlighted() const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kPopupMenuTextColourHighlighted;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kPopupMenuTextColourHighlighted;
-    }
-    else
-    {
-        colourValue = DebugTheme::kPopupMenuTextColourHighlighted;
-    }
-    
-    return juce::Colour(colourValue);
-}
-
-juce::Colour McTheme::getPopupMenuHighlightColour() const
-{
-    juce::uint32 colourValue;
-    
-    if (currentTheme == Theme::Black)
-    {
-        colourValue = BlackTheme::kPopupMenuHighlightColour;
-    }
-    else if (currentTheme == Theme::Cream)
-    {
-        colourValue = CreamTheme::kPopupMenuHighlightColour;
-    }
-    else
-    {
-        colourValue = DebugTheme::kPopupMenuHighlightColour;
     }
     
     return juce::Colour(colourValue);
@@ -665,6 +663,66 @@ juce::Colour McTheme::getPopupMenuSeparatorColour() const
     else
     {
         colourValue = DebugTheme::kPopupMenuSeparatorColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getPopupMenuTextColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kPopupMenuTextColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kPopupMenuTextColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kPopupMenuTextColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getPopupMenuBackgroundHooverColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kPopupMenuBackgroundHooverColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kPopupMenuBackgroundHooverColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kPopupMenuBackgroundHooverColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getPopupMenuTextHooverColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kPopupMenuTextHooverColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kPopupMenuTextHooverColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kPopupMenuTextHooverColour;
     }
     
     return juce::Colour(colourValue);

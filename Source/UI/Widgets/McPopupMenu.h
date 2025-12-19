@@ -24,82 +24,54 @@ public:
     static void show(McComboBox& comboBox);
 
 private:
-    static constexpr int kItemHeight      = 20;
-    static constexpr int kBorderSize      = 1;
-    static constexpr int kTextLeftMargin  = 4;
-    static constexpr int kMaxVisibleRows  = 12;
-    static constexpr int kColumnSpacing   = 2;
-    static constexpr int kVerticalSpacing = 2;
+    static constexpr int kItemHeight = 20;
+    static constexpr int kBorderThickness = 1;
+    static constexpr int kSeparatorWidth = 1;
+    static constexpr int kTextLeftPadding = 3;
+    static constexpr int kColumnThreshold = 10;
 
-    void updateHighlightedItem(int itemIndex);
-    int getItemIndexAt(int x, int y) const;
-    void selectItem(int itemIndex);
-    static juce::Point<int> calculatePopupPosition(McComboBox& comboBox, int popupWidth, int popupHeight);
-    
-    int calculateOptimalColumnCount(int totalItems, int availableWidth) const;
     void calculateColumnLayout();
-    int getItemColumn(int itemIndex) const;
-    int getItemRowInColumn(int itemIndex) const;
+    int calculateColumnCount(int totalItems) const;
+    int calculateItemsPerColumn(int totalItems, int columnCount) const;
+    
+    juce::Point<int> calculatePopupPosition() const;
+    int calculatePopupX(int popupWidth) const;
+    int calculatePopupY(int popupHeight) const;
+    
     juce::Rectangle<int> getItemBounds(int itemIndex) const;
+    int getItemIndexAt(int x, int y) const;
+    int getColumnFromX(int x) const;
+    int getRowFromY(int y) const;
+    int getItemIndexFromColumnAndRow(int column, int row) const;
     
-    void initializeMultiColumnLayout(int numItems, int comboWidth);
-    void initializeSingleColumnLayout(int numItems, int comboWidth);
-    void initializeHighlightedItem(int selectedIndex);
+    void updateHighlightedItem(int itemIndex);
+    void selectItem(int itemIndex);
     
-    void drawAllItems(juce::Graphics& g, const juce::Rectangle<int>& contentBounds) const;
-    void drawItem(juce::Graphics& g, int itemIndex, const juce::Rectangle<int>& itemBounds) const;
-    void drawItemHighlight(juce::Graphics& g, const juce::Rectangle<int>& itemBounds, int column) const;
-    void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds) const;
-    void drawPopupBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const;
+    void drawBase(juce::Graphics& g, const juce::Rectangle<int>& bounds);
+    void drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds);
+    void drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds);
+    void drawItems(juce::Graphics& g, const juce::Rectangle<int>& contentBounds);
+    void drawItem(juce::Graphics& g, int itemIndex, const juce::Rectangle<int>& itemBounds);
+    void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds);
     
-    int findColumnFromXPosition(int relativeX) const;
-    int findRowFromYPosition(int relativeY) const;
-    int calculateItemIndexFromColumnAndRow(int column, int row) const;
-    int findItemIndexInSingleColumn(int relativeY) const;
-    
-    static int calculatePopupXPosition(McComboBox&, int popupWidth, const juce::Rectangle<int>& parentBounds, const juce::Point<int>& comboBoxPosition, const juce::Rectangle<int>& comboBoxBounds);
-    static int calculatePopupYPosition(McComboBox&, int popupHeight, const juce::Rectangle<int>& parentBounds, const juce::Point<int>& comboBoxPosition, const juce::Rectangle<int>& comboBoxBounds);
-    static int clampPopupXToParentBounds(int x, int popupWidth, const juce::Rectangle<int>& parentBounds);
-    static int clampPopupYToParentBounds(int y, int popupHeight, const juce::Rectangle<int>& parentBounds);
-    
-    void handleMultiColumnNavigation(const juce::KeyPress& key);
-    void handleSingleColumnNavigation(const juce::KeyPress& key);
-    void navigateUpInColumn();
-    void navigateDownInColumn();
-    void navigateToPreviousColumn();
-    void navigateToNextColumn();
-    void navigateUpInSingleColumn();
-    void navigateDownInSingleColumn();
-    
-    void recalculateColumnLayoutIfNeeded();
-    
-    static int calculateCeilingDivision(int dividend, int divisor);
+    void handleKeyboardNavigation(const juce::KeyPress& key);
+    void navigateUp();
+    void navigateDown();
+    void navigateLeft();
+    void navigateRight();
     
     bool isValidItemIndex(int itemIndex) const;
     bool hasValidLookAndFeel() const;
     bool hasValidParent() const;
-    bool isPositionInsideBounds(int relativeX, int relativeY, const juce::Rectangle<int>& bounds) const;
-    bool isValidRow(int row) const;
-    bool hasItems() const;
-    bool hasHighlightedItem() const;
-    bool canNavigateUp() const;
-    bool canNavigateDown() const;
-    bool canNavigateToPreviousColumn() const;
-    bool canNavigateToNextColumn() const;
-    
-    juce::Rectangle<int> calculateHighlightBoundsForItem(const juce::Rectangle<int>& itemBounds, int column) const;
 
     McComboBox& comboBox;
     McTheme* mcTheme = nullptr;
     int highlightedItemIndex = -1;
     juce::Font cachedFont;
     
-    // Multi-column layout data
     int columnCount = 1;
     int itemsPerColumn = 0;
     int columnWidth = 0;
-    int totalPopupWidth = 0;
-    bool useMultiColumn = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(McPopupMenu)
 };
