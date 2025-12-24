@@ -59,6 +59,7 @@ set(PLUGIN_SOURCES
     Source/UI/Widgets/McComboBox.cpp
     Source/UI/Widgets/McFocusableWidget.cpp
     Source/UI/Widgets/McParameterLabel.cpp
+    Source/UI/Widgets/McParameterSeparator.cpp
     Source/UI/Widgets/McPopupMenu.cpp
     Source/UI/Widgets/McSlider.cpp
     

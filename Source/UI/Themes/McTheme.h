@@ -25,12 +25,14 @@ public:
         static constexpr juce::uint32 kDarkGrey2          = 0xFF202020;
         static constexpr juce::uint32 kDarkGrey3          = 0xFF303030;
         static constexpr juce::uint32 kDarkGrey4          = 0xFF404040;
+        static constexpr juce::uint32 kDarkGrey5          = 0xFF505050;
         
         static constexpr juce::uint32 kLightGrey1         = 0xFFC4C4C4;
 
         static constexpr juce::uint32 kRed                = 0xFFFF0000;
-        static constexpr juce::uint32 kOrange             = 0xFFFF9900;
+        static constexpr juce::uint32 kOrange             = 0xFFFF6600;
         static constexpr juce::uint32 kYellow             = 0xFFFFFF00;
+        static constexpr juce::uint32 kBlue               = 0xFF0560BE;
     
         static constexpr juce::uint32 kGreen1             = 0xFF002D0F;
         static constexpr juce::uint32 kGreen2             = 0xFF06471C;
@@ -108,6 +110,15 @@ public:
         static constexpr juce::uint32 kPopupMenuTextColour              = ColourPalette::kGreen4;
         static constexpr juce::uint32 kPopupMenuBackgroundHooverColour  = ColourPalette::kGreen4;
         static constexpr juce::uint32 kPopupMenuTextHooverColour        = ColourPalette::kHoover;
+        
+        // McParameterSeparator
+        static constexpr juce::uint32 kParameterSeparatorBaseColour     = ColourPalette::kTransparent;
+        static constexpr juce::uint32 kParameterSeparatorLineColour     = ColourPalette::kDarkGrey5;
+        
+        // McModuleTitle
+        static constexpr juce::uint32 kModuleTitleBaseColour            = ColourPalette::kTransparent;
+        static constexpr juce::uint32 kModuleTitleTextColour            = ColourPalette::kLightGrey1;
+        static constexpr juce::uint32 kModuleTitleLineColour            = ColourPalette::kBlue;
     };
 
     struct CreamTheme
@@ -175,12 +186,21 @@ public:
         static constexpr juce::uint32 kPopupMenuTextColour              = ColourPalette::kGreen4;
         static constexpr juce::uint32 kPopupMenuBackgroundHooverColour  = ColourPalette::kGreen4;
         static constexpr juce::uint32 kPopupMenuTextHooverColour        = ColourPalette::kHoover;
+        
+        // McParameterSeparator
+        static constexpr juce::uint32 kParameterSeparatorBaseColour     = ColourPalette::kTransparent;
+        static constexpr juce::uint32 kParameterSeparatorLineColour     = ColourPalette::kDarkGrey5;
+        
+        // McModuleTitle
+        static constexpr juce::uint32 kModuleTitleBaseColour            = ColourPalette::kTransparent;
+        static constexpr juce::uint32 kModuleTitleTextColour            = ColourPalette::kLightGrey1;
+        static constexpr juce::uint32 kModuleTitleLineColour            = ColourPalette::kBlue;
     };
 
     struct DebugTheme
     {
         // GUI
-        static constexpr juce::uint32 kGuiBackgroundColour              = 0xFF202020;
+        static constexpr juce::uint32 kGuiBackgroundColour              = ColourPalette::kBlack;
         
         // McButton
         static constexpr juce::uint32 kButtonBaseColour                 = ColourPalette::kRed;
@@ -242,6 +262,15 @@ public:
         static constexpr juce::uint32 kPopupMenuTextColour              = ColourPalette::kTransparent;
         static constexpr juce::uint32 kPopupMenuBackgroundHooverColour  = ColourPalette::kTransparent;
         static constexpr juce::uint32 kPopupMenuTextHooverColour        = ColourPalette::kTransparent;
+        
+        // McParameterSeparator
+        static constexpr juce::uint32 kParameterSeparatorBaseColour     = ColourPalette::kYellow;
+        static constexpr juce::uint32 kParameterSeparatorLineColour     = ColourPalette::kRed;
+        
+        // McModuleTitle
+        static constexpr juce::uint32 kModuleTitleBaseColour            = ColourPalette::kRed;
+        static constexpr juce::uint32 kModuleTitleTextColour            = ColourPalette::kTransparent;
+        static constexpr juce::uint32 kModuleTitleLineColour            = ColourPalette::kYellow;
     };
 
     McTheme();
@@ -294,6 +323,13 @@ public:
     juce::Colour getPopupMenuTextColour() const;
     juce::Colour getPopupMenuBackgroundHooverColour() const;
     juce::Colour getPopupMenuTextHooverColour() const;
+
+    juce::Colour getParameterSeparatorBaseColour() const;
+    juce::Colour getParameterSeparatorLineColour() const;
+
+    juce::Colour getModuleTitleBaseColour() const;
+    juce::Colour getModuleTitleTextColour() const;
+    juce::Colour getModuleTitleLineColour() const;
 
 private:
     Theme currentTheme = Theme::Black;

@@ -8,6 +8,7 @@
 #include "UI/Widgets/McButton.h"
 #include "UI/Widgets/McComboBox.h"
 #include "UI/Widgets/McParameterLabel.h"
+#include "UI/Widgets/McParameterSeparator.h"
 #include "UI/Widgets/McSlider.h"
 
 class PluginEditor : public juce::AudioProcessorEditor
@@ -44,6 +45,12 @@ private:
     
     McParameterLabel labelLegatoPorta;
     McComboBox comboBoxLegatoPorta;
+    
+    McParameterSeparator separator1;
+    McParameterSeparator separator2;
+    McParameterSeparator separator3;
+    McParameterSeparator separator4;
+    McParameterSeparator separator5;
     
     McComboBox comboBoxTopLeft;
     McComboBox comboBoxTopRight;

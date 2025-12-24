@@ -105,6 +105,21 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     comboBoxLegatoPorta.setTheme(theme.get());
     addAndMakeVisible(comboBoxLegatoPorta);
     
+    separator1.setTheme(theme.get());
+    addAndMakeVisible(separator1);
+    
+    separator2.setTheme(theme.get());
+    addAndMakeVisible(separator2);
+    
+    separator3.setTheme(theme.get());
+    addAndMakeVisible(separator3);
+    
+    separator4.setTheme(theme.get());
+    addAndMakeVisible(separator4);
+    
+    separator5.setTheme(theme.get());
+    addAndMakeVisible(separator5);
+    
     auto comboBoxChoices = juce::StringArray({
         "NONE", "DCO 1 FREQUENCY", "DCO 1 PULSE WIDTH", "DCO 1 WAVE SHAPE",
         "DCO 2 FREQUENCY", "DCO 2 PULSE WIDTH", "DCO 2 WAVE SHAPE",
@@ -175,31 +190,37 @@ void PluginEditor::resized()
     buttonDebug.setBounds(startX + 2 * (buttonWidth + spacing), centerY - buttonHeight / 2, buttonWidth, buttonHeight);
     buttonDisabled.setBounds(startX + 3 * (buttonWidth + spacing), centerY - buttonHeight / 2, buttonWidth, buttonHeight);
     
-    auto labelY = centerY + buttonHeight / 2 + 10;
-    labelPortamentoRate.setBounds(startX, labelY, labelPortamentoRate.getWidth(), labelPortamentoRate.getHeight());
-    
     auto sliderX = startX + labelPortamentoRate.getWidth();
-    sliderPortamentoRate.setBounds(sliderX, labelY, sliderPortamentoRate.getWidth(), sliderPortamentoRate.getHeight());
+    auto currentY = centerY + buttonHeight / 2 + 10;
     
-    auto labelPortaVelocityY = labelY + labelPortamentoRate.getHeight() + 5;
-    labelPortaVelocity.setBounds(startX, labelPortaVelocityY, labelPortaVelocity.getWidth(), labelPortaVelocity.getHeight());
+    labelPortamentoRate.setBounds(startX, currentY, labelPortamentoRate.getWidth(), labelPortamentoRate.getHeight());
+    sliderPortamentoRate.setBounds(sliderX, currentY, sliderPortamentoRate.getWidth(), sliderPortamentoRate.getHeight());
+    currentY += labelPortamentoRate.getHeight();
+    separator1.setBounds(startX, currentY, separator1.getWidth(), separator1.getHeight());
+    currentY += separator1.getHeight();
     
-    sliderPortaVelocity.setBounds(sliderX, labelPortaVelocityY, sliderPortaVelocity.getWidth(), sliderPortaVelocity.getHeight());
+    labelPortaVelocity.setBounds(startX, currentY, labelPortaVelocity.getWidth(), labelPortaVelocity.getHeight());
+    sliderPortaVelocity.setBounds(sliderX, currentY, sliderPortaVelocity.getWidth(), sliderPortaVelocity.getHeight());
+    currentY += labelPortaVelocity.getHeight();
+    separator2.setBounds(startX, currentY, separator2.getWidth(), separator2.getHeight());
+    currentY += separator2.getHeight();
     
-    auto labelFrequencyY = labelPortaVelocityY + labelPortaVelocity.getHeight() + 5;
-    labelFrequency.setBounds(startX, labelFrequencyY, labelFrequency.getWidth(), labelFrequency.getHeight());
+    labelFrequency.setBounds(startX, currentY, labelFrequency.getWidth(), labelFrequency.getHeight());
+    sliderFrequency.setBounds(sliderX, currentY, sliderFrequency.getWidth(), sliderFrequency.getHeight());
+    currentY += labelFrequency.getHeight();
+    separator3.setBounds(startX, currentY, separator3.getWidth(), separator3.getHeight());
+    currentY += separator3.getHeight();
     
-    sliderFrequency.setBounds(sliderX, labelFrequencyY, sliderFrequency.getWidth(), sliderFrequency.getHeight());
+    labelTrackInput.setBounds(startX, currentY, labelTrackInput.getWidth(), labelTrackInput.getHeight());
+    comboBoxTrackInput.setBounds(sliderX, currentY, comboBoxTrackInput.getWidth(), comboBoxTrackInput.getHeight());
+    currentY += labelTrackInput.getHeight();
+    separator4.setBounds(startX, currentY, separator4.getWidth(), separator4.getHeight());
+    currentY += separator4.getHeight();
     
-    auto labelTrackInputY = labelFrequencyY + labelFrequency.getHeight() + 5;
-    labelTrackInput.setBounds(startX, labelTrackInputY, labelTrackInput.getWidth(), labelTrackInput.getHeight());
-    
-    comboBoxTrackInput.setBounds(sliderX, labelTrackInputY, comboBoxTrackInput.getWidth(), comboBoxTrackInput.getHeight());
-    
-    auto labelLegatoPortaY = labelTrackInputY + labelTrackInput.getHeight() + 5;
-    labelLegatoPorta.setBounds(startX, labelLegatoPortaY, labelLegatoPorta.getWidth(), labelLegatoPorta.getHeight());
-    
-    comboBoxLegatoPorta.setBounds(sliderX, labelLegatoPortaY, comboBoxLegatoPorta.getWidth(), comboBoxLegatoPorta.getHeight());
+    labelLegatoPorta.setBounds(startX, currentY, labelLegatoPorta.getWidth(), labelLegatoPorta.getHeight());
+    comboBoxLegatoPorta.setBounds(sliderX, currentY, comboBoxLegatoPorta.getWidth(), comboBoxLegatoPorta.getHeight());
+    currentY += labelLegatoPorta.getHeight();
+    separator5.setBounds(startX, currentY, separator5.getWidth(), separator5.getHeight());
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -223,6 +244,11 @@ void PluginEditor::updateTheme()
     comboBoxTrackInput.repaint();
     labelLegatoPorta.repaint();
     comboBoxLegatoPorta.repaint();
+    separator1.repaint();
+    separator2.repaint();
+    separator3.repaint();
+    separator4.repaint();
+    separator5.repaint();
     comboBoxTopLeft.repaint();
     comboBoxTopRight.repaint();
     comboBoxBottomLeft.repaint();

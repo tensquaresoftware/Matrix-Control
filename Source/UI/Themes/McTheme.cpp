@@ -727,3 +727,103 @@ juce::Colour McTheme::getPopupMenuTextHooverColour() const
     
     return juce::Colour(colourValue);
 }
+
+juce::Colour McTheme::getParameterSeparatorBaseColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kParameterSeparatorBaseColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kParameterSeparatorBaseColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kParameterSeparatorBaseColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getParameterSeparatorLineColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kParameterSeparatorLineColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kParameterSeparatorLineColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kParameterSeparatorLineColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getModuleTitleBaseColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kModuleTitleBaseColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kModuleTitleBaseColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kModuleTitleBaseColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getModuleTitleTextColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kModuleTitleTextColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kModuleTitleTextColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kModuleTitleTextColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
+
+juce::Colour McTheme::getModuleTitleLineColour() const
+{
+    juce::uint32 colourValue;
+    
+    if (currentTheme == Theme::Black)
+    {
+        colourValue = BlackTheme::kModuleTitleLineColour;
+    }
+    else if (currentTheme == Theme::Cream)
+    {
+        colourValue = CreamTheme::kModuleTitleLineColour;
+    }
+    else
+    {
+        colourValue = DebugTheme::kModuleTitleLineColour;
+    }
+    
+    return juce::Colour(colourValue);
+}
