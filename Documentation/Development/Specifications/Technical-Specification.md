@@ -688,7 +688,7 @@ Matrix-Control/
 │   │   ├── ClipboardManager.h/cpp
 │   │   └── PluginParameterFactory.h/cpp
 │   │
-│   ├── UI/
+│   ├── GUI/
 │   │   ├── Components/
 │   │   │   ├── MatrixSlider.h/cpp
 │   │   │   ├── MatrixComboBox.h/cpp

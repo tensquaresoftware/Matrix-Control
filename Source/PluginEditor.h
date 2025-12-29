@@ -4,12 +4,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "PluginProcessor.h"
-#include "UI/Themes/McTheme.h"
-#include "UI/Widgets/McButton.h"
-#include "UI/Widgets/McComboBox.h"
-#include "UI/Widgets/McParameterLabel.h"
-#include "UI/Widgets/McParameterSeparator.h"
-#include "UI/Widgets/McSlider.h"
+#include "GUI/Skin/Skin.h"
+#include "GUI/Skin/SkinDimensions.h"
+#include "GUI/MainComponent.h"
 
 class PluginEditor : public juce::AudioProcessorEditor
 {
@@ -22,42 +19,13 @@ public:
     void mouseDown(const juce::MouseEvent& e) override;
 
 private:
+
     PluginProcessor& pluginProcessor;
     
-    std::unique_ptr<McTheme> theme;
+    std::unique_ptr<tss::Skin> skin;
+    std::unique_ptr<MainComponent> mainComponent;
     
-    McButton buttonBlack;
-    McButton buttonCream;
-    McButton buttonDebug;
-    McButton buttonDisabled;
-    
-    McParameterLabel labelPortamentoRate;
-    McSlider sliderPortamentoRate;
-    
-    McParameterLabel labelPortaVelocity;
-    McSlider sliderPortaVelocity;
-    
-    McParameterLabel labelFrequency;
-    McSlider sliderFrequency;
-    
-    McParameterLabel labelTrackInput;
-    McComboBox comboBoxTrackInput;
-    
-    McParameterLabel labelLegatoPorta;
-    McComboBox comboBoxLegatoPorta;
-    
-    McParameterSeparator separator1;
-    McParameterSeparator separator2;
-    McParameterSeparator separator3;
-    McParameterSeparator separator4;
-    McParameterSeparator separator5;
-    
-    McComboBox comboBoxTopLeft;
-    McComboBox comboBoxTopRight;
-    McComboBox comboBoxBottomLeft;
-    McComboBox comboBoxBottomRight;
-    
-    void updateTheme();
+    void updateSkin();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

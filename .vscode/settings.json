@@ -1,23 +1,4 @@
 {
-    "cmake.configureOnOpen": true,
-    "cmake.buildDirectory": "${workspaceFolder}/build-macos",
-    "cmake.configureEnvironment": {
-        "JUCE_DIR": "${env:JUCE_DIR}"
-    },
-    "cmake.configureOnEdit": false,
-    "cmake.buildBeforeRun": true,
-    "cmake.saveBeforeBuild": true,
-    "cmake.clearOutputBeforeBuild": true,
-    
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-    "files.associations": {
-        "*.h": "cpp",
-        "*.cpp": "cpp"
-    },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.DS_Store": true,
-        "**/build-macos": true,
-        "**/build-windows": true
-    }
+    // Augmente l'indentation de l'explorateur de fichiers pour mieux voir l'arborescence
+    "workbench.tree.indent": 16
 }

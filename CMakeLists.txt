@@ -23,6 +23,9 @@ project(Matrix-Control VERSION 0.0.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Generate compile_commands.json for IDE support (clangd, etc.)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Reference JUCE from environment variable
 if(DEFINED ENV{JUCE_DIR})
     add_subdirectory($ENV{JUCE_DIR} "${CMAKE_BINARY_DIR}/JUCE")
@@ -51,17 +54,35 @@ set(PLUGIN_SOURCES
     Source/Business/MIDI/SysEx/SysExDecoder.cpp
     Source/Business/MIDI/SysEx/SysExEncoder.cpp
     
-    # UI - Themes
-    Source/UI/Themes/McTheme.cpp
+    # GUI - Skin
+    Source/GUI/Skin/Skin.cpp
+    Source/GUI/Skin/SkinFactory.cpp
     
-    # UI - Widgets
-    Source/UI/Widgets/McButton.cpp
-    Source/UI/Widgets/McComboBox.cpp
-    Source/UI/Widgets/McFocusableWidget.cpp
-    Source/UI/Widgets/McParameterLabel.cpp
-    Source/UI/Widgets/McParameterSeparator.cpp
-    Source/UI/Widgets/McPopupMenu.cpp
-    Source/UI/Widgets/McSlider.cpp
+    # GUI - Main Component
+    Source/GUI/MainComponent.cpp
+    
+    # GUI - Panels
+    Source/GUI/Panels/FooterPanel/FooterPanel.cpp
+    Source/GUI/Panels/HeaderPanel/HeaderPanel.cpp
+    Source/GUI/Panels/MainPanel/MainPanel.cpp
+    Source/GUI/Panels/MainPanel/MasterEditPanel/MasterEditPanel.cpp
+    Source/GUI/Panels/MainPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/MainPanel/ModulePanel.cpp
+    Source/GUI/Panels/MainPanel/PatchEditPanel/PatchEditPanel.cpp
+    Source/GUI/Panels/MainPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    
+    # GUI - Widgets
+    Source/GUI/Widgets/Button.cpp
+    Source/GUI/Widgets/ComboBox.cpp
+    Source/GUI/Widgets/FocusableWidget.cpp
+    Source/GUI/Widgets/GroupLabel.cpp
+    Source/GUI/Widgets/ModuleName.cpp
+    Source/GUI/Widgets/PanelSeparator.cpp
+    Source/GUI/Widgets/ParameterLabel.cpp
+    Source/GUI/Widgets/ParameterSeparator.cpp
+    Source/GUI/Widgets/PopupMenu.cpp
+    Source/GUI/Widgets/SectionName.cpp
+    Source/GUI/Widgets/Slider.cpp
     
     # Utilities
     Source/Business/MIDI/Utilities/MidiLogger.cpp
