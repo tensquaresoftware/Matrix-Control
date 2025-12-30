@@ -35,12 +35,10 @@ namespace tss
             inline constexpr int kHeight = 730;
         }
 
-        namespace ModulePanel
+        namespace PatchEditModulePanel
         {
             inline constexpr int kWidth = 150;
-            inline constexpr int kHeaderHeight = 25;
-            inline constexpr int kParameterRowHeight = 25;  // widget height + separator height
-            inline constexpr int kButtonSpacing = 0;
+            inline constexpr int kHeight = 275;
         }
 
         namespace Gui
@@ -53,11 +51,11 @@ namespace tss
         {
             namespace SectionName
             {
-                inline constexpr int kHeight = 40;
-                inline constexpr float kContentHeight = 25.0f;
-                inline constexpr float kLineHeight = 25.0f;
-                inline constexpr float kLeftLineWidth = 40.0f;
-                inline constexpr float kTextSpacing = 20.0f;
+                inline constexpr int kHeight = 25;
+                inline constexpr float kContentHeight = 20.0f;
+                inline constexpr float kLineHeight = 10.0f;
+                inline constexpr float kLeftLineWidth = 20.0f;
+                inline constexpr float kTextSpacing = 10.0f;
             }
 
             namespace ModuleName
@@ -67,7 +65,7 @@ namespace tss
                 inline constexpr int kLargeWidth = 225;
                 inline constexpr float kTextLeftPadding = 2.0f;
                 inline constexpr float kTextAreaHeight = 20.0f;
-                inline constexpr float kLineThickness = 5.0f;
+                inline constexpr float kLineThickness = 3.0f;
             }
 
             namespace GroupLabel
@@ -117,6 +115,8 @@ namespace tss
             {
                 inline constexpr int kWidth = 60;
                 inline constexpr int kHeight = 20;
+                inline constexpr int kBackgroundWidth = 60;
+                inline constexpr int kBackgroundHeight = 16;
                 inline constexpr double kDragSensitivity = 0.5;
                 inline constexpr double kShiftKeyStep = 10.0;
             }
@@ -126,6 +126,9 @@ namespace tss
                 inline constexpr int kNormalWidth = 60;
                 inline constexpr int kLargeWidth = 105;
                 inline constexpr int kHeight = 20;
+                inline constexpr int kNormalBackgroundWidth = 60;
+                inline constexpr int kLargeBackgroundWidth = 105;
+                inline constexpr int kBackgroundHeight = 16;
                 inline constexpr float kLeftPadding = 3.0f;
                 inline constexpr float kRightPadding = 3.0f;
                 inline constexpr float kBorderThickness = 1.0f;

@@ -34,10 +34,12 @@ namespace tss
     private:
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus);
+        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         juce::Path createTrianglePath(float x, float y, float baseSize) const;
+        
+        juce::Rectangle<float> calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const;
 
         Skin* skin = nullptr;
         FocusableWidget focusableWidget;

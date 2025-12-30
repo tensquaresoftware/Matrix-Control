@@ -152,36 +152,36 @@ inline const std::vector<GroupDescriptor> getAllGroups()
 {
     return {
         // Modes
-        { "", GroupIds::kPatch, "PATCH" },
+        { "", GroupIds::kPatch,  "PATCH" },
         { "", GroupIds::kMaster, "MASTER" },
 
         // Sections
-        { GroupIds::kPatch, SectionIds::kPatchEdit, "PATCH EDIT" },
-        { GroupIds::kPatch, SectionIds::kMatrixModulation, "MATRIX MODULATION" },
-        { GroupIds::kPatch, SectionIds::kPatchManager, "PATCH MANAGER" },
-        { GroupIds::kMaster, SectionIds::kMasterEdit, "MASTER EDIT" },
+        { GroupIds::kPatch,  SectionIds::kPatchEdit,        "PATCH EDIT" },
+        { GroupIds::kPatch,  SectionIds::kMatrixModulation, "MATRIX MODULATION" },
+        { GroupIds::kPatch,  SectionIds::kPatchManager,     "PATCH MANAGER" },
+        { GroupIds::kMaster, SectionIds::kMasterEdit,       "MASTER EDIT" },
 
         // Patch Edit Modules
-        { SectionIds::kPatchEdit, ModuleIds::kDco1, "DCO 1" },
-        { SectionIds::kPatchEdit, ModuleIds::kDco2, "DCO 2" },
-        { SectionIds::kPatchEdit, ModuleIds::kVcfVca, "VCF/VCA" },
-        { SectionIds::kPatchEdit, ModuleIds::kFmTrack, "FM/TRACK" },
+        { SectionIds::kPatchEdit,  ModuleIds::kDco1,           "DCO 1" },
+        { SectionIds::kPatchEdit,  ModuleIds::kDco2,           "DCO 2" },
+        { SectionIds::kPatchEdit,  ModuleIds::kVcfVca,         "VCF/VCA" },
+        { SectionIds::kPatchEdit,  ModuleIds::kFmTrack,        "FM/TRACK" },
         { SectionIds::kPatchEdit, ModuleIds::kRampPortamento, "RAMP/PORTAMENTO" },
-        { SectionIds::kPatchEdit, ModuleIds::kEnvelope1, "ENV 1" },
-        { SectionIds::kPatchEdit, ModuleIds::kEnvelope2, "ENV 2" },
-        { SectionIds::kPatchEdit, ModuleIds::kEnvelope3, "ENV 3" },
-        { SectionIds::kPatchEdit, ModuleIds::kLfo1, "LFO 1" },
-        { SectionIds::kPatchEdit, ModuleIds::kLfo2, "LFO 2" },
+        { SectionIds::kPatchEdit, ModuleIds::kEnvelope1,      "ENV 1" },
+        { SectionIds::kPatchEdit, ModuleIds::kEnvelope2,      "ENV 2" },
+        { SectionIds::kPatchEdit, ModuleIds::kEnvelope3,      "ENV 3" },
+        { SectionIds::kPatchEdit, ModuleIds::kLfo1,           "LFO 1" },
+        { SectionIds::kPatchEdit, ModuleIds::kLfo2,           "LFO 2" },
 
         // Patch Manager Modules
-        { SectionIds::kPatchManager, ModuleIds::kBankUtility, "BANK UTILITY" },
+        { SectionIds::kPatchManager, ModuleIds::kBankUtility,     "BANK UTILITY" },
         { SectionIds::kPatchManager, ModuleIds::kInternalPatches, "INTERNAL PATCHES" },
         { SectionIds::kPatchManager, ModuleIds::kComputerPatches, "COMPUTER PATCHES" },
 
         // Master Edit Modules
-        { SectionIds::kMasterEdit, ModuleIds::kMidi, "MIDI" },
+        { SectionIds::kMasterEdit, ModuleIds::kMidi,    "MIDI" },
         { SectionIds::kMasterEdit, ModuleIds::kVibrato, "VIBRATO" },
-        { SectionIds::kMasterEdit, ModuleIds::kMisc, "MISC" },
+        { SectionIds::kMasterEdit, ModuleIds::kMisc,    "MISC" },
 
         // Modulation Busses
         { SectionIds::kMatrixModulation, BusIds::kMatrixModBus0, "MODULATION BUS 0" },
@@ -195,6 +195,23 @@ inline const std::vector<GroupDescriptor> getAllGroups()
         { SectionIds::kMatrixModulation, BusIds::kMatrixModBus8, "MODULATION BUS 8" },
         { SectionIds::kMatrixModulation, BusIds::kMatrixModBus9, "MODULATION BUS 9" }
     };
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+inline juce::String getSectionDisplayName(const char* sectionId)
+{
+    const auto groups = getAllGroups();
+    for (const auto& group : groups)
+    {
+        if (group.groupId == sectionId)
+        {
+            return group.displayName;
+        }
+    }
+    return juce::String();
 }
 
 // ============================================================================

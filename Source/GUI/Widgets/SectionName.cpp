@@ -29,6 +29,7 @@ namespace tss
         auto bounds = getLocalBounds().toFloat();
 
         drawBase(g, bounds);
+        drawContentArea(g, bounds);
         drawLeftLine(g, bounds);
         drawText(g, bounds);
         drawRightLine(g, bounds);
@@ -38,6 +39,13 @@ namespace tss
     {
         g.setColour(skin->getSectionNameBaseColour());
         g.fillRect(bounds);
+    }
+
+    void SectionName::drawContentArea(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    {
+        auto contentArea = getContentArea(bounds);
+        g.setColour(skin->getSectionNameContentAreaColour());
+        g.fillRect(contentArea);
     }
 
     void SectionName::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
@@ -56,7 +64,7 @@ namespace tss
 
         g.setColour(skin->getSectionNameTextColour());
         g.setFont(skin->getSectionNameFont());
-        g.drawText(name, textBounds, juce::Justification::centredLeft, false);
+        g.drawText(name, textBounds, juce::Justification::topLeft, false);
     }
 
     void SectionName::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
@@ -66,9 +74,12 @@ namespace tss
         auto leftLineWidth = skin->getSectionNameLeftLineWidth();
         auto lineHeight = skin->getSectionNameLineHeight();
         auto contentArea = getContentArea(bounds);
+        auto verticalOffset = (contentArea.getHeight() - lineHeight) / 2.0f;
+        
         auto line = contentArea;
         line.setWidth(leftLineWidth);
         line.setHeight(lineHeight);
+        line.translate(0.0f, verticalOffset);
         
         g.fillRect(line);
     }
@@ -87,9 +98,12 @@ namespace tss
 
             auto lineHeight = skin->getSectionNameLineHeight();
             auto contentArea = getContentArea(bounds);
+            auto verticalOffset = (contentArea.getHeight() - lineHeight) / 2.0f;
+            
             auto line = contentArea;
             line.removeFromLeft(lineStartX);
             line.setHeight(lineHeight);
+            line.translate(0.0f, verticalOffset);
             
             g.fillRect(line);
         }

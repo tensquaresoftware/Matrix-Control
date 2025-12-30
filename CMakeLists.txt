@@ -67,7 +67,12 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainPanel/MainPanel.cpp
     Source/GUI/Panels/MainPanel/MasterEditPanel/MasterEditPanel.cpp
     Source/GUI/Panels/MainPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/Dco1Panel.cpp
+    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/Dco2Panel.cpp
+    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/FmTrackPanel.cpp
     Source/GUI/Panels/MainPanel/PatchEditPanel/PatchEditPanel.cpp
+    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/RampPortamentoPanel.cpp
+    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/VcfVcaPanel.cpp
     Source/GUI/Panels/MainPanel/PatchManagerPanel/PatchManagerPanel.cpp
     
     # GUI - Widgets

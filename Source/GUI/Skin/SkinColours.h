@@ -18,7 +18,7 @@ namespace tss
 
         namespace Gui
         {
-            inline constexpr ColourElement kBackground = {
+            inline constexpr ColourElement kGuiBackground = {
                 "GuiBackground",
                 SkinColourChart::kBlack,
                 SkinColourChart::kWhite,
@@ -28,53 +28,60 @@ namespace tss
 
         namespace Panel
         {
-            inline constexpr ColourElement kHeaderBackground = {
+            inline constexpr ColourElement kHeaderPanelBackground = {
                 "HeaderPanelBackground",
                 SkinColourChart::kLightGrey1,
                 SkinColourChart::kLightGrey1,
                 SkinColourChart::kWhite
             };
 
-            inline constexpr ColourElement kMainBackground = {
+            inline constexpr ColourElement kMainPanelBackground = {
                 "MainPanelBackground",
                 SkinColourChart::kDarkGrey2,
                 SkinColourChart::kCream,
                 SkinColourChart::kBlack
             };
 
-            inline constexpr ColourElement kFooterBackground = {
+            inline constexpr ColourElement kFooterPanelBackground = {
                 "FooterPanelBackground",
                 SkinColourChart::kLightGrey1,
                 SkinColourChart::kLightGrey1,
                 SkinColourChart::kWhite
             };
 
-            inline constexpr ColourElement kPatchEditBackground = {
+            inline constexpr ColourElement kPatchEditPanelBackground = {
                 "PatchEditPanelBackground",
                 SkinColourChart::kTransparent,
                 SkinColourChart::kTransparent,
                 SkinColourChart::kRed
             };
 
-            inline constexpr ColourElement kMatrixModulationBackground = {
+            inline constexpr ColourElement kMatrixModulationPanelBackground = {
                 "MatrixModulationPanelBackground",
                 SkinColourChart::kTransparent,
                 SkinColourChart::kTransparent,
                 SkinColourChart::kRed
             };
 
-            inline constexpr ColourElement kPatchManagerBackground = {
+            inline constexpr ColourElement kPatchManagerPanelBackground = {
                 "PatchManagerPanelBackground",
                 SkinColourChart::kTransparent,
                 SkinColourChart::kTransparent,
-                SkinColourChart::kYellow
+                SkinColourChart::kOrange
             };
 
-            inline constexpr ColourElement kMasterEditBackground = {
+            inline constexpr ColourElement kMasterEditPanelBackground = {
                 "MasterEditPanelBackground",
                 SkinColourChart::kTransparent,
                 SkinColourChart::kTransparent,
                 SkinColourChart::kRed
+            };
+
+            inline constexpr ColourElement kPatchEditModulePanelBackground = {
+                "PatchEditModulePanelBackground",
+                SkinColourChart::kTransparent,
+                SkinColourChart::kTransparent,
+                SkinColourChart::kOrange
             };
         }
 
@@ -85,6 +92,13 @@ namespace tss
                 SkinColourChart::kTransparent,
                 SkinColourChart::kTransparent,
                 SkinColourChart::kRed
+            };
+
+            inline constexpr ColourElement kContentArea = {
+                "SectionNameContentArea",
+                SkinColourChart::kTransparent,
+                SkinColourChart::kTransparent,
+                SkinColourChart::kOrange
             };
 
             inline constexpr ColourElement kText = {
@@ -194,14 +208,14 @@ namespace tss
                 "PanelSeparatorBase",
                 SkinColourChart::kTransparent,
                 SkinColourChart::kTransparent,
-                SkinColourChart::kOrange
+                SkinColourChart::kYellow
             };
 
             inline constexpr ColourElement kLine = {
                 "PanelSeparatorLine",
                 SkinColourChart::kDarkGrey5,
                 SkinColourChart::kDarkGrey5,
-                SkinColourChart::kYellow
+                SkinColourChart::kOrange
             };
         }
 
@@ -320,8 +334,8 @@ namespace tss
 
             inline constexpr ColourElement kBorder = {
                 "SliderBorder",
-                SkinColourChart::kGreen2,
-                SkinColourChart::kGreen2,
+                SkinColourChart::kTransparent, // kGreen2,
+                SkinColourChart::kTransparent, // kGreen2,
                 SkinColourChart::kOrange
             };
 
@@ -341,8 +355,8 @@ namespace tss
 
             inline constexpr ColourElement kBorderFocus = {
                 "SliderBorderFocus",
-                SkinColourChart::kGreen4,
-                SkinColourChart::kGreen4,
+                SkinColourChart::kGreen2, // kGreen4
+                SkinColourChart::kGreen2, // kGreen4
                 SkinColourChart::kOrange
             };
 
@@ -393,8 +407,8 @@ namespace tss
 
             inline constexpr ColourElement kBorder = {
                 "ComboBoxBorder",
-                SkinColourChart::kGreen2,
-                SkinColourChart::kGreen2,
+                SkinColourChart::kTransparent, // kGreen2
+                SkinColourChart::kTransparent, // kGreen2
                 SkinColourChart::kOrange
             };
 
@@ -414,8 +428,8 @@ namespace tss
 
             inline constexpr ColourElement kBorderFocus = {
                 "ComboBoxBorderFocus",
-                SkinColourChart::kGreen4,
-                SkinColourChart::kGreen4,
+                SkinColourChart::kGreen2, // kGreen4
+                SkinColourChart::kGreen2, // kGreen4
                 SkinColourChart::kOrange
             };
 

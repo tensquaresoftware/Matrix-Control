@@ -31,49 +31,59 @@ namespace tss
     // GUI colours ------------------------------------------------------------
     juce::Colour Skin::getGuiBackgroundColour() const
     {
-        return getColour(SkinColours::Gui::kBackground);
+        return getColour(SkinColours::Gui::kGuiBackground);
     }
 
     // Panel colours ----------------------------------------------------------
     juce::Colour Skin::getHeaderPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kHeaderBackground);
+        return getColour(SkinColours::Panel::kHeaderPanelBackground);
     }
 
     juce::Colour Skin::getMainPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kMainBackground);
+        return getColour(SkinColours::Panel::kMainPanelBackground);
     }
 
     juce::Colour Skin::getFooterPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kFooterBackground);
+        return getColour(SkinColours::Panel::kFooterPanelBackground);
     }
 
     juce::Colour Skin::getPatchEditPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kPatchEditBackground);
+        return getColour(SkinColours::Panel::kPatchEditPanelBackground);
+    }
+
+    juce::Colour Skin::getPatchEditModulePanelBackgroundColour() const
+    {
+        return getColour(SkinColours::Panel::kPatchEditModulePanelBackground);
     }
 
     juce::Colour Skin::getMatrixModulationPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kMatrixModulationBackground);
+        return getColour(SkinColours::Panel::kMatrixModulationPanelBackground);
     }
 
     juce::Colour Skin::getPatchManagerPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kPatchManagerBackground);
+        return getColour(SkinColours::Panel::kPatchManagerPanelBackground);
     }
 
     juce::Colour Skin::getMasterEditPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kMasterEditBackground);
+        return getColour(SkinColours::Panel::kMasterEditPanelBackground);
     }
 
     // SectionName colours ----------------------------------------------------
     juce::Colour Skin::getSectionNameBaseColour() const
     {
         return getColour(SkinColours::SectionName::kBase);
+    }
+
+    juce::Colour Skin::getSectionNameContentAreaColour() const
+    {
+        return getColour(SkinColours::SectionName::kContentArea);
     }
 
     juce::Colour Skin::getSectionNameTextColour() const
@@ -405,25 +415,15 @@ namespace tss
         return SkinDimensions::MasterEditPanel::kHeight;
     }
 
-    // ModulePanel dimensions -------------------------------------------------
-    int Skin::getModulePanelWidth() const
+    // PatchEditModulePanel dimensions ----------------------------------------
+    int Skin::getPatchEditModulePanelWidth() const
     {
-        return SkinDimensions::ModulePanel::kWidth;
+        return SkinDimensions::PatchEditModulePanel::kWidth;
     }
 
-    int Skin::getModulePanelHeaderHeight() const
+    int Skin::getPatchEditModulePanelHeight() const
     {
-        return SkinDimensions::ModulePanel::kHeaderHeight;
-    }
-
-    int Skin::getModulePanelParameterRowHeight() const
-    {
-        return SkinDimensions::ModulePanel::kParameterRowHeight;
-    }
-
-    int Skin::getModulePanelButtonSpacing() const
-    {
-        return SkinDimensions::ModulePanel::kButtonSpacing;
+        return SkinDimensions::PatchEditModulePanel::kHeight;
     }
 
     // SectionName dimensions -------------------------------------------------
@@ -595,6 +595,16 @@ namespace tss
         return SkinDimensions::Widget::Slider::kHeight;
     }
 
+    int Skin::getSliderBackgroundWidth() const
+    {
+        return SkinDimensions::Widget::Slider::kBackgroundWidth;
+    }
+
+    int Skin::getSliderBackgroundHeight() const
+    {
+        return SkinDimensions::Widget::Slider::kBackgroundHeight;
+    }
+
     double Skin::getSliderDragSensitivity() const
     {
         return SkinDimensions::Widget::Slider::kDragSensitivity;
@@ -619,6 +629,21 @@ namespace tss
     int Skin::getComboBoxHeight() const
     {
         return SkinDimensions::Widget::ComboBox::kHeight;
+    }
+
+    int Skin::getComboBoxNormalBackgroundWidth() const
+    {
+        return SkinDimensions::Widget::ComboBox::kNormalBackgroundWidth;
+    }
+
+    int Skin::getComboBoxLargeBackgroundWidth() const
+    {
+        return SkinDimensions::Widget::ComboBox::kLargeBackgroundWidth;
+    }
+
+    int Skin::getComboBoxBackgroundHeight() const
+    {
+        return SkinDimensions::Widget::ComboBox::kBackgroundHeight;
     }
 
     float Skin::getComboBoxLeftPadding() const

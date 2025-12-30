@@ -33,12 +33,14 @@ namespace tss
         juce::Colour getMainPanelBackgroundColour() const;
         juce::Colour getFooterPanelBackgroundColour() const;
         juce::Colour getPatchEditPanelBackgroundColour() const;
+        juce::Colour getPatchEditModulePanelBackgroundColour() const;
         juce::Colour getMatrixModulationPanelBackgroundColour() const;
         juce::Colour getPatchManagerPanelBackgroundColour() const;
         juce::Colour getMasterEditPanelBackgroundColour() const;
 
         // SectionName colours ------------------------------------------------
         juce::Colour getSectionNameBaseColour() const;
+        juce::Colour getSectionNameContentAreaColour() const;
         juce::Colour getSectionNameTextColour() const;
         juce::Colour getSectionNameLineColourBlue() const;
         juce::Colour getSectionNameLineColourOrange() const;
@@ -137,11 +139,9 @@ namespace tss
         int getMasterEditPanelWidth() const;
         int getMasterEditPanelHeight() const;
 
-        // ModulePanel dimensions ---------------------------------------------
-        int getModulePanelWidth() const;
-        int getModulePanelHeaderHeight() const;
-        int getModulePanelParameterRowHeight() const;
-        int getModulePanelButtonSpacing() const;
+        // PatchEditModulePanel dimensions ------------------------------------
+        int getPatchEditModulePanelWidth() const;
+        int getPatchEditModulePanelHeight() const;
 
         // SectionName dimensions ---------------------------------------------
         int getSectionNameHeight() const;
@@ -192,6 +192,8 @@ namespace tss
         // Slider dimensions --------------------------------------------------
         int getSliderWidth() const;
         int getSliderHeight() const;
+        int getSliderBackgroundWidth() const;
+        int getSliderBackgroundHeight() const;
         double getSliderDragSensitivity() const;
         double getSliderShiftKeyStep() const;
 
@@ -199,6 +201,9 @@ namespace tss
         int getComboBoxNormalWidth() const;
         int getComboBoxLargeWidth() const;
         int getComboBoxHeight() const;
+        int getComboBoxNormalBackgroundWidth() const;
+        int getComboBoxLargeBackgroundWidth() const;
+        int getComboBoxBackgroundHeight() const;
         float getComboBoxLeftPadding() const;
         float getComboBoxRightPadding() const;
         float getComboBoxBorderThickness() const;

@@ -27,7 +27,7 @@ namespace tss
         inline juce::Font getSectionNameFont()
         {
             auto font = getDefaultFont();
-            return font.withHeight(18.0f).boldened();
+            return font.withHeight(20.0f);
         }
 
         inline juce::Font getModuleNameFont()

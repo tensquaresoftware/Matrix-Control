@@ -31,10 +31,11 @@ namespace tss
     private:
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus);
+        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
         void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         
+        juce::Rectangle<float> calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const;
         juce::Rectangle<float> calculateTrackBounds(const juce::Rectangle<float>& backgroundBounds, bool enabled) const;
         
         double calculateStepForRange(double rangeLength, bool isShiftPressed) const;

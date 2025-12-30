@@ -14,7 +14,6 @@ namespace tss
         auto width = (size == Size::Normal) ? SkinDimensions::Widget::ComboBox::kNormalWidth : SkinDimensions::Widget::ComboBox::kLargeWidth;
         setSize(width, SkinDimensions::Widget::ComboBox::kHeight);
         setWantsKeyboardFocus(true);
-        
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 
@@ -32,14 +31,14 @@ namespace tss
         }
 
         auto bounds = getLocalBounds().toFloat();
-        auto borderThickness = skin->getComboBoxBorderThickness();
-        auto backgroundBounds = bounds.reduced(borderThickness);
         auto enabled = isEnabled();
         auto hasFocus = focusableWidget.hasFocus() || isPopupOpen;
 
+        auto backgroundBounds = calculateBackgroundBounds(bounds);
+
         drawBase(g, bounds);
         drawBackground(g, backgroundBounds, enabled);
-        drawBorder(g, bounds, enabled, hasFocus);
+        drawBorder(g, bounds, backgroundBounds, enabled, hasFocus);
         drawText(g, bounds, enabled);
         drawTriangle(g, bounds, enabled);
     }
@@ -58,12 +57,19 @@ namespace tss
         g.fillRect(bounds);
     }
 
-    void ComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus)
+    void ComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        auto borderColour = skin->getComboBoxBorderColour(enabled, hasFocus);
+        auto borderColour = skin->getComboBoxBorderColour(enabled, false);
         g.setColour(borderColour);
         auto borderThickness = skin->getComboBoxBorderThickness();
         g.drawRect(bounds, borderThickness);
+
+        if (hasFocus)
+        {
+            auto focusBorderColour = skin->getComboBoxBorderColour(enabled, true);
+            g.setColour(focusBorderColour);
+            g.drawRect(backgroundBounds, borderThickness);
+        }
     }
 
     void ComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
@@ -118,6 +124,17 @@ namespace tss
         path.closeSubPath();
         
         return path;
+    }
+
+    juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
+    {
+        auto backgroundWidth = static_cast<float>((comboSize == Size::Normal) 
+            ? skin->getComboBoxNormalBackgroundWidth() 
+            : skin->getComboBoxLargeBackgroundWidth());
+        auto backgroundHeight = static_cast<float>(skin->getComboBoxBackgroundHeight());
+        auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
+        auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
+        return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);
     }
 
     void ComboBox::showPopup()

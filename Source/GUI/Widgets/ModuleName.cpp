@@ -75,9 +75,14 @@ namespace tss
     {
         auto lineColour = getLineColour();
         
+        auto textAreaHeight = skin->getModuleNameTextAreaHeight();
         auto lineThickness = skin->getModuleNameLineThickness();
+        auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
+        auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
+        
         auto lineBounds = bounds;
-        lineBounds.removeFromTop(bounds.getHeight() - lineThickness);
+        lineBounds.setHeight(lineThickness);
+        lineBounds.translate(0.0f, verticalOffset);
 
         g.setColour(lineColour);
         g.fillRect(lineBounds);

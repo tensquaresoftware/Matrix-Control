@@ -32,14 +32,23 @@ namespace tss
         auto enabled = isEnabled();
         auto hasFocus = focusableWidget.hasFocus();
 
-        auto backgroundBounds = bounds.reduced(1.0f);
+        auto backgroundBounds = calculateBackgroundBounds(bounds);
         auto trackBounds = calculateTrackBounds(backgroundBounds, enabled);
 
         drawBase(g, bounds);
         drawBackground(g, backgroundBounds, enabled);
-        drawBorder(g, bounds, enabled, hasFocus);
+        drawBorder(g, bounds, backgroundBounds, enabled, hasFocus);
         drawTrack(g, trackBounds, enabled);
         drawText(g, bounds, enabled);
+    }
+
+    juce::Rectangle<float> Slider::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
+    {
+        auto backgroundWidth = static_cast<float>(skin->getSliderBackgroundWidth());
+        auto backgroundHeight = static_cast<float>(skin->getSliderBackgroundHeight());
+        auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
+        auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
+        return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);
     }
 
     juce::Rectangle<float> Slider::calculateTrackBounds(const juce::Rectangle<float>& backgroundBounds, bool enabled) const
@@ -80,11 +89,18 @@ namespace tss
         g.fillRect(bounds);
     }
 
-    void Slider::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool hasFocus)
+    void Slider::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        auto borderColour = skin->getSliderBorderColour(enabled, hasFocus);
+        auto borderColour = skin->getSliderBorderColour(enabled, false);
         g.setColour(borderColour);
         g.drawRect(bounds, 1.0f);
+
+        if (hasFocus)
+        {
+            auto focusBorderColour = skin->getSliderBorderColour(enabled, true);
+            g.setColour(focusBorderColour);
+            g.drawRect(backgroundBounds, 1.0f);
+        }
     }
 
     void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
