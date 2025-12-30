@@ -8,7 +8,7 @@
 
 ---
 
-This annex documents key technical choices and component specifications for the MatrixControl GUI. All implementation must comply with JUCE 8.0.8 standards and latest API conventions.
+This annex documents key technical choices and component specifications for the MatrixControl GUI. All implementation must comply with JUCE 8.0.12 standards and latest API conventions.
 
 ## 1. Scalability and Display
 

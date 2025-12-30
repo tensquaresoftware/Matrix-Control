@@ -40,19 +40,19 @@ endif()
 
 set(PLUGIN_SOURCES
     # Core
+    Source/Shared/ApvtsFactory.cpp
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
-    Source/PluginFactory.cpp
     
-    # Business - MIDI Communication Layer
-    Source/Business/MIDI/Ports/MidiInputPort.cpp
-    Source/Business/MIDI/Ports/MidiOutputPort.cpp
-    Source/Business/MIDI/Transport/MidiSender.cpp
-    Source/Business/MIDI/Transport/MidiReceiver.cpp
-    Source/Business/MIDI/MidiManager.cpp
-    Source/Business/MIDI/SysEx/SysExParser.cpp
-    Source/Business/MIDI/SysEx/SysExDecoder.cpp
-    Source/Business/MIDI/SysEx/SysExEncoder.cpp
+    # Core - MIDI Communication Layer
+    Source/Core/MIDI/Ports/MidiInputPort.cpp
+    Source/Core/MIDI/Ports/MidiOutputPort.cpp
+    Source/Core/MIDI/Transport/MidiSender.cpp
+    Source/Core/MIDI/Transport/MidiReceiver.cpp
+    Source/Core/MIDI/MidiManager.cpp
+    Source/Core/MIDI/SysEx/SysExParser.cpp
+    Source/Core/MIDI/SysEx/SysExDecoder.cpp
+    Source/Core/MIDI/SysEx/SysExEncoder.cpp
     
     # GUI - Skin
     Source/GUI/Skin/Skin.cpp
@@ -67,7 +67,6 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainPanel/MainPanel.cpp
     Source/GUI/Panels/MainPanel/MasterEditPanel/MasterEditPanel.cpp
     Source/GUI/Panels/MainPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    Source/GUI/Panels/MainPanel/ModulePanel.cpp
     Source/GUI/Panels/MainPanel/PatchEditPanel/PatchEditPanel.cpp
     Source/GUI/Panels/MainPanel/PatchManagerPanel/PatchManagerPanel.cpp
     
@@ -85,7 +84,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/Slider.cpp
     
     # Utilities
-    Source/Business/MIDI/Utilities/MidiLogger.cpp
+    Source/Core/MIDI/Utilities/MidiLogger.cpp
 )
 
 # ============================================================================

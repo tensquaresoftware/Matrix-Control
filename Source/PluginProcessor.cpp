@@ -2,8 +2,9 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "Business/MIDI/MidiManager.h"
-#include "Business/MIDI/Utilities/MidiLogger.h"
+#include "Core/MIDI/MidiManager.h"
+#include "Core/MIDI/Utilities/MidiLogger.h"
+#include "Shared/ApvtsFactory.h"
 
 PluginProcessor::PluginProcessor()
     : AudioProcessor(BusesProperties()
@@ -188,13 +189,10 @@ void PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
 
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
 {
-    juce::AudioProcessorValueTreeState::ParameterLayout parameterLayout;
-    
-    // For now, we only add MIDI status properties
-    // Patch and master parameters will be added later via PluginParameterFactory
-    
-    // Note: APVTS properties for status are set directly via state.setProperty()
-    // They don't need to be in the parameter layout
-    
-    return parameterLayout;
+    return ApvtsFactory::createParameterLayout();
+}
+
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new PluginProcessor();
 }

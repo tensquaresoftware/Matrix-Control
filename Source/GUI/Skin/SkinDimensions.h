@@ -142,6 +142,12 @@ namespace tss
                 inline constexpr int kTextLeftPadding = 3;
                 inline constexpr int kColumnThreshold = 10;
             }
+
+            namespace EmptySlot
+            {
+                inline constexpr int kWidth = 150;
+                inline constexpr int kHeight = 20;
+            }
         }
     }
 }

@@ -324,7 +324,7 @@ Error   : "MIDI device disconnected"
 | **macOS**          | Tahoe 26 / Xcode 26                                                                         |
 | **Windows**        | Windows 11 / Visual Studio 2026                                                             |
 | **Plugin formats** | VST3 (macOS & Windows), AU2 (macOS)                                                         |
-| **Framework**      | JUCE 8.0.10 (latest stable version)                                                         |
+| **Framework**      | JUCE 8.0.12 (latest stable version)                                                         |
 | **Language**       | C++17                                                                                       |
 | **Synth**          | • Matrix-1000 only (v1.0)<br/>• Secondary compatibility with Matrix-6/6R, without guarantee |
 

@@ -4,7 +4,7 @@
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
 - Contexte : Développement de plugins VST/AU avec JUCE
-- Dernière mise à jour : 2025-12-19
+- Dernière mise à jour : 2025-12-30
 
 
 ================================================================================
@@ -35,7 +35,7 @@
 - IDE : Cursor (avec abonnement mensuel Agent IA)
 - Compilateur : Xcode 26
 - Build system : CMake
-- Framework audio : JUCE 8.0.10
+- Framework audio : JUCE 8.0.12
 
 [Référence JUCE]
 - Installation JUCE sur mon Mac : /Applications/JUCE

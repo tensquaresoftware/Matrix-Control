@@ -1,0 +1,27 @@
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+namespace tss
+{
+    class Skin;
+
+    class EmptySlot : public juce::Component
+    {
+    public:
+        explicit EmptySlot(Skin& newSkin);
+        ~EmptySlot() override = default;
+
+        void setSkin(Skin& newSkin);
+
+        void paint(juce::Graphics& g) override;
+
+    private:
+        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
+
+        Skin* skin = nullptr;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EmptySlot)
+    };
+}
+

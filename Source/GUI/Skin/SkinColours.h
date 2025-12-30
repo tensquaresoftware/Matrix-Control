@@ -499,6 +499,16 @@ namespace tss
                 SkinColourChart::kTransparent
             };
         }
+
+        namespace EmptySlot
+        {
+            inline constexpr ColourElement kBase = {
+                "EmptySlotBase",
+                SkinColourChart::kTransparent,
+                SkinColourChart::kTransparent,
+                SkinColourChart::kRed
+            };
+        }
     }
 }
 

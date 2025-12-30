@@ -323,6 +323,12 @@ namespace tss
         return getColour(SkinColours::PopupMenu::kTextHoover);
     }
 
+    // EmptySlot colours -------------------------------------------------------
+    juce::Colour Skin::getEmptySlotBaseColour() const
+    {
+        return getColour(SkinColours::EmptySlot::kBase);
+    }
+
 
     //=========================================================================
     // DIMENSIONS
@@ -664,6 +670,17 @@ namespace tss
     int Skin::getPopupMenuColumnThreshold() const
     {
         return SkinDimensions::Widget::PopupMenu::kColumnThreshold;
+    }
+
+    // EmptySlot dimensions ----------------------------------------------------
+    int Skin::getEmptySlotWidth() const
+    {
+        return SkinDimensions::Widget::EmptySlot::kWidth;
+    }
+
+    int Skin::getEmptySlotHeight() const
+    {
+        return SkinDimensions::Widget::EmptySlot::kHeight;
     }
 
     //=========================================================================

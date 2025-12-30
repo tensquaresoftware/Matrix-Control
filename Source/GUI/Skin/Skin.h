@@ -103,6 +103,9 @@ namespace tss
         juce::Colour getPopupMenuTextColour() const;
         juce::Colour getPopupMenuBackgroundHooverColour() const;
         juce::Colour getPopupMenuTextHooverColour() const;
+
+        // EmptySlot colours --------------------------------------------------
+        juce::Colour getEmptySlotBaseColour() const;
         
         
         //=====================================================================
@@ -208,6 +211,10 @@ namespace tss
         int getPopupMenuSeparatorWidth() const;
         int getPopupMenuTextLeftPadding() const;
         int getPopupMenuColumnThreshold() const;
+
+        // EmptySlot dimensions ------------------------------------------------
+        int getEmptySlotWidth() const;
+        int getEmptySlotHeight() const;
 
         
         //---------------------------------------------------------------------

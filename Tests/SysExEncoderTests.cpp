@@ -1,8 +1,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
-#include "../Source/Business/MIDI/SysEx/SysExConstants.h"
-#include "../Source/Business/MIDI/SysEx/SysExEncoder.h"
+#include "../Source/Core/MIDI/SysEx/SysExConstants.h"
+#include "../Source/Core/MIDI/SysEx/SysExEncoder.h"
 
 /**
  * Unit tests for SysExEncoder
