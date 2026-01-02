@@ -1,4 +1,4 @@
-#include "MainPanel.h"
+#include "BodyPanel.h"
 
 #include "../../Skin/Skin.h"
 #include "../../Widgets/PanelSeparator.h"
@@ -7,14 +7,15 @@
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "PatchManagerPanel/PatchManagerPanel.h"
 #include "../../Skin/SkinDimensions.h"
+#include "../../../Shared/WidgetFactory.h"
 
 using tss::Skin;
 using tss::PanelSeparator;
 
-MainPanel::MainPanel(Skin& newSkin)
+BodyPanel::BodyPanel(Skin& newSkin, WidgetFactory& widgetFactory)
     : skin(&newSkin)
 {
-    patchEditPanel = std::make_unique<PatchEditPanel>(newSkin);
+    patchEditPanel = std::make_unique<PatchEditPanel>(newSkin, widgetFactory);
     addAndMakeVisible(*patchEditPanel);
 
     panelSeparator1 = std::make_unique<PanelSeparator>(newSkin);
@@ -33,16 +34,16 @@ MainPanel::MainPanel(Skin& newSkin)
     addAndMakeVisible(*masterEditPanel);
 }
 
-MainPanel::~MainPanel() = default;
+BodyPanel::~BodyPanel() = default;
 
-void MainPanel::paint(juce::Graphics& g)
+void BodyPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(skin->getMainPanelBackgroundColour());
+        g.fillAll(skin->getBodyPanelBackgroundColour());
 }
 
-void MainPanel::resized()
+void BodyPanel::resized()
 {
-    auto spacing = tss::SkinDimensions::MainPanel::kSpacing;
+    auto spacing = tss::SkinDimensions::BodyPanel::kSpacing;
     auto patchEditPanelX = spacing;
     auto patchEditPanelY = spacing;
     patchEditPanel->setBounds(patchEditPanelX, patchEditPanelY, tss::SkinDimensions::PatchEditPanel::kWidth, tss::SkinDimensions::PatchEditPanel::kHeight);
@@ -68,7 +69,7 @@ void MainPanel::resized()
     masterEditPanel->setBounds(masterEditPanelX, masterEditPanelY, tss::SkinDimensions::MasterEditPanel::kWidth, tss::SkinDimensions::MasterEditPanel::kHeight);
 }
 
-void MainPanel::setSkin(Skin& newSkin)
+void BodyPanel::setSkin(Skin& newSkin)
 {
         skin = &newSkin;
 

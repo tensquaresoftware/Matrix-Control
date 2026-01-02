@@ -40,9 +40,9 @@ namespace tss
         return getColour(SkinColours::Panel::kHeaderPanelBackground);
     }
 
-    juce::Colour Skin::getMainPanelBackgroundColour() const
+    juce::Colour Skin::getBodyPanelBackgroundColour() const
     {
-        return getColour(SkinColours::Panel::kMainPanelBackground);
+        return getColour(SkinColours::Panel::kBodyPanelBackground);
     }
 
     juce::Colour Skin::getFooterPanelBackgroundColour() const
@@ -376,15 +376,15 @@ namespace tss
         return SkinDimensions::HeaderPanel::kButtonSpacing;
     }
 
-    // MainPanel dimensions ---------------------------------------------------
-    int Skin::getMainPanelHeight() const
+    // BodyPanel dimensions ---------------------------------------------------
+    int Skin::getBodyPanelHeight() const
     {
-        return SkinDimensions::MainPanel::kHeight;
+        return SkinDimensions::BodyPanel::kHeight;
     }
 
-    int Skin::getMainPanelSpacing() const
+    int Skin::getBodyPanelSpacing() const
     {
-        return SkinDimensions::MainPanel::kSpacing;
+        return SkinDimensions::BodyPanel::kSpacing;
     }
 
     // FooterPanel dimensions -------------------------------------------------

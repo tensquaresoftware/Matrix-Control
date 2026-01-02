@@ -10,15 +10,20 @@
 #include "../../../Skin/SkinDimensions.h"
 #include "../../../Widgets/SectionName.h"
 #include "../../../../Shared/SynthDescriptors.h"
+#include "../../../../Shared/ApvtsFactory.h"
+#include "../../../../Shared/WidgetFactory.h"
 
 using tss::Skin;
 
 PatchEditPanel::~PatchEditPanel() = default;
 
-PatchEditPanel::PatchEditPanel(Skin& newSkin)
+PatchEditPanel::PatchEditPanel(Skin& newSkin, WidgetFactory& widgetFactory)
     : skin(&newSkin)
-    , sectionName(std::make_unique<tss::SectionName>(newSkin, tss::SkinDimensions::PatchEditPanel::kWidth, SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
-    , dco1Panel(std::make_unique<Dco1Panel>(newSkin))
+    , sectionName(std::make_unique<tss::SectionName>(
+        newSkin, 
+        tss::SkinDimensions::PatchEditPanel::kWidth, 
+        ApvtsFactory::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
+    , dco1Panel(std::make_unique<Dco1Panel>(newSkin, widgetFactory))
     , dco2Panel(std::make_unique<Dco2Panel>(newSkin))
     , vcfVcaPanel(std::make_unique<VcfVcaPanel>(newSkin))
     , fmTrackPanel(std::make_unique<FmTrackPanel>(newSkin))
@@ -49,7 +54,7 @@ void PatchEditPanel::resized()
     const auto sectionNameHeight = tss::SkinDimensions::Widget::SectionName::kHeight;
     const auto panelWidth = tss::SkinDimensions::PatchEditModulePanel::kWidth;
     const auto panelHeight = tss::SkinDimensions::PatchEditModulePanel::kHeight;
-    const auto spacing = tss::SkinDimensions::MainPanel::kSpacing;
+    const auto spacing = tss::SkinDimensions::BodyPanel::kSpacing;
 
     if (sectionName != nullptr)
     {

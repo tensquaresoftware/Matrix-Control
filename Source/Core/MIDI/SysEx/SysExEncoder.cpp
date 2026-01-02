@@ -12,24 +12,11 @@ juce::MemoryBlock SysExEncoder::encodePatchSysEx(juce::uint8 patchNumber, const 
         return {};
     }
 
-    // Build header: F0 10 06 01 <patch_number>
     auto header = buildHeader(SysExConstants::Opcode::kSinglePatchData, patchNumber);
-
-    // Unpack bytes to nibbles
-    std::vector<juce::uint8> nibbles(SysExConstants::kPatchPackedDataSize * 2);
-    size_t numNibbles = unpackBytes(packedData, SysExConstants::kPatchPackedDataSize, nibbles.data());
-
-    // Calculate checksum on packed data
+    std::vector<juce::uint8> nibbles = unpackBytesToNibbles(packedData, SysExConstants::kPatchPackedDataSize);
     juce::uint8 checksum = calculateChecksum(packedData, SysExConstants::kPatchPackedDataSize);
 
-    // Build complete message
-    juce::MemoryBlock message;
-    message.append(header.data(), header.size());
-    message.append(nibbles.data(), numNibbles);
-    message.append(&checksum, 1);
-    message.append(&SysExConstants::kSysExEnd, 1);
-
-    return message;
+    return buildCompletePatchSysExMessage(header, nibbles, checksum);
 }
 
 juce::MemoryBlock SysExEncoder::encodeMasterSysEx(juce::uint8 version, const juce::uint8* packedData) const
@@ -40,24 +27,11 @@ juce::MemoryBlock SysExEncoder::encodeMasterSysEx(juce::uint8 version, const juc
         return {};
     }
 
-    // Build header: F0 10 06 03 <version>
     auto header = buildHeader(SysExConstants::Opcode::kMasterParameterData, version);
-
-    // Unpack bytes to nibbles
-    std::vector<juce::uint8> nibbles(SysExConstants::kMasterPackedDataSize * 2);
-    size_t numNibbles = unpackBytes(packedData, SysExConstants::kMasterPackedDataSize, nibbles.data());
-
-    // Calculate checksum on packed data
+    std::vector<juce::uint8> nibbles = unpackBytesToNibbles(packedData, SysExConstants::kMasterPackedDataSize);
     juce::uint8 checksum = calculateChecksum(packedData, SysExConstants::kMasterPackedDataSize);
 
-    // Build complete message
-    juce::MemoryBlock message;
-    message.append(header.data(), header.size());
-    message.append(nibbles.data(), numNibbles);
-    message.append(&checksum, 1);
-    message.append(&SysExConstants::kSysExEnd, 1);
-
-    return message;
+    return buildCompleteMasterSysExMessage(header, nibbles, checksum);
 }
 
 juce::MemoryBlock SysExEncoder::encodeDeviceInquiry()
@@ -84,11 +58,43 @@ size_t SysExEncoder::unpackBytes(const juce::uint8* bytes, size_t numBytes, juce
 {
     for (size_t i = 0; i < numBytes; ++i)
     {
-        // Low nibble first, then high nibble (Oberheim format)
         output[i * 2] = bytes[i] & 0x0F;
         output[i * 2 + 1] = (bytes[i] >> 4) & 0x0F;
     }
     return numBytes * 2;
+}
+
+std::vector<juce::uint8> SysExEncoder::unpackBytesToNibbles(const juce::uint8* packedData, size_t numBytes) const
+{
+    std::vector<juce::uint8> nibbles(numBytes * 2);
+    unpackBytes(packedData, numBytes, nibbles.data());
+    return nibbles;
+}
+
+juce::MemoryBlock SysExEncoder::buildCompletePatchSysExMessage(
+    const std::vector<juce::uint8>& header,
+    const std::vector<juce::uint8>& nibbles,
+    juce::uint8 checksum) const
+{
+    juce::MemoryBlock message;
+    message.append(header.data(), header.size());
+    message.append(nibbles.data(), nibbles.size());
+    message.append(&checksum, 1);
+    message.append(&SysExConstants::kSysExEnd, 1);
+    return message;
+}
+
+juce::MemoryBlock SysExEncoder::buildCompleteMasterSysExMessage(
+    const std::vector<juce::uint8>& header,
+    const std::vector<juce::uint8>& nibbles,
+    juce::uint8 checksum) const
+{
+    juce::MemoryBlock message;
+    message.append(header.data(), header.size());
+    message.append(nibbles.data(), nibbles.size());
+    message.append(&checksum, 1);
+    message.append(&SysExConstants::kSysExEnd, 1);
+    return message;
 }
 
 juce::uint8 SysExEncoder::calculateChecksum(const juce::uint8* data, size_t length)

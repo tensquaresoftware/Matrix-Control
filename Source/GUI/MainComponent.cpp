@@ -1,14 +1,16 @@
 #include "MainComponent.h"
 
+#include "../Shared/WidgetFactory.h"
+
 using tss::Skin;
 
-MainComponent::MainComponent(Skin& skin)
+MainComponent::MainComponent(Skin& skin, WidgetFactory& widgetFactory)
     : headerPanel(skin)
-    , mainPanel(skin)
+    , bodyPanel(skin, widgetFactory)
     , footerPanel(skin)
 {
     addAndMakeVisible(headerPanel);
-    addAndMakeVisible(mainPanel);
+    addAndMakeVisible(bodyPanel);
     addAndMakeVisible(footerPanel);
 }
 
@@ -16,18 +18,18 @@ void MainComponent::resized()
 {
     auto bounds = getLocalBounds();
     auto headerHeight = HeaderPanel::getHeight();
-    auto mainPanelHeight = MainPanel::getHeight();
+    auto bodyPanelHeight = BodyPanel::getHeight();
     auto footerHeight = FooterPanel::getHeight();
 
     headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);
-    mainPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight, bounds.getWidth(), mainPanelHeight);
-    footerPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight + mainPanelHeight, bounds.getWidth(), footerHeight);
+    bodyPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight, bounds.getWidth(), bodyPanelHeight);
+    footerPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight + bodyPanelHeight, bounds.getWidth(), footerHeight);
 }
 
 void MainComponent::setSkin(Skin& skin)
 {
     headerPanel.setSkin(skin);
-    mainPanel.setSkin(skin);
+    bodyPanel.setSkin(skin);
     footerPanel.setSkin(skin);
 }
 

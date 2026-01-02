@@ -10,6 +10,8 @@ namespace tss
     class SectionName;
 }
 
+class WidgetFactory;
+
 using tss::Skin;
 
 class Dco1Panel;
@@ -21,7 +23,7 @@ class RampPortamentoPanel;
 class PatchEditPanel : public juce::Component
 {
 public:
-    explicit PatchEditPanel(Skin& skin);
+    PatchEditPanel(Skin& skin, WidgetFactory& widgetFactory);
     ~PatchEditPanel() override;
 
     void paint(juce::Graphics&) override;

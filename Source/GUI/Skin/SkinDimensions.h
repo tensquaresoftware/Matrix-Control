@@ -12,7 +12,7 @@ namespace tss
             inline constexpr int kButtonSpacing = 5;
         }
 
-        namespace MainPanel
+        namespace BodyPanel
         {
             inline constexpr int kHeight = 760;
             inline constexpr int kSpacing = 15;
@@ -44,18 +44,18 @@ namespace tss
         namespace Gui
         {
             inline constexpr int kWidth = 1325;
-            inline constexpr int kHeight = HeaderPanel::kHeight + MainPanel::kHeight + FooterPanel::kHeight;
+            inline constexpr int kHeight = HeaderPanel::kHeight + BodyPanel::kHeight + FooterPanel::kHeight;
         }
 
         namespace Widget
         {
             namespace SectionName
             {
-                inline constexpr int kHeight = 25;
+                inline constexpr int kHeight = 30;
                 inline constexpr float kContentHeight = 20.0f;
-                inline constexpr float kLineHeight = 10.0f;
+                inline constexpr float kLineHeight = 12.0f;
                 inline constexpr float kLeftLineWidth = 20.0f;
-                inline constexpr float kTextSpacing = 10.0f;
+                inline constexpr float kTextSpacing = 5.0f;
             }
 
             namespace ModuleName

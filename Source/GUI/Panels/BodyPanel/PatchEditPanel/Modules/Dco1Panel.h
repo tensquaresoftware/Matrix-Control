@@ -15,12 +15,14 @@ namespace tss
     class ParameterSeparator;
 }
 
+class WidgetFactory;
+
 using tss::Skin;
 
 class Dco1Panel : public juce::Component
 {
 public:
-    explicit Dco1Panel(Skin& newSkin);
+    Dco1Panel(Skin& newSkin, WidgetFactory& widgetFactory);
     ~Dco1Panel() override;
 
     void paint(juce::Graphics&) override;

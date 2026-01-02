@@ -35,8 +35,8 @@ namespace tss
                 SkinColourChart::kWhite
             };
 
-            inline constexpr ColourElement kMainPanelBackground = {
-                "MainPanelBackground",
+            inline constexpr ColourElement kBodyPanelBackground = {
+                "BodyPanelBackground",
                 SkinColourChart::kDarkGrey2,
                 SkinColourChart::kCream,
                 SkinColourChart::kBlack

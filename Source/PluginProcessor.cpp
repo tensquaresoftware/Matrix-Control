@@ -18,15 +18,7 @@ PluginProcessor::PluginProcessor()
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
     , midiManager(std::make_unique<MidiManager>(apvts))
 {
-    // Initialize APVTS properties for MIDI port selection
-    if (!apvts.state.hasProperty("midiInputPortId"))
-    {
-        apvts.state.setProperty("midiInputPortId", juce::String(), nullptr);
-    }
-    if (!apvts.state.hasProperty("midiOutputPortId"))
-    {
-        apvts.state.setProperty("midiOutputPortId", juce::String(), nullptr);
-    }
+    initializeMidiPortProperties();
 }
 
 PluginProcessor::~PluginProcessor()
@@ -100,11 +92,7 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused(sampleRate, samplesPerBlock);
     
-    // Enable file logging now that JUCE is fully initialized
-    // This creates a new timestamped log file for each session
-    MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
-    MidiLogger::getInstance().setLogToFile(true);
-    
+    enableFileLoggingForSession();
     startMidiThread();
 }
 
@@ -119,10 +107,7 @@ void PluginProcessor::startMidiThread()
 void PluginProcessor::releaseResources()
 {
     stopMidiThread();
-    
-    // Close log file when releasing resources
-    // This ensures the "Session Ended" message is written
-    MidiLogger::getInstance().setLogToFile(false);
+    closeLogFileForSession();
 }
 
 void PluginProcessor::stopMidiThread()
@@ -190,6 +175,29 @@ void PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
 {
     return ApvtsFactory::createParameterLayout();
+}
+
+void PluginProcessor::initializeMidiPortProperties()
+{
+    if (!apvts.state.hasProperty("midiInputPortId"))
+    {
+        apvts.state.setProperty("midiInputPortId", juce::String(), nullptr);
+    }
+    if (!apvts.state.hasProperty("midiOutputPortId"))
+    {
+        apvts.state.setProperty("midiOutputPortId", juce::String(), nullptr);
+    }
+}
+
+void PluginProcessor::enableFileLoggingForSession()
+{
+    MidiLogger::getInstance().setLogLevel(MidiLogger::LogLevel::kDebug);
+    MidiLogger::getInstance().setLogToFile(true);
+}
+
+void PluginProcessor::closeLogFileForSession()
+{
+    MidiLogger::getInstance().setLogToFile(false);
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

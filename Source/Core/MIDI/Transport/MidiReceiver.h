@@ -37,6 +37,12 @@ private:
     std::mutex responseMutex;
 
     void processCompleteSysEx(const juce::MemoryBlock& completeSysEx);
+    bool checkIfResponseReceived();
+    juce::MemoryBlock getReceivedSysEx();
+    bool hasTimeoutElapsed(const std::chrono::steady_clock::time_point& startTime, int timeoutMs) const;
+    void logTimeoutAndReset(int timeoutMs);
+    void sleepToAvoidBusyWaiting();
+    void storeReceivedSysExAndNotify(const juce::MemoryBlock& completeSysEx);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiReceiver)
 };

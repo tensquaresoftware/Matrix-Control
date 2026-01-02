@@ -49,6 +49,9 @@ public:
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    void initializeMidiPortProperties();
+    void enableFileLoggingForSession();
+    void closeLogFileForSession();
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;

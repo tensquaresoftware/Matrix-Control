@@ -19,18 +19,19 @@ class PatchEditPanel;
 class MatrixModulationPanel;
 class PatchManagerPanel;
 class MasterEditPanel;
+class WidgetFactory;
 
-class MainPanel : public juce::Component
+class BodyPanel : public juce::Component
 {
 public:
-    explicit MainPanel(Skin& newSkin);
-    ~MainPanel() override;
+    BodyPanel(Skin& newSkin, WidgetFactory& widgetFactory);
+    ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(Skin& newSkin);
 
-    static int getHeight() { return tss::SkinDimensions::MainPanel::kHeight; }
+    static int getHeight() { return tss::SkinDimensions::BodyPanel::kHeight; }
 
 private:
 
@@ -43,6 +44,6 @@ private:
     std::unique_ptr<PanelSeparator> panelSeparator2;
     std::unique_ptr<MasterEditPanel> masterEditPanel;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BodyPanel)
 };
 

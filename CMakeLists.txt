@@ -18,7 +18,7 @@ elseif(WIN32)
     endif()
 endif()
 
-project(Matrix-Control VERSION 0.0.0)
+project(Matrix-Control VERSION 0.0.18)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -41,6 +41,8 @@ endif()
 set(PLUGIN_SOURCES
     # Core
     Source/Shared/ApvtsFactory.cpp
+    Source/Shared/SynthDescriptors.cpp
+    Source/Shared/WidgetFactory.cpp
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
     
@@ -64,16 +66,16 @@ set(PLUGIN_SOURCES
     # GUI - Panels
     Source/GUI/Panels/FooterPanel/FooterPanel.cpp
     Source/GUI/Panels/HeaderPanel/HeaderPanel.cpp
-    Source/GUI/Panels/MainPanel/MainPanel.cpp
-    Source/GUI/Panels/MainPanel/MasterEditPanel/MasterEditPanel.cpp
-    Source/GUI/Panels/MainPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/Dco1Panel.cpp
-    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/Dco2Panel.cpp
-    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/FmTrackPanel.cpp
-    Source/GUI/Panels/MainPanel/PatchEditPanel/PatchEditPanel.cpp
-    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/RampPortamentoPanel.cpp
-    Source/GUI/Panels/MainPanel/PatchEditPanel/Modules/VcfVcaPanel.cpp
-    Source/GUI/Panels/MainPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    Source/GUI/Panels/BodyPanel/BodyPanel.cpp
+    Source/GUI/Panels/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
+    Source/GUI/Panels/BodyPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/Dco1Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/Dco2Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/FmTrackPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/RampPortamentoPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/VcfVcaPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchManagerPanel/PatchManagerPanel.cpp
     
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp

@@ -16,17 +16,10 @@ bool SysExDecoder::decodePatchSysEx(const juce::MemoryBlock& sysEx, juce::uint8*
         return false;
     }
 
-    // Validate message first
-    auto validation = parser.validateSysEx(sysEx);
-    if (!validation.isValid || validation.messageType != SysExParser::MessageType::kPatch)
-    {
-        MidiLogger::getInstance().logError("decodePatchSysEx: validation failed");
+    if (!validatePatchSysExMessage(sysEx))
         return false;
-    }
 
-    // Extract packed data: F0 10 06 01 <patch_number> <nibbles...> <checksum> F7
-    // Data starts at index 5 (after F0 10 06 01 <patch_number>)
-    bool success = extractPackedData(sysEx, 5, SysExConstants::kPatchPackedDataSize, output);
+    bool success = extractPackedDataFromPatchSysEx(sysEx, output);
     if (success)
     {
         MidiLogger::getInstance().logInfo("Successfully decoded patch SysEx");
@@ -46,17 +39,10 @@ bool SysExDecoder::decodeMasterSysEx(const juce::MemoryBlock& sysEx, juce::uint8
         return false;
     }
 
-    // Validate message first
-    auto validation = parser.validateSysEx(sysEx);
-    if (!validation.isValid || validation.messageType != SysExParser::MessageType::kMaster)
-    {
-        MidiLogger::getInstance().logError("decodeMasterSysEx: validation failed");
+    if (!validateMasterSysExMessage(sysEx))
         return false;
-    }
 
-    // Extract packed data: F0 10 06 03 <version> <nibbles...> <checksum> F7
-    // Data starts at index 5 (after F0 10 06 03 <version>)
-    bool success = extractPackedData(sysEx, 5, SysExConstants::kMasterPackedDataSize, output);
+    bool success = extractPackedDataFromMasterSysEx(sysEx, output);
     if (success)
     {
         MidiLogger::getInstance().logInfo("Successfully decoded master SysEx");
@@ -81,38 +67,12 @@ DeviceIdInfo SysExDecoder::decodeDeviceId(const juce::MemoryBlock& sysEx) const
 
     const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
 
-    // Validate structure: F0 7E <chan> 06 02 10 06 00 02 00 <rev-0> <rev-1> <rev-2> <rev-3> F7
-    if (data[0] != SysExConstants::kSysExStart ||
-        data[1] != SysExConstants::DeviceInquiry::kUniversalNonRealtimeId ||
-        data[3] != SysExConstants::DeviceInquiry::kSubIdGeneralInfo ||
-        data[4] != SysExConstants::DeviceInquiry::kSubIdDeviceIdReply)
-    {
+    if (!validateDeviceInquiryStructure(data))
         return info;
-    }
 
-    // Extract device information
-    info.manufacturerId = data[5];
-    info.familyLow = data[6];
-    info.familyHigh = data[7];
-    info.memberLow = data[8];
-    info.memberHigh = data[9];
-
-    // Extract version (4 bytes, typically ASCII)
-    if (sysEx.getSize() >= 15)
-    {
-        char versionStr[5] = {0};
-        versionStr[0] = static_cast<char>(data[10]);
-        versionStr[1] = static_cast<char>(data[11]);
-        versionStr[2] = static_cast<char>(data[12]);
-        versionStr[3] = static_cast<char>(data[13]);
-        info.version = juce::String(versionStr).trim();
-    }
-
-    // Validate Matrix-1000
-    info.isValid = (info.manufacturerId == SysExConstants::DeviceInquiry::kExpectedManufacturer &&
-                    info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily &&
-                    info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow &&
-                    info.memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh);
+    extractDeviceInformation(data, info);
+    extractDeviceVersion(data, sysEx.getSize(), info);
+    validateMatrix1000Device(info);
 
     if (info.isValid)
     {
@@ -157,8 +117,7 @@ bool SysExDecoder::extractPackedData(const juce::MemoryBlock& sysEx,
     const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
     size_t totalSize = sysEx.getSize();
 
-    // Checksum is second-to-last byte (before F7)
-    size_t checksumIndex = totalSize - 2;
+    size_t checksumIndex = getChecksumIndex(totalSize);
     size_t numNibbles = checksumIndex - dataStartIndex;
 
     if (numNibbles != expectedPackedSize * 2)
@@ -166,8 +125,82 @@ bool SysExDecoder::extractPackedData(const juce::MemoryBlock& sysEx,
         return false;
     }
 
-    // Pack nibbles into bytes
     size_t packedBytes = packNibbles(&data[dataStartIndex], numNibbles, output);
     return packedBytes == expectedPackedSize;
+}
+
+bool SysExDecoder::validatePatchSysExMessage(const juce::MemoryBlock& sysEx) const
+{
+    auto validation = parser.validateSysEx(sysEx);
+    if (!validation.isValid || validation.messageType != SysExParser::MessageType::kPatch)
+    {
+        MidiLogger::getInstance().logError("decodePatchSysEx: validation failed");
+        return false;
+    }
+    return true;
+}
+
+bool SysExDecoder::extractPackedDataFromPatchSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const
+{
+    return extractPackedData(sysEx, 5, SysExConstants::kPatchPackedDataSize, output);
+}
+
+bool SysExDecoder::validateMasterSysExMessage(const juce::MemoryBlock& sysEx) const
+{
+    auto validation = parser.validateSysEx(sysEx);
+    if (!validation.isValid || validation.messageType != SysExParser::MessageType::kMaster)
+    {
+        MidiLogger::getInstance().logError("decodeMasterSysEx: validation failed");
+        return false;
+    }
+    return true;
+}
+
+bool SysExDecoder::extractPackedDataFromMasterSysEx(const juce::MemoryBlock& sysEx, juce::uint8* output) const
+{
+    return extractPackedData(sysEx, 5, SysExConstants::kMasterPackedDataSize, output);
+}
+
+bool SysExDecoder::validateDeviceInquiryStructure(const juce::uint8* data) const
+{
+    return data[0] == SysExConstants::kSysExStart &&
+           data[1] == SysExConstants::DeviceInquiry::kUniversalNonRealtimeId &&
+           data[3] == SysExConstants::DeviceInquiry::kSubIdGeneralInfo &&
+           data[4] == SysExConstants::DeviceInquiry::kSubIdDeviceIdReply;
+}
+
+void SysExDecoder::extractDeviceInformation(const juce::uint8* data, DeviceIdInfo& info) const
+{
+    info.manufacturerId = data[5];
+    info.familyLow = data[6];
+    info.familyHigh = data[7];
+    info.memberLow = data[8];
+    info.memberHigh = data[9];
+}
+
+void SysExDecoder::extractDeviceVersion(const juce::uint8* data, size_t messageSize, DeviceIdInfo& info) const
+{
+    if (messageSize >= 15)
+    {
+        char versionStr[5] = {0};
+        versionStr[0] = static_cast<char>(data[10]);
+        versionStr[1] = static_cast<char>(data[11]);
+        versionStr[2] = static_cast<char>(data[12]);
+        versionStr[3] = static_cast<char>(data[13]);
+        info.version = juce::String(versionStr).trim();
+    }
+}
+
+void SysExDecoder::validateMatrix1000Device(DeviceIdInfo& info) const
+{
+    info.isValid = (info.manufacturerId == SysExConstants::DeviceInquiry::kExpectedManufacturer &&
+                    info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily &&
+                    info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow &&
+                    info.memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh);
+}
+
+size_t SysExDecoder::getChecksumIndex(size_t totalSize) const
+{
+    return totalSize - 2;
 }
 

@@ -101,31 +101,18 @@ juce::MemoryBlock MidiReceiver::waitForSysExResponse(int timeoutMs)
     
     while (true)
     {
-        // Check if response received
+        if (checkIfResponseReceived())
         {
-            std::lock_guard<std::mutex> lock(responseMutex);
-            if (responseReceived.load())
-            {
-                responseReceived = false;
-                return receivedSysEx;
-            }
+            return getReceivedSysEx();
         }
 
-        // Check timeout
-        auto currentTime = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-            currentTime - startTime).count();
-
-        if (elapsed >= timeoutMs)
+        if (hasTimeoutElapsed(startTime, timeoutMs))
         {
-            MidiLogger::getInstance().logWarning("Timeout waiting for SysEx response (" + 
-                                                  juce::String(timeoutMs) + "ms)");
-            reset();
-            return {};  // Timeout
+            logTimeoutAndReset(timeoutMs);
+            return {};
         }
 
-        // Sleep to avoid busy-waiting
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        sleepToAvoidBusyWaiting();
     }
 }
 
@@ -147,20 +134,58 @@ bool MidiReceiver::isInputAvailable() const noexcept
 
 void MidiReceiver::processCompleteSysEx(const juce::MemoryBlock& completeSysEx)
 {
-    // Safety check: ensure we're not being destroyed
     if (isDestroying.load())
-    {
         return;
-    }
     
-    // Store the received SysEx and notify waiting thread
+    storeReceivedSysExAndNotify(completeSysEx);
+}
+
+bool MidiReceiver::checkIfResponseReceived()
+{
+    std::lock_guard<std::mutex> lock(responseMutex);
+    if (responseReceived.load())
     {
-        std::lock_guard<std::mutex> lock(responseMutex);
-        if (!isDestroying.load())
-        {
-            receivedSysEx = completeSysEx;
-            responseReceived = true;
-        }
+        responseReceived = false;
+        return true;
+    }
+    return false;
+}
+
+juce::MemoryBlock MidiReceiver::getReceivedSysEx()
+{
+    std::lock_guard<std::mutex> lock(responseMutex);
+    return receivedSysEx;
+}
+
+bool MidiReceiver::hasTimeoutElapsed(
+    const std::chrono::steady_clock::time_point& startTime,
+    int timeoutMs) const
+{
+    auto currentTime = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        currentTime - startTime).count();
+    return elapsed >= timeoutMs;
+}
+
+void MidiReceiver::logTimeoutAndReset(int timeoutMs)
+{
+    MidiLogger::getInstance().logWarning("Timeout waiting for SysEx response (" + 
+                                          juce::String(timeoutMs) + "ms)");
+    reset();
+}
+
+void MidiReceiver::sleepToAvoidBusyWaiting()
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+}
+
+void MidiReceiver::storeReceivedSysExAndNotify(const juce::MemoryBlock& completeSysEx)
+{
+    std::lock_guard<std::mutex> lock(responseMutex);
+    if (!isDestroying.load())
+    {
+        receivedSysEx = completeSysEx;
+        responseReceived = true;
     }
 }
 

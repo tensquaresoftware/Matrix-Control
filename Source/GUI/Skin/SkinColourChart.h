@@ -22,9 +22,9 @@ struct SkinColourChart
     static constexpr juce::uint32 kRed                = 0xFFFF0000;
     static constexpr juce::uint32 kOrange             = 0xFFFF6600;
     static constexpr juce::uint32 kYellow             = 0xFFFFFF00;
-    static constexpr juce::uint32 kBlue               = 0xFF0560BE;
+    static constexpr juce::uint32 kBlue               = 0xFF045FBE;
     
-    static constexpr juce::uint32 kGreen1             = 0xFF002D0F;
+    static constexpr juce::uint32 kGreen1             = 0xFF002D0E;
     static constexpr juce::uint32 kGreen2             = 0xFF06471C;
     static constexpr juce::uint32 kGreen3             = 0xFF00785E;
     static constexpr juce::uint32 kGreen4             = 0xFF00DDAD;

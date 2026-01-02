@@ -8,46 +8,93 @@
 #include "../../../../Widgets/ComboBox.h"
 #include "../../../../Widgets/Button.h"
 #include "../../../../Widgets/ParameterSeparator.h"
+#include "../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../Shared/WidgetFactory.h"
 
 using tss::Skin;
 
-Dco1Panel::Dco1Panel(Skin& newSkin)
+Dco1Panel::Dco1Panel(Skin& newSkin, WidgetFactory& widgetFactory)
     : skin(&newSkin)
-    , dco1ModuleName(std::make_unique<tss::ModuleName>(newSkin, "DCO 1"))
-    , dco1InitButton(std::make_unique<tss::Button>(newSkin, tss::SkinDimensions::Widget::Button::kDefaultWidth, "I"))
-    , dco1CopyButton(std::make_unique<tss::Button>(newSkin, tss::SkinDimensions::Widget::Button::kDefaultWidth, "C"))
-    , dco1PasteButton(std::make_unique<tss::Button>(newSkin, tss::SkinDimensions::Widget::Button::kDefaultWidth, "P"))
-    , dco1FrequencyLabel(std::make_unique<tss::ParameterLabel>(newSkin, "FREQUENCY"))
-    , dco1FrequencySlider(std::make_unique<tss::Slider>(newSkin))
-    , parameterSeparator1(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1FrequencyModByLfo1Label(std::make_unique<tss::ParameterLabel>(newSkin, "FREQ MOD BY LFO 1"))
-    , dco1FrequencyModByLfo1Slider(std::make_unique<tss::Slider>(newSkin))
-    , parameterSeparator2(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1SyncLabel(std::make_unique<tss::ParameterLabel>(newSkin, "SYNC"))
-    , dco1SyncComboBox(std::make_unique<tss::ComboBox>(newSkin))
-    , parameterSeparator3(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1PulseWidthLabel(std::make_unique<tss::ParameterLabel>(newSkin, "PULSE WIDTH"))
-    , dco1PulseWidthSlider(std::make_unique<tss::Slider>(newSkin))
-    , parameterSeparator4(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1PulseWidthModByLfo2Label(std::make_unique<tss::ParameterLabel>(newSkin, "PW MOD BY LFO 2"))
-    , dco1PulseWidthModByLfo2Slider(std::make_unique<tss::Slider>(newSkin))
-    , parameterSeparator5(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1WaveShapeLabel(std::make_unique<tss::ParameterLabel>(newSkin, "WAVE SHAPE"))
-    , dco1WaveShapeSlider(std::make_unique<tss::Slider>(newSkin))
-    , parameterSeparator6(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1WaveSelectLabel(std::make_unique<tss::ParameterLabel>(newSkin, "WAVE SELECT"))
-    , dco1WaveSelectComboBox(std::make_unique<tss::ComboBox>(newSkin))
-    , parameterSeparator7(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1LeversLabel(std::make_unique<tss::ParameterLabel>(newSkin, "LEVERS"))
-    , dco1LeversComboBox(std::make_unique<tss::ComboBox>(newSkin))
-    , parameterSeparator8(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1KeyboardPortamentoLabel(std::make_unique<tss::ParameterLabel>(newSkin, "KEYBOARD/PORTAMENTO"))
-    , dco1KeyboardPortamentoComboBox(std::make_unique<tss::ComboBox>(newSkin))
-    , parameterSeparator9(std::make_unique<tss::ParameterSeparator>(newSkin))
-    , dco1KeyClickLabel(std::make_unique<tss::ParameterLabel>(newSkin, "KEY CLICK"))
-    , dco1KeyClickComboBox(std::make_unique<tss::ComboBox>(newSkin))
-    , parameterSeparator10(std::make_unique<tss::ParameterSeparator>(newSkin))
 {
+    dco1ModuleName = std::make_unique<tss::ModuleName>(
+        newSkin, 
+        widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kDco1)
+    );
+
+    dco1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Init, newSkin);
+    dco1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Copy, newSkin);
+    dco1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Paste, newSkin);
+
+    dco1FrequencyLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Frequency)
+    );
+    dco1FrequencySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1Frequency, newSkin);
+    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1FrequencyModByLfo1Label = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1)
+    );
+    dco1FrequencyModByLfo1Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1, newSkin);
+    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1SyncLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Sync)
+    );
+    dco1SyncComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1Sync, newSkin);
+    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1PulseWidthLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1PulseWidth)
+    );
+    dco1PulseWidthSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1PulseWidth, newSkin);
+    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1PulseWidthModByLfo2Label = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2)
+    );
+    dco1PulseWidthModByLfo2Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2, newSkin);
+    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1WaveShapeLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1WaveShape)
+    );
+    dco1WaveShapeSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1WaveShape, newSkin);
+    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1WaveSelectLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1WaveSelect)
+    );
+    dco1WaveSelectComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1WaveSelect, newSkin);
+    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1LeversLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Levers)
+    );
+    dco1LeversComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1Levers, newSkin);
+    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1KeyboardPortamentoLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1KeyboardPortamento)
+    );
+    dco1KeyboardPortamentoComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1KeyboardPortamento, newSkin);
+    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
+    dco1KeyClickLabel = std::make_unique<tss::ParameterLabel>(
+        newSkin, 
+        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1KeyClick)
+    );
+    dco1KeyClickComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1KeyClick, newSkin);
+    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(newSkin);
+
     addAndMakeVisible(*dco1ModuleName);
     addAndMakeVisible(*dco1InitButton);
     addAndMakeVisible(*dco1CopyButton);

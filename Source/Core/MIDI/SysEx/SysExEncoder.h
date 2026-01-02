@@ -21,6 +21,15 @@ public:
 
 private:
     std::vector<juce::uint8> buildHeader(juce::uint8 opcode, juce::uint8 headerData = 0) const;
+    std::vector<juce::uint8> unpackBytesToNibbles(const juce::uint8* packedData, size_t numBytes) const;
+    juce::MemoryBlock buildCompletePatchSysExMessage(
+        const std::vector<juce::uint8>& header,
+        const std::vector<juce::uint8>& nibbles,
+        juce::uint8 checksum) const;
+    juce::MemoryBlock buildCompleteMasterSysExMessage(
+        const std::vector<juce::uint8>& header,
+        const std::vector<juce::uint8>& nibbles,
+        juce::uint8 checksum) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SysExEncoder)
 };

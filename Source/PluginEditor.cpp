@@ -1,14 +1,19 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "GUI/Skin/SkinFactory.h"
+#include "Shared/WidgetFactory.h"
+#include "Shared/ApvtsFactory.h"
 
 PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
+    validateSynthDescriptorsAtStartup();
+    
     skin = tss::SkinFactory::createSkin(tss::Skin::ColourVariant::Black);
     
-    mainComponent = std::make_unique<MainComponent>(*skin);
+    widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
+    mainComponent = std::make_unique<MainComponent>(*skin, *widgetFactory);
     addAndMakeVisible(*mainComponent);
     
     auto& headerPanel = mainComponent->getHeaderPanel();
@@ -61,5 +66,19 @@ void PluginEditor::updateSkin()
         mainComponent->setSkin(*skin);
     }
     repaint();
+}
+
+void PluginEditor::validateSynthDescriptorsAtStartup()
+{
+    auto validationResult = ApvtsFactory::validateSynthDescriptors();
+    if (!validationResult.isValid)
+    {
+        DBG("SynthDescriptors validation failed:");
+        for (const auto& error : validationResult.errors)
+        {
+            DBG("  ERROR: " + error);
+        }
+        jassertfalse;
+    }
 }
 

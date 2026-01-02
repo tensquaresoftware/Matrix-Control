@@ -30,7 +30,7 @@ namespace tss
 
         // Panel colours ------------------------------------------------------
         juce::Colour getHeaderPanelBackgroundColour() const;
-        juce::Colour getMainPanelBackgroundColour() const;
+        juce::Colour getBodyPanelBackgroundColour() const;
         juce::Colour getFooterPanelBackgroundColour() const;
         juce::Colour getPatchEditPanelBackgroundColour() const;
         juce::Colour getPatchEditModulePanelBackgroundColour() const;
@@ -124,9 +124,9 @@ namespace tss
         int getHeaderButtonHeight() const;
         int getHeaderButtonSpacing() const;
 
-        // MainPanel dimensions -----------------------------------------------
-        int getMainPanelHeight() const;
-        int getMainPanelSpacing() const;
+        // BodyPanel dimensions -----------------------------------------------
+        int getBodyPanelHeight() const;
+        int getBodyPanelSpacing() const;
 
         // FooterPanel dimensions ---------------------------------------------
         int getFooterPanelHeight() const;
