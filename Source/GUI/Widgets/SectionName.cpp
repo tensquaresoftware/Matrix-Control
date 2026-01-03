@@ -1,27 +1,26 @@
 #include "SectionName.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    SectionName::SectionName(Skin& newSkin, int width, const juce::String& text, ColourVariant variant)
-        : skin(&newSkin)
+    SectionName::SectionName(Theme& newTheme, int width, const juce::String& text, ColourVariant variant)
+        : theme(&newTheme)
         , name(text)
         , colourVariant(variant)
     {
-        setSize(width, SkinDimensions::Widget::SectionName::kHeight);
+        setSize(width, kHeight);
     }
 
-    void SectionName::setSkin(Skin& newSkin)
+    void SectionName::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
     void SectionName::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -37,14 +36,14 @@ namespace tss
 
     void SectionName::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        g.setColour(skin->getSectionNameBaseColour());
+        g.setColour(theme->getSectionNameBaseColour());
         g.fillRect(bounds);
     }
 
     void SectionName::drawContentArea(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto contentArea = getContentArea(bounds);
-        g.setColour(skin->getSectionNameContentAreaColour());
+        g.setColour(theme->getSectionNameContentAreaColour());
         g.fillRect(contentArea);
     }
 
@@ -55,15 +54,15 @@ namespace tss
             return;
         }
 
-        auto leftLineWidth = skin->getSectionNameLeftLineWidth();
-        auto textSpacing = skin->getSectionNameTextSpacing();
+        auto leftLineWidth = kLeftLineWidth;
+        auto textSpacing = kTextSpacing;
         auto contentArea = getContentArea(bounds);
         auto textBounds = contentArea;
         textBounds.removeFromLeft(leftLineWidth + textSpacing);
         textBounds.setWidth(calculateTextWidth());
 
-        g.setColour(skin->getSectionNameTextColour());
-        g.setFont(skin->getSectionNameFont());
+        g.setColour(theme->getSectionNameTextColour());
+        g.setFont(theme->getBaseFont().withHeight(20.0f));
         g.drawText(name, textBounds, juce::Justification::topLeft, false);
     }
 
@@ -71,8 +70,8 @@ namespace tss
     {
         g.setColour(getLineColour());
 
-        auto leftLineWidth = skin->getSectionNameLeftLineWidth();
-        auto lineHeight = skin->getSectionNameLineHeight();
+        auto leftLineWidth = kLeftLineWidth;
+        auto lineHeight = kLineHeight;
         auto contentArea = getContentArea(bounds);
         auto verticalOffset = (contentArea.getHeight() - lineHeight) / 2.0f;
         
@@ -87,8 +86,8 @@ namespace tss
     void SectionName::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto textWidth = calculateTextWidth();
-        auto leftLineWidth = skin->getSectionNameLeftLineWidth();
-        auto textSpacing = skin->getSectionNameTextSpacing();
+        auto leftLineWidth = kLeftLineWidth;
+        auto textSpacing = kTextSpacing;
         auto lineStartX = leftLineWidth + textSpacing + textWidth + textSpacing;
         auto remainingWidth = bounds.getWidth() - lineStartX;
 
@@ -96,7 +95,7 @@ namespace tss
         {
             g.setColour(getLineColour());
 
-            auto lineHeight = skin->getSectionNameLineHeight();
+            auto lineHeight = kLineHeight;
             auto contentArea = getContentArea(bounds);
             auto verticalOffset = (contentArea.getHeight() - lineHeight) / 2.0f;
             
@@ -112,13 +111,13 @@ namespace tss
     juce::Colour SectionName::getLineColour() const
     {
         return (colourVariant == ColourVariant::Blue) 
-            ? skin->getSectionNameLineColourBlue() 
-            : skin->getSectionNameLineColourOrange();
+            ? theme->getSectionNameLineColourBlue() 
+            : theme->getSectionNameLineColourOrange();
     }
 
     juce::Rectangle<float> SectionName::getContentArea(const juce::Rectangle<float>& bounds) const
     {
-        auto contentHeight = skin->getSectionNameContentHeight();
+        auto contentHeight = kContentHeight;
         auto contentArea = bounds;
         contentArea.setHeight(contentHeight);
         return contentArea;
@@ -126,12 +125,12 @@ namespace tss
 
     float SectionName::calculateTextWidth() const
     {
-        if (name.isEmpty() || skin == nullptr)
+        if (name.isEmpty() || theme == nullptr)
         {
             return 0.0f;
         }
 
-        auto font = skin->getSectionNameFont();
+        auto font = theme->getBaseFont().withHeight(20.0f);
         juce::GlyphArrangement glyphArrangement;
         glyphArrangement.addLineOfText(font, name, 0.0f, 0.0f);
         auto bounds = glyphArrangement.getBoundingBox(0, -1, true);

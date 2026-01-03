@@ -3,37 +3,43 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "../../Widgets/Button.h"
-#include "../../Skin/SkinDimensions.h"
 
 namespace tss
 {
-    class Skin;
+    class Theme;
     class Button;
 }
 
-using tss::Skin;
+using tss::Theme;
 using tss::Button;
 
 class HeaderPanel : public juce::Component
 {
 public:
-    explicit HeaderPanel(Skin& skin);
+    explicit HeaderPanel(Theme& newTheme);
     ~HeaderPanel() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(Skin& skin);
+    void setTheme(Theme& newTheme);
 
     Button& getButtonBlack() { return buttonBlack; }
     Button& getButtonCream() { return buttonCream; }
     Button& getButtonDebug() { return buttonDebug; }
     Button& getButtonDisabled() { return buttonDisabled; }
 
-    static int getHeight() { return tss::SkinDimensions::HeaderPanel::kHeight; }
+    static int getHeight() { return kHeight; }
+    static int getButtonWidth() { return kButtonWidth; }
+    static int getButtonHeight() { return kButtonHeight; }
+    static int getButtonSpacing() { return kButtonSpacing; }
 
 private:
+    inline constexpr static int kHeight = 30;
+    inline constexpr static int kButtonWidth = 70;
+    inline constexpr static int kButtonHeight = 20;
+    inline constexpr static int kButtonSpacing = 5;
 
-    Skin* skin;
+    Theme* theme;
 
     Button buttonBlack;
     Button buttonCream;

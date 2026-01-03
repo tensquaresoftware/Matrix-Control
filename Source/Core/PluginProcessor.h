@@ -49,6 +49,7 @@ public:
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    void validateSynthDescriptorsAtStartup();
     void initializeMidiPortProperties();
     void enableFileLoggingForSession();
     void closeLogFileForSession();

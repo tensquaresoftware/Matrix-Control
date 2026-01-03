@@ -5,17 +5,15 @@
 #include "Panels/BodyPanel/BodyPanel.h"
 #include "Panels/FooterPanel/FooterPanel.h"
 #include "Factories/WidgetFactory.h"
-#include "../Core/Factories/ApvtsFactory.h"
 
 PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
-    validateSynthDescriptorsAtStartup();
-    
     theme = tss::Theme::create(tss::Theme::ColourVariant::Black);
     
     widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
+    
     mainComponent = std::make_unique<MainComponent>(*theme, *widgetFactory);
     addAndMakeVisible(*mainComponent);
     
@@ -41,7 +39,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     setWantsKeyboardFocus(false);
     setInterceptsMouseClicks(true, true);
     
-    setSize(1325, HeaderPanel::kHeight + BodyPanel::kHeight + FooterPanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 PluginEditor::~PluginEditor() = default;
@@ -69,19 +67,5 @@ void PluginEditor::updateTheme()
         mainComponent->setTheme(*theme);
     }
     repaint();
-}
-
-void PluginEditor::validateSynthDescriptorsAtStartup()
-{
-    auto validationResult = ApvtsFactory::validateSynthDescriptors();
-    if (!validationResult.isValid)
-    {
-        DBG("SynthDescriptors validation failed:");
-        for (const auto& error : validationResult.errors)
-        {
-            DBG("  ERROR: " + error);
-        }
-        jassertfalse;
-    }
 }
 

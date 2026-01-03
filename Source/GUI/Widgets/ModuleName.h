@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 
     class ModuleName : public juce::Component
     {
@@ -21,26 +21,37 @@ namespace tss
             Orange
         };
 
-        explicit ModuleName(Skin& newSkin, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
+        explicit ModuleName(Theme& newTheme, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
         ~ModuleName() override = default;
 
-        void setSkin(Skin& newSkin);
+        void setTheme(Theme& newTheme);
         
         void setText(const juce::String& newText);
         juce::String getText() const { return name; }
 
         void paint(juce::Graphics& g) override;
 
+        static constexpr int getNormalWidth() { return kNormalWidth; }
+        static constexpr int getHeight() { return kHeight; }
+
     private:
+        inline constexpr static int kNormalWidth = 150;
+        inline constexpr static int kLargeWidth = 225;
+        inline constexpr static int kHeight = 30;
+        
+        inline constexpr static float kTextLeftPadding = 2.0f;
+        inline constexpr static float kTextAreaHeight = 20.0f;
+        inline constexpr static float kLineThickness = 3.0f;
+
+        Theme* theme = nullptr;
+        juce::String name;
+        ColourVariant colourVariant;
+
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         
         juce::Colour getLineColour() const;
-
-        Skin* skin = nullptr;
-        juce::String name;
-        ColourVariant colourVariant;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleName)
     };

@@ -11,12 +11,6 @@
 class MidiLogger
 {
 public:
-    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Logs/MIDI";
-    static constexpr const char* kLogFilenamePrefix = "midi-log";
-    
-    static constexpr int kMinLogLineWidth = 60;
-    static constexpr int kLogLineWidth = 80;
-    
     enum class LogLevel
     {
         kNone    = 0,
@@ -45,11 +39,30 @@ public:
     juce::String formatSysExMessage(const juce::MemoryBlock& sysEx) const;
     
 private:
+    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Logs/MIDI";
+    static constexpr const char* kLogFilenamePrefix = "midi-log";
+    
+    static constexpr int kMinLogLineWidth = 60;
+    static constexpr int kLogLineWidth = 80;
+    
+    static constexpr const char* kLogLevelNames[] = {
+        "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
+    };
+    
+    static constexpr int kLogLevelColumnWidth = 9;
+
+    LogLevel currentLogLevel = LogLevel::kInfo;
+    bool logToFile = false;
+    bool logToConsole = true;
+    juce::File logFile;
+    std::unique_ptr<std::ofstream> fileStream;
+    std::mutex logMutex;
+
     MidiLogger() = default;
     ~MidiLogger() = default;
     MidiLogger(const MidiLogger&) = delete;
     MidiLogger& operator=(const MidiLogger&) = delete;
-    
+
     void writeLog(const juce::String& formattedMessage);
     void writeLogRaw(const juce::String& message);
 
@@ -78,18 +91,5 @@ private:
     juce::String analyzeSysExMessage(const juce::MemoryBlock& sysEx) const;
     juce::uint8 extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const;
     juce::MemoryBlock addSysExDelimiters(const juce::MemoryBlock& sysEx) const;
-    
-    LogLevel currentLogLevel = LogLevel::kInfo;
-    bool logToFile = false;
-    bool logToConsole = true;
-    juce::File logFile;
-    std::unique_ptr<std::ofstream> fileStream;
-    std::mutex logMutex;
-    
-    static constexpr const char* kLogLevelNames[] = {
-        "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
-    };
-    
-    static constexpr int kLogLevelColumnWidth = 9;
 };
 

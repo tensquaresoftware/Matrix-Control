@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
     class ComboBox;
 
     class PopupMenu : public juce::Component
@@ -26,6 +26,21 @@ namespace tss
         static void show(ComboBox& comboBox);
 
     private:
+        inline constexpr static int kItemHeight = 20;
+        inline constexpr static float kBorderThickness = 1.0f;
+        inline constexpr static int kSeparatorWidth = 1;
+        inline constexpr static int kTextLeftPadding = 3;
+        inline constexpr static int kColumnThreshold = 10;
+
+        ComboBox& comboBox;
+        Theme* theme = nullptr;
+        int highlightedItemIndex = -1;
+        juce::Font cachedFont { juce::FontOptions() };
+        
+        int columnCount = 1;
+        int itemsPerColumn = 0;
+        int columnWidth = 0;
+
         void calculateColumnLayout();
         int calculateColumnCount(int totalItems) const;
         int calculateItemsPerColumn(int totalItems, int columnCount) const;
@@ -59,15 +74,6 @@ namespace tss
         bool isValidItemIndex(int itemIndex) const;
         bool hasValidLookAndFeel() const;
         bool hasValidParent() const;
-
-        ComboBox& comboBox;
-        Skin* skin = nullptr;
-        int highlightedItemIndex = -1;
-        juce::Font cachedFont { juce::FontOptions() };
-        
-        int columnCount = 1;
-        int itemsPerColumn = 0;
-        int columnWidth = 0;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PopupMenu)
     };

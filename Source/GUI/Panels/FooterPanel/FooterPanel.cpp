@@ -1,26 +1,26 @@
 #include "FooterPanel.h"
 
-#include "../../Skin/Skin.h"
+#include "../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-FooterPanel::FooterPanel(Skin& newSkin)
-    : skin(&newSkin)
+FooterPanel::FooterPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
 }
 
 void FooterPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(skin->getFooterPanelBackgroundColour());
+        g.fillAll(theme->getFooterPanelBackgroundColour());
 }
 
 void FooterPanel::resized()
 {
 }
 
-void FooterPanel::setSkin(Skin& newSkin)
+void FooterPanel::setTheme(Theme& newTheme)
 {
-        skin = &newSkin;
+        theme = &newTheme;
     repaint();
 }
 

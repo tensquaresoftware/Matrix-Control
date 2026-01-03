@@ -1,29 +1,28 @@
 #include "RampPortamentoPanel.h"
 
-#include "../../../../Skin/Skin.h"
-#include "../../../../Skin/SkinDimensions.h"
+#include "../../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-RampPortamentoPanel::RampPortamentoPanel(Skin& newSkin)
-    : skin(&newSkin)
+RampPortamentoPanel::RampPortamentoPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(tss::SkinDimensions::PatchEditModulePanel::kWidth, tss::SkinDimensions::PatchEditModulePanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 void RampPortamentoPanel::paint(juce::Graphics& g)
 {
-    if (skin == nullptr)
+    if (theme == nullptr)
     {
         return;
     }
 
-    g.fillAll(skin->getPatchEditModulePanelBackgroundColour());
+    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
-void RampPortamentoPanel::setSkin(Skin& newSkin)
+void RampPortamentoPanel::setTheme(Theme& newTheme)
 {
-    skin = &newSkin;
+    theme = &newTheme;
     repaint();
 }
 

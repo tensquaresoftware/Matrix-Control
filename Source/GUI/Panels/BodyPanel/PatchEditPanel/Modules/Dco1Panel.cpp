@@ -1,7 +1,6 @@
 #include "Dco1Panel.h"
 
-#include "../../../../Skin/Skin.h"
-#include "../../../../Skin/SkinDimensions.h"
+#include "../../../../Themes/Theme.h"
 #include "../../../../Widgets/ModuleName.h"
 #include "../../../../Widgets/ParameterLabel.h"
 #include "../../../../Widgets/Slider.h"
@@ -9,91 +8,91 @@
 #include "../../../../Widgets/Button.h"
 #include "../../../../Widgets/ParameterSeparator.h"
 #include "../../../../../Shared/SynthDescriptors.h"
-#include "../../../../../Shared/WidgetFactory.h"
+#include "../../../../../GUI/Factories/WidgetFactory.h"
 
-using tss::Skin;
+using tss::Theme;
 
-Dco1Panel::Dco1Panel(Skin& newSkin, WidgetFactory& widgetFactory)
-    : skin(&newSkin)
+Dco1Panel::Dco1Panel(Theme& newTheme, WidgetFactory& widgetFactory)
+    : theme(&newTheme)
 {
     dco1ModuleName = std::make_unique<tss::ModuleName>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kDco1)
     );
 
-    dco1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Init, newSkin);
-    dco1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Copy, newSkin);
-    dco1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Paste, newSkin);
+    dco1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Init, newTheme);
+    dco1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Copy, newTheme);
+    dco1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco1Paste, newTheme);
 
     dco1FrequencyLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Frequency)
     );
-    dco1FrequencySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1Frequency, newSkin);
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1FrequencySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1Frequency, newTheme);
+    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1FrequencyModByLfo1Label = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1)
     );
-    dco1FrequencyModByLfo1Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1, newSkin);
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1FrequencyModByLfo1Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1, newTheme);
+    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1SyncLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Sync)
     );
-    dco1SyncComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1Sync, newSkin);
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1SyncComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1Sync, newTheme);
+    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1PulseWidthLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1PulseWidth)
     );
-    dco1PulseWidthSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1PulseWidth, newSkin);
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1PulseWidthSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1PulseWidth, newTheme);
+    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1PulseWidthModByLfo2Label = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2)
     );
-    dco1PulseWidthModByLfo2Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2, newSkin);
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1PulseWidthModByLfo2Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2, newTheme);
+    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1WaveShapeLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1WaveShape)
     );
-    dco1WaveShapeSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1WaveShape, newSkin);
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1WaveShapeSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kDco1WaveShape, newTheme);
+    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1WaveSelectLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1WaveSelect)
     );
-    dco1WaveSelectComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1WaveSelect, newSkin);
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1WaveSelectComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1WaveSelect, newTheme);
+    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1LeversLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Levers)
     );
-    dco1LeversComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1Levers, newSkin);
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1LeversComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1Levers, newTheme);
+    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1KeyboardPortamentoLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1KeyboardPortamento)
     );
-    dco1KeyboardPortamentoComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1KeyboardPortamento, newSkin);
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1KeyboardPortamentoComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1KeyboardPortamento, newTheme);
+    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     dco1KeyClickLabel = std::make_unique<tss::ParameterLabel>(
-        newSkin, 
+        newTheme, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1KeyClick)
     );
-    dco1KeyClickComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1KeyClick, newSkin);
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(newSkin);
+    dco1KeyClickComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kDco1KeyClick, newTheme);
+    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(newTheme);
 
     addAndMakeVisible(*dco1ModuleName);
     addAndMakeVisible(*dco1InitButton);
@@ -130,35 +129,35 @@ Dco1Panel::Dco1Panel(Skin& newSkin, WidgetFactory& widgetFactory)
     addAndMakeVisible(*dco1KeyClickComboBox);
     addAndMakeVisible(*parameterSeparator10);
 
-    setSize(tss::SkinDimensions::PatchEditModulePanel::kWidth, tss::SkinDimensions::PatchEditModulePanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 Dco1Panel::~Dco1Panel() = default;
 
 void Dco1Panel::paint(juce::Graphics& g)
 {
-    if (skin == nullptr)
+    if (theme == nullptr)
     {
         return;
     }
 
-    g.fillAll(skin->getPatchEditModulePanelBackgroundColour());
+    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
 void Dco1Panel::resized()
 {
-    const auto moduleNameHeight = tss::SkinDimensions::Widget::ModuleName::kHeight;
-    const auto moduleNameWidth = tss::SkinDimensions::Widget::ModuleName::kNormalWidth;
-    const auto buttonWidth = tss::SkinDimensions::Widget::Button::kDefaultWidth;
-    const auto buttonHeight = tss::SkinDimensions::Widget::Button::kHeight;
-    const auto labelWidth = tss::SkinDimensions::Widget::ParameterLabel::kWidth;
-    const auto labelHeight = tss::SkinDimensions::Widget::ParameterLabel::kHeight;
-    const auto sliderWidth = tss::SkinDimensions::Widget::Slider::kWidth;
-    const auto sliderHeight = tss::SkinDimensions::Widget::Slider::kHeight;
-    const auto comboBoxWidth = tss::SkinDimensions::Widget::ComboBox::kNormalWidth;
-    const auto comboBoxHeight = tss::SkinDimensions::Widget::ComboBox::kHeight;
-    const auto separatorWidth = tss::SkinDimensions::Widget::ParameterSeparator::kWidth;
-    const auto separatorHeight = tss::SkinDimensions::Widget::ParameterSeparator::kHeight;
+    const auto moduleNameHeight = tss::ModuleName::getHeight();
+    const auto moduleNameWidth = tss::ModuleName::getNormalWidth();
+    const auto buttonWidth = tss::Button::getDefaultWidth();
+    const auto buttonHeight = tss::Button::getHeight();
+    const auto labelWidth = tss::ParameterLabel::getWidth();
+    const auto labelHeight = tss::ParameterLabel::getHeight();
+    const auto sliderWidth = tss::Slider::getWidth();
+    const auto sliderHeight = tss::Slider::getHeight();
+    const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
+    const auto comboBoxHeight = tss::ComboBox::getHeight();
+    const auto separatorWidth = tss::ParameterSeparator::getWidth();
+    const auto separatorHeight = tss::ParameterSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
@@ -374,178 +373,178 @@ void Dco1Panel::resized()
     }
 }
 
-void Dco1Panel::setSkin(Skin& newSkin)
+void Dco1Panel::setTheme(Theme& newTheme)
 {
-    skin = &newSkin;
+    theme = &newTheme;
 
     if (dco1ModuleName != nullptr)
     {
-        dco1ModuleName->setSkin(newSkin);
+        dco1ModuleName->setTheme(newTheme);
     }
 
     if (dco1InitButton != nullptr)
     {
-        dco1InitButton->setSkin(newSkin);
+        dco1InitButton->setTheme(newTheme);
     }
 
     if (dco1CopyButton != nullptr)
     {
-        dco1CopyButton->setSkin(newSkin);
+        dco1CopyButton->setTheme(newTheme);
     }
 
     if (dco1PasteButton != nullptr)
     {
-        dco1PasteButton->setSkin(newSkin);
+        dco1PasteButton->setTheme(newTheme);
     }
 
     if (dco1FrequencyLabel != nullptr)
     {
-        dco1FrequencyLabel->setSkin(newSkin);
+        dco1FrequencyLabel->setTheme(newTheme);
     }
 
     if (dco1FrequencySlider != nullptr)
     {
-        dco1FrequencySlider->setSkin(newSkin);
+        dco1FrequencySlider->setTheme(newTheme);
     }
 
     if (parameterSeparator1 != nullptr)
     {
-        parameterSeparator1->setSkin(newSkin);
+        parameterSeparator1->setTheme(newTheme);
     }
 
     if (dco1FrequencyModByLfo1Label != nullptr)
     {
-        dco1FrequencyModByLfo1Label->setSkin(newSkin);
+        dco1FrequencyModByLfo1Label->setTheme(newTheme);
     }
 
     if (dco1FrequencyModByLfo1Slider != nullptr)
     {
-        dco1FrequencyModByLfo1Slider->setSkin(newSkin);
+        dco1FrequencyModByLfo1Slider->setTheme(newTheme);
     }
 
     if (parameterSeparator2 != nullptr)
     {
-        parameterSeparator2->setSkin(newSkin);
+        parameterSeparator2->setTheme(newTheme);
     }
 
     if (dco1SyncLabel != nullptr)
     {
-        dco1SyncLabel->setSkin(newSkin);
+        dco1SyncLabel->setTheme(newTheme);
     }
 
     if (dco1SyncComboBox != nullptr)
     {
-        dco1SyncComboBox->setSkin(newSkin);
+        dco1SyncComboBox->setTheme(newTheme);
     }
 
     if (parameterSeparator3 != nullptr)
     {
-        parameterSeparator3->setSkin(newSkin);
+        parameterSeparator3->setTheme(newTheme);
     }
 
     if (dco1PulseWidthLabel != nullptr)
     {
-        dco1PulseWidthLabel->setSkin(newSkin);
+        dco1PulseWidthLabel->setTheme(newTheme);
     }
 
     if (dco1PulseWidthSlider != nullptr)
     {
-        dco1PulseWidthSlider->setSkin(newSkin);
+        dco1PulseWidthSlider->setTheme(newTheme);
     }
 
     if (parameterSeparator4 != nullptr)
     {
-        parameterSeparator4->setSkin(newSkin);
+        parameterSeparator4->setTheme(newTheme);
     }
 
     if (dco1PulseWidthModByLfo2Label != nullptr)
     {
-        dco1PulseWidthModByLfo2Label->setSkin(newSkin);
+        dco1PulseWidthModByLfo2Label->setTheme(newTheme);
     }
 
     if (dco1PulseWidthModByLfo2Slider != nullptr)
     {
-        dco1PulseWidthModByLfo2Slider->setSkin(newSkin);
+        dco1PulseWidthModByLfo2Slider->setTheme(newTheme);
     }
 
     if (parameterSeparator5 != nullptr)
     {
-        parameterSeparator5->setSkin(newSkin);
+        parameterSeparator5->setTheme(newTheme);
     }
 
     if (dco1WaveShapeLabel != nullptr)
     {
-        dco1WaveShapeLabel->setSkin(newSkin);
+        dco1WaveShapeLabel->setTheme(newTheme);
     }
 
     if (dco1WaveShapeSlider != nullptr)
     {
-        dco1WaveShapeSlider->setSkin(newSkin);
+        dco1WaveShapeSlider->setTheme(newTheme);
     }
 
     if (parameterSeparator6 != nullptr)
     {
-        parameterSeparator6->setSkin(newSkin);
+        parameterSeparator6->setTheme(newTheme);
     }
 
     if (dco1WaveSelectLabel != nullptr)
     {
-        dco1WaveSelectLabel->setSkin(newSkin);
+        dco1WaveSelectLabel->setTheme(newTheme);
     }
 
     if (dco1WaveSelectComboBox != nullptr)
     {
-        dco1WaveSelectComboBox->setSkin(newSkin);
+        dco1WaveSelectComboBox->setTheme(newTheme);
     }
 
     if (parameterSeparator7 != nullptr)
     {
-        parameterSeparator7->setSkin(newSkin);
+        parameterSeparator7->setTheme(newTheme);
     }
 
     if (dco1LeversLabel != nullptr)
     {
-        dco1LeversLabel->setSkin(newSkin);
+        dco1LeversLabel->setTheme(newTheme);
     }
 
     if (dco1LeversComboBox != nullptr)
     {
-        dco1LeversComboBox->setSkin(newSkin);
+        dco1LeversComboBox->setTheme(newTheme);
     }
 
     if (parameterSeparator8 != nullptr)
     {
-        parameterSeparator8->setSkin(newSkin);
+        parameterSeparator8->setTheme(newTheme);
     }
 
     if (dco1KeyboardPortamentoLabel != nullptr)
     {
-        dco1KeyboardPortamentoLabel->setSkin(newSkin);
+        dco1KeyboardPortamentoLabel->setTheme(newTheme);
     }
 
     if (dco1KeyboardPortamentoComboBox != nullptr)
     {
-        dco1KeyboardPortamentoComboBox->setSkin(newSkin);
+        dco1KeyboardPortamentoComboBox->setTheme(newTheme);
     }
 
     if (parameterSeparator9 != nullptr)
     {
-        parameterSeparator9->setSkin(newSkin);
+        parameterSeparator9->setTheme(newTheme);
     }
 
     if (dco1KeyClickLabel != nullptr)
     {
-        dco1KeyClickLabel->setSkin(newSkin);
+        dco1KeyClickLabel->setTheme(newTheme);
     }
 
     if (dco1KeyClickComboBox != nullptr)
     {
-        dco1KeyClickComboBox->setSkin(newSkin);
+        dco1KeyClickComboBox->setTheme(newTheme);
     }
 
     if (parameterSeparator10 != nullptr)
     {
-        parameterSeparator10->setSkin(newSkin);
+        parameterSeparator10->setTheme(newTheme);
     }
 
     repaint();

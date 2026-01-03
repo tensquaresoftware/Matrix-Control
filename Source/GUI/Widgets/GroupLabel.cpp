@@ -1,20 +1,19 @@
 #include "GroupLabel.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    GroupLabel::GroupLabel(Skin& newSkin, int width, const juce::String& text)
-        : skin(&newSkin)
+    GroupLabel::GroupLabel(Theme& newTheme, int width, const juce::String& text)
+        : theme(&newTheme)
         , labelText(text)
     {
-        setSize(width, SkinDimensions::Widget::GroupLabel::kHeight);
+        setSize(width, kHeight);
     }
 
-    void GroupLabel::setSkin(Skin& newSkin)
+    void GroupLabel::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
@@ -29,7 +28,7 @@ namespace tss
 
     void GroupLabel::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -44,7 +43,7 @@ namespace tss
 
     void GroupLabel::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        g.setColour(skin->getGroupLabelBaseColour());
+        g.setColour(theme->getGroupLabelBaseColour());
         g.fillRect(bounds);
     }
 
@@ -56,9 +55,9 @@ namespace tss
         }
 
         auto textArea = getContentArea(bounds);
-        auto font = skin->getGroupLabelFont();
+        auto font = theme->getBaseFont();
 
-        g.setColour(skin->getGroupLabelTextColour());
+        g.setColour(theme->getGroupLabelTextColour());
         g.setFont(font);
         g.drawText(labelText, textArea, juce::Justification::centred, false);
     }
@@ -74,15 +73,15 @@ namespace tss
         auto textWidth = calculateTextWidth();
         auto textCentreX = textArea.getCentreX();
         auto lineY = textArea.getCentreY();
-        auto textSpacing = skin->getGroupLabelTextSpacing();
+        auto textSpacing = kTextSpacing;
         auto leftLineEndX = textCentreX - textWidth * 0.5f - textSpacing;
         auto remainingWidth = leftLineEndX - textArea.getX();
 
         if (remainingWidth > 0.0f)
         {
-            g.setColour(skin->getGroupLabelLineColour());
+            g.setColour(theme->getGroupLabelLineColour());
 
-            auto lineThickness = skin->getGroupLabelLineThickness();
+            auto lineThickness = kLineThickness;
             auto leftLine = textArea;
             leftLine.setWidth(remainingWidth);
             leftLine.setY(lineY - lineThickness * 0.5f);
@@ -103,15 +102,15 @@ namespace tss
         auto textWidth = calculateTextWidth();
         auto textCentreX = textArea.getCentreX();
         auto lineY = textArea.getCentreY();
-        auto textSpacing = skin->getGroupLabelTextSpacing();
+        auto textSpacing = kTextSpacing;
         auto rightLineStartX = textCentreX + textWidth * 0.5f + textSpacing;
         auto remainingWidth = textArea.getRight() - rightLineStartX;
 
         if (remainingWidth > 0.0f)
         {
-            g.setColour(skin->getGroupLabelLineColour());
+            g.setColour(theme->getGroupLabelLineColour());
 
-            auto lineThickness = skin->getGroupLabelLineThickness();
+            auto lineThickness = kLineThickness;
             auto rightLine = textArea;
             rightLine.removeFromLeft(rightLineStartX - textArea.getX());
             rightLine.setY(lineY - lineThickness * 0.5f);
@@ -123,8 +122,8 @@ namespace tss
 
     juce::Rectangle<float> GroupLabel::getContentArea(const juce::Rectangle<float>& bounds) const
     {
-        auto topAreaHeight = skin->getGroupLabelTopAreaHeight();
-        auto contentHeight = skin->getGroupLabelContentHeight();
+        auto topAreaHeight = kTopAreaHeight;
+        auto contentHeight = kContentHeight;
         auto textArea = bounds;
         textArea.removeFromTop(topAreaHeight);
         textArea.setHeight(contentHeight);
@@ -133,12 +132,12 @@ namespace tss
 
     float GroupLabel::calculateTextWidth() const
     {
-        if (labelText.isEmpty() || skin == nullptr)
+        if (labelText.isEmpty() || theme == nullptr)
         {
             return 0.0f;
         }
 
-        auto font = skin->getGroupLabelFont();
+        auto font = theme->getBaseFont();
         juce::GlyphArrangement glyphArrangement;
         glyphArrangement.addLineOfText(font, labelText, 0.0f, 0.0f);
         auto bounds = glyphArrangement.getBoundingBox(0, -1, true);

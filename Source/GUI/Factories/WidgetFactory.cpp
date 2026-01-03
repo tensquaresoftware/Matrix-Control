@@ -95,7 +95,7 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     
     auto button = std::make_unique<tss::Button>(
         theme, 
-        tss::Button::kDefaultWidth, 
+        tss::Button::getDefaultWidth(), 
         desc->displayName
     );
     

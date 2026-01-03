@@ -1,20 +1,19 @@
 #include "ParameterLabel.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    ParameterLabel::ParameterLabel(Skin& newSkin, const juce::String& text)
-        : skin(&newSkin)
+    ParameterLabel::ParameterLabel(Theme& newTheme, const juce::String& text)
+        : theme(&newTheme)
         , labelText(text)
     {
-        setSize(SkinDimensions::Widget::ParameterLabel::kWidth, SkinDimensions::Widget::ParameterLabel::kHeight);
+        setSize(kWidth, kHeight);
     }
 
-    void ParameterLabel::setSkin(Skin& newSkin)
+    void ParameterLabel::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
@@ -29,7 +28,7 @@ namespace tss
 
     void ParameterLabel::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -43,15 +42,15 @@ namespace tss
 
     void ParameterLabel::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getParameterLabelBaseColour();
+        auto baseColour = theme->getParameterLabelBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ParameterLabel::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto backgroundColour = skin->getParameterLabelBackgroundColour();
-        auto backgroundMargin = skin->getParameterLabelBackgroundPadding();
+        auto backgroundColour = theme->getParameterLabelBackgroundColour();
+        auto backgroundMargin = kBackgroundPadding;
         auto backgroundBounds = bounds.reduced(backgroundMargin);
         
         g.setColour(backgroundColour);
@@ -65,12 +64,12 @@ namespace tss
             return;
         }
 
-        auto textColour = skin->getParameterLabelTextColour();
-        auto font = skin->getParameterLabelFont();
+        auto textColour = theme->getParameterLabelTextColour();
+        auto font = theme->getBaseFont();
 
-        auto backgroundMargin = skin->getParameterLabelBackgroundPadding();
+        auto backgroundMargin = kBackgroundPadding;
         auto textBounds = bounds.reduced(backgroundMargin);
-        textBounds.removeFromLeft(skin->getParameterLabelTextLeftPadding());
+        textBounds.removeFromLeft(kTextLeftPadding);
 
         g.setColour(textColour);
         g.setFont(font);

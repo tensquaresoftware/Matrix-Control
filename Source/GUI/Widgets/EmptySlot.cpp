@@ -1,25 +1,24 @@
 #include "EmptySlot.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    EmptySlot::EmptySlot(Skin& newSkin)
-        : skin(&newSkin)
+    EmptySlot::EmptySlot(Theme& newTheme)
+        : theme(&newTheme)
     {
-        setSize(SkinDimensions::Widget::EmptySlot::kWidth, SkinDimensions::Widget::EmptySlot::kHeight);
+        setSize(kWidth, kHeight);
     }
 
-    void EmptySlot::setSkin(Skin& newSkin)
+    void EmptySlot::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
     void EmptySlot::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -31,7 +30,7 @@ namespace tss
 
     void EmptySlot::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getEmptySlotBaseColour();
+        auto baseColour = theme->getEmptySlotBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }

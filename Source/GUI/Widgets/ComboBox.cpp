@@ -1,31 +1,30 @@
 #include "ComboBox.h"
 #include "PopupMenu.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    ComboBox::ComboBox(Skin& newSkin, Size size)
+    ComboBox::ComboBox(Theme& newTheme, Size size)
         : juce::ComboBox()
-        , skin(&newSkin)
+        , theme(&newTheme)
         , comboSize(size)
     {
-        auto width = (size == Size::Normal) ? SkinDimensions::Widget::ComboBox::kNormalWidth : SkinDimensions::Widget::ComboBox::kLargeWidth;
-        setSize(width, SkinDimensions::Widget::ComboBox::kHeight);
+        auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
+        setSize(width, kHeight);
         setWantsKeyboardFocus(true);
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 
-    void ComboBox::setSkin(Skin& newSkin)
+    void ComboBox::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 
     void ComboBox::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -45,28 +44,28 @@ namespace tss
 
     void ComboBox::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getComboBoxBaseColour();
+        auto baseColour = theme->getComboBoxBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        auto backgroundColour = skin->getComboBoxBackgroundColour(enabled);
+        auto backgroundColour = theme->getComboBoxBackgroundColour(enabled);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void ComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        auto borderColour = skin->getComboBoxBorderColour(enabled, false);
+        auto borderColour = theme->getComboBoxBorderColour(enabled, false);
         g.setColour(borderColour);
-        auto borderThickness = skin->getComboBoxBorderThickness();
+        auto borderThickness = kBorderThickness;
         g.drawRect(bounds, borderThickness);
 
         if (hasFocus)
         {
-            auto focusBorderColour = skin->getComboBoxBorderColour(enabled, true);
+            auto focusBorderColour = theme->getComboBoxBorderColour(enabled, true);
             g.setColour(focusBorderColour);
             g.drawRect(backgroundBounds, borderThickness);
         }
@@ -82,12 +81,12 @@ namespace tss
             text = getItemText(selectedIndex);
         }
 
-        auto textColour = skin->getComboBoxTextColour(enabled);
-        auto font = skin->getComboBoxFont();
+        auto textColour = theme->getComboBoxTextColour(enabled);
+        auto font = theme->getBaseFont();
 
-        auto leftPadding = skin->getComboBoxLeftPadding();
-        auto rightPadding = skin->getComboBoxRightPadding();
-        auto triangleBaseSize = skin->getComboBoxTriangleBaseSize();
+        auto leftPadding = kLeftPadding;
+        auto rightPadding = kRightPadding;
+        auto triangleBaseSize = kTriangleBaseSize;
         auto textBounds = bounds;
         textBounds.removeFromLeft(leftPadding);
         textBounds.removeFromRight(triangleBaseSize + rightPadding);
@@ -99,12 +98,12 @@ namespace tss
 
     void ComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        auto triangleColour = skin->getComboBoxTriangleColour(enabled);
+        auto triangleColour = theme->getComboBoxTriangleColour(enabled);
         g.setColour(triangleColour);
 
-        auto triangleBaseSize = skin->getComboBoxTriangleBaseSize();
-        auto triangleHeight = triangleBaseSize * tss::SkinDimensions::Widget::ComboBox::kTriangleHeightFactor;
-        auto rightPadding = skin->getComboBoxRightPadding();
+        auto triangleBaseSize = kTriangleBaseSize;
+        auto triangleHeight = triangleBaseSize * kTriangleHeightFactor;
+        auto rightPadding = kRightPadding;
         auto triangleX = bounds.getRight() - triangleBaseSize - rightPadding;
         auto triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
 
@@ -116,7 +115,7 @@ namespace tss
     {
         juce::Path path;
         
-        auto height = baseSize * tss::SkinDimensions::Widget::ComboBox::kTriangleHeightFactor;
+        auto height = baseSize * kTriangleHeightFactor;
         
         path.startNewSubPath(x, y);
         path.lineTo(x + baseSize, y);
@@ -129,9 +128,9 @@ namespace tss
     juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
         auto backgroundWidth = static_cast<float>((comboSize == Size::Normal) 
-            ? skin->getComboBoxNormalBackgroundWidth() 
-            : skin->getComboBoxLargeBackgroundWidth());
-        auto backgroundHeight = static_cast<float>(skin->getComboBoxBackgroundHeight());
+            ? kNormalBackgroundWidth 
+            : kLargeBackgroundWidth);
+        auto backgroundHeight = static_cast<float>(kBackgroundHeight);
         auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
         auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
         return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);

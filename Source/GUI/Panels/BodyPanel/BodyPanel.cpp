@@ -1,36 +1,35 @@
 #include "BodyPanel.h"
 
-#include "../../Skin/Skin.h"
+#include "../../Themes/Theme.h"
 #include "../../Widgets/PanelSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MatrixModulationPanel/MatrixModulationPanel.h"
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "PatchManagerPanel/PatchManagerPanel.h"
-#include "../../Skin/SkinDimensions.h"
-#include "../../../Shared/WidgetFactory.h"
+#include "../../../GUI/Factories/WidgetFactory.h"
 
-using tss::Skin;
+using tss::Theme;
 using tss::PanelSeparator;
 
-BodyPanel::BodyPanel(Skin& newSkin, WidgetFactory& widgetFactory)
-    : skin(&newSkin)
+BodyPanel::BodyPanel(Theme& newTheme, WidgetFactory& widgetFactory)
+    : theme(&newTheme)
 {
-    patchEditPanel = std::make_unique<PatchEditPanel>(newSkin, widgetFactory);
+    patchEditPanel = std::make_unique<PatchEditPanel>(newTheme, widgetFactory);
     addAndMakeVisible(*patchEditPanel);
 
-    panelSeparator1 = std::make_unique<PanelSeparator>(newSkin);
+    panelSeparator1 = std::make_unique<PanelSeparator>(newTheme);
     addAndMakeVisible(*panelSeparator1);
 
-    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(newSkin);
+    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(newTheme);
     addAndMakeVisible(*matrixModulationPanel);
 
-    patchManagerPanel = std::make_unique<PatchManagerPanel>(newSkin);
+    patchManagerPanel = std::make_unique<PatchManagerPanel>(newTheme);
     addAndMakeVisible(*patchManagerPanel);
 
-    panelSeparator2 = std::make_unique<PanelSeparator>(newSkin);
+    panelSeparator2 = std::make_unique<PanelSeparator>(newTheme);
     addAndMakeVisible(*panelSeparator2);
 
-    masterEditPanel = std::make_unique<MasterEditPanel>(newSkin);
+    masterEditPanel = std::make_unique<MasterEditPanel>(newTheme);
     addAndMakeVisible(*masterEditPanel);
 }
 
@@ -38,69 +37,69 @@ BodyPanel::~BodyPanel() = default;
 
 void BodyPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(skin->getBodyPanelBackgroundColour());
+        g.fillAll(theme->getBodyPanelBackgroundColour());
 }
 
 void BodyPanel::resized()
 {
-    auto spacing = tss::SkinDimensions::BodyPanel::kSpacing;
+    auto spacing = getSpacing();
     auto patchEditPanelX = spacing;
     auto patchEditPanelY = spacing;
-    patchEditPanel->setBounds(patchEditPanelX, patchEditPanelY, tss::SkinDimensions::PatchEditPanel::kWidth, tss::SkinDimensions::PatchEditPanel::kHeight);
+    patchEditPanel->setBounds(patchEditPanelX, patchEditPanelY, PatchEditPanel::getWidth(), PatchEditPanel::getHeight());
 
-    auto separatorX = patchEditPanelX + tss::SkinDimensions::PatchEditPanel::kWidth;
+    auto separatorX = patchEditPanelX + PatchEditPanel::getWidth();
     auto separatorY = spacing;
     panelSeparator1->setTopLeftPosition(separatorX, separatorY);
 
     auto matrixModulationPanelX = separatorX + panelSeparator1->getWidth();
     auto matrixModulationPanelY = spacing;
-    matrixModulationPanel->setBounds(matrixModulationPanelX, matrixModulationPanelY, 275, 315);
+    matrixModulationPanel->setBounds(matrixModulationPanelX, matrixModulationPanelY, MatrixModulationPanel::getWidth(), MatrixModulationPanel::getHeight());
 
     auto patchManagerPanelX = matrixModulationPanelX;
-    auto patchManagerPanelY = matrixModulationPanelY + 315;
-    patchManagerPanel->setBounds(patchManagerPanelX, patchManagerPanelY, 275, 415);
+    auto patchManagerPanelY = matrixModulationPanelY + MatrixModulationPanel::getHeight();
+    patchManagerPanel->setBounds(patchManagerPanelX, patchManagerPanelY, PatchManagerPanel::getWidth(), PatchManagerPanel::getHeight());
 
-    auto separator2X = matrixModulationPanelX + 275;
+    auto separator2X = matrixModulationPanelX + MatrixModulationPanel::getWidth();
     auto separator2Y = spacing;
     panelSeparator2->setTopLeftPosition(separator2X, separator2Y);
 
     auto masterEditPanelX = separator2X + panelSeparator2->getWidth();
     auto masterEditPanelY = spacing;
-    masterEditPanel->setBounds(masterEditPanelX, masterEditPanelY, tss::SkinDimensions::MasterEditPanel::kWidth, tss::SkinDimensions::MasterEditPanel::kHeight);
+    masterEditPanel->setBounds(masterEditPanelX, masterEditPanelY, MasterEditPanel::getWidth(), MasterEditPanel::getHeight());
 }
 
-void BodyPanel::setSkin(Skin& newSkin)
+void BodyPanel::setTheme(Theme& newTheme)
 {
-        skin = &newSkin;
+        theme = &newTheme;
 
     if (patchEditPanel != nullptr)
     {
-        patchEditPanel->setSkin(*skin);
+        patchEditPanel->setTheme(*theme);
     }
 
     if (panelSeparator1 != nullptr)
     {
-        panelSeparator1->setSkin(*skin);
+        panelSeparator1->setTheme(*theme);
     }
 
     if (matrixModulationPanel != nullptr)
     {
-        matrixModulationPanel->setSkin(*skin);
+        matrixModulationPanel->setTheme(*theme);
     }
 
     if (panelSeparator2 != nullptr)
     {
-        panelSeparator2->setSkin(*skin);
+        panelSeparator2->setTheme(*theme);
     }
 
     if (masterEditPanel != nullptr)
     {
-        masterEditPanel->setSkin(*skin);
+        masterEditPanel->setTheme(*theme);
     }
 
     if (patchManagerPanel != nullptr)
     {
-        patchManagerPanel->setSkin(*skin);
+        patchManagerPanel->setTheme(*theme);
     }
 
     repaint();

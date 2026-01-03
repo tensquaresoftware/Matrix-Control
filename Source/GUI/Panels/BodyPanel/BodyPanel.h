@@ -4,15 +4,14 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "../../Skin/SkinDimensions.h"
 
 namespace tss
 {
-    class Skin;
+    class Theme;
     class PanelSeparator;
 }
 
-using tss::Skin;
+using tss::Theme;
 using tss::PanelSeparator;
 
 class PatchEditPanel;
@@ -24,18 +23,21 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(Skin& newSkin, WidgetFactory& widgetFactory);
+    BodyPanel(Theme& newTheme, WidgetFactory& widgetFactory);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(Skin& newSkin);
+    void setTheme(Theme& newTheme);
 
-    static int getHeight() { return tss::SkinDimensions::BodyPanel::kHeight; }
+    static int getHeight() { return kHeight; }
+    static int getSpacing() { return kSpacing; }
 
 private:
+    inline constexpr static int kHeight = 760;
+    inline constexpr static int kSpacing = 15;
 
-    Skin* skin;
+    Theme* theme;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel;
     std::unique_ptr<PanelSeparator> panelSeparator1;

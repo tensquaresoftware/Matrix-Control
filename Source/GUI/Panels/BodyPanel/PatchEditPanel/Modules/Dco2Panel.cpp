@@ -1,29 +1,28 @@
 #include "Dco2Panel.h"
 
-#include "../../../../Skin/Skin.h"
-#include "../../../../Skin/SkinDimensions.h"
+#include "../../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-Dco2Panel::Dco2Panel(Skin& newSkin)
-    : skin(&newSkin)
+Dco2Panel::Dco2Panel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(tss::SkinDimensions::PatchEditModulePanel::kWidth, tss::SkinDimensions::PatchEditModulePanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 void Dco2Panel::paint(juce::Graphics& g)
 {
-    if (skin == nullptr)
+    if (theme == nullptr)
     {
         return;
     }
 
-    g.fillAll(skin->getPatchEditModulePanelBackgroundColour());
+    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
-void Dco2Panel::setSkin(Skin& newSkin)
+void Dco2Panel::setTheme(Theme& newTheme)
 {
-    skin = &newSkin;
+    theme = &newTheme;
     repaint();
 }
 

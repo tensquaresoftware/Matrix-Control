@@ -1,22 +1,21 @@
 #include "ModuleName.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    ModuleName::ModuleName(Skin& newSkin, const juce::String& text, Size size, ColourVariant variant)
-        : skin(&newSkin)
+    ModuleName::ModuleName(Theme& newTheme, const juce::String& text, Size size, ColourVariant variant)
+        : theme(&newTheme)
         , name(text)
         , colourVariant(variant)
     {
-        auto width = (size == Size::Normal) ? SkinDimensions::Widget::ModuleName::kNormalWidth : SkinDimensions::Widget::ModuleName::kLargeWidth;
-        setSize(width, SkinDimensions::Widget::ModuleName::kHeight);
+        auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
+        setSize(width, kHeight);
     }
 
-    void ModuleName::setSkin(Skin& newSkin)
+    void ModuleName::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
@@ -31,7 +30,7 @@ namespace tss
 
     void ModuleName::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -45,7 +44,7 @@ namespace tss
 
     void ModuleName::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getModuleNameBaseColour();
+        auto baseColour = theme->getModuleNameBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
@@ -57,11 +56,11 @@ namespace tss
             return;
         }
 
-        auto textColour = skin->getModuleNameTextColour();
-        auto font = skin->getModuleNameFont();
+        auto textColour = theme->getModuleNameTextColour();
+        auto font = theme->getBaseFont().withHeight(16.0f).boldened();
 
-        auto textAreaHeight = skin->getModuleNameTextAreaHeight();
-        auto textLeftPadding = skin->getModuleNameTextLeftPadding();
+        auto textAreaHeight = kTextAreaHeight;
+        auto textLeftPadding = kTextLeftPadding;
         auto textBounds = bounds;
         textBounds.setHeight(textAreaHeight);
         textBounds.removeFromLeft(textLeftPadding);
@@ -75,8 +74,8 @@ namespace tss
     {
         auto lineColour = getLineColour();
         
-        auto textAreaHeight = skin->getModuleNameTextAreaHeight();
-        auto lineThickness = skin->getModuleNameLineThickness();
+        auto textAreaHeight = kTextAreaHeight;
+        auto lineThickness = kLineThickness;
         auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
         auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
         
@@ -91,8 +90,8 @@ namespace tss
     juce::Colour ModuleName::getLineColour() const
     {
         return (colourVariant == ColourVariant::Blue) 
-            ? skin->getModuleNameLineColourBlue() 
-            : skin->getModuleNameLineColourOrange();
+            ? theme->getModuleNameLineColourBlue() 
+            : theme->getModuleNameLineColourOrange();
     }
 }
 

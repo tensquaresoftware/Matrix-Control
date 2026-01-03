@@ -4,22 +4,27 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 }
 
-using tss::Skin;
+using tss::Theme;
 
 class Dco2Panel : public juce::Component
 {
 public:
-    explicit Dco2Panel(Skin& newSkin);
+    explicit Dco2Panel(Theme& newTheme);
     ~Dco2Panel() override = default;
 
     void paint(juce::Graphics&) override;
-    void setSkin(Skin& newSkin);
+    void setTheme(Theme& newTheme);
+
+    static int getWidth() { return kWidth; }
+    static int getHeight() { return kHeight; }
 
 private:
-    Skin* skin;
+    inline constexpr static int kWidth = 150;
+    inline constexpr static int kHeight = 275;
+    Theme* theme;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Dco2Panel)
 };

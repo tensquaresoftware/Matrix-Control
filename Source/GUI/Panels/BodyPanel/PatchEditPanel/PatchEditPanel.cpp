@@ -6,28 +6,28 @@
 #include "Modules/FmTrackPanel.h"
 #include "Modules/RampPortamentoPanel.h"
 
-#include "../../../Skin/Skin.h"
-#include "../../../Skin/SkinDimensions.h"
+#include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionName.h"
+#include "../BodyPanel.h"
 #include "../../../../Shared/SynthDescriptors.h"
-#include "../../../../Shared/ApvtsFactory.h"
-#include "../../../../Shared/WidgetFactory.h"
+#include "../../../../Core/Factories/ApvtsFactory.h"
+#include "../../../../GUI/Factories/WidgetFactory.h"
 
-using tss::Skin;
+using tss::Theme;
 
 PatchEditPanel::~PatchEditPanel() = default;
 
-PatchEditPanel::PatchEditPanel(Skin& newSkin, WidgetFactory& widgetFactory)
-    : skin(&newSkin)
+PatchEditPanel::PatchEditPanel(Theme& newTheme, WidgetFactory& widgetFactory)
+    : theme(&newTheme)
     , sectionName(std::make_unique<tss::SectionName>(
-        newSkin, 
-        tss::SkinDimensions::PatchEditPanel::kWidth, 
-        ApvtsFactory::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
-    , dco1Panel(std::make_unique<Dco1Panel>(newSkin, widgetFactory))
-    , dco2Panel(std::make_unique<Dco2Panel>(newSkin))
-    , vcfVcaPanel(std::make_unique<VcfVcaPanel>(newSkin))
-    , fmTrackPanel(std::make_unique<FmTrackPanel>(newSkin))
-    , rampPortamentoPanel(std::make_unique<RampPortamentoPanel>(newSkin))
+        newTheme, 
+        getWidth(), 
+        SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
+    , dco1Panel(std::make_unique<Dco1Panel>(newTheme, widgetFactory))
+    , dco2Panel(std::make_unique<Dco2Panel>(newTheme))
+    , vcfVcaPanel(std::make_unique<VcfVcaPanel>(newTheme))
+    , fmTrackPanel(std::make_unique<FmTrackPanel>(newTheme))
+    , rampPortamentoPanel(std::make_unique<RampPortamentoPanel>(newTheme))
 {
     addAndMakeVisible(*sectionName);
     addAndMakeVisible(*dco1Panel);
@@ -36,25 +36,25 @@ PatchEditPanel::PatchEditPanel(Skin& newSkin, WidgetFactory& widgetFactory)
     addAndMakeVisible(*fmTrackPanel);
     addAndMakeVisible(*rampPortamentoPanel);
 
-    setSize(tss::SkinDimensions::PatchEditPanel::kWidth, tss::SkinDimensions::PatchEditPanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 void PatchEditPanel::paint(juce::Graphics& g)
 {
-    if (skin == nullptr)
+    if (theme == nullptr)
     {
         return;
     }
 
-    g.fillAll(skin->getPatchEditPanelBackgroundColour());
+    g.fillAll(theme->getPatchEditPanelBackgroundColour());
 }
 
 void PatchEditPanel::resized()
 {
-    const auto sectionNameHeight = tss::SkinDimensions::Widget::SectionName::kHeight;
-    const auto panelWidth = tss::SkinDimensions::PatchEditModulePanel::kWidth;
-    const auto panelHeight = tss::SkinDimensions::PatchEditModulePanel::kHeight;
-    const auto spacing = tss::SkinDimensions::BodyPanel::kSpacing;
+    const auto sectionNameHeight = tss::SectionName::getHeight();
+    const auto panelWidth = Dco1Panel::getWidth();
+    const auto panelHeight = Dco1Panel::getHeight();
+    const auto spacing = BodyPanel::getSpacing();
 
     if (sectionName != nullptr)
     {
@@ -94,38 +94,38 @@ void PatchEditPanel::resized()
     }
 }
 
-void PatchEditPanel::setSkin(Skin& newSkin)
+void PatchEditPanel::setTheme(Theme& newTheme)
 {
-    skin = &newSkin;
+    theme = &newTheme;
 
     if (sectionName != nullptr)
     {
-        sectionName->setSkin(newSkin);
+        sectionName->setTheme(newTheme);
     }
 
     if (dco1Panel != nullptr)
     {
-        dco1Panel->setSkin(newSkin);
+        dco1Panel->setTheme(newTheme);
     }
 
     if (dco2Panel != nullptr)
     {
-        dco2Panel->setSkin(newSkin);
+        dco2Panel->setTheme(newTheme);
     }
 
     if (vcfVcaPanel != nullptr)
     {
-        vcfVcaPanel->setSkin(newSkin);
+        vcfVcaPanel->setTheme(newTheme);
     }
 
     if (fmTrackPanel != nullptr)
     {
-        fmTrackPanel->setSkin(newSkin);
+        fmTrackPanel->setTheme(newTheme);
     }
 
     if (rampPortamentoPanel != nullptr)
     {
-        rampPortamentoPanel->setSkin(newSkin);
+        rampPortamentoPanel->setTheme(newTheme);
     }
 
     repaint();

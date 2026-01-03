@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 
     class FocusableWidget
     {
@@ -15,11 +15,12 @@ namespace tss
         void handleFocusGained(juce::Component* component);
         void handleFocusLost(juce::Component* component);
         
-        void drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Skin& skin) const;
+        void drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Theme& theme) const;
         
         bool hasFocus() const { return hasFocusFlag; }
 
     private:
+        inline constexpr static float kBorderThickness = 1.0f;
         bool hasFocusFlag = false;
     };
 }

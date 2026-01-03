@@ -1,29 +1,28 @@
 #include "Slider.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    Slider::Slider(Skin& newSkin, double initValue)
+    Slider::Slider(Theme& newTheme, double initValue)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
-        , skin(&newSkin)
+        , theme(&newTheme)
         , defaultValue(initValue)
     {
-        setSize(SkinDimensions::Widget::Slider::kWidth, SkinDimensions::Widget::Slider::kHeight);
+        setSize(kWidth, kHeight);
         setWantsKeyboardFocus(true);
         setInterceptsMouseClicks(true, false);
     }
 
-    void Slider::setSkin(Skin& newSkin)
+    void Slider::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
     void Slider::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -44,8 +43,8 @@ namespace tss
 
     juce::Rectangle<float> Slider::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
-        auto backgroundWidth = static_cast<float>(skin->getSliderBackgroundWidth());
-        auto backgroundHeight = static_cast<float>(skin->getSliderBackgroundHeight());
+        auto backgroundWidth = static_cast<float>(kBackgroundWidth);
+        auto backgroundHeight = static_cast<float>(kBackgroundHeight);
         auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
         auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
         return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);
@@ -77,27 +76,27 @@ namespace tss
 
     void Slider::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getSliderBaseColour();
+        auto baseColour = theme->getSliderBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void Slider::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        auto backgroundColour = skin->getSliderBackgroundColour(enabled);
+        auto backgroundColour = theme->getSliderBackgroundColour(enabled);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void Slider::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        auto borderColour = skin->getSliderBorderColour(enabled, false);
+        auto borderColour = theme->getSliderBorderColour(enabled, false);
         g.setColour(borderColour);
         g.drawRect(bounds, 1.0f);
 
         if (hasFocus)
         {
-            auto focusBorderColour = skin->getSliderBorderColour(enabled, true);
+            auto focusBorderColour = theme->getSliderBorderColour(enabled, true);
             g.setColour(focusBorderColour);
             g.drawRect(backgroundBounds, 1.0f);
         }
@@ -110,7 +109,7 @@ namespace tss
             return;
         }
 
-        auto trackColour = skin->getSliderTrackColour(enabled);
+        auto trackColour = theme->getSliderTrackColour(enabled);
         g.setColour(trackColour);
         g.fillRect(bounds);
     }
@@ -118,8 +117,8 @@ namespace tss
     void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
         auto valueText = juce::String(static_cast<int>(std::round(getValue())));
-        auto textColour = skin->getSliderTextColour(enabled);
-        auto font = skin->getSliderFont();
+        auto textColour = theme->getSliderTextColour(enabled);
+        auto font = theme->getBaseFont();
 
         g.setColour(textColour);
         g.setFont(font);
@@ -146,7 +145,7 @@ namespace tss
         }
         
         auto dragDistance = dragStartPosition.y - e.getPosition().y;
-        auto valueDelta = dragDistance * skin->getSliderDragSensitivity();
+        auto valueDelta = dragDistance * kDragSensitivity;
         
         auto range = getRange();
         auto newValue = dragStartValue + valueDelta;
@@ -223,7 +222,7 @@ namespace tss
     {
         if (isShiftPressed)
         {
-            return skin->getSliderShiftKeyStep();
+            return kShiftKeyStep;
         }
         
         if (rangeLength <= 100.0)

@@ -1,29 +1,28 @@
 #include "FmTrackPanel.h"
 
-#include "../../../../Skin/Skin.h"
-#include "../../../../Skin/SkinDimensions.h"
+#include "../../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-FmTrackPanel::FmTrackPanel(Skin& newSkin)
-    : skin(&newSkin)
+FmTrackPanel::FmTrackPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(tss::SkinDimensions::PatchEditModulePanel::kWidth, tss::SkinDimensions::PatchEditModulePanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 void FmTrackPanel::paint(juce::Graphics& g)
 {
-    if (skin == nullptr)
+    if (theme == nullptr)
     {
         return;
     }
 
-    g.fillAll(skin->getPatchEditModulePanelBackgroundColour());
+    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
-void FmTrackPanel::setSkin(Skin& newSkin)
+void FmTrackPanel::setTheme(Theme& newTheme)
 {
-    skin = &newSkin;
+    theme = &newTheme;
     repaint();
 }
 

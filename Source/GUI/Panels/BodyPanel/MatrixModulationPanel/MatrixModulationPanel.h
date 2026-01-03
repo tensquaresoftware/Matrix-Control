@@ -4,22 +4,28 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 }
 
-using tss::Skin;
+using tss::Theme;
 
 class MatrixModulationPanel : public juce::Component
 {
 public:
-    explicit MatrixModulationPanel(Skin& skin);
+    explicit MatrixModulationPanel(Theme& newTheme);
     ~MatrixModulationPanel() override = default;
 
     void paint(juce::Graphics&) override;
-    void setSkin(Skin& skin);
+    void setTheme(Theme& newTheme);
+
+    static int getWidth() { return kWidth; }
+    static int getHeight() { return kHeight; }
 
 private:
-    Skin* skin;
+    inline constexpr static int kWidth = 275;
+    inline constexpr static int kHeight = 315;
+
+    Theme* theme;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)
 };

@@ -2,30 +2,30 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "../../Skin/SkinDimensions.h"
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 }
 
-using tss::Skin;
+using tss::Theme;
 
 class FooterPanel : public juce::Component
 {
 public:
-    explicit FooterPanel(Skin& newSkin);
+    explicit FooterPanel(Theme& newTheme);
     ~FooterPanel() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(Skin& skin);
+    void setTheme(Theme& newTheme);
 
-    static int getHeight() { return tss::SkinDimensions::FooterPanel::kHeight; }
+    static int getHeight() { return kHeight; }
 
 private:
+    inline constexpr static int kHeight = 30;
 
-    Skin* skin;
+    Theme* theme;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)
 };

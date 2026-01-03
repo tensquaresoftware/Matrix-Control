@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-struct SkinColourChart
+struct ColourChart
 {
     static constexpr juce::uint32 kBlack              = 0xFF000000;
     static constexpr juce::uint32 kWhite              = 0xFFFFFFFF;

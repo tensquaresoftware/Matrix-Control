@@ -1,6 +1,6 @@
 #include "FocusableWidget.h"
 
-#include "../Skin/Skin.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
@@ -26,17 +26,17 @@ namespace tss
         }
     }
 
-    void FocusableWidget::drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Skin& skin) const
+    void FocusableWidget::drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Theme& theme) const
     {
         if (hasFocusFlag)
         {
-            g.setColour(skin.getSliderFocusBorderColour());
+            g.setColour(theme.getSliderFocusBorderColour());
         }
         else
         {
             g.setColour(juce::Colours::transparentBlack);
         }
-        auto focusBorderThickness = skin.getFocusBorderThickness();
+        auto focusBorderThickness = kBorderThickness;
         g.drawRect(bounds, focusBorderThickness);
     }
 }

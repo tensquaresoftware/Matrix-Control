@@ -1,29 +1,28 @@
 #include "MasterEditPanel.h"
 
-#include "../../../Skin/Skin.h"
-#include "../../../Skin/SkinDimensions.h"
+#include "../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-MasterEditPanel::MasterEditPanel(Skin& newSkin)
-    : skin(&newSkin)
+MasterEditPanel::MasterEditPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(tss::SkinDimensions::MasterEditPanel::kWidth, tss::SkinDimensions::MasterEditPanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 void MasterEditPanel::paint(juce::Graphics& g)
 {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
         
-        g.fillAll(skin->getMasterEditPanelBackgroundColour());
+        g.fillAll(theme->getMasterEditPanelBackgroundColour());
 }
 
-void MasterEditPanel::setSkin(Skin& newSkin)
+void MasterEditPanel::setTheme(Theme& newTheme)
 {
-        skin = &newSkin;
+        theme = &newTheme;
     repaint();
 }
 

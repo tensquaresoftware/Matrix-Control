@@ -1,7 +1,7 @@
 #include "PopupMenu.h"
 #include "ComboBox.h"
 
-#include "../Skin/Skin.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
@@ -16,10 +16,10 @@ namespace tss
         auto* parent = comboBox.getParentComponent();
         if (parent != nullptr)
         {
-            skin = comboBox.skin;
-            if (skin != nullptr)
+            theme = comboBox.theme;
+            if (theme != nullptr)
             {
-                cachedFont = skin->getPopupMenuFont();
+                cachedFont = theme->getBaseFont();
             }
         }
         
@@ -44,7 +44,7 @@ namespace tss
         }
 
         auto bounds = getLocalBounds();
-        auto borderThickness = skin != nullptr ? skin->getPopupMenuBorderThickness() : 1.0f;
+        auto borderThickness = kBorderThickness;
         auto borderThicknessInt = static_cast<int>(borderThickness);
         
         drawBase(g, bounds);
@@ -146,9 +146,9 @@ namespace tss
         itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
         columnWidth = comboBox.getWidth();
         
-        auto separatorWidth = skin != nullptr ? skin->getPopupMenuSeparatorWidth() : 1;
-        auto itemHeight = skin != nullptr ? skin->getPopupMenuItemHeight() : 20;
-        auto borderThickness = skin != nullptr ? skin->getPopupMenuBorderThickness() : 1.0f;
+        auto separatorWidth = kSeparatorWidth;
+        auto itemHeight = kItemHeight;
+        auto borderThickness = kBorderThickness;
         auto totalWidth = columnCount * columnWidth + (columnCount - 1) * separatorWidth;
         auto totalHeight = itemsPerColumn * itemHeight;
         
@@ -157,7 +157,7 @@ namespace tss
 
     int PopupMenu::calculateColumnCount(int totalItems) const
     {
-        auto columnThreshold = skin != nullptr ? skin->getPopupMenuColumnThreshold() : 10;
+        auto columnThreshold = kColumnThreshold;
         if (totalItems <= columnThreshold)
         {
             return 1;
@@ -225,7 +225,7 @@ namespace tss
         auto spaceBelow = parentBounds.getBottom() - (comboY + comboHeight);
         auto spaceAbove = comboY - parentBounds.getY();
         
-        auto verticalMargin = comboBox.skin != nullptr ? comboBox.skin->getComboBoxVerticalMargin() : 4;
+        auto verticalMargin = ComboBox::getVerticalMargin();
         auto requiredSpaceBelow = popupHeight + verticalMargin;
         auto requiredSpaceAbove = popupHeight + verticalMargin;
         
@@ -250,9 +250,9 @@ namespace tss
             return juce::Rectangle<int>();
         }
         
-        auto borderThickness = skin != nullptr ? skin->getPopupMenuBorderThickness() : 1.0f;
-        auto itemHeight = skin != nullptr ? skin->getPopupMenuItemHeight() : 20;
-        auto separatorWidth = skin != nullptr ? skin->getPopupMenuSeparatorWidth() : 1;
+        auto borderThickness = kBorderThickness;
+        auto itemHeight = kItemHeight;
+        auto separatorWidth = kSeparatorWidth;
         auto contentBounds = getLocalBounds().reduced(static_cast<int>(borderThickness));
         
         if (columnCount == 1)
@@ -274,7 +274,7 @@ namespace tss
 
     int PopupMenu::getItemIndexAt(int x, int y) const
     {
-        auto borderThickness = skin != nullptr ? skin->getPopupMenuBorderThickness() : 1.0f;
+        auto borderThickness = kBorderThickness;
         auto contentBounds = getLocalBounds().reduced(static_cast<int>(borderThickness));
         
         if (! contentBounds.contains(x, y))
@@ -319,7 +319,7 @@ namespace tss
         
         relativeX -= columnWidth;
         
-        auto separatorWidth = skin != nullptr ? skin->getPopupMenuSeparatorWidth() : 1;
+        auto separatorWidth = kSeparatorWidth;
         for (int column = 1; column < columnCount; ++column)
         {
             if (relativeX < separatorWidth)
@@ -342,7 +342,7 @@ namespace tss
 
     int PopupMenu::getRowFromY(int y) const
     {
-        auto itemHeight = skin != nullptr ? skin->getPopupMenuItemHeight() : 20;
+        auto itemHeight = kItemHeight;
         return y / itemHeight;
     }
 
@@ -395,7 +395,7 @@ namespace tss
             return;
         }
         
-        auto baseColour = skin->getPopupMenuBaseColour();
+        auto baseColour = theme->getPopupMenuBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
@@ -407,7 +407,7 @@ namespace tss
             return;
         }
         
-        auto backgroundColour = skin->getPopupMenuBackgroundColour();
+        auto backgroundColour = theme->getPopupMenuBackgroundColour();
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
@@ -419,9 +419,9 @@ namespace tss
             return;
         }
         
-        auto borderColour = skin->getPopupMenuBorderColour();
+        auto borderColour = theme->getPopupMenuBorderColour();
         g.setColour(borderColour);
-        auto borderThickness = skin->getPopupMenuBorderThickness();
+        auto borderThickness = kBorderThickness;
         g.drawRect(bounds.toFloat(), borderThickness);
     }
 
@@ -453,22 +453,22 @@ namespace tss
         
         if (isHighlighted && isActive)
         {
-            auto hooverBackgroundColour = skin->getPopupMenuBackgroundHooverColour();
+            auto hooverBackgroundColour = theme->getPopupMenuBackgroundHooverColour();
             auto hooverBounds = itemBounds.reduced(1);
             g.setColour(hooverBackgroundColour);
             g.fillRect(hooverBounds);
             
-            auto hooverTextColour = skin->getPopupMenuTextHooverColour();
+            auto hooverTextColour = theme->getPopupMenuTextHooverColour();
             g.setColour(hooverTextColour);
             g.setFont(cachedFont);
             
             auto textBounds = itemBounds;
-            textBounds.removeFromLeft(skin->getPopupMenuTextLeftPadding());
+            textBounds.removeFromLeft(kTextLeftPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
         else
         {
-            auto textColour = skin->getPopupMenuTextColour();
+            auto textColour = theme->getPopupMenuTextColour();
             if (! isActive)
             {
                 textColour = textColour.withAlpha(0.5f);
@@ -478,7 +478,7 @@ namespace tss
             g.setFont(cachedFont);
             
             auto textBounds = itemBounds;
-            textBounds.removeFromLeft(skin->getPopupMenuTextLeftPadding());
+            textBounds.removeFromLeft(kTextLeftPadding);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
     }
@@ -490,10 +490,10 @@ namespace tss
             return;
         }
         
-        auto separatorColour = skin->getPopupMenuSeparatorColour();
+        auto separatorColour = theme->getPopupMenuSeparatorColour();
         g.setColour(separatorColour);
         
-        auto separatorWidth = skin->getPopupMenuSeparatorWidth();
+        auto separatorWidth = kSeparatorWidth;
         for (int i = 1; i < columnCount; ++i)
         {
             auto separatorX = contentBounds.getX() + i * columnWidth + (i - 1) * separatorWidth;
@@ -632,7 +632,7 @@ namespace tss
 
     bool PopupMenu::hasValidLookAndFeel() const
     {
-        return skin != nullptr;
+        return theme != nullptr;
     }
 
     bool PopupMenu::hasValidParent() const
@@ -647,8 +647,8 @@ namespace tss
             return;
         }
 
-        auto* skinPtr = comboBoxRef.skin;
-        if (skinPtr == nullptr)
+        auto* themePtr = comboBoxRef.theme;
+        if (themePtr == nullptr)
         {
             return;
         }

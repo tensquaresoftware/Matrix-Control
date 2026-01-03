@@ -1,28 +1,28 @@
 #include "PatchManagerPanel.h"
 
-#include "../../../Skin/Skin.h"
+#include "../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-PatchManagerPanel::PatchManagerPanel(Skin& newSkin)
-    : skin(&newSkin)
+PatchManagerPanel::PatchManagerPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(275, 415);
+    setSize(getWidth(), getHeight());
 }
 
 void PatchManagerPanel::paint(juce::Graphics& g)
 {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
         
-        g.fillAll(skin->getPatchManagerPanelBackgroundColour());
+        g.fillAll(theme->getPatchManagerPanelBackgroundColour());
 }
 
-void PatchManagerPanel::setSkin(Skin& newSkin)
+void PatchManagerPanel::setTheme(Theme& newTheme)
 {
-        skin = &newSkin;
+        theme = &newTheme;
     repaint();
 }
 

@@ -1,25 +1,24 @@
 #include "ParameterSeparator.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    ParameterSeparator::ParameterSeparator(Skin& newSkin)
-        : skin(&newSkin)
+    ParameterSeparator::ParameterSeparator(Theme& newTheme)
+        : theme(&newTheme)
     {
-        setSize(SkinDimensions::Widget::ParameterSeparator::kWidth, SkinDimensions::Widget::ParameterSeparator::kHeight);
+        setSize(kWidth, kHeight);
     }
 
-    void ParameterSeparator::setSkin(Skin& newSkin)
+    void ParameterSeparator::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
     void ParameterSeparator::paint(juce::Graphics& g)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -32,16 +31,16 @@ namespace tss
 
     void ParameterSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getParameterSeparatorBaseColour();
+        auto baseColour = theme->getParameterSeparatorBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ParameterSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto lineColour = skin->getParameterSeparatorLineColour();
+        auto lineColour = theme->getParameterSeparatorLineColour();
         auto lineY = bounds.getCentreY();
-        auto lineThickness = skin->getParameterSeparatorLineThickness();
+        auto lineThickness = kLineThickness;
         
         g.setColour(lineColour);
         g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, lineThickness);

@@ -6,15 +6,15 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(Skin& newSkin, double initValue = 0.0);
+        explicit Slider(Theme& newTheme, double initValue = 0.0);
         ~Slider() override = default;
 
-        void setSkin(Skin& newSkin);
+        void setTheme(Theme& newTheme);
 
         void paint(juce::Graphics& g) override;
 
@@ -28,7 +28,24 @@ namespace tss
 
         bool keyPressed(const juce::KeyPress& key) override;
 
+        static constexpr int getWidth() { return kWidth; }
+        static constexpr int getHeight() { return kHeight; }
+
     private:
+        inline constexpr static int kWidth = 60;
+        inline constexpr static int kHeight = 20;
+        inline constexpr static int kBackgroundWidth = 60;
+        inline constexpr static int kBackgroundHeight = 16;
+        inline constexpr static double kDragSensitivity = 0.5;
+        inline constexpr static double kShiftKeyStep = 10.0;
+
+        Theme* theme = nullptr;
+        FocusableWidget focusableWidget;
+        
+        double defaultValue = 0.0;
+        double dragStartValue = 0.0;
+        juce::Point<int> dragStartPosition;
+
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
@@ -43,13 +60,6 @@ namespace tss
         bool isDecrementKey(int keyCode) const;
         void updateValueWithStep(double step, bool increment);
         void resetToDefaultValue();
-
-        Skin* skin = nullptr;
-        FocusableWidget focusableWidget;
-        
-        double defaultValue = 0.0;
-        double dragStartValue = 0.0;
-        juce::Point<int> dragStartPosition;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Slider)
     };

@@ -4,28 +4,36 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 
     class ParameterLabel : public juce::Component
     {
     public:
-        explicit ParameterLabel(Skin& newSkin, const juce::String& text = juce::String());
+        explicit ParameterLabel(Theme& newTheme, const juce::String& text = juce::String());
         ~ParameterLabel() override = default;
 
-        void setSkin(Skin& newSkin);
+        void setTheme(Theme& newTheme);
         
         void setText(const juce::String& newText);
         juce::String getText() const { return labelText; }
 
         void paint(juce::Graphics& g) override;
 
+        static constexpr int getWidth() { return kWidth; }
+        static constexpr int getHeight() { return kHeight; }
+
     private:
+        inline constexpr static int kWidth = 90;
+        inline constexpr static int kHeight = 20;
+        inline constexpr static float kBackgroundPadding = 1.0f;
+        inline constexpr static float kTextLeftPadding = 2.0f;
+
+        Theme* theme = nullptr;
+        juce::String labelText;
+
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-
-        Skin* skin = nullptr;
-        juce::String labelText;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterLabel)
     };

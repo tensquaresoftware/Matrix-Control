@@ -1,29 +1,28 @@
 #include "VcfVcaPanel.h"
 
-#include "../../../../Skin/Skin.h"
-#include "../../../../Skin/SkinDimensions.h"
+#include "../../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-VcfVcaPanel::VcfVcaPanel(Skin& newSkin)
-    : skin(&newSkin)
+VcfVcaPanel::VcfVcaPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(tss::SkinDimensions::PatchEditModulePanel::kWidth, tss::SkinDimensions::PatchEditModulePanel::kHeight);
+    setSize(getWidth(), getHeight());
 }
 
 void VcfVcaPanel::paint(juce::Graphics& g)
 {
-    if (skin == nullptr)
+    if (theme == nullptr)
     {
         return;
     }
 
-    g.fillAll(skin->getPatchEditModulePanelBackgroundColour());
+    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
-void VcfVcaPanel::setSkin(Skin& newSkin)
+void VcfVcaPanel::setTheme(Theme& newTheme)
 {
-    skin = &newSkin;
+    theme = &newTheme;
     repaint();
 }
 

@@ -6,7 +6,7 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
     class ModuleName;
     class ParameterLabel;
     class Slider;
@@ -17,20 +17,25 @@ namespace tss
 
 class WidgetFactory;
 
-using tss::Skin;
+using tss::Theme;
 
 class Dco1Panel : public juce::Component
 {
 public:
-    Dco1Panel(Skin& newSkin, WidgetFactory& widgetFactory);
+    Dco1Panel(Theme& newTheme, WidgetFactory& widgetFactory);
     ~Dco1Panel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(Skin& newSkin);
+    void setTheme(Theme& newTheme);
+
+    static int getWidth() { return kWidth; }
+    static int getHeight() { return kHeight; }
 
 private:
-    Skin* skin;
+    inline constexpr static int kWidth = 150;
+    inline constexpr static int kHeight = 275;
+    Theme* theme;
 
     std::unique_ptr<tss::ModuleName> dco1ModuleName;
 

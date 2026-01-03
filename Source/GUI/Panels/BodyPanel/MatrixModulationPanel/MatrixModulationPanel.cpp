@@ -1,28 +1,28 @@
 #include "MatrixModulationPanel.h"
 
-#include "../../../Skin/Skin.h"
+#include "../../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-MatrixModulationPanel::MatrixModulationPanel(Skin& newSkin)
-    : skin(&newSkin)
+MatrixModulationPanel::MatrixModulationPanel(Theme& newTheme)
+    : theme(&newTheme)
 {
-    setSize(275, 315);
+    setSize(getWidth(), getHeight());
 }
 
 void MatrixModulationPanel::paint(juce::Graphics& g)
 {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
         
-        g.fillAll(skin->getMatrixModulationPanelBackgroundColour());
+        g.fillAll(theme->getMatrixModulationPanelBackgroundColour());
 }
 
-void MatrixModulationPanel::setSkin(Skin& newSkin)
+void MatrixModulationPanel::setTheme(Theme& newTheme)
 {
-        skin = &newSkin;
+        theme = &newTheme;
     repaint();
 }
 

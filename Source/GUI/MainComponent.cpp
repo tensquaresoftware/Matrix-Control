@@ -1,13 +1,13 @@
 #include "MainComponent.h"
 
-#include "../Shared/WidgetFactory.h"
+#include "../GUI/Factories/WidgetFactory.h"
 
-using tss::Skin;
+using tss::Theme;
 
-MainComponent::MainComponent(Skin& skin, WidgetFactory& widgetFactory)
-    : headerPanel(skin)
-    , bodyPanel(skin, widgetFactory)
-    , footerPanel(skin)
+MainComponent::MainComponent(Theme& theme, WidgetFactory& widgetFactory)
+    : headerPanel(theme)
+    , bodyPanel(theme, widgetFactory)
+    , footerPanel(theme)
 {
     addAndMakeVisible(headerPanel);
     addAndMakeVisible(bodyPanel);
@@ -26,10 +26,10 @@ void MainComponent::resized()
     footerPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight + bodyPanelHeight, bounds.getWidth(), footerHeight);
 }
 
-void MainComponent::setSkin(Skin& skin)
+void MainComponent::setTheme(Theme& theme)
 {
-    headerPanel.setSkin(skin);
-    bodyPanel.setSkin(skin);
-    footerPanel.setSkin(skin);
+    headerPanel.setTheme(theme);
+    bodyPanel.setTheme(theme);
+    footerPanel.setTheme(theme);
 }
 

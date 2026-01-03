@@ -8,21 +8,21 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
 }
 
 class WidgetFactory;
 
-using tss::Skin;
+using tss::Theme;
 
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(Skin& skin, WidgetFactory& widgetFactory);
+    MainComponent(Theme& theme, WidgetFactory& widgetFactory);
     ~MainComponent() override = default;
 
     void resized() override;
-    void setSkin(Skin& skin);
+    void setTheme(Theme& theme);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }

@@ -1,26 +1,25 @@
 #include "Button.h"
 
-#include "../Skin/Skin.h"
-#include "../Skin/SkinDimensions.h"
+#include "../Themes/Theme.h"
 
 namespace tss
 {
-    Button::Button(Skin& newSkin, int width, const juce::String& text)
+    Button::Button(Theme& newTheme, int width, const juce::String& text)
         : juce::Button(text)
-        , skin(&newSkin)
+        , theme(&newTheme)
     {
-        setSize(width, SkinDimensions::Widget::Button::kHeight);
+        setSize(width, kHeight);
     }
 
-    void Button::setSkin(Skin& newSkin)
+    void Button::setTheme(Theme& newTheme)
     {
-        skin = &newSkin;
+        theme = &newTheme;
         repaint();
     }
 
     void Button::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
     {
-        if (skin == nullptr)
+        if (theme == nullptr)
         {
             return;
         }
@@ -36,7 +35,7 @@ namespace tss
 
     void Button::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = skin->getButtonBaseColour();
+        auto baseColour = theme->getButtonBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
@@ -47,19 +46,19 @@ namespace tss
         
         if (!enabled)
         {
-            backgroundColour = skin->getButtonBackgroundColourOff();
+            backgroundColour = theme->getButtonBackgroundColourOff();
         }
         else if (isDown)
         {
-            backgroundColour = skin->getButtonBackgroundColourClicked();
+            backgroundColour = theme->getButtonBackgroundColourClicked();
         }
         else if (isHighlighted)
         {
-            backgroundColour = skin->getButtonBackgroundColourHoover();
+            backgroundColour = theme->getButtonBackgroundColourHoover();
         }
         else
         {
-            backgroundColour = skin->getButtonBackgroundColourOn();
+            backgroundColour = theme->getButtonBackgroundColourOn();
         }
         
         g.setColour(backgroundColour);
@@ -72,16 +71,16 @@ namespace tss
         
         if (!enabled)
         {
-            borderColour = skin->getButtonBorderColourOff();
+            borderColour = theme->getButtonBorderColourOff();
         }
         else
         {
-            borderColour = skin->getButtonBorderColourOn();
+            borderColour = theme->getButtonBorderColourOn();
         }
         
         g.setColour(borderColour);
         
-        auto borderThickness = skin->getButtonBorderThickness();
+        auto borderThickness = kBorderThickness;
         
         auto topBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY(), bounds.getWidth(), borderThickness);
         auto bottomBorder = juce::Rectangle<float>(bounds.getX(), bounds.getBottom() - borderThickness, bounds.getWidth(), borderThickness);
@@ -106,22 +105,22 @@ namespace tss
         
         if (!enabled)
         {
-            textColour = skin->getButtonTextColourOff();
+            textColour = theme->getButtonTextColourOff();
         }
         else if (isDown)
         {
-            textColour = skin->getButtonTextColourClicked();
+            textColour = theme->getButtonTextColourClicked();
         }
         else if (isHighlighted)
         {
-            textColour = skin->getButtonTextColourHoover();
+            textColour = theme->getButtonTextColourHoover();
         }
         else
         {
-            textColour = skin->getButtonTextColourOn();
+            textColour = theme->getButtonTextColourOn();
         }
 
-        auto font = skin->getButtonFont();
+        auto font = theme->getBaseFont();
 
         g.setColour(textColour);
         g.setFont(font);

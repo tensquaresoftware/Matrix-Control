@@ -1,17 +1,16 @@
 #include "HeaderPanel.h"
 
 #include "../../Widgets/Button.h"
-#include "../../Skin/Skin.h"
-#include "../../Skin/SkinDimensions.h"
+#include "../../Themes/Theme.h"
 
-using tss::Skin;
+using tss::Theme;
 
-HeaderPanel::HeaderPanel(Skin& newSkin)
-    : skin(&newSkin)
-    , buttonBlack(newSkin, tss::SkinDimensions::HeaderPanel::kButtonWidth, "BLACK")
-    , buttonCream(newSkin, tss::SkinDimensions::HeaderPanel::kButtonWidth, "CREAM")
-    , buttonDebug(newSkin, tss::SkinDimensions::HeaderPanel::kButtonWidth, "DEBUG")
-    , buttonDisabled(newSkin, tss::SkinDimensions::HeaderPanel::kButtonWidth, "DISABLED")
+HeaderPanel::HeaderPanel(Theme& newTheme)
+    : theme(&newTheme)
+    , buttonBlack(newTheme, getButtonWidth(), "BLACK")
+    , buttonCream(newTheme, getButtonWidth(), "CREAM")
+    , buttonDebug(newTheme, getButtonWidth(), "DEBUG")
+    , buttonDisabled(newTheme, getButtonWidth(), "DISABLED")
 {
     addAndMakeVisible(buttonBlack);
     addAndMakeVisible(buttonCream);
@@ -22,14 +21,14 @@ HeaderPanel::HeaderPanel(Skin& newSkin)
 
 void HeaderPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(skin->getHeaderPanelBackgroundColour());
+        g.fillAll(theme->getHeaderPanelBackgroundColour());
 }
 
 void HeaderPanel::resized()
 {
-    auto buttonSpacing = tss::SkinDimensions::HeaderPanel::kButtonSpacing;
-    auto buttonWidth = tss::SkinDimensions::HeaderPanel::kButtonWidth;
-    auto buttonHeight = tss::SkinDimensions::HeaderPanel::kButtonHeight;
+    auto buttonSpacing = getButtonSpacing();
+    auto buttonWidth = getButtonWidth();
+    auto buttonHeight = getButtonHeight();
     auto currentX = buttonSpacing;
     auto buttonY = (getHeight() - buttonHeight) / 2;
     auto buttonStep = buttonWidth + buttonSpacing;
@@ -46,13 +45,13 @@ void HeaderPanel::resized()
     buttonDisabled.setBounds(currentX, buttonY, buttonWidth, buttonHeight);
 }
 
-void HeaderPanel::setSkin(Skin& newSkin)
+void HeaderPanel::setTheme(Theme& newTheme)
 {
-        skin = &newSkin;
-    buttonBlack.setSkin(newSkin);
-    buttonCream.setSkin(newSkin);
-    buttonDebug.setSkin(newSkin);
-    buttonDisabled.setSkin(newSkin);
+        theme = &newTheme;
+    buttonBlack.setTheme(newTheme);
+    buttonCream.setTheme(newTheme);
+    buttonDebug.setTheme(newTheme);
+    buttonDisabled.setTheme(newTheme);
     repaint();
 }
 

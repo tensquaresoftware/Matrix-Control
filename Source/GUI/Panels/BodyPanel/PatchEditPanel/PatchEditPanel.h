@@ -6,13 +6,13 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
     class SectionName;
 }
 
 class WidgetFactory;
 
-using tss::Skin;
+using tss::Theme;
 
 class Dco1Panel;
 class Dco2Panel;
@@ -23,15 +23,20 @@ class RampPortamentoPanel;
 class PatchEditPanel : public juce::Component
 {
 public:
-    PatchEditPanel(Skin& skin, WidgetFactory& widgetFactory);
+    PatchEditPanel(Theme& newTheme, WidgetFactory& widgetFactory);
     ~PatchEditPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setSkin(Skin& skin);
+    void setTheme(Theme& newTheme);
+
+    static int getWidth() { return kWidth; }
+    static int getHeight() { return kHeight; }
 
 private:
-    Skin* skin;
+    inline constexpr static int kWidth = 810;
+    inline constexpr static int kHeight = 315;
+    Theme* theme;
 
     std::unique_ptr<tss::SectionName> sectionName;
     std::unique_ptr<Dco1Panel> dco1Panel;

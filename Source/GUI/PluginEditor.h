@@ -5,6 +5,9 @@
 
 #include "../Core/PluginProcessor.h"
 #include "Themes/Theme.h"
+#include "Panels/HeaderPanel/HeaderPanel.h"
+#include "Panels/BodyPanel/BodyPanel.h"
+#include "Panels/FooterPanel/FooterPanel.h"
 #include "MainComponent.h"
 
 class WidgetFactory;
@@ -19,7 +22,12 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
 
+    static int getWidth() { return kWidth; }
+    static int getHeight() { return kHeight; }
+
 private:
+    inline constexpr static int kWidth = 1325;
+    inline constexpr static int kHeight = 820;
 
     PluginProcessor& pluginProcessor;
     
@@ -28,7 +36,6 @@ private:
     std::unique_ptr<MainComponent> mainComponent;
     
     void updateTheme();
-    void validateSynthDescriptorsAtStartup();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

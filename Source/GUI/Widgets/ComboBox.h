@@ -6,7 +6,7 @@
 
 namespace tss
 {
-    class Skin;
+    class Theme;
     class PopupMenu;
 
     class ComboBox : public juce::ComboBox
@@ -18,10 +18,10 @@ namespace tss
             Large
         };
 
-        explicit ComboBox(Skin& newSkin, Size size = Size::Normal);
+        explicit ComboBox(Theme& newTheme, Size size = Size::Normal);
         ~ComboBox() override = default;
 
-        void setSkin(Skin& newSkin);
+        void setTheme(Theme& newTheme);
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;
@@ -31,7 +31,31 @@ namespace tss
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
+        static constexpr int getNormalWidth() { return kNormalWidth; }
+        static constexpr int getHeight() { return kHeight; }
+        static constexpr int getVerticalMargin() { return kVerticalMargin; }
+
     private:
+        inline constexpr static int kNormalWidth = 60;
+        inline constexpr static int kLargeWidth = 105;
+        inline constexpr static int kHeight = 20;
+
+        inline constexpr static int kNormalBackgroundWidth = 60;
+        inline constexpr static int kLargeBackgroundWidth = 105;
+        inline constexpr static int kBackgroundHeight = 16;
+        
+        inline constexpr static float kLeftPadding = 3.0f;
+        inline constexpr static float kRightPadding = 3.0f;
+        inline constexpr static float kBorderThickness = 1.0f;
+        inline constexpr static int kVerticalMargin = 4;
+        inline constexpr static float kTriangleBaseSize = 7.0f;
+        inline constexpr static float kTriangleHeightFactor = 0.8660254f; // √3 / 2
+
+        Theme* theme = nullptr;
+        FocusableWidget focusableWidget;
+        Size comboSize;
+        bool isPopupOpen = false;
+
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
@@ -40,11 +64,6 @@ namespace tss
         juce::Path createTrianglePath(float x, float y, float baseSize) const;
         
         juce::Rectangle<float> calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const;
-
-        Skin* skin = nullptr;
-        FocusableWidget focusableWidget;
-        Size comboSize;
-        bool isPopupOpen = false;
 
         friend class PopupMenu;
 

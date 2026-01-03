@@ -18,6 +18,7 @@ PluginProcessor::PluginProcessor()
     , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
     , midiManager(std::make_unique<MidiManager>(apvts))
 {
+    validateSynthDescriptorsAtStartup();
     initializeMidiPortProperties();
 }
 
@@ -175,6 +176,20 @@ void PluginProcessor::setMidiOutputPort(const juce::String& deviceId)
 juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
 {
     return ApvtsFactory::createParameterLayout();
+}
+
+void PluginProcessor::validateSynthDescriptorsAtStartup()
+{
+    auto validationResult = ApvtsFactory::validateSynthDescriptors();
+    if (!validationResult.isValid)
+    {
+        DBG("SynthDescriptors validation failed:");
+        for (const auto& error : validationResult.errors)
+        {
+            DBG("  ERROR: " + error);
+        }
+        jassertfalse;
+    }
 }
 
 void PluginProcessor::initializeMidiPortProperties()
