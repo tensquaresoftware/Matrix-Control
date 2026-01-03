@@ -40,11 +40,11 @@ endif()
 
 set(PLUGIN_SOURCES
     # Core
-    Source/Shared/ApvtsFactory.cpp
+    Source/Core/PluginProcessor.cpp
+    Source/Core/Factories/ApvtsFactory.cpp
     Source/Shared/SynthDescriptors.cpp
-    Source/Shared/WidgetFactory.cpp
-    Source/PluginProcessor.cpp
-    Source/PluginEditor.cpp
+    Source/GUI/PluginEditor.cpp
+    Source/GUI/Factories/WidgetFactory.cpp
     
     # Core - MIDI Communication Layer
     Source/Core/MIDI/Ports/MidiInputPort.cpp
@@ -56,9 +56,8 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/SysEx/SysExDecoder.cpp
     Source/Core/MIDI/SysEx/SysExEncoder.cpp
     
-    # GUI - Skin
-    Source/GUI/Skin/Skin.cpp
-    Source/GUI/Skin/SkinFactory.cpp
+    # GUI - Themes
+    Source/GUI/Themes/Theme.cpp
     
     # GUI - Main Component
     Source/GUI/MainComponent.cpp

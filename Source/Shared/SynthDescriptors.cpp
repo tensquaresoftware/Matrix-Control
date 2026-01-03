@@ -1939,5 +1939,26 @@ const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets = {
     }
 };
 
+// ============================================================================
+// Helper Functions Implementation
+// ============================================================================
+
+juce::String getGroupDisplayName(const juce::String& groupId)
+{
+    for (const auto& group : kAllGroups)
+    {
+        if (group.groupId == groupId)
+        {
+            return group.displayName;
+        }
+    }
+    return groupId;  // Fallback to ID if not found
+}
+
+juce::String getSectionDisplayName(const char* sectionId)
+{
+    return getGroupDisplayName(sectionId);
+}
+
 } // namespace SynthDescriptors
 

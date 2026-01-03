@@ -780,4 +780,11 @@ extern const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets;
 extern const std::array<std::vector<IntParameterDescriptor>, kMatrixModBusCount> kMatrixModBusIntParameters;
 extern const std::array<std::vector<ChoiceParameterDescriptor>, kMatrixModBusCount> kMatrixModBusChoiceParameters;
 
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+juce::String getGroupDisplayName(const juce::String& groupId);
+juce::String getSectionDisplayName(const char* sectionId);
+
 } // namespace SynthDescriptors
