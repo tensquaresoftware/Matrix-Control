@@ -17,17 +17,15 @@ namespace tss
 
 class WidgetFactory;
 
-using tss::Theme;
-
 class Dco1Panel : public juce::Component
 {
 public:
-    Dco1Panel(Theme& newTheme, WidgetFactory& widgetFactory);
+    Dco1Panel(tss::Theme& newTheme, WidgetFactory& widgetFactory);
     ~Dco1Panel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(Theme& newTheme);
+    void setTheme(tss::Theme& newTheme);
 
     static int getWidth() { return kWidth; }
     static int getHeight() { return kHeight; }
@@ -35,7 +33,7 @@ public:
 private:
     inline constexpr static int kWidth = 150;
     inline constexpr static int kHeight = 275;
-    Theme* theme;
+    tss::Theme* theme;
 
     std::unique_ptr<tss::ModuleName> dco1ModuleName;
 

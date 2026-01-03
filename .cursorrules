@@ -4,7 +4,7 @@
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
 - Contexte : Développement de plugins VST/AU avec JUCE
-- Dernière mise à jour : 2025-12-30
+- Dernière mise à jour : 2026-01-03
 
 
 ================================================================================
@@ -87,6 +87,9 @@
 - Classes : PascalCase
   * Exemple : PluginProcessor, PluginEditor, AudioAnalyzer
 - Éviter les underscore_case, sauf cas très particulier
+- Paramètres de constructeur : préfixe "in" pour éviter le shadowing
+  * Exemple : inParameterId, inReason, inWidgetId
+  * Permet d'initialiser clairement les membres : parameterId(inParameterId)
 
 [Organisation des includes]
 1. Headers système C++ (ex : <vector>, <memory>, etc. puis sauter une ligne)

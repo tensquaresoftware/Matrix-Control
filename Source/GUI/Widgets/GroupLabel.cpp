@@ -73,19 +73,17 @@ namespace tss
         auto textWidth = calculateTextWidth();
         auto textCentreX = textArea.getCentreX();
         auto lineY = textArea.getCentreY();
-        auto textSpacing = kTextSpacing;
-        auto leftLineEndX = textCentreX - textWidth * 0.5f - textSpacing;
+        auto leftLineEndX = textCentreX - textWidth * 0.5f - kTextSpacing;
         auto remainingWidth = leftLineEndX - textArea.getX();
 
         if (remainingWidth > 0.0f)
         {
             g.setColour(theme->getGroupLabelLineColour());
 
-            auto lineThickness = kLineThickness;
             auto leftLine = textArea;
             leftLine.setWidth(remainingWidth);
-            leftLine.setY(lineY - lineThickness * 0.5f);
-            leftLine.setHeight(lineThickness);
+            leftLine.setY(lineY - kLineThickness * 0.5f);
+            leftLine.setHeight(kLineThickness);
 
             g.fillRect(leftLine);
         }
@@ -102,19 +100,17 @@ namespace tss
         auto textWidth = calculateTextWidth();
         auto textCentreX = textArea.getCentreX();
         auto lineY = textArea.getCentreY();
-        auto textSpacing = kTextSpacing;
-        auto rightLineStartX = textCentreX + textWidth * 0.5f + textSpacing;
+        auto rightLineStartX = textCentreX + textWidth * 0.5f + kTextSpacing;
         auto remainingWidth = textArea.getRight() - rightLineStartX;
 
         if (remainingWidth > 0.0f)
         {
             g.setColour(theme->getGroupLabelLineColour());
 
-            auto lineThickness = kLineThickness;
             auto rightLine = textArea;
             rightLine.removeFromLeft(rightLineStartX - textArea.getX());
-            rightLine.setY(lineY - lineThickness * 0.5f);
-            rightLine.setHeight(lineThickness);
+            rightLine.setY(lineY - kLineThickness * 0.5f);
+            rightLine.setHeight(kLineThickness);
 
             g.fillRect(rightLine);
         }

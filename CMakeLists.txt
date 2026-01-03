@@ -45,6 +45,7 @@ set(PLUGIN_SOURCES
     Source/Shared/SynthDescriptors.cpp
     Source/GUI/PluginEditor.cpp
     Source/GUI/Factories/WidgetFactory.cpp
+    Source/GUI/Factories/WidgetFactoryValidator.cpp
     
     # Core - MIDI Communication Layer
     Source/Core/MIDI/Ports/MidiInputPort.cpp

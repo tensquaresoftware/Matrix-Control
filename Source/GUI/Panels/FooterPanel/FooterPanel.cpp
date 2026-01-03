@@ -4,14 +4,58 @@
 
 using tss::Theme;
 
-FooterPanel::FooterPanel(Theme& newTheme)
+const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
+const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
+
+FooterPanel::FooterPanel(Theme& newTheme, juce::AudioProcessorValueTreeState& apvtsRef)
     : theme(&newTheme)
+    , apvts(apvtsRef)
 {
+    // Écouter les changements de l'APVTS
+    apvts.state.addListener(this);
+    
+    // Initialiser avec le message actuel s'il existe
+    auto messageTextVar = apvts.state.getProperty(kMessageTextId, juce::String());
+    auto severityStrVar = apvts.state.getProperty(kMessageSeverityId, juce::String());
+    
+    juce::String messageText = messageTextVar.toString();
+    juce::String severityStr = severityStrVar.toString();
+    
+    if (messageText.isNotEmpty())
+    {
+        currentMessage = messageText;
+        currentSeverity = parseSeverity(severityStr);
+    }
+}
+
+FooterPanel::~FooterPanel()
+{
+    apvts.state.removeListener(this);
 }
 
 void FooterPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(theme->getFooterPanelBackgroundColour());
+    g.fillAll(theme->getFooterPanelBackgroundColour());
+    
+    if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
+        return;
+    
+    auto bounds = getLocalBounds().reduced(kPadding);
+    
+    // Couleur du texte selon la sévérité
+    g.setColour(getSeverityColour(currentSeverity));
+    g.setFont(theme->getBaseFont());
+    
+    // Icône (optionnel)
+    juce::String icon = getSeverityIcon(currentSeverity);
+    if (icon.isNotEmpty())
+    {
+        auto iconBounds = bounds.removeFromLeft(kIconSize + kPadding);
+        g.drawText(icon, iconBounds, juce::Justification::centredLeft);
+    }
+    
+    // Message
+    g.drawText(currentMessage, bounds, juce::Justification::centredLeft);
 }
 
 void FooterPanel::resized()
@@ -20,7 +64,74 @@ void FooterPanel::resized()
 
 void FooterPanel::setTheme(Theme& newTheme)
 {
-        theme = &newTheme;
+    theme = &newTheme;
     repaint();
+}
+
+void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
+                                          const juce::Identifier& property)
+{
+    if (property == kMessageTextId || property == kMessageSeverityId)
+    {
+        auto messageText = tree.getProperty(kMessageTextId, juce::String()).toString();
+        auto severityStr = tree.getProperty(kMessageSeverityId, juce::String()).toString();
+        
+        currentMessage = messageText;
+        currentSeverity = parseSeverity(severityStr);
+        
+        repaint();
+    }
+}
+
+FooterPanel::MessageSeverity FooterPanel::parseSeverity(const juce::String& severityStr) const
+{
+    if (severityStr == "info")
+        return MessageSeverity::Info;
+    if (severityStr == "success")
+        return MessageSeverity::Success;
+    if (severityStr == "warning")
+        return MessageSeverity::Warning;
+    if (severityStr == "error")
+        return MessageSeverity::Error;
+    
+    return MessageSeverity::None;
+}
+
+juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
+{
+    switch (severity)
+    {
+        case MessageSeverity::None:
+            return theme->getParameterLabelTextColour();
+        case MessageSeverity::Info:
+            return juce::Colour(0xFF808080);  // Gris
+        case MessageSeverity::Success:
+            return juce::Colour(0xFF00FF00);  // Vert
+        case MessageSeverity::Warning:
+            return juce::Colour(0xFFFF8800);  // Orange
+        case MessageSeverity::Error:
+            return juce::Colour(0xFFFF0000);  // Rouge
+        default:
+            return theme->getParameterLabelTextColour();
+    }
+}
+
+juce::String FooterPanel::getSeverityIcon(MessageSeverity severity) const
+{
+    switch (severity)
+    {
+        case MessageSeverity::None:
+            return juce::String();
+        case MessageSeverity::Info:
+            return "ℹ";
+        case MessageSeverity::Success:
+            return "✓";
+        case MessageSeverity::Warning:
+            return "⚠";
+        case MessageSeverity::Error:
+            return "✗";
+        default:
+            return juce::String();
+    }
 }
 

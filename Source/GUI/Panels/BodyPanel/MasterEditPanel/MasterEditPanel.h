@@ -7,16 +7,14 @@ namespace tss
     class Theme;
 }
 
-using tss::Theme;
-
 class MasterEditPanel : public juce::Component
 {
 public:
-    explicit MasterEditPanel(Theme& newTheme);
+    explicit MasterEditPanel(tss::Theme& newTheme);
     ~MasterEditPanel() override = default;
 
     void paint(juce::Graphics&) override;
-    void setTheme(Theme& newTheme);
+    void setTheme(tss::Theme& newTheme);
 
     static int getWidth() { return kWidth; }
     static int getHeight() { return kHeight; }
@@ -24,7 +22,7 @@ public:
 private:
     inline constexpr static int kWidth = 150;
     inline constexpr static int kHeight = 730;
-    Theme* theme;
+    tss::Theme* theme;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterEditPanel)
 };

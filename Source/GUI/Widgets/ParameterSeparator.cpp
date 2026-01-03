@@ -40,10 +40,9 @@ namespace tss
     {
         auto lineColour = theme->getParameterSeparatorLineColour();
         auto lineY = bounds.getCentreY();
-        auto lineThickness = kLineThickness;
         
         g.setColour(lineColour);
-        g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, lineThickness);
+        g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, kLineThickness);
     }
 }
 

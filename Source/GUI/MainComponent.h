@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Panels/HeaderPanel/HeaderPanel.h"
 #include "Panels/BodyPanel/BodyPanel.h"
@@ -13,16 +14,14 @@ namespace tss
 
 class WidgetFactory;
 
-using tss::Theme;
-
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(Theme& theme, WidgetFactory& widgetFactory);
+    MainComponent(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MainComponent() override = default;
 
     void resized() override;
-    void setTheme(Theme& theme);
+    void setTheme(tss::Theme& theme);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }

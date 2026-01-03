@@ -274,8 +274,7 @@ namespace tss
 
     int PopupMenu::getItemIndexAt(int x, int y) const
     {
-        auto borderThickness = kBorderThickness;
-        auto contentBounds = getLocalBounds().reduced(static_cast<int>(borderThickness));
+        auto contentBounds = getLocalBounds().reduced(static_cast<int>(kBorderThickness));
         
         if (! contentBounds.contains(x, y))
         {
@@ -342,8 +341,7 @@ namespace tss
 
     int PopupMenu::getRowFromY(int y) const
     {
-        auto itemHeight = kItemHeight;
-        return y / itemHeight;
+        return y / kItemHeight;
     }
 
     int PopupMenu::getItemIndexFromColumnAndRow(int column, int row) const
@@ -421,8 +419,7 @@ namespace tss
         
         auto borderColour = theme->getPopupMenuBorderColour();
         g.setColour(borderColour);
-        auto borderThickness = kBorderThickness;
-        g.drawRect(bounds.toFloat(), borderThickness);
+        g.drawRect(bounds.toFloat(), kBorderThickness);
     }
 
     void PopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<int>&)

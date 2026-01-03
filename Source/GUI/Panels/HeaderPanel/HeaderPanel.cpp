@@ -4,6 +4,7 @@
 #include "../../Themes/Theme.h"
 
 using tss::Theme;
+using tss::Button;
 
 HeaderPanel::HeaderPanel(Theme& newTheme)
     : theme(&newTheme)
@@ -21,7 +22,7 @@ HeaderPanel::HeaderPanel(Theme& newTheme)
 
 void HeaderPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(theme->getHeaderPanelBackgroundColour());
+    g.fillAll(theme->getHeaderPanelBackgroundColour());
 }
 
 void HeaderPanel::resized()
@@ -47,7 +48,7 @@ void HeaderPanel::resized()
 
 void HeaderPanel::setTheme(Theme& newTheme)
 {
-        theme = &newTheme;
+    theme = &newTheme;
     buttonBlack.setTheme(newTheme);
     buttonCream.setTheme(newTheme);
     buttonDebug.setTheme(newTheme);

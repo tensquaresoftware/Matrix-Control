@@ -59,11 +59,9 @@ namespace tss
         auto textColour = theme->getModuleNameTextColour();
         auto font = theme->getBaseFont().withHeight(16.0f).boldened();
 
-        auto textAreaHeight = kTextAreaHeight;
-        auto textLeftPadding = kTextLeftPadding;
         auto textBounds = bounds;
-        textBounds.setHeight(textAreaHeight);
-        textBounds.removeFromLeft(textLeftPadding);
+        textBounds.setHeight(kTextAreaHeight);
+        textBounds.removeFromLeft(kTextLeftPadding);
 
         g.setColour(textColour);
         g.setFont(font);
@@ -74,10 +72,9 @@ namespace tss
     {
         auto lineColour = getLineColour();
         
-        auto textAreaHeight = kTextAreaHeight;
         auto lineThickness = kLineThickness;
-        auto lineAreaHeight = bounds.getHeight() - textAreaHeight;
-        auto verticalOffset = textAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
+        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight;
+        auto verticalOffset = kTextAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
         
         auto lineBounds = bounds;
         lineBounds.setHeight(lineThickness);

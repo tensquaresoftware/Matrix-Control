@@ -95,13 +95,12 @@ namespace tss
         {
             g.setColour(getLineColour());
 
-            auto lineHeight = kLineHeight;
             auto contentArea = getContentArea(bounds);
-            auto verticalOffset = (contentArea.getHeight() - lineHeight) / 2.0f;
+            auto verticalOffset = (contentArea.getHeight() - kLineHeight) / 2.0f;
             
             auto line = contentArea;
             line.removeFromLeft(lineStartX);
-            line.setHeight(lineHeight);
+            line.setHeight(kLineHeight);
             line.translate(0.0f, verticalOffset);
             
             g.fillRect(line);
@@ -117,9 +116,8 @@ namespace tss
 
     juce::Rectangle<float> SectionName::getContentArea(const juce::Rectangle<float>& bounds) const
     {
-        auto contentHeight = kContentHeight;
         auto contentArea = bounds;
-        contentArea.setHeight(contentHeight);
+        contentArea.setHeight(kContentHeight);
         return contentArea;
     }
 

@@ -6,316 +6,242 @@
 #include "../../Shared/SynthDescriptors.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
-    : apvts(inApvts)
+    : validator(inApvts)
 {
+    buildSearchMaps();
 }
 
-namespace
+std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
+    const SynthDescriptors::IntParameterDescriptor* desc,
+    tss::Theme& theme)
 {
-    template<typename DescriptorType>
-    const DescriptorType* searchInVector(const std::vector<DescriptorType>& vec, const juce::String& id)
-    {
-        for (const auto& item : vec)
-        {
-            if constexpr (std::is_same_v<DescriptorType, SynthDescriptors::IntParameterDescriptor> || 
-                         std::is_same_v<DescriptorType, SynthDescriptors::ChoiceParameterDescriptor>)
-            {
-                if (item.parameterId == id)
-                {
-                    return &item;
-                }
-            }
-            else if constexpr (std::is_same_v<DescriptorType, SynthDescriptors::StandaloneWidgetDescriptor>)
-            {
-                if (item.widgetId == id)
-                {
-                    return &item;
-                }
-            }
-        }
-        return nullptr;
-    }
+    auto slider = std::make_unique<tss::Slider>(theme, static_cast<double>(desc->defaultValue));
+    slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
+    slider->setValue(static_cast<double>(desc->defaultValue));
+    return slider;
+}
+
+std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
+    const SynthDescriptors::ChoiceParameterDescriptor* desc,
+    tss::Theme& theme)
+{
+    auto comboBox = std::make_unique<tss::ComboBox>(theme);
+    
+    for (const auto& choice : desc->choices)
+        comboBox->addItem(choice, comboBox->getNumItems() + 1);
+    
+    comboBox->setSelectedItemIndex(desc->defaultIndex);
+    return comboBox;
 }
 
 std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
     tss::Theme& theme)
 {
+    validator.throwIfParameterIdEmpty(parameterId);
     const auto* desc = findIntParameter(parameterId);
-    jassert(desc != nullptr);
-    
-    if (desc == nullptr)
-    {
-        return nullptr;
-    }
-    
-    auto slider = std::make_unique<tss::Slider>(theme, static_cast<double>(desc->defaultValue));
-    slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
-    slider->setValue(static_cast<double>(desc->defaultValue));
-    
-    return slider;
+    validator.getIntParameterDescriptorOrThrow(desc, parameterId);
+    validator.validateIntParameterValues(desc, parameterId);
+    return createSliderFromDescriptor(desc, theme);
 }
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     const juce::String& parameterId,
     tss::Theme& theme)
 {
+    validator.throwIfParameterIdEmpty(parameterId);
     const auto* desc = findChoiceParameter(parameterId);
-    jassert(desc != nullptr);
-    
-    if (desc == nullptr)
-    {
-        return nullptr;
-    }
-    
-    auto comboBox = std::make_unique<tss::ComboBox>(theme);
-    
-    for (const auto& choice : desc->choices)
-    {
-        comboBox->addItem(choice, comboBox->getNumItems() + 1);
-    }
-    
-    comboBox->setSelectedItemIndex(desc->defaultIndex);
-    
-    return comboBox;
+    validator.getChoiceParameterDescriptorOrThrow(desc, parameterId);
+    validator.validateChoiceParameterValues(desc, parameterId);
+    return createComboBoxFromDescriptor(desc, theme);
 }
 
 std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     const juce::String& widgetId,
     tss::Theme& theme)
 {
+    validator.throwIfWidgetIdEmpty(widgetId);
     const auto* desc = findStandaloneWidget(widgetId);
-    jassert(desc != nullptr);
-    jassert(desc->widgetType == SynthDescriptors::StandaloneWidgetType::kButton);
+    validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
+    validator.validateWidgetType(desc, widgetId);
     
-    if (desc == nullptr || desc->widgetType != SynthDescriptors::StandaloneWidgetType::kButton)
-    {
-        return nullptr;
-    }
-    
-    auto button = std::make_unique<tss::Button>(
+    return std::make_unique<tss::Button>(
         theme, 
         tss::Button::getDefaultWidth(), 
         desc->displayName
     );
-    
-    return button;
 }
 
-juce::String WidgetFactory::getParameterDisplayName(const juce::String& parameterId)
+juce::String WidgetFactory::getParameterDisplayName(const juce::String& parameterId) const
 {
     const auto* intParam = findIntParameter(parameterId);
     if (intParam != nullptr)
-    {
         return intParam->displayName;
-    }
     
     const auto* choiceParam = findChoiceParameter(parameterId);
     if (choiceParam != nullptr)
-    {
         return choiceParam->displayName;
-    }
     
     return juce::String();
 }
 
-juce::String WidgetFactory::getGroupDisplayName(const juce::String& groupId)
+juce::String WidgetFactory::getGroupDisplayName(const juce::String& groupId) const
 {
     return SynthDescriptors::getGroupDisplayName(groupId);
 }
 
-juce::String WidgetFactory::getStandaloneWidgetDisplayName(const juce::String& widgetId)
+juce::String WidgetFactory::getStandaloneWidgetDisplayName(const juce::String& widgetId) const
 {
     const auto* desc = findStandaloneWidget(widgetId);
     if (desc != nullptr)
-    {
         return desc->displayName;
-    }
     
     return juce::String();
 }
 
-const SynthDescriptors::IntParameterDescriptor* WidgetFactory::findIntParameter(const juce::String& parameterId)
+const SynthDescriptors::IntParameterDescriptor* WidgetFactory::findIntParameter(const juce::String& parameterId) const
 {
-    const auto* param = searchInPatchEditModuleIntParameters(parameterId);
-    if (param != nullptr)
-        return param;
-    
-    param = searchInMatrixModulationBusIntParameters(parameterId);
-    if (param != nullptr)
-        return param;
-    
-    param = searchInVector(SynthDescriptors::kMasterEditIntParameters, parameterId);
-    if (param != nullptr)
-        return param;
-    
-    return nullptr;
+    auto it = intParameterMap.find(parameterId);
+    return (it != intParameterMap.end()) ? it->second : nullptr;
 }
 
-const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactory::findChoiceParameter(const juce::String& parameterId)
+const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactory::findChoiceParameter(const juce::String& parameterId) const
 {
-    const auto* param = searchInPatchEditModuleChoiceParameters(parameterId);
-    if (param != nullptr)
-        return param;
-    
-    param = searchInMatrixModulationBusChoiceParameters(parameterId);
-    if (param != nullptr)
-        return param;
-    
-    param = searchInVector(SynthDescriptors::kMasterEditChoiceParameters, parameterId);
-    if (param != nullptr)
-        return param;
-    
-    return nullptr;
+    auto it = choiceParameterMap.find(parameterId);
+    return (it != choiceParameterMap.end()) ? it->second : nullptr;
 }
 
-const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::findStandaloneWidget(const juce::String& widgetId)
+const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::findStandaloneWidget(const juce::String& widgetId) const
 {
-    const auto* widget = searchInPatchEditStandaloneWidgets(widgetId);
-    if (widget != nullptr)
-        return widget;
-    
-    widget = searchInPatchManagerStandaloneWidgets(widgetId);
-    if (widget != nullptr)
-        return widget;
-    
-    widget = searchInVector(SynthDescriptors::kMasterEditStandaloneWidgets, widgetId);
-    if (widget != nullptr)
-        return widget;
-    
-    return nullptr;
+    auto it = standaloneWidgetMap.find(widgetId);
+    return (it != standaloneWidgetMap.end()) ? it->second : nullptr;
 }
 
-const SynthDescriptors::GroupDescriptor* WidgetFactory::findGroup(const juce::String& groupId)
+void WidgetFactory::buildGroupMap()
 {
     for (const auto& group : SynthDescriptors::kAllGroups)
-    {
-        if (group.groupId == groupId)
-        {
-            return &group;
-        }
-    }
-    
-    return nullptr;
+        groupMap[group.groupId] = &group;
 }
 
-const SynthDescriptors::IntParameterDescriptor* WidgetFactory::searchInPatchEditModuleIntParameters(const juce::String& parameterId)
+const SynthDescriptors::GroupDescriptor* WidgetFactory::findGroup(const juce::String& groupId) const
 {
-    const auto* param = searchInVector(SynthDescriptors::kDco1IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kDco2IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kVcfVcaIntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kFmTrackIntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kRampPortamentoIntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kEnv1IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kEnv2IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kEnv3IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kLfo1IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kLfo2IntParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    return nullptr;
+    auto it = groupMap.find(groupId);
+    return (it != groupMap.end()) ? it->second : nullptr;
 }
 
-const SynthDescriptors::IntParameterDescriptor* WidgetFactory::searchInMatrixModulationBusIntParameters(const juce::String& parameterId)
+void WidgetFactory::buildSearchMaps()
 {
-    for (size_t bus = 0; bus < static_cast<size_t>(SynthDescriptors::kMatrixModBusCount); ++bus)
-    {
-        const auto* param = searchInVector(SynthDescriptors::kMatrixModBusIntParameters[bus], parameterId);
-        if (param != nullptr)
-            return param;
-    }
-    return nullptr;
+    buildIntParameterMap();
+    buildChoiceParameterMap();
+    buildStandaloneWidgetMap();
+    buildGroupMap();
 }
 
-const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactory::searchInPatchEditModuleChoiceParameters(const juce::String& parameterId)
+void WidgetFactory::buildIntParameterMap()
 {
-    const auto* param = searchInVector(SynthDescriptors::kDco1ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kDco2ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kVcfVcaChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kFmTrackChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kRampPortamentoChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kEnv1ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kEnv2ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kEnv3ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kLfo1ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    param = searchInVector(SynthDescriptors::kLfo2ChoiceParameters, parameterId);
-    if (param != nullptr) return param;
-    
-    return nullptr;
+    addPatchEditModuleIntParametersToMap();
+    addMatrixModulationBusIntParametersToMap();
+    addMasterEditIntParametersToMap();
 }
 
-const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactory::searchInMatrixModulationBusChoiceParameters(const juce::String& parameterId)
+void WidgetFactory::buildChoiceParameterMap()
 {
-    for (size_t bus = 0; bus < static_cast<size_t>(SynthDescriptors::kMatrixModBusCount); ++bus)
-    {
-        const auto* param = searchInVector(SynthDescriptors::kMatrixModBusChoiceParameters[bus], parameterId);
-        if (param != nullptr)
-            return param;
-    }
-    return nullptr;
+    addPatchEditModuleChoiceParametersToMap();
+    addMatrixModulationBusChoiceParametersToMap();
+    addMasterEditChoiceParametersToMap();
 }
 
-const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::searchInPatchEditStandaloneWidgets(const juce::String& widgetId)
+void WidgetFactory::buildStandaloneWidgetMap()
 {
-    const auto* widget = searchInVector(SynthDescriptors::kDcoStandaloneWidgets, widgetId);
-    if (widget != nullptr) return widget;
-    
-    widget = searchInVector(SynthDescriptors::kEnvStandaloneWidgets, widgetId);
-    if (widget != nullptr) return widget;
-    
-    widget = searchInVector(SynthDescriptors::kLfoStandaloneWidgets, widgetId);
-    if (widget != nullptr) return widget;
-    
-    return nullptr;
+    addPatchEditStandaloneWidgetsToMap();
+    addPatchManagerStandaloneWidgetsToMap();
+    addMasterEditStandaloneWidgetsToMap();
 }
 
-const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::searchInPatchManagerStandaloneWidgets(const juce::String& widgetId)
+void WidgetFactory::addIntParametersToMap(const std::vector<SynthDescriptors::IntParameterDescriptor>& parameters)
 {
-    const auto* widget = searchInVector(SynthDescriptors::kBankUtilityWidgets, widgetId);
-    if (widget != nullptr) return widget;
-    
-    widget = searchInVector(SynthDescriptors::kInternalPatchesWidgets, widgetId);
-    if (widget != nullptr) return widget;
-    
-    widget = searchInVector(SynthDescriptors::kComputerPatchesWidgets, widgetId);
-    if (widget != nullptr) return widget;
-    
-    return nullptr;
+    for (const auto& param : parameters)
+        intParameterMap[param.parameterId] = &param;
+}
+
+void WidgetFactory::addPatchEditModuleIntParametersToMap()
+{
+    addIntParametersToMap(SynthDescriptors::kDco1IntParameters);
+    addIntParametersToMap(SynthDescriptors::kDco2IntParameters);
+    addIntParametersToMap(SynthDescriptors::kVcfVcaIntParameters);
+    addIntParametersToMap(SynthDescriptors::kFmTrackIntParameters);
+    addIntParametersToMap(SynthDescriptors::kRampPortamentoIntParameters);
+    addIntParametersToMap(SynthDescriptors::kEnv1IntParameters);
+    addIntParametersToMap(SynthDescriptors::kEnv2IntParameters);
+    addIntParametersToMap(SynthDescriptors::kEnv3IntParameters);
+    addIntParametersToMap(SynthDescriptors::kLfo1IntParameters);
+    addIntParametersToMap(SynthDescriptors::kLfo2IntParameters);
+}
+
+void WidgetFactory::addMatrixModulationBusIntParametersToMap()
+{
+    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
+        addIntParametersToMap(SynthDescriptors::kMatrixModBusIntParameters[static_cast<size_t>(bus)]);
+}
+
+void WidgetFactory::addMasterEditIntParametersToMap()
+{
+    addIntParametersToMap(SynthDescriptors::kMasterEditIntParameters);
+}
+
+void WidgetFactory::addChoiceParametersToMap(const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& parameters)
+{
+    for (const auto& param : parameters)
+        choiceParameterMap[param.parameterId] = &param;
+}
+
+void WidgetFactory::addPatchEditModuleChoiceParametersToMap()
+{
+    addChoiceParametersToMap(SynthDescriptors::kDco1ChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kDco2ChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kVcfVcaChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kFmTrackChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kRampPortamentoChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kEnv1ChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kEnv2ChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kEnv3ChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kLfo1ChoiceParameters);
+    addChoiceParametersToMap(SynthDescriptors::kLfo2ChoiceParameters);
+}
+
+void WidgetFactory::addMatrixModulationBusChoiceParametersToMap()
+{
+    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
+        addChoiceParametersToMap(SynthDescriptors::kMatrixModBusChoiceParameters[static_cast<size_t>(bus)]);
+}
+
+void WidgetFactory::addMasterEditChoiceParametersToMap()
+{
+    addChoiceParametersToMap(SynthDescriptors::kMasterEditChoiceParameters);
+}
+
+void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<SynthDescriptors::StandaloneWidgetDescriptor>& widgets)
+{
+    for (const auto& widget : widgets)
+        standaloneWidgetMap[widget.widgetId] = &widget;
+}
+
+void WidgetFactory::addPatchEditStandaloneWidgetsToMap()
+{
+    addStandaloneWidgetsToMap(SynthDescriptors::kDcoStandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kEnvStandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kLfoStandaloneWidgets);
+}
+
+void WidgetFactory::addPatchManagerStandaloneWidgetsToMap()
+{
+    addStandaloneWidgetsToMap(SynthDescriptors::kBankUtilityWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kInternalPatchesWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kComputerPatchesWidgets);
+}
+
+void WidgetFactory::addMasterEditStandaloneWidgetsToMap()
+{
+    addStandaloneWidgetsToMap(SynthDescriptors::kMasterEditStandaloneWidgets);
 }
 

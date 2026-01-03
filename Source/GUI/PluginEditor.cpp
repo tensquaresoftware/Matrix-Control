@@ -14,7 +14,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     
     widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
     
-    mainComponent = std::make_unique<MainComponent>(*theme, *widgetFactory);
+    mainComponent = std::make_unique<MainComponent>(*theme, *widgetFactory, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent);
     
     auto& headerPanel = mainComponent->getHeaderPanel();

@@ -4,10 +4,10 @@
 
 using tss::Theme;
 
-MainComponent::MainComponent(Theme& theme, WidgetFactory& widgetFactory)
+MainComponent::MainComponent(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : headerPanel(theme)
     , bodyPanel(theme, widgetFactory)
-    , footerPanel(theme)
+    , footerPanel(theme, apvts)
 {
     addAndMakeVisible(headerPanel);
     addAndMakeVisible(bodyPanel);

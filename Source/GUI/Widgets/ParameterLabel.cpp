@@ -50,8 +50,7 @@ namespace tss
     void ParameterLabel::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto backgroundColour = theme->getParameterLabelBackgroundColour();
-        auto backgroundMargin = kBackgroundPadding;
-        auto backgroundBounds = bounds.reduced(backgroundMargin);
+        auto backgroundBounds = bounds.reduced(kBackgroundPadding);
         
         g.setColour(backgroundColour);
         g.fillRect(backgroundBounds);
@@ -67,8 +66,7 @@ namespace tss
         auto textColour = theme->getParameterLabelTextColour();
         auto font = theme->getBaseFont();
 
-        auto backgroundMargin = kBackgroundPadding;
-        auto textBounds = bounds.reduced(backgroundMargin);
+        auto textBounds = bounds.reduced(kBackgroundPadding);
         textBounds.removeFromLeft(kTextLeftPadding);
 
         g.setColour(textColour);

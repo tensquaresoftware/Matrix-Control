@@ -10,23 +10,20 @@ namespace tss
     class Button;
 }
 
-using tss::Theme;
-using tss::Button;
-
 class HeaderPanel : public juce::Component
 {
 public:
-    explicit HeaderPanel(Theme& newTheme);
+    explicit HeaderPanel(tss::Theme& newTheme);
     ~HeaderPanel() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(Theme& newTheme);
+    void setTheme(tss::Theme& newTheme);
 
-    Button& getButtonBlack() { return buttonBlack; }
-    Button& getButtonCream() { return buttonCream; }
-    Button& getButtonDebug() { return buttonDebug; }
-    Button& getButtonDisabled() { return buttonDisabled; }
+    tss::Button& getButtonBlack() { return buttonBlack; }
+    tss::Button& getButtonCream() { return buttonCream; }
+    tss::Button& getButtonDebug() { return buttonDebug; }
+    tss::Button& getButtonDisabled() { return buttonDisabled; }
 
     static int getHeight() { return kHeight; }
     static int getButtonWidth() { return kButtonWidth; }
@@ -39,12 +36,12 @@ private:
     inline constexpr static int kButtonHeight = 20;
     inline constexpr static int kButtonSpacing = 5;
 
-    Theme* theme;
+    tss::Theme* theme;
 
-    Button buttonBlack;
-    Button buttonCream;
-    Button buttonDebug;
-    Button buttonDisabled;
+    tss::Button buttonBlack;
+    tss::Button buttonCream;
+    tss::Button buttonDebug;
+    tss::Button buttonDisabled;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)
 };

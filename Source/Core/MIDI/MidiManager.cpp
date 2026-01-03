@@ -15,11 +15,11 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
     , sysExDecoder(std::make_unique<SysExDecoder>(*sysExParser))
     , sysExEncoder(std::make_unique<SysExEncoder>())
 {
-    this->apvts.state.setProperty("deviceDetected", false, nullptr);
-    this->apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
-    this->apvts.state.setProperty("lastError", juce::String(), nullptr);
-    this->apvts.state.setProperty("errorType", juce::String(), nullptr);
-    this->apvts.state.setProperty("lastPatchLoaded", juce::String(), nullptr);
+    apvts.state.setProperty("deviceDetected", false, nullptr);
+    apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
+    apvts.state.setProperty("lastError", juce::String(), nullptr);
+    apvts.state.setProperty("errorType", juce::String(), nullptr);
+    apvts.state.setProperty("lastPatchLoaded", juce::String(), nullptr);
     
     MidiLogger::getInstance().logInfo("MidiManager initialized");
 }
@@ -336,7 +336,7 @@ void MidiManager::stopMidiInputCallbacks()
     {
         midiInput->stop();
         midiReceiver->setMidiInput(nullptr);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(SysExConstants::kMidiInputStopDelayMs));
     }
     inputMidiPort->closePort();
 }

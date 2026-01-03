@@ -103,8 +103,7 @@ namespace tss
 
         auto triangleBaseSize = kTriangleBaseSize;
         auto triangleHeight = triangleBaseSize * kTriangleHeightFactor;
-        auto rightPadding = kRightPadding;
-        auto triangleX = bounds.getRight() - triangleBaseSize - rightPadding;
+        auto triangleX = bounds.getRight() - triangleBaseSize - kRightPadding;
         auto triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
 
         auto trianglePath = createTrianglePath(triangleX, triangleY, triangleBaseSize);

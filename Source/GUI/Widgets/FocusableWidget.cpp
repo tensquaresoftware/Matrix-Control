@@ -36,8 +36,7 @@ namespace tss
         {
             g.setColour(juce::Colours::transparentBlack);
         }
-        auto focusBorderThickness = kBorderThickness;
-        g.drawRect(bounds, focusBorderThickness);
+        g.drawRect(bounds, kBorderThickness);
     }
 }
 

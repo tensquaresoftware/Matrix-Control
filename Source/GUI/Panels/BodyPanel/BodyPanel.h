@@ -11,9 +11,6 @@ namespace tss
     class PanelSeparator;
 }
 
-using tss::Theme;
-using tss::PanelSeparator;
-
 class PatchEditPanel;
 class MatrixModulationPanel;
 class PatchManagerPanel;
@@ -23,12 +20,12 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(Theme& newTheme, WidgetFactory& widgetFactory);
+    BodyPanel(tss::Theme& newTheme, WidgetFactory& widgetFactory);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(Theme& newTheme);
+    void setTheme(tss::Theme& newTheme);
 
     static int getHeight() { return kHeight; }
     static int getSpacing() { return kSpacing; }
@@ -37,13 +34,13 @@ private:
     inline constexpr static int kHeight = 760;
     inline constexpr static int kSpacing = 15;
 
-    Theme* theme;
+    tss::Theme* theme;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel;
-    std::unique_ptr<PanelSeparator> panelSeparator1;
+    std::unique_ptr<tss::PanelSeparator> panelSeparator1;
     std::unique_ptr<MatrixModulationPanel> matrixModulationPanel;
     std::unique_ptr<PatchManagerPanel> patchManagerPanel;
-    std::unique_ptr<PanelSeparator> panelSeparator2;
+    std::unique_ptr<tss::PanelSeparator> panelSeparator2;
     std::unique_ptr<MasterEditPanel> masterEditPanel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BodyPanel)
