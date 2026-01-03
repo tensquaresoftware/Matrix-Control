@@ -137,21 +137,29 @@ namespace tss
 
     void ComboBox::showPopup()
     {
-        if (isEnabled() && getNumItems() > 0)
+        if (! isEnabled() || getNumItems() == 0)
         {
-            isPopupOpen = true;
-            repaint();
-            PopupMenu::show(*this);
+            return;
         }
+
+        // Defer popup creation and display asynchronously, just like JUCE does
+        // This prevents blocking the message thread during popup creation
+        juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this)]()
+        {
+            if (safePointer != nullptr && safePointer->isEnabled() && safePointer->getNumItems() > 0)
+            {
+                safePointer->isPopupOpen = true;
+                PopupMenu::show(*safePointer);
+            }
+        });
+        
+        repaint();
     }
 
     void ComboBox::mouseDown(const juce::MouseEvent& e)
     {
         if (isEnabled())
         {
-            grabKeyboardFocus();
-            focusableWidget.handleFocusGained(this);
-            
             if (e.mods.isLeftButtonDown())
             {
                 showPopup();

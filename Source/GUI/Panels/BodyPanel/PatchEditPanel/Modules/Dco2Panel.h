@@ -14,6 +14,7 @@ public:
     ~Dco2Panel() override = default;
 
     void paint(juce::Graphics&) override;
+    void resized() override;
     void setTheme(tss::Theme& newTheme);
 
     static int getWidth() { return kWidth; }

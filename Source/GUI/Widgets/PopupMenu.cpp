@@ -146,13 +146,8 @@ namespace tss
         itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
         columnWidth = comboBox.getWidth();
         
-        auto separatorWidth = kSeparatorWidth;
-        auto itemHeight = kItemHeight;
-        auto borderThickness = kBorderThickness;
-        auto totalWidth = columnCount * columnWidth + (columnCount - 1) * separatorWidth;
-        auto totalHeight = itemsPerColumn * itemHeight;
-        
-        setSize(totalWidth + static_cast<int>(borderThickness * 2.0f), totalHeight + static_cast<int>(borderThickness * 2.0f));
+        // Note: setSize() is now called in show() after adding to parent
+        // to avoid triggering expensive events before the component is in the hierarchy
     }
 
     int PopupMenu::calculateColumnCount(int totalItems) const
@@ -172,75 +167,60 @@ namespace tss
         return (totalItems + numColumns - 1) / numColumns;
     }
 
-    juce::Point<int> PopupMenu::calculatePopupPosition() const
+    juce::Component* PopupMenu::findTopLevelComponent() const
     {
+        auto* component = comboBox.getParentComponent();
+        while (component != nullptr)
+        {
+            auto* parent = component->getParentComponent();
+            if (parent == nullptr)
+            {
+                return component;
+            }
+            component = parent;
+        }
+        return nullptr;
+    }
+
+    juce::Point<int> PopupMenu::calculatePopupPosition(juce::Component* topLevelComponent) const
+    {
+        if (topLevelComponent == nullptr)
+        {
+            return juce::Point<int>();
+        }
+
         auto popupWidth = getWidth();
         auto popupHeight = getHeight();
         
-        auto x = calculatePopupX(popupWidth);
-        auto y = calculatePopupY(popupHeight);
+        // Single call to getScreenBounds() for each component
+        auto comboBoxScreenBounds = comboBox.getScreenBounds();
+        auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
+        
+        // Calculate all needed values from bounds
+        auto comboX = comboBoxScreenBounds.getX() - topLevelScreenBounds.getX();
+        auto comboY = comboBoxScreenBounds.getY() - topLevelScreenBounds.getY();
+        auto comboWidth = comboBoxScreenBounds.getWidth();
+        auto comboHeight = comboBoxScreenBounds.getHeight();
+        
+        // Calculate X position
+        auto spaceRight = topLevelScreenBounds.getRight() - comboBoxScreenBounds.getRight();
+        auto spaceLeft = comboX;
+        auto x = (spaceRight < popupWidth && spaceRight < spaceLeft) 
+                 ? comboX + comboWidth - popupWidth 
+                 : comboX;
+        
+        // Calculate Y position
+        auto verticalMargin = ComboBox::getVerticalMargin();
+        auto spaceBelow = topLevelScreenBounds.getBottom() - comboBoxScreenBounds.getBottom();
+        auto spaceAbove = comboY;
+        auto requiredSpace = popupHeight + verticalMargin;
+        auto y = comboY + comboHeight + verticalMargin;
+        if (spaceBelow < requiredSpace && spaceAbove >= requiredSpace)
+        {
+            y = comboY - popupHeight - verticalMargin;
+        }
         
         return juce::Point<int>(x, y);
-    }
-
-    int PopupMenu::calculatePopupX(int popupWidth) const
-    {
-        auto* parent = comboBox.getParentComponent();
-        if (parent == nullptr)
-        {
-            return comboBox.getX();
-        }
-        
-        auto comboBounds = comboBox.getBounds();
-        auto comboX = comboBox.getX();
-        auto comboWidth = comboBounds.getWidth();
-        auto parentBounds = parent->getBounds();
-        
-        auto spaceRight = parentBounds.getRight() - (comboX + comboWidth);
-        auto spaceLeft = comboX - parentBounds.getX();
-        
-        if (spaceRight >= popupWidth || spaceRight >= spaceLeft)
-        {
-            return comboX;
-        }
-        else
-        {
-            return comboX + comboWidth - popupWidth;
-        }
-    }
-
-    int PopupMenu::calculatePopupY(int popupHeight) const
-    {
-        auto* parent = comboBox.getParentComponent();
-        if (parent == nullptr)
-        {
-            return comboBox.getBottom();
-        }
-        
-        auto comboBounds = comboBox.getBounds();
-        auto comboY = comboBox.getY();
-        auto comboHeight = comboBounds.getHeight();
-        auto parentBounds = parent->getBounds();
-        
-        auto spaceBelow = parentBounds.getBottom() - (comboY + comboHeight);
-        auto spaceAbove = comboY - parentBounds.getY();
-        
-        auto verticalMargin = ComboBox::getVerticalMargin();
-        auto requiredSpaceBelow = popupHeight + verticalMargin;
-        auto requiredSpaceAbove = popupHeight + verticalMargin;
-        
-        if (spaceBelow >= requiredSpaceBelow || spaceBelow >= spaceAbove)
-        {
-            return comboY + comboHeight + verticalMargin;
-        }
-        else if (spaceAbove >= requiredSpaceAbove)
-        {
-            return comboY - popupHeight - verticalMargin;
-        }
-        else
-        {
-            return comboY + comboHeight + verticalMargin;
-        }
     }
 
     juce::Rectangle<int> PopupMenu::getItemBounds(int itemIndex) const
@@ -656,14 +636,56 @@ namespace tss
             return;
         }
 
+        auto* topLevelComponent = comboBoxRef.getTopLevelComponent();
+        if (topLevelComponent == nullptr)
+        {
+            return;
+        }
+
         auto popupMenu = std::make_unique<PopupMenu>(comboBoxRef);
-        
-        auto popupPosition = popupMenu->calculatePopupPosition();
-        
         auto* rawPtr = popupMenu.get();
-        parent->addAndMakeVisible(popupMenu.release());
         
-        rawPtr->setTopLeftPosition(popupPosition);
+        // Calculate size before adding to parent (layout is already calculated in constructor)
+        auto columnCount = rawPtr->columnCount;
+        auto itemsPerColumn = rawPtr->itemsPerColumn;
+        auto columnWidth = rawPtr->columnWidth;
+        auto separatorWidth = kSeparatorWidth;
+        auto itemHeight = kItemHeight;
+        auto borderThickness = kBorderThickness;
+        auto totalWidth = columnCount * columnWidth + (columnCount - 1) * separatorWidth;
+        auto totalHeight = itemsPerColumn * itemHeight;
+        auto popupSize = juce::Point<int>(totalWidth + static_cast<int>(borderThickness * 2.0f),
+                                          totalHeight + static_cast<int>(borderThickness * 2.0f));
+        
+        // Pre-calculate position before adding to parent
+        auto comboBoxScreenBounds = comboBoxRef.getScreenBounds();
+        auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
+        auto verticalMargin = ComboBox::getVerticalMargin();
+        
+        auto desiredPopupTopLeft = comboBoxRef.localPointToGlobal(juce::Point<int>(0, comboBoxRef.getHeight() + verticalMargin));
+        auto popupWidth = popupSize.getX();
+        auto popupHeight = popupSize.getY();
+        
+        // Adjust X position
+        if (desiredPopupTopLeft.getX() + popupWidth > topLevelScreenBounds.getRight())
+        {
+            desiredPopupTopLeft.setX(comboBoxRef.localPointToGlobal(juce::Point<int>(comboBoxRef.getWidth() - popupWidth, 0)).getX());
+        }
+
+        // Adjust Y position
+        if (desiredPopupTopLeft.getY() + popupHeight > topLevelScreenBounds.getBottom())
+        {
+            desiredPopupTopLeft.setY(comboBoxRef.localPointToGlobal(juce::Point<int>(0, -popupHeight - verticalMargin)).getY());
+        }
+        
+        // Convert screen position to top-level component coordinates
+        auto popupPosition = desiredPopupTopLeft - topLevelScreenBounds.getPosition();
+        
+        topLevelComponent->addAndMakeVisible(popupMenu.release());
+        
+        // Use setBounds() instead of separate setSize() and setTopLeftPosition() calls
+        // This is more efficient as it combines both operations
+        rawPtr->setBounds(popupPosition.getX(), popupPosition.getY(), popupSize.getX(), popupSize.getY());
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         

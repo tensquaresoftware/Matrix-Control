@@ -45,9 +45,8 @@ namespace tss
         int calculateColumnCount(int totalItems) const;
         int calculateItemsPerColumn(int totalItems, int columnCount) const;
         
-        juce::Point<int> calculatePopupPosition() const;
-        int calculatePopupX(int popupWidth) const;
-        int calculatePopupY(int popupHeight) const;
+        juce::Point<int> calculatePopupPosition(juce::Component* topLevelComponent) const;
+        juce::Component* findTopLevelComponent() const;
         
         juce::Rectangle<int> getItemBounds(int itemIndex) const;
         int getItemIndexAt(int x, int y) const;

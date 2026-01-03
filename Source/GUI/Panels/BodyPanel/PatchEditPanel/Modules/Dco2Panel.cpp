@@ -20,6 +20,10 @@ void Dco2Panel::paint(juce::Graphics& g)
     g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
+void Dco2Panel::resized()
+{
+}
+
 void Dco2Panel::setTheme(Theme& newTheme)
 {
     theme = &newTheme;
