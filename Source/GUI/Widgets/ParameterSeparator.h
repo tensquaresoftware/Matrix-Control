@@ -9,10 +9,10 @@ namespace tss
     class ParameterSeparator : public juce::Component
     {
     public:
-        explicit ParameterSeparator(Theme& newTheme);
+        explicit ParameterSeparator(Theme& inTheme);
         ~ParameterSeparator() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
 

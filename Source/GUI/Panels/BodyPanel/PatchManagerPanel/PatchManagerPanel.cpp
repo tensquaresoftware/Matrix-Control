@@ -4,8 +4,8 @@
 
 using tss::Theme;
 
-PatchManagerPanel::PatchManagerPanel(Theme& newTheme)
-    : theme(&newTheme)
+PatchManagerPanel::PatchManagerPanel(Theme& inTheme)
+    : theme(&inTheme)
 {
     setSize(getWidth(), getHeight());
 }
@@ -20,9 +20,9 @@ void PatchManagerPanel::paint(juce::Graphics& g)
         g.fillAll(theme->getPatchManagerPanelBackgroundColour());
 }
 
-void PatchManagerPanel::setTheme(Theme& newTheme)
+void PatchManagerPanel::setTheme(Theme& inTheme)
 {
-        theme = &newTheme;
+        theme = &inTheme;
     repaint();
 }
 

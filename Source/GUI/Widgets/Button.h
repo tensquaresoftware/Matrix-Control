@@ -9,10 +9,10 @@ namespace tss
     class Button : public juce::Button
     {
     public:
-        explicit Button(Theme& newTheme, int width, const juce::String& text = {});
+        explicit Button(Theme& inTheme, int width, const juce::String& text = {});
         ~Button() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
         
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 

@@ -6,7 +6,7 @@ using tss::Theme;
 
 MainComponent::MainComponent(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : headerPanel(theme)
-    , bodyPanel(theme, widgetFactory)
+    , bodyPanel(theme, widgetFactory, apvts)
     , footerPanel(theme, apvts)
 {
     addAndMakeVisible(headerPanel);

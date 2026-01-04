@@ -6,7 +6,7 @@
 
 class MidiManager;
 
-class PluginProcessor : public juce::AudioProcessor
+class PluginProcessor : public juce::AudioProcessor, public juce::ValueTree::Listener
 {
 public:
     PluginProcessor();
@@ -47,12 +47,26 @@ public:
     void setMidiInputPort(const juce::String& deviceId);
     void setMidiOutputPort(const juce::String& deviceId);
 
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                 const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree& parentTree,
+                            juce::ValueTree& childWhichHasBeenAdded) override;
+    void valueTreeChildRemoved(juce::ValueTree& parentTree,
+                              juce::ValueTree& childWhichHasBeenRemoved,
+                              int indexFromWhichChildWasRemoved) override;
+    void valueTreeChildOrderChanged(juce::ValueTree& parentTreeWhoseChildrenHaveChanged,
+                                   int oldIndex, int newIndex) override;
+    void valueTreeParentChanged(juce::ValueTree& treeWhoseParentHasChanged) override;
+    void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
+
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validateSynthDescriptorsAtStartup();
     void initializeMidiPortProperties();
     void enableFileLoggingForSession();
     void closeLogFileForSession();
+    void enableApvtsLogging();
+    void disableApvtsLogging();
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;

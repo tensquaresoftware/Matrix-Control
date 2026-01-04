@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    PanelSeparator::PanelSeparator(Theme& newTheme)
-        : theme(&newTheme)
+    PanelSeparator::PanelSeparator(Theme& inTheme)
+        : theme(&inTheme)
     {
         setSize(kWidth, kHeight);
     }
 
-    void PanelSeparator::setTheme(Theme& newTheme)
+    void PanelSeparator::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

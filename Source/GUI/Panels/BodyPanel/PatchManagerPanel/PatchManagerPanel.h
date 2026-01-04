@@ -10,11 +10,11 @@ namespace tss
 class PatchManagerPanel : public juce::Component
 {
 public:
-    explicit PatchManagerPanel(tss::Theme& newTheme);
+    explicit PatchManagerPanel(tss::Theme& inTheme);
     ~PatchManagerPanel() override = default;
 
     void paint(juce::Graphics&) override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     static int getWidth() { return kWidth; }
     static int getHeight() { return kHeight; }

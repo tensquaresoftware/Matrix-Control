@@ -1,5 +1,5 @@
 #include "MidiOutputPort.h"
-#include "../Utilities/MidiLogger.h"
+#include "../../Loggers/MidiLogger.h"
 
 MidiOutputPort::MidiOutputPort()
     : portIsOpen(false)

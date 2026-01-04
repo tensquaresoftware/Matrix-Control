@@ -1639,8 +1639,8 @@ const std::array<std::vector<IntParameterDescriptor>, kMatrixModBusCount> kMatri
 // Master Edit Standalone Widgets
 const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets = {};
 
-// Patch Edit Standalone Widgets - DCO Modules
-const std::vector<StandaloneWidgetDescriptor> kDcoStandaloneWidgets = {
+// Patch Edit Standalone Widgets - DCO 1 Module
+const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kDco1Init,
         .displayName = WidgetDisplayNames::kDco1Init,
@@ -1658,7 +1658,11 @@ const std::vector<StandaloneWidgetDescriptor> kDcoStandaloneWidgets = {
         .displayName = WidgetDisplayNames::kDco1Paste,
         .parentGroupId = ModuleIds::kDco1,
         .widgetType = StandaloneWidgetType::kButton
-    },
+    }
+};
+
+// Patch Edit Standalone Widgets - DCO 2 Module
+const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kDco2Init,
         .displayName = WidgetDisplayNames::kDco2Init,
@@ -1679,8 +1683,38 @@ const std::vector<StandaloneWidgetDescriptor> kDcoStandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - Envelope Modules
-const std::vector<StandaloneWidgetDescriptor> kEnvStandaloneWidgets = {
+// Patch Edit Standalone Widgets - VCF/VCA Module
+const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets = {
+    {
+        .widgetId = WidgetIds::kVcfVcaInit,
+        .displayName = WidgetDisplayNames::kVcfVcaInit,
+        .parentGroupId = ModuleIds::kVcfVca,
+        .widgetType = StandaloneWidgetType::kButton
+    }
+};
+
+// Patch Edit Standalone Widgets - FM/TRACK Module
+const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets = {
+    {
+        .widgetId = WidgetIds::kFmTrackInit,
+        .displayName = WidgetDisplayNames::kFmTrackInit,
+        .parentGroupId = ModuleIds::kFmTrack,
+        .widgetType = StandaloneWidgetType::kButton
+    }
+};
+
+// Patch Edit Standalone Widgets - RAMP/PORTAMENTO Module
+const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets = {
+    {
+        .widgetId = WidgetIds::kRampPortamentoInit,
+        .displayName = WidgetDisplayNames::kRampPortamentoInit,
+        .parentGroupId = ModuleIds::kRampPortamento,
+        .widgetType = StandaloneWidgetType::kButton
+    }
+};
+
+// Patch Edit Standalone Widgets - ENV 1 Module
+const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kEnv1Init,
         .displayName = WidgetDisplayNames::kEnv1Init,
@@ -1698,7 +1732,11 @@ const std::vector<StandaloneWidgetDescriptor> kEnvStandaloneWidgets = {
         .displayName = WidgetDisplayNames::kEnv1Paste,
         .parentGroupId = ModuleIds::kEnvelope1,
         .widgetType = StandaloneWidgetType::kButton
-    },
+    }
+};
+
+// Patch Edit Standalone Widgets - ENV 2 Module
+const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kEnv2Init,
         .displayName = WidgetDisplayNames::kEnv2Init,
@@ -1716,7 +1754,11 @@ const std::vector<StandaloneWidgetDescriptor> kEnvStandaloneWidgets = {
         .displayName = WidgetDisplayNames::kEnv2Paste,
         .parentGroupId = ModuleIds::kEnvelope2,
         .widgetType = StandaloneWidgetType::kButton
-    },
+    }
+};
+
+// Patch Edit Standalone Widgets - ENV 3 Module
+const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kEnv3Init,
         .displayName = WidgetDisplayNames::kEnv3Init,
@@ -1737,8 +1779,8 @@ const std::vector<StandaloneWidgetDescriptor> kEnvStandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - LFO Modules
-const std::vector<StandaloneWidgetDescriptor> kLfoStandaloneWidgets = {
+// Patch Edit Standalone Widgets - LFO 1 Module
+const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kLfo1Init,
         .displayName = WidgetDisplayNames::kLfo1Init,
@@ -1756,7 +1798,11 @@ const std::vector<StandaloneWidgetDescriptor> kLfoStandaloneWidgets = {
         .displayName = WidgetDisplayNames::kLfo1Paste,
         .parentGroupId = ModuleIds::kLfo1,
         .widgetType = StandaloneWidgetType::kButton
-    },
+    }
+};
+
+// Patch Edit Standalone Widgets - LFO 2 Module
+const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets = {
     {
         .widgetId = WidgetIds::kLfo2Init,
         .displayName = WidgetDisplayNames::kLfo2Init,

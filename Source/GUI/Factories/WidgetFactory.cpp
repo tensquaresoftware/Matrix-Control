@@ -228,9 +228,16 @@ void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<SynthDescriptors
 
 void WidgetFactory::addPatchEditStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(SynthDescriptors::kDcoStandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kEnvStandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kLfoStandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kDco1StandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kDco2StandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kVcfVcaStandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kFmTrackStandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kRampPortamentoStandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kEnv1StandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kEnv2StandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kEnv3StandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kLfo1StandaloneWidgets);
+    addStandaloneWidgetsToMap(SynthDescriptors::kLfo2StandaloneWidgets);
 }
 
 void WidgetFactory::addPatchManagerStandaloneWidgetsToMap()

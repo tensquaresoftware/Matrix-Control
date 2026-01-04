@@ -658,7 +658,6 @@ namespace tss
                                           totalHeight + static_cast<int>(borderThickness * 2.0f));
         
         // Pre-calculate position before adding to parent
-        auto comboBoxScreenBounds = comboBoxRef.getScreenBounds();
         auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
         auto verticalMargin = ComboBox::getVerticalMargin();
         

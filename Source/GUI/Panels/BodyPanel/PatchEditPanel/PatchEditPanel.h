@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 namespace tss
 {
@@ -21,12 +22,12 @@ class RampPortamentoPanel;
 class PatchEditPanel : public juce::Component
 {
 public:
-    PatchEditPanel(tss::Theme& newTheme, WidgetFactory& widgetFactory);
+    PatchEditPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchEditPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     static int getWidth() { return kWidth; }
     static int getHeight() { return kHeight; }

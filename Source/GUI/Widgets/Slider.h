@@ -11,10 +11,10 @@ namespace tss
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(Theme& newTheme, double initValue = 0.0);
+        explicit Slider(Theme& inTheme, double initValue = 0.0);
         ~Slider() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
 

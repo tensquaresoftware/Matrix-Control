@@ -4,8 +4,8 @@
 
 using tss::Theme;
 
-MasterEditPanel::MasterEditPanel(Theme& newTheme)
-    : theme(&newTheme)
+MasterEditPanel::MasterEditPanel(Theme& inTheme)
+    : theme(&inTheme)
 {
     setSize(getWidth(), getHeight());
 }
@@ -20,9 +20,9 @@ void MasterEditPanel::paint(juce::Graphics& g)
         g.fillAll(theme->getMasterEditPanelBackgroundColour());
 }
 
-void MasterEditPanel::setTheme(Theme& newTheme)
+void MasterEditPanel::setTheme(Theme& inTheme)
 {
-        theme = &newTheme;
+        theme = &inTheme;
     repaint();
 }
 

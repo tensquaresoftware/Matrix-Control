@@ -2,7 +2,7 @@
 
 #include "MidiReceiver.h"
 
-#include "../Utilities/MidiLogger.h"
+#include "../../Loggers/MidiLogger.h"
 
 MidiReceiver::MidiReceiver()
     : midiInput(nullptr)

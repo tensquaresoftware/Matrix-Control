@@ -11,25 +11,25 @@
 using tss::Theme;
 using tss::PanelSeparator;
 
-BodyPanel::BodyPanel(Theme& newTheme, WidgetFactory& widgetFactory)
-    : theme(&newTheme)
+BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme(&inTheme)
 {
-    patchEditPanel = std::make_unique<PatchEditPanel>(newTheme, widgetFactory);
+    patchEditPanel = std::make_unique<PatchEditPanel>(inTheme, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel);
 
-    panelSeparator1 = std::make_unique<PanelSeparator>(newTheme);
+    panelSeparator1 = std::make_unique<PanelSeparator>(inTheme);
     addAndMakeVisible(*panelSeparator1);
 
-    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(newTheme);
+    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(inTheme);
     addAndMakeVisible(*matrixModulationPanel);
 
-    patchManagerPanel = std::make_unique<PatchManagerPanel>(newTheme);
+    patchManagerPanel = std::make_unique<PatchManagerPanel>(inTheme);
     addAndMakeVisible(*patchManagerPanel);
 
-    panelSeparator2 = std::make_unique<PanelSeparator>(newTheme);
+    panelSeparator2 = std::make_unique<PanelSeparator>(inTheme);
     addAndMakeVisible(*panelSeparator2);
 
-    masterEditPanel = std::make_unique<MasterEditPanel>(newTheme);
+    masterEditPanel = std::make_unique<MasterEditPanel>(inTheme);
     addAndMakeVisible(*masterEditPanel);
 }
 
@@ -68,9 +68,9 @@ void BodyPanel::resized()
     masterEditPanel->setBounds(masterEditPanelX, masterEditPanelY, MasterEditPanel::getWidth(), MasterEditPanel::getHeight());
 }
 
-void BodyPanel::setTheme(Theme& newTheme)
+void BodyPanel::setTheme(Theme& inTheme)
 {
-        theme = &newTheme;
+        theme = &inTheme;
 
     if (patchEditPanel != nullptr)
     {

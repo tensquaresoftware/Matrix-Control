@@ -4,8 +4,8 @@
 
 namespace tss
 {
-    ModuleName::ModuleName(Theme& newTheme, const juce::String& text, Size size, ColourVariant variant)
-        : theme(&newTheme)
+    ModuleName::ModuleName(Theme& inTheme, const juce::String& text, Size size, ColourVariant variant)
+        : theme(&inTheme)
         , name(text)
         , colourVariant(variant)
     {
@@ -13,9 +13,9 @@ namespace tss
         setSize(width, kHeight);
     }
 
-    void ModuleName::setTheme(Theme& newTheme)
+    void ModuleName::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

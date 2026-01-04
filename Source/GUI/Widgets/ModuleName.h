@@ -21,10 +21,10 @@ namespace tss
             Orange
         };
 
-        explicit ModuleName(Theme& newTheme, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
+        explicit ModuleName(Theme& inTheme, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
         ~ModuleName() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
         
         void setText(const juce::String& newText);
         juce::String getText() const { return name; }
@@ -41,7 +41,7 @@ namespace tss
         
         inline constexpr static float kTextLeftPadding = 2.0f;
         inline constexpr static float kTextAreaHeight = 20.0f;
-        inline constexpr static float kLineThickness = 3.0f;
+        inline constexpr static float kLineThickness = 4.0f;
 
         Theme* theme = nullptr;
         juce::String name;

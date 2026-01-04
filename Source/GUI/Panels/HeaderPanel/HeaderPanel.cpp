@@ -6,12 +6,12 @@
 using tss::Theme;
 using tss::Button;
 
-HeaderPanel::HeaderPanel(Theme& newTheme)
-    : theme(&newTheme)
-    , buttonBlack(newTheme, getButtonWidth(), "BLACK")
-    , buttonCream(newTheme, getButtonWidth(), "CREAM")
-    , buttonDebug(newTheme, getButtonWidth(), "DEBUG")
-    , buttonDisabled(newTheme, getButtonWidth(), "DISABLED")
+HeaderPanel::HeaderPanel(Theme& inTheme)
+    : theme(&inTheme)
+    , buttonBlack(inTheme, getButtonWidth(), "BLACK")
+    , buttonCream(inTheme, getButtonWidth(), "CREAM")
+    , buttonDebug(inTheme, getButtonWidth(), "DEBUG")
+    , buttonDisabled(inTheme, getButtonWidth(), "DISABLED")
 {
     addAndMakeVisible(buttonBlack);
     addAndMakeVisible(buttonCream);
@@ -46,13 +46,13 @@ void HeaderPanel::resized()
     buttonDisabled.setBounds(currentX, buttonY, buttonWidth, buttonHeight);
 }
 
-void HeaderPanel::setTheme(Theme& newTheme)
+void HeaderPanel::setTheme(Theme& inTheme)
 {
-    theme = &newTheme;
-    buttonBlack.setTheme(newTheme);
-    buttonCream.setTheme(newTheme);
-    buttonDebug.setTheme(newTheme);
-    buttonDisabled.setTheme(newTheme);
+    theme = &inTheme;
+    buttonBlack.setTheme(inTheme);
+    buttonCream.setTheme(inTheme);
+    buttonDebug.setTheme(inTheme);
+    buttonDisabled.setTheme(inTheme);
     repaint();
 }
 

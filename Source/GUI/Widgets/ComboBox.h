@@ -18,10 +18,10 @@ namespace tss
             Large
         };
 
-        explicit ComboBox(Theme& newTheme, Size size = Size::Normal);
+        explicit ComboBox(Theme& inTheme, Size size = Size::Normal);
         ~ComboBox() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;

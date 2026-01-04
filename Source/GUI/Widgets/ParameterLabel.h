@@ -9,10 +9,10 @@ namespace tss
     class ParameterLabel : public juce::Component
     {
     public:
-        explicit ParameterLabel(Theme& newTheme, const juce::String& text = juce::String());
+        explicit ParameterLabel(Theme& inTheme, const juce::String& text = juce::String());
         ~ParameterLabel() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
         
         void setText(const juce::String& newText);
         juce::String getText() const { return labelText; }

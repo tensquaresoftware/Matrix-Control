@@ -5,9 +5,9 @@
 
 namespace tss
 {
-    ComboBox::ComboBox(Theme& newTheme, Size size)
+    ComboBox::ComboBox(Theme& inTheme, Size size)
         : juce::ComboBox()
-        , theme(&newTheme)
+        , theme(&inTheme)
         , comboSize(size)
     {
         auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
@@ -16,9 +16,9 @@ namespace tss
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 
-    void ComboBox::setTheme(Theme& newTheme)
+    void ComboBox::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 

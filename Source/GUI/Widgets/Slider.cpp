@@ -4,9 +4,9 @@
 
 namespace tss
 {
-    Slider::Slider(Theme& newTheme, double initValue)
+    Slider::Slider(Theme& inTheme, double initValue)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
-        , theme(&newTheme)
+        , theme(&inTheme)
         , defaultValue(initValue)
     {
         setSize(kWidth, kHeight);
@@ -14,9 +14,9 @@ namespace tss
         setInterceptsMouseClicks(true, false);
     }
 
-    void Slider::setTheme(Theme& newTheme)
+    void Slider::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

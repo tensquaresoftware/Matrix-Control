@@ -173,9 +173,13 @@ std::vector<SynthDescriptors::StandaloneWidgetDescriptor> ApvtsFactory::getAllSt
         allWidgets.insert(allWidgets.end(), widgets.begin(), widgets.end());
     };
 
-    addWidgets(SynthDescriptors::kDcoStandaloneWidgets);
-    addWidgets(SynthDescriptors::kEnvStandaloneWidgets);
-    addWidgets(SynthDescriptors::kLfoStandaloneWidgets);
+    addWidgets(SynthDescriptors::kDco1StandaloneWidgets);
+    addWidgets(SynthDescriptors::kDco2StandaloneWidgets);
+    addWidgets(SynthDescriptors::kEnv1StandaloneWidgets);
+    addWidgets(SynthDescriptors::kEnv2StandaloneWidgets);
+    addWidgets(SynthDescriptors::kEnv3StandaloneWidgets);
+    addWidgets(SynthDescriptors::kLfo1StandaloneWidgets);
+    addWidgets(SynthDescriptors::kLfo2StandaloneWidgets);
     addWidgets(SynthDescriptors::kBankUtilityWidgets);
     addWidgets(SynthDescriptors::kInternalPatchesWidgets);
     addWidgets(SynthDescriptors::kComputerPatchesWidgets);

@@ -13,12 +13,12 @@ namespace tss
 class HeaderPanel : public juce::Component
 {
 public:
-    explicit HeaderPanel(tss::Theme& newTheme);
+    explicit HeaderPanel(tss::Theme& inTheme);
     ~HeaderPanel() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     tss::Button& getButtonBlack() { return buttonBlack; }
     tss::Button& getButtonCream() { return buttonCream; }

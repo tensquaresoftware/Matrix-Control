@@ -10,24 +10,23 @@
 #include "../../../Widgets/SectionName.h"
 #include "../BodyPanel.h"
 #include "../../../../Shared/SynthDescriptors.h"
-#include "../../../../Core/Factories/ApvtsFactory.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
 PatchEditPanel::~PatchEditPanel() = default;
 
-PatchEditPanel::PatchEditPanel(Theme& newTheme, WidgetFactory& widgetFactory)
-    : theme(&newTheme)
+PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme(&inTheme)
     , sectionName(std::make_unique<tss::SectionName>(
-        newTheme, 
+        inTheme, 
         getWidth(), 
         SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
-    , dco1Panel(std::make_unique<Dco1Panel>(newTheme, widgetFactory))
-    , dco2Panel(std::make_unique<Dco2Panel>(newTheme))
-    , vcfVcaPanel(std::make_unique<VcfVcaPanel>(newTheme))
-    , fmTrackPanel(std::make_unique<FmTrackPanel>(newTheme))
-    , rampPortamentoPanel(std::make_unique<RampPortamentoPanel>(newTheme))
+    , dco1Panel(std::make_unique<Dco1Panel>(inTheme, widgetFactory, apvts))
+    , dco2Panel(std::make_unique<Dco2Panel>(inTheme, widgetFactory, apvts))
+    , vcfVcaPanel(std::make_unique<VcfVcaPanel>(inTheme, widgetFactory, apvts))
+    , fmTrackPanel(std::make_unique<FmTrackPanel>(inTheme, widgetFactory, apvts))
+    , rampPortamentoPanel(std::make_unique<RampPortamentoPanel>(inTheme, widgetFactory, apvts))
 {
     addAndMakeVisible(*sectionName);
     addAndMakeVisible(*dco1Panel);
@@ -94,38 +93,38 @@ void PatchEditPanel::resized()
     }
 }
 
-void PatchEditPanel::setTheme(Theme& newTheme)
+void PatchEditPanel::setTheme(Theme& inTheme)
 {
-    theme = &newTheme;
+    theme = &inTheme;
 
     if (sectionName != nullptr)
     {
-        sectionName->setTheme(newTheme);
+        sectionName->setTheme(inTheme);
     }
 
     if (dco1Panel != nullptr)
     {
-        dco1Panel->setTheme(newTheme);
+        dco1Panel->setTheme(inTheme);
     }
 
     if (dco2Panel != nullptr)
     {
-        dco2Panel->setTheme(newTheme);
+        dco2Panel->setTheme(inTheme);
     }
 
     if (vcfVcaPanel != nullptr)
     {
-        vcfVcaPanel->setTheme(newTheme);
+        vcfVcaPanel->setTheme(inTheme);
     }
 
     if (fmTrackPanel != nullptr)
     {
-        fmTrackPanel->setTheme(newTheme);
+        fmTrackPanel->setTheme(inTheme);
     }
 
     if (rampPortamentoPanel != nullptr)
     {
-        rampPortamentoPanel->setTheme(newTheme);
+        rampPortamentoPanel->setTheme(inTheme);
     }
 
     repaint();

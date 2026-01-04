@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit SectionName(Theme& newTheme, int width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionName(Theme& inTheme, int width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionName() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
 

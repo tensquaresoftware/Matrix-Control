@@ -7,8 +7,8 @@ using tss::Theme;
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
 
-FooterPanel::FooterPanel(Theme& newTheme, juce::AudioProcessorValueTreeState& apvtsRef)
-    : theme(&newTheme)
+FooterPanel::FooterPanel(Theme& inTheme, juce::AudioProcessorValueTreeState& apvtsRef)
+    : theme(&inTheme)
     , apvts(apvtsRef)
 {
     // Écouter les changements de l'APVTS
@@ -62,9 +62,9 @@ void FooterPanel::resized()
 {
 }
 
-void FooterPanel::setTheme(Theme& newTheme)
+void FooterPanel::setTheme(Theme& inTheme)
 {
-    theme = &newTheme;
+    theme = &inTheme;
     repaint();
 }
 

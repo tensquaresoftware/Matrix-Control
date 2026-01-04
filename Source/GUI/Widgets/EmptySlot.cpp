@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    EmptySlot::EmptySlot(Theme& newTheme)
-        : theme(&newTheme)
+    EmptySlot::EmptySlot(Theme& inTheme)
+        : theme(&inTheme)
     {
         setSize(kWidth, kHeight);
     }
 
-    void EmptySlot::setTheme(Theme& newTheme)
+    void EmptySlot::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

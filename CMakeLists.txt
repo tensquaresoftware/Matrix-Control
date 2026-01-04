@@ -90,8 +90,9 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/SectionName.cpp
     Source/GUI/Widgets/Slider.cpp
     
-    # Utilities
-    Source/Core/MIDI/Utilities/MidiLogger.cpp
+    # Loggers
+    Source/Core/Loggers/MidiLogger.cpp
+    Source/Core/Loggers/ApvtsLogger.cpp
 )
 
 # ============================================================================

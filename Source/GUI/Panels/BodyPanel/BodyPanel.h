@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 
 namespace tss
@@ -20,12 +21,12 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(tss::Theme& newTheme, WidgetFactory& widgetFactory);
+    BodyPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     static int getHeight() { return kHeight; }
     static int getSpacing() { return kSpacing; }

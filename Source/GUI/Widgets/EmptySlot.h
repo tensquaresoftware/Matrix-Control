@@ -9,10 +9,10 @@ namespace tss
     class EmptySlot : public juce::Component
     {
     public:
-        explicit EmptySlot(Theme& newTheme);
+        explicit EmptySlot(Theme& inTheme);
         ~EmptySlot() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
 

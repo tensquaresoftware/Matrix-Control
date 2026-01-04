@@ -10,11 +10,11 @@ namespace tss
 class MasterEditPanel : public juce::Component
 {
 public:
-    explicit MasterEditPanel(tss::Theme& newTheme);
+    explicit MasterEditPanel(tss::Theme& inTheme);
     ~MasterEditPanel() override = default;
 
     void paint(juce::Graphics&) override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     static int getWidth() { return kWidth; }
     static int getHeight() { return kHeight; }

@@ -9,10 +9,10 @@ namespace tss
     class GroupLabel : public juce::Component
     {
     public:
-        explicit GroupLabel(Theme& newTheme, int width, const juce::String& text = juce::String());
+        explicit GroupLabel(Theme& inTheme, int width, const juce::String& text = juce::String());
         ~GroupLabel() override = default;
 
-        void setTheme(Theme& newTheme);
+        void setTheme(Theme& inTheme);
 
         void setText(const juce::String& newText);
         juce::String getText() const { return labelText; }

@@ -9,7 +9,7 @@ namespace tss
     class PanelSeparator : public juce::Component
     {
     public:
-        explicit PanelSeparator(Theme& newTheme);
+        explicit PanelSeparator(Theme& inTheme);
         ~PanelSeparator() override = default;
 
         void setTheme(Theme& theme);

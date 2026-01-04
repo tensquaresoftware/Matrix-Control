@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 namespace tss
 {
@@ -20,66 +21,80 @@ class WidgetFactory;
 class Dco1Panel : public juce::Component
 {
 public:
-    Dco1Panel(tss::Theme& newTheme, WidgetFactory& widgetFactory);
+    Dco1Panel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
     ~Dco1Panel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     static int getWidth() { return kWidth; }
     static int getHeight() { return kHeight; }
 
 private:
     inline constexpr static int kWidth = 150;
-    inline constexpr static int kHeight = 275;
+    inline constexpr static int kHeight = 280;
+    
     tss::Theme* theme;
+    juce::AudioProcessorValueTreeState& apvts;
 
+    // Module Name
     std::unique_ptr<tss::ModuleName> dco1ModuleName;
 
+    // Buttons
     std::unique_ptr<tss::Button> dco1InitButton;
     std::unique_ptr<tss::Button> dco1CopyButton;
     std::unique_ptr<tss::Button> dco1PasteButton;
 
+    // Labels
     std::unique_ptr<tss::ParameterLabel> dco1FrequencyLabel;
-    std::unique_ptr<tss::Slider> dco1FrequencySlider;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator1;
-
     std::unique_ptr<tss::ParameterLabel> dco1FrequencyModByLfo1Label;
-    std::unique_ptr<tss::Slider> dco1FrequencyModByLfo1Slider;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator2;
-
     std::unique_ptr<tss::ParameterLabel> dco1SyncLabel;
-    std::unique_ptr<tss::ComboBox> dco1SyncComboBox;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator3;
-
     std::unique_ptr<tss::ParameterLabel> dco1PulseWidthLabel;
-    std::unique_ptr<tss::Slider> dco1PulseWidthSlider;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator4;
-
     std::unique_ptr<tss::ParameterLabel> dco1PulseWidthModByLfo2Label;
-    std::unique_ptr<tss::Slider> dco1PulseWidthModByLfo2Slider;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator5;
-
     std::unique_ptr<tss::ParameterLabel> dco1WaveShapeLabel;
-    std::unique_ptr<tss::Slider> dco1WaveShapeSlider;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator6;
-
     std::unique_ptr<tss::ParameterLabel> dco1WaveSelectLabel;
-    std::unique_ptr<tss::ComboBox> dco1WaveSelectComboBox;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator7;
-
     std::unique_ptr<tss::ParameterLabel> dco1LeversLabel;
-    std::unique_ptr<tss::ComboBox> dco1LeversComboBox;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator8;
-
     std::unique_ptr<tss::ParameterLabel> dco1KeyboardPortamentoLabel;
-    std::unique_ptr<tss::ComboBox> dco1KeyboardPortamentoComboBox;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator9;
-    
     std::unique_ptr<tss::ParameterLabel> dco1KeyClickLabel;
+
+    // Sliders
+    std::unique_ptr<tss::Slider> dco1FrequencySlider;
+    std::unique_ptr<tss::Slider> dco1FrequencyModByLfo1Slider;
+    std::unique_ptr<tss::Slider> dco1PulseWidthSlider;
+    std::unique_ptr<tss::Slider> dco1PulseWidthModByLfo2Slider;
+    std::unique_ptr<tss::Slider> dco1WaveShapeSlider;
+
+    // Combo Boxes
+    std::unique_ptr<tss::ComboBox> dco1SyncComboBox;
+    std::unique_ptr<tss::ComboBox> dco1WaveSelectComboBox;
+    std::unique_ptr<tss::ComboBox> dco1LeversComboBox;
+    std::unique_ptr<tss::ComboBox> dco1KeyboardPortamentoComboBox;
     std::unique_ptr<tss::ComboBox> dco1KeyClickComboBox;
+
+    // Separators
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator1;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator2;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator3;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator4;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator5;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator6;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator7;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator8;
+    std::unique_ptr<tss::ParameterSeparator> parameterSeparator9;
     std::unique_ptr<tss::ParameterSeparator> parameterSeparator10;
+
+    // Attachments
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dco1FrequencyAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dco1FrequencyModByLfo1Attachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dco1SyncAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dco1PulseWidthAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dco1PulseWidthModByLfo2Attachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dco1WaveShapeAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dco1WaveSelectAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dco1LeversAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dco1KeyboardPortamentoAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> dco1KeyClickAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Dco1Panel)
 };

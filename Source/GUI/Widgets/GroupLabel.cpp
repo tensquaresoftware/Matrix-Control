@@ -4,16 +4,16 @@
 
 namespace tss
 {
-    GroupLabel::GroupLabel(Theme& newTheme, int width, const juce::String& text)
-        : theme(&newTheme)
+    GroupLabel::GroupLabel(Theme& inTheme, int width, const juce::String& text)
+        : theme(&inTheme)
         , labelText(text)
     {
         setSize(width, kHeight);
     }
 
-    void GroupLabel::setTheme(Theme& newTheme)
+    void GroupLabel::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

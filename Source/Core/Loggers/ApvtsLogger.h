@@ -4,11 +4,10 @@
 #include <memory>
 #include <mutex>
 
+#include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
-#include "../SysEx/SysExParser.h"
-
-class MidiLogger
+class ApvtsLogger
 {
 public:
     enum class LogLevel
@@ -21,26 +20,39 @@ public:
         kVerbose = 5
     };
 
-    static MidiLogger& getInstance();
+    static ApvtsLogger& getInstance();
     
     void setLogLevel(LogLevel level);
     void setLogToFile(bool enabled, const juce::File& logFile = juce::File());
     void setLogToConsole(bool enabled);
     
     void logMessage(LogLevel level, const juce::String& message);
-    void logSysExSent(const juce::MemoryBlock& sysEx, const juce::String& description = "");
-    void logSysExReceived(const juce::MemoryBlock& sysEx, const juce::String& description = "");
-    void logSysExDataDecimal(const juce::uint8* data, size_t size, const juce::String& description = "");
-    void logProgramChange(juce::uint8 programNumber, const juce::String& direction = "");
+    void logParameterChanged(const juce::String& parameterId, 
+                            float oldValue, 
+                            float newValue,
+                            const juce::String& source = "");
+    
+    void logValueTreePropertyChanged(const juce::Identifier& property,
+                                    const juce::var& oldValue,
+                                    const juce::var& newValue,
+                                    const juce::String& threadName = "");
+    
+    void logAttachmentCreated(const juce::String& parameterId, 
+                             const juce::String& widgetType);
+    
+    void logAttachmentDestroyed(const juce::String& parameterId);
+    
+    void logStateReplaced();
+    void logStateLoaded(const juce::String& source);
+    
     void logError(const juce::String& errorMessage);
     void logWarning(const juce::String& warningMessage);
     void logInfo(const juce::String& infoMessage);
-    
-    juce::String formatSysExMessage(const juce::MemoryBlock& sysEx) const;
+    void logDebug(const juce::String& debugMessage);
     
 private:
-    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Logs/MIDI";
-    static constexpr const char* kLogFilenamePrefix = "midi-log";
+    static constexpr const char* kLogDirectoryPath = "/Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Logs/APVTS";
+    static constexpr const char* kLogFilenamePrefix = "apvts-log";
     
     static constexpr int kMinLogLineWidth = 60;
     static constexpr int kLogLineWidth = 80;
@@ -58,13 +70,12 @@ private:
     std::unique_ptr<std::ofstream> fileStream;
     std::mutex logMutex;
 
-    MidiLogger() = default;
-    ~MidiLogger() = default;
-    MidiLogger(const MidiLogger&) = delete;
-    MidiLogger& operator=(const MidiLogger&) = delete;
+    ApvtsLogger() = default;
+    ~ApvtsLogger() = default;
+    ApvtsLogger(const ApvtsLogger&) = delete;
+    ApvtsLogger& operator=(const ApvtsLogger&) = delete;
 
     void writeLog(const juce::String& formattedMessage);
-    void writeLogRaw(const juce::String& message);
 
     juce::String getTimestamp() const;
     juce::File getDefaultLogDirectory() const;
@@ -81,15 +92,9 @@ private:
     void writeSessionStartedHeader();
     juce::String formatLogLevelColumn(LogLevel level) const;
     juce::String wrapLogMessage(const juce::String& prefix, const juce::String& message) const;
-    juce::String buildSysExHeaderMessage(const juce::String& direction, const juce::String& description, size_t byteCount) const;
-    int calculateBytesPerLine() const;
-    juce::String formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const;
-    void insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const;
-    void appendHexByteWithSpace(juce::String& hexString, juce::uint8 byte, bool isLastByte) const;
     juce::String buildTimestampString() const;
     void createLogDirectoryIfNeeded(juce::File& logDir) const;
-    juce::String analyzeSysExMessage(const juce::MemoryBlock& sysEx) const;
-    juce::uint8 extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const;
-    juce::MemoryBlock addSysExDelimiters(const juce::MemoryBlock& sysEx) const;
+    juce::String formatVarValue(const juce::var& value) const;
+    juce::String getCurrentThreadName() const;
 };
 

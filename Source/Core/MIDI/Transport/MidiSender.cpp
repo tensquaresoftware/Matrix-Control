@@ -1,7 +1,7 @@
 #include "MidiSender.h"
 
 #include "../Exceptions/Exceptions.h"
-#include "../Utilities/MidiLogger.h"
+#include "../../Loggers/MidiLogger.h"
 
 MidiSender::MidiSender()
     : midiOutput(nullptr)

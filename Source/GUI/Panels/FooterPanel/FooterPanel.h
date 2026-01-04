@@ -12,12 +12,12 @@ class FooterPanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    FooterPanel(tss::Theme& newTheme, juce::AudioProcessorValueTreeState& apvtsRef);
+    FooterPanel(tss::Theme& inTheme, juce::AudioProcessorValueTreeState& apvtsRef);
     ~FooterPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& newTheme);
+    void setTheme(tss::Theme& inTheme);
 
     static int getHeight() { return kHeight; }
 

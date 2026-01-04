@@ -592,29 +592,46 @@ namespace ChoiceLists
 
 namespace WidgetIds
 {
-    // DCO widgets
+    // DCO 1 widgets
     constexpr const char* kDco1Init                     = "dco1Init";
     constexpr const char* kDco1Copy                     = "dco1Copy";
     constexpr const char* kDco1Paste                    = "dco1Paste";
+
+    // DCO 2 widgets
     constexpr const char* kDco2Init                     = "dco2Init";
     constexpr const char* kDco2Copy                     = "dco2Copy";
     constexpr const char* kDco2Paste                    = "dco2Paste";
 
-    // ENV widgets
+    // VCF/VCA widgets
+    constexpr const char* kVcfVcaInit                   = "vcfVcaInit";
+
+    // FM/TRACK widgets
+    constexpr const char* kFmTrackInit                  = "fmTrackInit";
+
+    // RAMP/PORTAMENTO widgets
+    constexpr const char* kRampPortamentoInit           = "rampPortamentoInit";
+
+    // ENV 1 widgets
     constexpr const char* kEnv1Init                     = "env1Init";
     constexpr const char* kEnv1Copy                     = "env1Copy";
     constexpr const char* kEnv1Paste                    = "env1Paste";
+
+    // ENV 2 widgets
     constexpr const char* kEnv2Init                     = "env2Init";
     constexpr const char* kEnv2Copy                     = "env2Copy";
     constexpr const char* kEnv2Paste                    = "env2Paste";
+
+    // ENV 3 widgets
     constexpr const char* kEnv3Init                     = "env3Init";
     constexpr const char* kEnv3Copy                     = "env3Copy";
     constexpr const char* kEnv3Paste                    = "env3Paste";
 
-    // LFO widgets
+    // LFO 1 widgets
     constexpr const char* kLfo1Init                     = "lfo1Init";
     constexpr const char* kLfo1Copy                     = "lfo1Copy";
     constexpr const char* kLfo1Paste                    = "lfo1Paste";
+
+    // LFO 2 widgets
     constexpr const char* kLfo2Init                     = "lfo2Init";
     constexpr const char* kLfo2Copy                     = "lfo2Copy";
     constexpr const char* kLfo2Paste                    = "lfo2Paste";
@@ -658,29 +675,46 @@ namespace WidgetDisplayNames
     constexpr const char* kActionLabelCopy              = "C";
     constexpr const char* kActionLabelPaste             = "P";
 
-    // DCO widgets
+    // DCO 1 widgets
     constexpr const char* kDco1Init                     = kActionLabelInit;
     constexpr const char* kDco1Copy                     = kActionLabelCopy;
     constexpr const char* kDco1Paste                    = kActionLabelPaste;
+
+    // DCO 2 widgets
     constexpr const char* kDco2Init                     = kActionLabelInit;
     constexpr const char* kDco2Copy                     = kActionLabelCopy;
     constexpr const char* kDco2Paste                    = kActionLabelPaste;
 
-    // ENV widgets
+    // VCF/VCA widgets
+    constexpr const char* kVcfVcaInit                   = kActionLabelInit;
+
+    // FM/TRACK widgets
+    constexpr const char* kFmTrackInit                  = kActionLabelInit;
+
+    // RAMP/PORTAMENTO widgets
+    constexpr const char* kRampPortamentoInit           = kActionLabelInit;
+
+    // ENV 1 widgets
     constexpr const char* kEnv1Init                     = kActionLabelInit;
     constexpr const char* kEnv1Copy                     = kActionLabelCopy;
     constexpr const char* kEnv1Paste                    = kActionLabelPaste;
+
+    // ENV 2 widgets
     constexpr const char* kEnv2Init                     = kActionLabelInit;
     constexpr const char* kEnv2Copy                     = kActionLabelCopy;
     constexpr const char* kEnv2Paste                    = kActionLabelPaste;
+
+    // ENV 3 widgets
     constexpr const char* kEnv3Init                     = kActionLabelInit;
     constexpr const char* kEnv3Copy                     = kActionLabelCopy;
     constexpr const char* kEnv3Paste                    = kActionLabelPaste;
 
-    // LFO widgets
+    // LFO 1 widgets
     constexpr const char* kLfo1Init                     = kActionLabelInit;
     constexpr const char* kLfo1Copy                     = kActionLabelCopy;
     constexpr const char* kLfo1Paste                    = kActionLabelPaste;
+
+    // LFO 2 widgets
     constexpr const char* kLfo2Init                     = kActionLabelInit;
     constexpr const char* kLfo2Copy                     = kActionLabelCopy;
     constexpr const char* kLfo2Paste                    = kActionLabelPaste;
@@ -717,68 +751,74 @@ namespace WidgetDisplayNames
 // Data Declarations (definitions in SynthDescriptors.cpp)
 // ============================================================================
 
-// Synth
+// Synth - All Groups
 extern const std::vector<GroupDescriptor> kAllGroups;
 
-// Master Edit
+// Master Edit - Parameter & Standalone Widgets
 extern const std::vector<IntParameterDescriptor> kMasterEditIntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters;
 extern const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets;
 
-
-// Patch Edit
-
-// DCO 1
+// Patch Edit - DCO 1 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kDco1IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters;
 
-// DCO 2
+// Patch Edit - DCO 2 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kDco2IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters;
 
-// VCF/VCA
+// Patch Edit - VCF/VCA Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kVcfVcaIntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters;
 
-// FM/TRACK
+// Patch Edit - FM/TRACK Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kFmTrackIntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kFmTrackChoiceParameters;
 
-// RAMP/PORTAMENTO
+// Patch Edit - RAMP/PORTAMENTO Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters;
 
-// ENV 1
+// Patch Edit - ENV 1 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kEnv1IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters;
 
-// ENV 2
+// Patch Edit - ENV 2 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kEnv2IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters;
 
-// ENV 3
+// Patch Edit - ENV 3 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kEnv3IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters;
 
-// LFO 1
+// Patch Edit - LFO 1 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kLfo1IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters;
 
-// LFO 2
+// Patch Edit - LFO 2 Parameter Widgets
 extern const std::vector<IntParameterDescriptor> kLfo2IntParameters;
 extern const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters;
 
-// Standalone Widgets
-extern const std::vector<StandaloneWidgetDescriptor> kDcoStandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kEnvStandaloneWidgets;
-extern const std::vector<StandaloneWidgetDescriptor> kLfoStandaloneWidgets;
+// Patch Edit - Standalone Widgets
+extern const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets;
+extern const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets;
+
+// Matrix Modulation - Parameter Widgets
+extern const std::array<std::vector<IntParameterDescriptor>, kMatrixModBusCount> kMatrixModBusIntParameters;
+extern const std::array<std::vector<ChoiceParameterDescriptor>, kMatrixModBusCount> kMatrixModBusChoiceParameters;
+
+// Patch Manager - Standalone Widgets
 extern const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets;
 extern const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets;
 extern const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets;
-
-// Matrix Modulation
-extern const std::array<std::vector<IntParameterDescriptor>, kMatrixModBusCount> kMatrixModBusIntParameters;
-extern const std::array<std::vector<ChoiceParameterDescriptor>, kMatrixModBusCount> kMatrixModBusChoiceParameters;
 
 // ============================================================================
 // Helper Functions

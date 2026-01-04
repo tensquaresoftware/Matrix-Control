@@ -4,17 +4,17 @@
 
 namespace tss
 {
-    SectionName::SectionName(Theme& newTheme, int width, const juce::String& text, ColourVariant variant)
-        : theme(&newTheme)
+    SectionName::SectionName(Theme& inTheme, int width, const juce::String& text, ColourVariant variant)
+        : theme(&inTheme)
         , name(text)
         , colourVariant(variant)
     {
         setSize(width, kHeight);
     }
 
-    void SectionName::setTheme(Theme& newTheme)
+    void SectionName::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

@@ -4,16 +4,16 @@
 
 namespace tss
 {
-    ParameterLabel::ParameterLabel(Theme& newTheme, const juce::String& text)
-        : theme(&newTheme)
+    ParameterLabel::ParameterLabel(Theme& inTheme, const juce::String& text)
+        : theme(&inTheme)
         , labelText(text)
     {
         setSize(kWidth, kHeight);
     }
 
-    void ParameterLabel::setTheme(Theme& newTheme)
+    void ParameterLabel::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

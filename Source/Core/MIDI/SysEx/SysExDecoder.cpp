@@ -1,6 +1,6 @@
 #include "SysExDecoder.h"
 
-#include "../Utilities/MidiLogger.h"
+#include "../../Loggers/MidiLogger.h"
 #include "SysExConstants.h"
 
 SysExDecoder::SysExDecoder(SysExParser& parserRef)

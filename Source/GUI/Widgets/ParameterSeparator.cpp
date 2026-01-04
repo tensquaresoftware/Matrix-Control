@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    ParameterSeparator::ParameterSeparator(Theme& newTheme)
-        : theme(&newTheme)
+    ParameterSeparator::ParameterSeparator(Theme& inTheme)
+        : theme(&inTheme)
     {
         setSize(kWidth, kHeight);
     }
 
-    void ParameterSeparator::setTheme(Theme& newTheme)
+    void ParameterSeparator::setTheme(Theme& inTheme)
     {
-        theme = &newTheme;
+        theme = &inTheme;
         repaint();
     }
 

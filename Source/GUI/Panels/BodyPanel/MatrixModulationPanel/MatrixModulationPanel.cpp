@@ -4,8 +4,8 @@
 
 using tss::Theme;
 
-MatrixModulationPanel::MatrixModulationPanel(Theme& newTheme)
-    : theme(&newTheme)
+MatrixModulationPanel::MatrixModulationPanel(Theme& inTheme)
+    : theme(&inTheme)
 {
     setSize(getWidth(), getHeight());
 }
@@ -20,9 +20,9 @@ void MatrixModulationPanel::paint(juce::Graphics& g)
         g.fillAll(theme->getMatrixModulationPanelBackgroundColour());
 }
 
-void MatrixModulationPanel::setTheme(Theme& newTheme)
+void MatrixModulationPanel::setTheme(Theme& inTheme)
 {
-        theme = &newTheme;
+        theme = &inTheme;
     repaint();
 }
 
