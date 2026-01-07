@@ -52,7 +52,7 @@ private:
     std::map<juce::String, const SynthDescriptors::IntParameterDescriptor*> intParameterMap;
     std::map<juce::String, const SynthDescriptors::ChoiceParameterDescriptor*> choiceParameterMap;
     std::map<juce::String, const SynthDescriptors::StandaloneWidgetDescriptor*> standaloneWidgetMap;
-    std::map<juce::String, const SynthDescriptors::GroupDescriptor*> groupMap;
+    std::map<juce::String, const SynthDescriptors::ApvtsGroupDescriptor*> groupMap;
     
     void buildSearchMaps();
     void buildIntParameterMap();
@@ -72,7 +72,7 @@ private:
     const SynthDescriptors::IntParameterDescriptor* findIntParameter(const juce::String& parameterId) const;
     const SynthDescriptors::ChoiceParameterDescriptor* findChoiceParameter(const juce::String& parameterId) const;
     const SynthDescriptors::StandaloneWidgetDescriptor* findStandaloneWidget(const juce::String& widgetId) const;
-    const SynthDescriptors::GroupDescriptor* findGroup(const juce::String& groupId) const;
+    const SynthDescriptors::ApvtsGroupDescriptor* findGroup(const juce::String& groupId) const;
     
     void addIntParametersToMap(const std::vector<SynthDescriptors::IntParameterDescriptor>& parameters);
     void addChoiceParametersToMap(const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& parameters);

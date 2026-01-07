@@ -23,28 +23,28 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     addAndMakeVisible(*env1ModuleName);
 
     // Standalone Widgets
-    env1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kEnv1Init, inTheme);
+    env1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Init, inTheme);
     env1InitButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kEnv1Init,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kEnv1Init,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
     addAndMakeVisible(*env1InitButton);
 
-    env1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kEnv1Copy, inTheme);
+    env1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Copy, inTheme);
     env1CopyButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kEnv1Copy,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kEnv1Copy,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
     addAndMakeVisible(*env1CopyButton);
 
-    env1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kEnv1Paste, inTheme);
+    env1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Paste, inTheme);
     env1PasteButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kEnv1Paste,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kEnv1Paste,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

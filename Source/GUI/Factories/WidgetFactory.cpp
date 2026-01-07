@@ -119,11 +119,11 @@ const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::findStandalon
 
 void WidgetFactory::buildGroupMap()
 {
-    for (const auto& group : SynthDescriptors::kAllGroups)
+    for (const auto& group : SynthDescriptors::kAllApvtsGroups)
         groupMap[group.groupId] = &group;
 }
 
-const SynthDescriptors::GroupDescriptor* WidgetFactory::findGroup(const juce::String& groupId) const
+const SynthDescriptors::ApvtsGroupDescriptor* WidgetFactory::findGroup(const juce::String& groupId) const
 {
     auto it = groupMap.find(groupId);
     return (it != groupMap.end()) ? it->second : nullptr;
@@ -180,8 +180,8 @@ void WidgetFactory::addPatchEditModuleIntParametersToMap()
 
 void WidgetFactory::addMatrixModulationBusIntParametersToMap()
 {
-    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
-        addIntParametersToMap(SynthDescriptors::kMatrixModBusIntParameters[static_cast<size_t>(bus)]);
+    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
+        addIntParametersToMap(SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addMasterEditIntParametersToMap()
@@ -211,8 +211,8 @@ void WidgetFactory::addPatchEditModuleChoiceParametersToMap()
 
 void WidgetFactory::addMatrixModulationBusChoiceParametersToMap()
 {
-    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
-        addChoiceParametersToMap(SynthDescriptors::kMatrixModBusChoiceParameters[static_cast<size_t>(bus)]);
+    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
+        addChoiceParametersToMap(SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addMasterEditChoiceParametersToMap()

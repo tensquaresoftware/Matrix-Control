@@ -7,7 +7,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ApvtsFactory::createParamete
 {
     juce::AudioProcessorValueTreeState::ParameterLayout parameterLayout;
     
-    const auto& allGroups = SynthDescriptors::kAllGroups;
+    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
     std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>> groupMap;
     
     createRootGroups(allGroups, groupMap);
@@ -18,7 +18,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ApvtsFactory::createParamete
 }
 
 void ApvtsFactory::createRootGroups(
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
     std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap)
 {
     for (const auto& group : allGroups)
@@ -33,7 +33,7 @@ void ApvtsFactory::createRootGroups(
 }
 
 void ApvtsFactory::createChildGroups(
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
     std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap)
 {
     for (const auto& group : allGroups)
@@ -192,19 +192,19 @@ const char* ApvtsFactory::getBusId(int busNumber)
 {
     static constexpr const char* busIds[] =
     {
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus0,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus1,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus2,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus3,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus4,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus5,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus6,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus7,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus8,
-        SynthDescriptors::MatrixModBusIds::kMatrixModBus9
+        SynthDescriptors::ModulationBusIds::kModulationBus0,
+        SynthDescriptors::ModulationBusIds::kModulationBus1,
+        SynthDescriptors::ModulationBusIds::kModulationBus2,
+        SynthDescriptors::ModulationBusIds::kModulationBus3,
+        SynthDescriptors::ModulationBusIds::kModulationBus4,
+        SynthDescriptors::ModulationBusIds::kModulationBus5,
+        SynthDescriptors::ModulationBusIds::kModulationBus6,
+        SynthDescriptors::ModulationBusIds::kModulationBus7,
+        SynthDescriptors::ModulationBusIds::kModulationBus8,
+        SynthDescriptors::ModulationBusIds::kModulationBus9
     };
     
-    jassert(busNumber >= 0 && busNumber < SynthDescriptors::kMatrixModBusCount);
+    jassert(busNumber >= 0 && busNumber < SynthDescriptors::kModulationBusCount);
     return busIds[busNumber];
 }
 
@@ -317,7 +317,7 @@ void ApvtsFactory::addPatchEditParameters(juce::AudioProcessorParameterGroup& pa
 
 void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGroup& matrixModulationGroup)
 {
-    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
+    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
     {
         const juce::String busId = getBusId(bus);
         const juce::String busDisplayName = SynthDescriptors::getGroupDisplayName(busId);
@@ -326,12 +326,12 @@ void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGr
             busId, busDisplayName, kSubgroupSeparator
         );
         
-        for (const auto& paramDesc : SynthDescriptors::kMatrixModBusIntParameters[static_cast<size_t>(bus)])
+        for (const auto& paramDesc : SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)])
         {
             ApvtsFactory::addIntParameter(*busGroup, paramDesc);
         }
         
-        for (const auto& paramDesc : SynthDescriptors::kMatrixModBusChoiceParameters[static_cast<size_t>(bus)])
+        for (const auto& paramDesc : SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)])
         {
             ApvtsFactory::addChoiceParameter(*busGroup, paramDesc);
         }
@@ -343,22 +343,22 @@ void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGr
 void ApvtsFactory::addMatrixModulationBusIntParameters(
     std::vector<SynthDescriptors::IntParameterDescriptor>& allParams)
 {
-    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
+    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
     {
         allParams.insert(allParams.end(),
-                        SynthDescriptors::kMatrixModBusIntParameters[static_cast<size_t>(bus)].begin(),
-                        SynthDescriptors::kMatrixModBusIntParameters[static_cast<size_t>(bus)].end());
+                        SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].begin(),
+                        SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].end());
     }
 }
 
 void ApvtsFactory::addMatrixModulationBusChoiceParameters(
     std::vector<SynthDescriptors::ChoiceParameterDescriptor>& allParams)
 {
-    for (int bus = 0; bus < SynthDescriptors::kMatrixModBusCount; ++bus)
+    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
     {
         allParams.insert(allParams.end(),
-                        SynthDescriptors::kMatrixModBusChoiceParameters[static_cast<size_t>(bus)].begin(),
-                        SynthDescriptors::kMatrixModBusChoiceParameters[static_cast<size_t>(bus)].end());
+                        SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].begin(),
+                        SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].end());
     }
 }
 
@@ -394,7 +394,7 @@ ApvtsFactory::ValidationResult ApvtsFactory::validateSynthDescriptors()
 juce::StringArray ApvtsFactory::validateGroups()
 {
     juce::StringArray errors;
-    const auto& allGroups = SynthDescriptors::kAllGroups;
+    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
     std::set<juce::String> seenIds;
     
     for (const auto& group : allGroups)
@@ -467,7 +467,7 @@ juce::StringArray ApvtsFactory::checkForDuplicateIds()
 juce::StringArray ApvtsFactory::checkForOrphanedReferences()
 {
     juce::StringArray errors;
-    const auto& allGroups = SynthDescriptors::kAllGroups;
+    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
     std::set<juce::String> definedGroupIds = buildDefinedGroupIdsSet(allGroups);
     
     checkParentIdReferencesPointToDefinedGroups(allGroups, definedGroupIds, errors);
@@ -478,7 +478,7 @@ juce::StringArray ApvtsFactory::checkForOrphanedReferences()
 juce::StringArray ApvtsFactory::checkForCircularReferences()
 {
     juce::StringArray errors;
-    const auto& allGroups = SynthDescriptors::kAllGroups;
+    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
     std::map<juce::String, juce::String> parentMap = buildGroupParentMap(allGroups);
     
     detectCyclesInGroupHierarchy(allGroups, parentMap, errors);
@@ -509,7 +509,7 @@ void ApvtsFactory::checkWidgetParentGroupExists(
 }
 
 void ApvtsFactory::checkGroupIdUniqueness(
-    const SynthDescriptors::GroupDescriptor& group,
+    const SynthDescriptors::ApvtsGroupDescriptor& group,
     std::set<juce::String>& seenIds,
     juce::StringArray& errors)
 {
@@ -521,8 +521,8 @@ void ApvtsFactory::checkGroupIdUniqueness(
 }
 
 void ApvtsFactory::checkGroupParentExists(
-    const SynthDescriptors::GroupDescriptor& group,
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+    const SynthDescriptors::ApvtsGroupDescriptor& group,
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
     juce::StringArray& errors)
 {
     if (group.parentId.isEmpty())
@@ -538,7 +538,7 @@ void ApvtsFactory::checkGroupParentExists(
 }
 
 void ApvtsFactory::checkGroupDisplayNameNotEmpty(
-    const SynthDescriptors::GroupDescriptor& group,
+    const SynthDescriptors::ApvtsGroupDescriptor& group,
     juce::StringArray& errors)
 {
     if (group.displayName.isEmpty())
@@ -681,7 +681,7 @@ void ApvtsFactory::checkWidgetIdCollisions(
 }
 
 std::set<juce::String> ApvtsFactory::buildDefinedGroupIdsSet(
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups)
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups)
 {
     std::set<juce::String> definedGroupIds;
     for (const auto& group : allGroups)
@@ -692,7 +692,7 @@ std::set<juce::String> ApvtsFactory::buildDefinedGroupIdsSet(
 }
 
 void ApvtsFactory::checkParentIdReferencesPointToDefinedGroups(
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
     const std::set<juce::String>& definedGroupIds,
     juce::StringArray& errors)
 {
@@ -706,7 +706,7 @@ void ApvtsFactory::checkParentIdReferencesPointToDefinedGroups(
 }
 
 std::map<juce::String, juce::String> ApvtsFactory::buildGroupParentMap(
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups)
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups)
 {
     std::map<juce::String, juce::String> parentMap;
     for (const auto& group : allGroups)
@@ -720,7 +720,7 @@ std::map<juce::String, juce::String> ApvtsFactory::buildGroupParentMap(
 }
 
 void ApvtsFactory::detectCyclesInGroupHierarchy(
-    const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
     const std::map<juce::String, juce::String>& parentMap,
     juce::StringArray& errors)
 {
@@ -765,7 +765,7 @@ void ApvtsFactory::detectCyclesInGroupHierarchy(
 juce::StringArray ApvtsFactory::collectAllGroupIds()
 {
     juce::StringArray ids;
-    for (const auto& group : SynthDescriptors::kAllGroups)
+    for (const auto& group : SynthDescriptors::kAllApvtsGroups)
     {
         ids.add(group.groupId);
     }
@@ -808,7 +808,7 @@ juce::StringArray ApvtsFactory::collectAllWidgetIds()
 
 bool ApvtsFactory::groupExists(const juce::String& groupId)
 {
-    for (const auto& group : SynthDescriptors::kAllGroups)
+    for (const auto& group : SynthDescriptors::kAllApvtsGroups)
     {
         if (group.groupId == groupId)
         {

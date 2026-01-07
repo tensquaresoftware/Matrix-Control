@@ -23,28 +23,28 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     addAndMakeVisible(*dco2ModuleName);
 
     // Standalone Widgets
-    dco2InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco2Init, inTheme);
+    dco2InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kDco2Init, inTheme);
     dco2InitButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kDco2Init,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kDco2Init,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
     addAndMakeVisible(*dco2InitButton);
 
-    dco2CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco2Copy, inTheme);
+    dco2CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kDco2Copy, inTheme);
     dco2CopyButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kDco2Copy,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kDco2Copy,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };
     addAndMakeVisible(*dco2CopyButton);
 
-    dco2PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kDco2Paste, inTheme);
+    dco2PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kDco2Paste, inTheme);
     dco2PasteButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kDco2Paste,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kDco2Paste,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

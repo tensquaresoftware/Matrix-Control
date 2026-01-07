@@ -23,10 +23,10 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
     addAndMakeVisible(*fmTrackModuleName);
 
     // Standalone Widgets
-    fmTrackInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kFmTrackInit, inTheme);
+    fmTrackInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kFmTrackInit, inTheme);
     fmTrackInitButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kFmTrackInit,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kFmTrackInit,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

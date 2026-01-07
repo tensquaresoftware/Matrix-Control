@@ -4,7 +4,7 @@
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
 - Contexte : Développement de plugins VST/AU avec JUCE
-- Dernière mise à jour : 2026-01-03
+- Dernière mise à jour : 2026-01-07
 
 
 ================================================================================
@@ -90,6 +90,20 @@
 - Paramètres de constructeur : préfixe "in" pour éviter le shadowing
   * Exemple : inParameterId, inReason, inWidgetId
   * Permet d'initialiser clairement les membres : parameterId(inParameterId)
+
+[Magic Numbers - INTERDITS]
+- Ne JAMAIS utiliser de magic numbers dans le code !
+- Toujours définir des constantes explicites avec des noms significatifs
+- Exemples à éviter :
+  * `if (value == -1)` → utiliser `if (value == kNoSysExId)`
+  * `for (int i = 0; i < 10; ++i)` → utiliser `for (int i = 0; i < kModulationBusCount; ++i)`
+  * `return nullptr;` → OK (nullptr est explicite, pas un magic number)
+- Les seules exceptions acceptables :
+  * Valeurs littérales évidentes et auto-explicatives : `0`, `1`, `nullptr`, `true`, `false`
+  * Valeurs dans des tests unitaires où la valeur exacte est le sujet du test
+- Format des constantes : utiliser le préfixe `k` suivi d'un nom explicite en PascalCase
+  * Exemple : `constexpr int kNoSysExId = -1;`
+  * Exemple : `constexpr int kModulationBusCount = 10;`
 
 [Organisation des includes]
 1. Headers système C++ (ex : <vector>, <memory>, etc. puis sauter une ligne)

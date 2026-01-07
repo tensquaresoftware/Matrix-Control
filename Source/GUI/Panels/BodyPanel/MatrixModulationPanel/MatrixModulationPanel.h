@@ -21,7 +21,7 @@ public:
 
 private:
     inline constexpr static int kWidth = 275;
-    inline constexpr static int kHeight = 315;
+    inline constexpr static int kHeight = 325;
 
     tss::Theme* theme;
 

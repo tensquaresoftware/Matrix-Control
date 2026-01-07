@@ -23,10 +23,10 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
     addAndMakeVisible(*vcfVcaModuleName);
 
     // Standalone Widgets
-    vcfVcaInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kVcfVcaInit, inTheme);
+    vcfVcaInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kVcfVcaInit, inTheme);
     vcfVcaInitButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kVcfVcaInit,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kVcfVcaInit,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

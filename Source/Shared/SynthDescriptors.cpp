@@ -27,37 +27,37 @@ namespace
 // Data Definitions - Groups
 // ============================================================================
 
-const std::vector<GroupDescriptor> kAllGroups = {
-    // Modes
+const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups = {
+    // Synth Modes
     {
-        .parentId = "",
-        .groupId = GroupIds::kMaster,
+        .parentId = kNoParentId,
+        .groupId = ModeIds::kMaster,
         .displayName = "MASTER"
     },
     {
-        .parentId = "",
-        .groupId = GroupIds::kPatch,
+        .parentId = kNoParentId,
+        .groupId = ModeIds::kPatch,
         .displayName = "PATCH"
     },
 
-    // Sections
+    // Synth Sections
     {
-        .parentId = GroupIds::kMaster,
+        .parentId = ModeIds::kMaster,
         .groupId = SectionIds::kMasterEdit,
         .displayName = "MASTER EDIT"
     },
     {
-        .parentId = GroupIds::kPatch,
+        .parentId = ModeIds::kPatch,
         .groupId = SectionIds::kPatchEdit,
         .displayName = "PATCH EDIT"
     },
     {
-        .parentId = GroupIds::kPatch,
+        .parentId = ModeIds::kPatch,
         .groupId = SectionIds::kMatrixModulation,
         .displayName = "MATRIX MODULATION"
     },
     {
-        .parentId = GroupIds::kPatch,
+        .parentId = ModeIds::kPatch,
         .groupId = SectionIds::kPatchManager,
         .displayName = "PATCH MANAGER"
     },
@@ -134,53 +134,53 @@ const std::vector<GroupDescriptor> kAllGroups = {
     // Matrix Modulation Busses
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus0,
-        .displayName = "MATRIX MODULATION BUS 0"
+        .groupId = ModulationBusIds::kModulationBus0,
+        .displayName = "MODULATION BUS 0"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus1,
-        .displayName = "MATRIX MODULATION BUS 1"
+        .groupId = ModulationBusIds::kModulationBus1,
+        .displayName = "MODULATION BUS 1"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus2,
-        .displayName = "MATRIX MODULATION BUS 2"
+        .groupId = ModulationBusIds::kModulationBus2,
+        .displayName = "MODULATION BUS 2"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus3,
-        .displayName = "MATRIX MODULATION BUS 3"
+        .groupId = ModulationBusIds::kModulationBus3,
+        .displayName = "MODULATION BUS 3"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus4,
-        .displayName = "MATRIX MODULATION BUS 4"
+        .groupId = ModulationBusIds::kModulationBus4,
+        .displayName = "MODULATION BUS 4"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus5,
-        .displayName = "MATRIX MODULATION BUS 5"
+        .groupId = ModulationBusIds::kModulationBus5,
+        .displayName = "MODULATION BUS 5"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus6,
-        .displayName = "MATRIX MODULATION BUS 6"
+        .groupId = ModulationBusIds::kModulationBus6,
+        .displayName = "MODULATION BUS 6"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus7,
-        .displayName = "MATRIX MODULATION BUS 7"
+        .groupId = ModulationBusIds::kModulationBus7,
+        .displayName = "MODULATION BUS 7"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus8,
-        .displayName = "MATRIX MODULATION BUS 8"
+        .groupId = ModulationBusIds::kModulationBus8,
+        .displayName = "MODULATION BUS 8"
     },
     {
         .parentId = SectionIds::kMatrixModulation,
-        .groupId = MatrixModBusIds::kMatrixModBus9,
-        .displayName = "MATRIX MODULATION BUS 9"
+        .groupId = ModulationBusIds::kModulationBus9,
+        .displayName = "MODULATION BUS 9"
     },
 
     // Patch Manager Modules
@@ -216,7 +216,7 @@ const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters = {};
 const std::vector<IntParameterDescriptor> kDco1IntParameters = {
     {
         .parameterId = ParameterIds::kDco1Frequency,
-        .displayName = DisplayNames::kDco1Frequency,
+        .displayName = ParameterDisplayNames::kDco1Frequency,
         .parentGroupId = ModuleIds::kDco1,
         .minValue = 0,
         .maxValue = 63,
@@ -226,7 +226,7 @@ const std::vector<IntParameterDescriptor> kDco1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1FrequencyModByLfo1,
-        .displayName = DisplayNames::kDco1FrequencyModByLfo1,
+        .displayName = ParameterDisplayNames::kDco1FrequencyModByLfo1,
         .parentGroupId = ModuleIds::kDco1,
         .minValue = -63,
         .maxValue = 63,
@@ -236,7 +236,7 @@ const std::vector<IntParameterDescriptor> kDco1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1PulseWidth,
-        .displayName = DisplayNames::kDco1PulseWidth,
+        .displayName = ParameterDisplayNames::kDco1PulseWidth,
         .parentGroupId = ModuleIds::kDco1,
         .minValue = 0,
         .maxValue = 63,
@@ -246,7 +246,7 @@ const std::vector<IntParameterDescriptor> kDco1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1PulseWidthModByLfo2,
-        .displayName = DisplayNames::kDco1PulseWidthModByLfo2,
+        .displayName = ParameterDisplayNames::kDco1PulseWidthModByLfo2,
         .parentGroupId = ModuleIds::kDco1,
         .minValue = -63,
         .maxValue = 63,
@@ -256,7 +256,7 @@ const std::vector<IntParameterDescriptor> kDco1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1WaveShape,
-        .displayName = DisplayNames::kDco1WaveShape,
+        .displayName = ParameterDisplayNames::kDco1WaveShape,
         .parentGroupId = ModuleIds::kDco1,
         .minValue = 0,
         .maxValue = 63,
@@ -269,7 +269,7 @@ const std::vector<IntParameterDescriptor> kDco1IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
     {
         .parameterId = ParameterIds::kDco1Sync,
-        .displayName = DisplayNames::kDco1Sync,
+        .displayName = ParameterDisplayNames::kDco1Sync,
         .parentGroupId = ModuleIds::kDco1,
         .choices = makeStringArray({ ChoiceLists::kSyncOff, ChoiceLists::kSyncSoft, ChoiceLists::kSyncMedium, ChoiceLists::kSyncHard }),
         .defaultIndex = 0,
@@ -278,7 +278,7 @@ const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1WaveSelect,
-        .displayName = DisplayNames::kDco1WaveSelect,
+        .displayName = ParameterDisplayNames::kDco1WaveSelect,
         .parentGroupId = ModuleIds::kDco1,
         .choices = makeStringArray({ ChoiceLists::kWaveSelectOff, ChoiceLists::kWaveSelectPulse, ChoiceLists::kWaveSelectWave, ChoiceLists::kWaveSelectBoth }),
         .defaultIndex = 2,
@@ -287,7 +287,7 @@ const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1Levers,
-        .displayName = DisplayNames::kDco1Levers,
+        .displayName = ParameterDisplayNames::kDco1Levers,
         .parentGroupId = ModuleIds::kDco1,
         .choices = makeStringArray({ ChoiceLists::kLeversOff, ChoiceLists::kLeversL1Bend, ChoiceLists::kLeversL2Vib, ChoiceLists::kLeversBoth }),
         .defaultIndex = 3,
@@ -296,7 +296,7 @@ const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1KeyboardPortamento,
-        .displayName = DisplayNames::kDco1KeyboardPortamento,
+        .displayName = ParameterDisplayNames::kDco1KeyboardPortamento,
         .parentGroupId = ModuleIds::kDco1,
         .choices = makeStringArray({ ChoiceLists::kKeyboardPortamentoKeybd, ChoiceLists::kKeyboardPortamentoPorta }),
         .defaultIndex = 0,
@@ -305,7 +305,7 @@ const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco1KeyClick,
-        .displayName = DisplayNames::kDco1KeyClick,
+        .displayName = ParameterDisplayNames::kDco1KeyClick,
         .parentGroupId = ModuleIds::kDco1,
         .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
         .defaultIndex = 0,
@@ -321,7 +321,7 @@ const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
 const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     {
         .parameterId = ParameterIds::kDco2Frequency,
-        .displayName = DisplayNames::kDco2Frequency,
+        .displayName = ParameterDisplayNames::kDco2Frequency,
         .parentGroupId = ModuleIds::kDco2,
         .minValue = 0,
         .maxValue = 63,
@@ -331,7 +331,7 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2FrequencyModByLfo1,
-        .displayName = DisplayNames::kDco2FrequencyModByLfo1,
+        .displayName = ParameterDisplayNames::kDco2FrequencyModByLfo1,
         .parentGroupId = ModuleIds::kDco2,
         .minValue = -63,
         .maxValue = 63,
@@ -341,7 +341,7 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2Detune,
-        .displayName = DisplayNames::kDco2Detune,
+        .displayName = ParameterDisplayNames::kDco2Detune,
         .parentGroupId = ModuleIds::kDco2,
         .minValue = -31,
         .maxValue = 31,
@@ -351,7 +351,7 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2PulseWidth,
-        .displayName = DisplayNames::kDco2PulseWidth,
+        .displayName = ParameterDisplayNames::kDco2PulseWidth,
         .parentGroupId = ModuleIds::kDco2,
         .minValue = 0,
         .maxValue = 63,
@@ -361,7 +361,7 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2PulseWidthModByLfo2,
-        .displayName = DisplayNames::kDco2PulseWidthModByLfo2,
+        .displayName = ParameterDisplayNames::kDco2PulseWidthModByLfo2,
         .parentGroupId = ModuleIds::kDco2,
         .minValue = -63,
         .maxValue = 63,
@@ -371,7 +371,7 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2WaveShape,
-        .displayName = DisplayNames::kDco2WaveShape,
+        .displayName = ParameterDisplayNames::kDco2WaveShape,
         .parentGroupId = ModuleIds::kDco2,
         .minValue = 0,
         .maxValue = 63,
@@ -384,7 +384,7 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
     {
         .parameterId = ParameterIds::kDco2WaveSelect,
-        .displayName = DisplayNames::kDco2WaveSelect,
+        .displayName = ParameterDisplayNames::kDco2WaveSelect,
         .parentGroupId = ModuleIds::kDco2,
         .choices = makeStringArray({ ChoiceLists::kWaveSelectOff, ChoiceLists::kWaveSelectPulse, ChoiceLists::kWaveSelectWave, ChoiceLists::kWaveSelectBoth, ChoiceLists::kWaveSelectNoise }),
         .defaultIndex = 1,
@@ -393,7 +393,7 @@ const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2Levers,
-        .displayName = DisplayNames::kDco2Levers,
+        .displayName = ParameterDisplayNames::kDco2Levers,
         .parentGroupId = ModuleIds::kDco2,
         .choices = makeStringArray({ ChoiceLists::kLeversOff, ChoiceLists::kLeversL1Bend, ChoiceLists::kLeversL2Vib, ChoiceLists::kLeversBoth }),
         .defaultIndex = 3,
@@ -402,7 +402,7 @@ const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2KeyboardPortamento,
-        .displayName = DisplayNames::kDco2KeyboardPortamento,
+        .displayName = ParameterDisplayNames::kDco2KeyboardPortamento,
         .parentGroupId = ModuleIds::kDco2,
         .choices = makeStringArray({ ChoiceLists::kKeyboardPortamentoOff, ChoiceLists::kKeyboardPortamentoPorta, ChoiceLists::kKeyboardPortamentoKeybd }),
         .defaultIndex = 2,
@@ -411,7 +411,7 @@ const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kDco2KeyClick,
-        .displayName = DisplayNames::kDco2KeyClick,
+        .displayName = ParameterDisplayNames::kDco2KeyClick,
         .parentGroupId = ModuleIds::kDco2,
         .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
         .defaultIndex = 0,
@@ -427,7 +427,7 @@ const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
 const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     {
         .parameterId = ParameterIds::kVcfBalance,
-        .displayName = DisplayNames::kVcfBalance,
+        .displayName = ParameterDisplayNames::kVcfBalance,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = 0,
         .maxValue = 63,
@@ -437,7 +437,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVcfFequency,
-        .displayName = DisplayNames::kVcfFequency,
+        .displayName = ParameterDisplayNames::kVcfFequency,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = 0,
         .maxValue = 127,
@@ -447,7 +447,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVcfFrequencyModByEnv1,
-        .displayName = DisplayNames::kVcfFrequencyModByEnv1,
+        .displayName = ParameterDisplayNames::kVcfFrequencyModByEnv1,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = -63,
         .maxValue = 63,
@@ -457,7 +457,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVcfFrequencyModByPressure,
-        .displayName = DisplayNames::kVcfFrequencyModByPressure,
+        .displayName = ParameterDisplayNames::kVcfFrequencyModByPressure,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = -63,
         .maxValue = 63,
@@ -467,7 +467,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVcfResonance,
-        .displayName = DisplayNames::kVcfResonance,
+        .displayName = ParameterDisplayNames::kVcfResonance,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = 0,
         .maxValue = 63,
@@ -477,7 +477,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVca1Volume,
-        .displayName = DisplayNames::kVca1Volume,
+        .displayName = ParameterDisplayNames::kVca1Volume,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = 0,
         .maxValue = 63,
@@ -487,7 +487,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVca1ModByVelocity,
-        .displayName = DisplayNames::kVca1ModByVelocity,
+        .displayName = ParameterDisplayNames::kVca1ModByVelocity,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = -63,
         .maxValue = 63,
@@ -497,7 +497,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     },
     {
         .parameterId = ParameterIds::kVca2ModByEnv2,
-        .displayName = DisplayNames::kVca2ModByEnv2,
+        .displayName = ParameterDisplayNames::kVca2ModByEnv2,
         .parentGroupId = ModuleIds::kVcfVca,
         .minValue = -63,
         .maxValue = 63,
@@ -510,7 +510,7 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
 const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters = {
     {
         .parameterId = ParameterIds::kVcfLevers,
-        .displayName = DisplayNames::kVcfLevers,
+        .displayName = ParameterDisplayNames::kVcfLevers,
         .parentGroupId = ModuleIds::kVcfVca,
         .choices = makeStringArray({ ChoiceLists::kLeversOff, ChoiceLists::kLeversL1Bend, ChoiceLists::kLeversL2Vib, ChoiceLists::kLeversBoth }),
         .defaultIndex = 0,
@@ -519,7 +519,7 @@ const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kVcfKeyboardPortamento,
-        .displayName = DisplayNames::kVcfKeyboardPortamento,
+        .displayName = ParameterDisplayNames::kVcfKeyboardPortamento,
         .parentGroupId = ModuleIds::kVcfVca,
         .choices = makeStringArray({ ChoiceLists::kKeyboardPortamentoOff, ChoiceLists::kKeyboardPortamentoPorta, ChoiceLists::kKeyboardPortamentoKeybd }),
         .defaultIndex = 2,
@@ -535,7 +535,7 @@ const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters = {
 const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     {
         .parameterId = ParameterIds::kFmAmount,
-        .displayName = DisplayNames::kFmAmount,
+        .displayName = ParameterDisplayNames::kFmAmount,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = 0,
         .maxValue = 63,
@@ -545,7 +545,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kFmModByEnv3,
-        .displayName = DisplayNames::kFmModByEnv3,
+        .displayName = ParameterDisplayNames::kFmModByEnv3,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = -63,
         .maxValue = 63,
@@ -555,7 +555,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kFmModByPressure,
-        .displayName = DisplayNames::kFmModByPressure,
+        .displayName = ParameterDisplayNames::kFmModByPressure,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = -63,
         .maxValue = 63,
@@ -565,7 +565,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kTrackPoint1,
-        .displayName = DisplayNames::kTrackPoint1,
+        .displayName = ParameterDisplayNames::kTrackPoint1,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = 0,
         .maxValue = 63,
@@ -575,7 +575,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kTrackPoint2,
-        .displayName = DisplayNames::kTrackPoint2,
+        .displayName = ParameterDisplayNames::kTrackPoint2,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = 0,
         .maxValue = 63,
@@ -585,7 +585,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kTrackPoint3,
-        .displayName = DisplayNames::kTrackPoint3,
+        .displayName = ParameterDisplayNames::kTrackPoint3,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = 0,
         .maxValue = 63,
@@ -595,7 +595,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kTrackPoint4,
-        .displayName = DisplayNames::kTrackPoint4,
+        .displayName = ParameterDisplayNames::kTrackPoint4,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = 0,
         .maxValue = 63,
@@ -605,7 +605,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     },
     {
         .parameterId = ParameterIds::kTrackPoint5,
-        .displayName = DisplayNames::kTrackPoint5,
+        .displayName = ParameterDisplayNames::kTrackPoint5,
         .parentGroupId = ModuleIds::kFmTrack,
         .minValue = 0,
         .maxValue = 63,
@@ -618,7 +618,7 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
 const std::vector<ChoiceParameterDescriptor> kFmTrackChoiceParameters = {
     {
         .parameterId = ParameterIds::kTrackInput,
-        .displayName = DisplayNames::kTrackInput,
+        .displayName = ParameterDisplayNames::kTrackInput,
         .parentGroupId = ModuleIds::kFmTrack,
         .choices = makeStringArray({ ChoiceLists::kSourceNone, ChoiceLists::kSourceEnv1, ChoiceLists::kSourceEnv2, ChoiceLists::kSourceEnv3, 
                                      ChoiceLists::kSourceLfo1, ChoiceLists::kSourceLfo2, ChoiceLists::kSourceVibrato, ChoiceLists::kSourceRamp1, ChoiceLists::kSourceRamp2,
@@ -638,7 +638,7 @@ const std::vector<ChoiceParameterDescriptor> kFmTrackChoiceParameters = {
 const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
     {
         .parameterId = ParameterIds::kRamp1Rate,
-        .displayName = DisplayNames::kRamp1Rate,
+        .displayName = ParameterDisplayNames::kRamp1Rate,
         .parentGroupId = ModuleIds::kRampPortamento,
         .minValue = 0,
         .maxValue = 63,
@@ -648,7 +648,7 @@ const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
     },
     {
         .parameterId = ParameterIds::kRamp2Rate,
-        .displayName = DisplayNames::kRamp2Rate,
+        .displayName = ParameterDisplayNames::kRamp2Rate,
         .parentGroupId = ModuleIds::kRampPortamento,
         .minValue = 0,
         .maxValue = 63,
@@ -658,7 +658,7 @@ const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
     },
     {
         .parameterId = ParameterIds::kPortamentoRate,
-        .displayName = DisplayNames::kPortamentoRate,
+        .displayName = ParameterDisplayNames::kPortamentoRate,
         .parentGroupId = ModuleIds::kRampPortamento,
         .minValue = 0,
         .maxValue = 63,
@@ -668,7 +668,7 @@ const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
     },
     {
         .parameterId = ParameterIds::kPortamentoModByVelocity,
-        .displayName = DisplayNames::kPortamentoModByVelocity,
+        .displayName = ParameterDisplayNames::kPortamentoModByVelocity,
         .parentGroupId = ModuleIds::kRampPortamento,
         .minValue = -63,
         .maxValue = 63,
@@ -681,7 +681,7 @@ const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
 const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
     {
         .parameterId = ParameterIds::kRamp1Trigger,
-        .displayName = DisplayNames::kRamp1Trigger,
+        .displayName = ParameterDisplayNames::kRamp1Trigger,
         .parentGroupId = ModuleIds::kRampPortamento,
         .choices = makeStringArray({ ChoiceLists::kRampTriggerStrig, ChoiceLists::kRampTriggerMtrig, ChoiceLists::kRampTriggerExtrig, ChoiceLists::kRampTriggerGatedx }),
         .defaultIndex = 0,
@@ -690,7 +690,7 @@ const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kRamp2Trigger,
-        .displayName = DisplayNames::kRamp2Trigger,
+        .displayName = ParameterDisplayNames::kRamp2Trigger,
         .parentGroupId = ModuleIds::kRampPortamento,
         .choices = makeStringArray({ ChoiceLists::kRampTriggerStrig, ChoiceLists::kRampTriggerMtrig, ChoiceLists::kRampTriggerExtrig, ChoiceLists::kRampTriggerGatedx }),
         .defaultIndex = 0,
@@ -699,7 +699,7 @@ const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kPortamentoMode,
-        .displayName = DisplayNames::kPortamentoMode,
+        .displayName = ParameterDisplayNames::kPortamentoMode,
         .parentGroupId = ModuleIds::kRampPortamento,
         .choices = makeStringArray({ ChoiceLists::kPortamentoModeLinear, ChoiceLists::kPortamentoModeConst, ChoiceLists::kPortamentoModeExpo }),
         .defaultIndex = 0,
@@ -708,7 +708,7 @@ const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kPortamentoLegato,
-        .displayName = DisplayNames::kPortamentoLegato,
+        .displayName = ParameterDisplayNames::kPortamentoLegato,
         .parentGroupId = ModuleIds::kRampPortamento,
         .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
         .defaultIndex = 0,
@@ -717,7 +717,7 @@ const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kPortamentoKeyboardMode,
-        .displayName = DisplayNames::kPortamentoKeyboardMode,
+        .displayName = ParameterDisplayNames::kPortamentoKeyboardMode,
         .parentGroupId = ModuleIds::kRampPortamento,
         .choices = makeStringArray({ ChoiceLists::kPortamentoKeyboardModeRotate, ChoiceLists::kPortamentoKeyboardModeReasgn, 
                                      ChoiceLists::kPortamentoKeyboardModeUnison, ChoiceLists::kPortamentoKeyboardModeRearob }),
@@ -734,7 +734,7 @@ const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
 const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     {
         .parameterId = ParameterIds::kEnv1Delay,
-        .displayName = DisplayNames::kEnv1Delay,
+        .displayName = ParameterDisplayNames::kEnv1Delay,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = 0,
         .maxValue = 63,
@@ -744,7 +744,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1Attack,
-        .displayName = DisplayNames::kEnv1Attack,
+        .displayName = ParameterDisplayNames::kEnv1Attack,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = 0,
         .maxValue = 63,
@@ -754,7 +754,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1Decay,
-        .displayName = DisplayNames::kEnv1Decay,
+        .displayName = ParameterDisplayNames::kEnv1Decay,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = 0,
         .maxValue = 63,
@@ -764,7 +764,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1Sustain,
-        .displayName = DisplayNames::kEnv1Sustain,
+        .displayName = ParameterDisplayNames::kEnv1Sustain,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = 0,
         .maxValue = 63,
@@ -774,7 +774,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1Release,
-        .displayName = DisplayNames::kEnv1Release,
+        .displayName = ParameterDisplayNames::kEnv1Release,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = 0,
         .maxValue = 63,
@@ -784,7 +784,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1Amplitude,
-        .displayName = DisplayNames::kEnv1Amplitude,
+        .displayName = ParameterDisplayNames::kEnv1Amplitude,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = 0,
         .maxValue = 63,
@@ -794,7 +794,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1AmplitudeModByVelocity,
-        .displayName = DisplayNames::kEnv1AmplitudeModByVelocity,
+        .displayName = ParameterDisplayNames::kEnv1AmplitudeModByVelocity,
         .parentGroupId = ModuleIds::kEnvelope1,
         .minValue = -63,
         .maxValue = 63,
@@ -807,7 +807,7 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters = {
     {
         .parameterId = ParameterIds::kEnv1TriggerMode,
-        .displayName = DisplayNames::kEnv1TriggerMode,
+        .displayName = ParameterDisplayNames::kEnv1TriggerMode,
         .parentGroupId = ModuleIds::kEnvelope1,
         .choices = makeStringArray({ ChoiceLists::kTriggerModeStrig, ChoiceLists::kTriggerModeMtrig, ChoiceLists::kTriggerModeSreset, 
                                      ChoiceLists::kTriggerModeMreset, ChoiceLists::kTriggerModeXtrig, ChoiceLists::kTriggerModeXmtrig, 
@@ -818,7 +818,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1EnvelopeMode,
-        .displayName = DisplayNames::kEnv1EnvelopeMode,
+        .displayName = ParameterDisplayNames::kEnv1EnvelopeMode,
         .parentGroupId = ModuleIds::kEnvelope1,
         .choices = makeStringArray({ ChoiceLists::kEnvelopeModeNormal, ChoiceLists::kEnvelopeModeDadr, ChoiceLists::kEnvelopeModeFree, ChoiceLists::kEnvelopeModeBoth }),
         .defaultIndex = 0,
@@ -827,7 +827,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv1Lfo1Trigger,
-        .displayName = DisplayNames::kEnv1Lfo1Trigger,
+        .displayName = ParameterDisplayNames::kEnv1Lfo1Trigger,
         .parentGroupId = ModuleIds::kEnvelope1,
         .choices = makeStringArray({ ChoiceLists::kLfo1TriggerNormal, ChoiceLists::kLfo1TriggerLfo1, ChoiceLists::kLfo1TriggerGLfo1 }),
         .defaultIndex = 0,
@@ -843,7 +843,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters = {
 const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     {
         .parameterId = ParameterIds::kEnv2Delay,
-        .displayName = DisplayNames::kEnv2Delay,
+        .displayName = ParameterDisplayNames::kEnv2Delay,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = 0,
         .maxValue = 63,
@@ -853,7 +853,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2Attack,
-        .displayName = DisplayNames::kEnv2Attack,
+        .displayName = ParameterDisplayNames::kEnv2Attack,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = 0,
         .maxValue = 63,
@@ -863,7 +863,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2Decay,
-        .displayName = DisplayNames::kEnv2Decay,
+        .displayName = ParameterDisplayNames::kEnv2Decay,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = 0,
         .maxValue = 63,
@@ -873,7 +873,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2Sustain,
-        .displayName = DisplayNames::kEnv2Sustain,
+        .displayName = ParameterDisplayNames::kEnv2Sustain,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = 0,
         .maxValue = 63,
@@ -883,7 +883,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2Release,
-        .displayName = DisplayNames::kEnv2Release,
+        .displayName = ParameterDisplayNames::kEnv2Release,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = 0,
         .maxValue = 63,
@@ -893,7 +893,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2Amplitude,
-        .displayName = DisplayNames::kEnv2Amplitude,
+        .displayName = ParameterDisplayNames::kEnv2Amplitude,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = 0,
         .maxValue = 63,
@@ -903,7 +903,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2AmplitudeModByVelocity,
-        .displayName = DisplayNames::kEnv2AmplitudeModByVelocity,
+        .displayName = ParameterDisplayNames::kEnv2AmplitudeModByVelocity,
         .parentGroupId = ModuleIds::kEnvelope2,
         .minValue = -63,
         .maxValue = 63,
@@ -916,7 +916,7 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters = {
     {
         .parameterId = ParameterIds::kEnv2TriggerMode,
-        .displayName = DisplayNames::kEnv2TriggerMode,
+        .displayName = ParameterDisplayNames::kEnv2TriggerMode,
         .parentGroupId = ModuleIds::kEnvelope2,
         .choices = makeStringArray({ ChoiceLists::kTriggerModeStrig, ChoiceLists::kTriggerModeMtrig, ChoiceLists::kTriggerModeSreset, 
                                      ChoiceLists::kTriggerModeMreset, ChoiceLists::kTriggerModeXtrig, ChoiceLists::kTriggerModeXmtrig, 
@@ -927,7 +927,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2EnvelopeMode,
-        .displayName = DisplayNames::kEnv2EnvelopeMode,
+        .displayName = ParameterDisplayNames::kEnv2EnvelopeMode,
         .parentGroupId = ModuleIds::kEnvelope2,
         .choices = makeStringArray({ ChoiceLists::kEnvelopeModeNormal, ChoiceLists::kEnvelopeModeDadr, ChoiceLists::kEnvelopeModeFree, ChoiceLists::kEnvelopeModeBoth }),
         .defaultIndex = 0,
@@ -936,7 +936,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv2Lfo1Trigger,
-        .displayName = DisplayNames::kEnv2Lfo1Trigger,
+        .displayName = ParameterDisplayNames::kEnv2Lfo1Trigger,
         .parentGroupId = ModuleIds::kEnvelope2,
         .choices = makeStringArray({ ChoiceLists::kLfo1TriggerNormal, ChoiceLists::kLfo1TriggerLfo1, ChoiceLists::kLfo1TriggerGLfo1 }),
         .defaultIndex = 0,
@@ -952,7 +952,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters = {
 const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     {
         .parameterId = ParameterIds::kEnv3Delay,
-        .displayName = DisplayNames::kEnv3Delay,
+        .displayName = ParameterDisplayNames::kEnv3Delay,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = 0,
         .maxValue = 63,
@@ -962,7 +962,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3Attack,
-        .displayName = DisplayNames::kEnv3Attack,
+        .displayName = ParameterDisplayNames::kEnv3Attack,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = 0,
         .maxValue = 63,
@@ -972,7 +972,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3Decay,
-        .displayName = DisplayNames::kEnv3Decay,
+        .displayName = ParameterDisplayNames::kEnv3Decay,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = 0,
         .maxValue = 63,
@@ -982,7 +982,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3Sustain,
-        .displayName = DisplayNames::kEnv3Sustain,
+        .displayName = ParameterDisplayNames::kEnv3Sustain,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = 0,
         .maxValue = 63,
@@ -992,7 +992,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3Release,
-        .displayName = DisplayNames::kEnv3Release,
+        .displayName = ParameterDisplayNames::kEnv3Release,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = 0,
         .maxValue = 63,
@@ -1002,7 +1002,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3Amplitude,
-        .displayName = DisplayNames::kEnv3Amplitude,
+        .displayName = ParameterDisplayNames::kEnv3Amplitude,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = 0,
         .maxValue = 63,
@@ -1012,7 +1012,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3AmplitudeModByVelocity,
-        .displayName = DisplayNames::kEnv3AmplitudeModByVelocity,
+        .displayName = ParameterDisplayNames::kEnv3AmplitudeModByVelocity,
         .parentGroupId = ModuleIds::kEnvelope3,
         .minValue = -63,
         .maxValue = 63,
@@ -1025,7 +1025,7 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters = {
     {
         .parameterId = ParameterIds::kEnv3TriggerMode,
-        .displayName = DisplayNames::kEnv3TriggerMode,
+        .displayName = ParameterDisplayNames::kEnv3TriggerMode,
         .parentGroupId = ModuleIds::kEnvelope3,
         .choices = makeStringArray({ ChoiceLists::kTriggerModeStrig, ChoiceLists::kTriggerModeMtrig, ChoiceLists::kTriggerModeSreset, 
                                      ChoiceLists::kTriggerModeMreset, ChoiceLists::kTriggerModeXtrig, ChoiceLists::kTriggerModeXmtrig, 
@@ -1036,7 +1036,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3EnvelopeMode,
-        .displayName = DisplayNames::kEnv3EnvelopeMode,
+        .displayName = ParameterDisplayNames::kEnv3EnvelopeMode,
         .parentGroupId = ModuleIds::kEnvelope3,
         .choices = makeStringArray({ ChoiceLists::kEnvelopeModeNormal, ChoiceLists::kEnvelopeModeDadr, ChoiceLists::kEnvelopeModeFree, ChoiceLists::kEnvelopeModeBoth }),
         .defaultIndex = 0,
@@ -1045,7 +1045,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kEnv3Lfo1Trigger,
-        .displayName = DisplayNames::kEnv3Lfo1Trigger,
+        .displayName = ParameterDisplayNames::kEnv3Lfo1Trigger,
         .parentGroupId = ModuleIds::kEnvelope3,
         .choices = makeStringArray({ ChoiceLists::kLfo1TriggerNormal, ChoiceLists::kLfo1TriggerLfo1, ChoiceLists::kLfo1TriggerGatedLfo1Trigger }),
         .defaultIndex = 0,
@@ -1061,7 +1061,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters = {
 const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
     {
         .parameterId = ParameterIds::kLfo1Speed,
-        .displayName = DisplayNames::kLfo1Speed,
+        .displayName = ParameterDisplayNames::kLfo1Speed,
         .parentGroupId = ModuleIds::kLfo1,
         .minValue = 0,
         .maxValue = 63,
@@ -1071,7 +1071,7 @@ const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1SpeedModByPressure,
-        .displayName = DisplayNames::kLfo1SpeedModByPressure,
+        .displayName = ParameterDisplayNames::kLfo1SpeedModByPressure,
         .parentGroupId = ModuleIds::kLfo1,
         .minValue = -63,
         .maxValue = 63,
@@ -1081,7 +1081,7 @@ const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1RetriggerPoint,
-        .displayName = DisplayNames::kLfo1RetriggerPoint,
+        .displayName = ParameterDisplayNames::kLfo1RetriggerPoint,
         .parentGroupId = ModuleIds::kLfo1,
         .minValue = 0,
         .maxValue = 63,
@@ -1091,7 +1091,7 @@ const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1Amplitude,
-        .displayName = DisplayNames::kLfo1Amplitude,
+        .displayName = ParameterDisplayNames::kLfo1Amplitude,
         .parentGroupId = ModuleIds::kLfo1,
         .minValue = 0,
         .maxValue = 63,
@@ -1101,7 +1101,7 @@ const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1AmplitudeModByRamp1,
-        .displayName = DisplayNames::kLfo1AmplitudeModByRamp1,
+        .displayName = ParameterDisplayNames::kLfo1AmplitudeModByRamp1,
         .parentGroupId = ModuleIds::kLfo1,
         .minValue = -63,
         .maxValue = 63,
@@ -1114,7 +1114,7 @@ const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters = {
     {
         .parameterId = ParameterIds::kLfo1Waveform,
-        .displayName = DisplayNames::kLfo1Waveform,
+        .displayName = ParameterDisplayNames::kLfo1Waveform,
         .parentGroupId = ModuleIds::kLfo1,
         .choices = makeStringArray({ ChoiceLists::kLfoWaveformTriangle, ChoiceLists::kLfoWaveformUpsaw, ChoiceLists::kLfoWaveformDnsaw, 
                                      ChoiceLists::kLfoWaveformSquare, ChoiceLists::kLfoWaveformRandom, ChoiceLists::kLfoWaveformNoise, ChoiceLists::kLfoWaveformSampled }),
@@ -1124,7 +1124,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1TriggerMode,
-        .displayName = DisplayNames::kLfo1TriggerMode,
+        .displayName = ParameterDisplayNames::kLfo1TriggerMode,
         .parentGroupId = ModuleIds::kLfo1,
         .choices = makeStringArray({ ChoiceLists::kLfoTriggerModeOff, ChoiceLists::kLfoTriggerModeStrig, ChoiceLists::kLfoTriggerModeMtrig, ChoiceLists::kLfoTriggerModeXtrig }),
         .defaultIndex = 0,
@@ -1133,7 +1133,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1Lag,
-        .displayName = DisplayNames::kLfo1Lag,
+        .displayName = ParameterDisplayNames::kLfo1Lag,
         .parentGroupId = ModuleIds::kLfo1,
         .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
         .defaultIndex = 0,
@@ -1142,7 +1142,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo1SampleInput,
-        .displayName = DisplayNames::kLfo1SampleInput,
+        .displayName = ParameterDisplayNames::kLfo1SampleInput,
         .parentGroupId = ModuleIds::kLfo1,
         .choices = makeStringArray({ ChoiceLists::kSourceNone, ChoiceLists::kSourceEnv1, ChoiceLists::kSourceEnv2, ChoiceLists::kSourceEnv3, 
                                      ChoiceLists::kSourceLfo1, ChoiceLists::kSourceLfo2, ChoiceLists::kSourceVibrato, ChoiceLists::kSourceRamp1, ChoiceLists::kSourceRamp2,
@@ -1162,7 +1162,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters = {
 const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
     {
         .parameterId = ParameterIds::kLfo2Speed,
-        .displayName = DisplayNames::kLfo2Speed,
+        .displayName = ParameterDisplayNames::kLfo2Speed,
         .parentGroupId = ModuleIds::kLfo2,
         .minValue = 0,
         .maxValue = 63,
@@ -1172,7 +1172,7 @@ const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2SpeedModByKeyboard,
-        .displayName = DisplayNames::kLfo2SpeedModByKeyboard,
+        .displayName = ParameterDisplayNames::kLfo2SpeedModByKeyboard,
         .parentGroupId = ModuleIds::kLfo2,
         .minValue = -63,
         .maxValue = 63,
@@ -1182,7 +1182,7 @@ const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2RetriggerPoint,
-        .displayName = DisplayNames::kLfo2RetriggerPoint,
+        .displayName = ParameterDisplayNames::kLfo2RetriggerPoint,
         .parentGroupId = ModuleIds::kLfo2,
         .minValue = 0,
         .maxValue = 63,
@@ -1192,7 +1192,7 @@ const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2Amplitude,
-        .displayName = DisplayNames::kLfo2Amplitude,
+        .displayName = ParameterDisplayNames::kLfo2Amplitude,
         .parentGroupId = ModuleIds::kLfo2,
         .minValue = 0,
         .maxValue = 63,
@@ -1202,7 +1202,7 @@ const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2AmplitudeModByRamp2,
-        .displayName = DisplayNames::kLfo2AmplitudeModByRamp2,
+        .displayName = ParameterDisplayNames::kLfo2AmplitudeModByRamp2,
         .parentGroupId = ModuleIds::kLfo2,
         .minValue = -63,
         .maxValue = 63,
@@ -1215,7 +1215,7 @@ const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
 const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters = {
     {
         .parameterId = ParameterIds::kLfo2Waveform,
-        .displayName = DisplayNames::kLfo2Waveform,
+        .displayName = ParameterDisplayNames::kLfo2Waveform,
         .parentGroupId = ModuleIds::kLfo2,
         .choices = makeStringArray({ ChoiceLists::kLfoWaveformTriangle, ChoiceLists::kLfoWaveformUpsaw, ChoiceLists::kLfoWaveformDnsaw, 
                                      ChoiceLists::kLfoWaveformSquare, ChoiceLists::kLfoWaveformRandom, ChoiceLists::kLfoWaveformNoise, ChoiceLists::kLfoWaveformSampled }),
@@ -1225,7 +1225,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2TriggerMode,
-        .displayName = DisplayNames::kLfo2TriggerMode,
+        .displayName = ParameterDisplayNames::kLfo2TriggerMode,
         .parentGroupId = ModuleIds::kLfo2,
         .choices = makeStringArray({ ChoiceLists::kLfoTriggerModeOff, ChoiceLists::kLfoTriggerModeStrig, ChoiceLists::kLfoTriggerModeMtrig, ChoiceLists::kLfoTriggerModeXtrig }),
         .defaultIndex = 0,
@@ -1234,7 +1234,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2Lag,
-        .displayName = DisplayNames::kLfo2Lag,
+        .displayName = ParameterDisplayNames::kLfo2Lag,
         .parentGroupId = ModuleIds::kLfo2,
         .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
         .defaultIndex = 0,
@@ -1243,7 +1243,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters = {
     },
     {
         .parameterId = ParameterIds::kLfo2SampleInput,
-        .displayName = DisplayNames::kLfo2SampleInput,
+        .displayName = ParameterDisplayNames::kLfo2SampleInput,
         .parentGroupId = ModuleIds::kLfo2,
         .choices = makeStringArray({ ChoiceLists::kSourceNone, ChoiceLists::kSourceEnv1, ChoiceLists::kSourceEnv2, ChoiceLists::kSourceEnv3, 
                                      ChoiceLists::kSourceLfo1, ChoiceLists::kSourceLfo2, ChoiceLists::kSourceVibrato, ChoiceLists::kSourceRamp1, ChoiceLists::kSourceRamp2,
@@ -1286,348 +1286,348 @@ namespace
     });
 }
 
-const std::array<std::vector<ChoiceParameterDescriptor>, kMatrixModBusCount> kMatrixModBusChoiceParameters = {{
-    // Bus 0
+const std::array<std::vector<ChoiceParameterDescriptor>, kModulationBusCount> kModulationBusChoiceParameters = {{
+    // Modulation Bus 0
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus0Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus0,
+            .parameterId = ParameterIds::kModulationBus0Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus0,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 104,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus0Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus0,
+            .parameterId = ParameterIds::kModulationBus0Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus0,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 106,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 1
+    // Modulation Bus 1
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus1Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus1,
+            .parameterId = ParameterIds::kModulationBus1Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus1,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 107,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus1Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus1,
+            .parameterId = ParameterIds::kModulationBus1Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus1,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 109,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 2
+    // Modulation Bus 2
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus2Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus2,
+            .parameterId = ParameterIds::kModulationBus2Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus2,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 110,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus2Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus2,
+            .parameterId = ParameterIds::kModulationBus2Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus2,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 112,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 3
+    // Modulation Bus 3
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus3Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus3,
+            .parameterId = ParameterIds::kModulationBus3Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus3,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 113,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus3Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus3,
+            .parameterId = ParameterIds::kModulationBus3Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus3,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 115,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 4
+    // Modulation Bus 4
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus4Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus4,
+            .parameterId = ParameterIds::kModulationBus4Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus4,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 116,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus4Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus4,
+            .parameterId = ParameterIds::kModulationBus4Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus4,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 118,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 5
+    // Modulation Bus 5
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus5Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus5,
+            .parameterId = ParameterIds::kModulationBus5Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus5,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 119,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus5Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus5,
+            .parameterId = ParameterIds::kModulationBus5Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus5,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 121,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 6
+    // Modulation Bus 6
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus6Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus6,
+            .parameterId = ParameterIds::kModulationBus6Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus6,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 122,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus6Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus6,
+            .parameterId = ParameterIds::kModulationBus6Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus6,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 124,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 7
+    // Modulation Bus 7
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus7Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus7,
+            .parameterId = ParameterIds::kModulationBus7Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus7,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 125,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus7Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus7,
+            .parameterId = ParameterIds::kModulationBus7Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus7,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 127,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 8
+    // Modulation Bus 8
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus8Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus8,
+            .parameterId = ParameterIds::kModulationBus8Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus8,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 128,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus8Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus8,
+            .parameterId = ParameterIds::kModulationBus8Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus8,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 130,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 9
+    // Modulation Bus 9
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus9Source,
-            .displayName = DisplayNames::kMatrixModBusSource,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus9,
+            .parameterId = ParameterIds::kModulationBus9Source,
+            .displayName = ParameterDisplayNames::kModulationBusSource,
+            .parentGroupId = ModulationBusIds::kModulationBus9,
             .choices = kSourceChoices,
             .defaultIndex = 0,
             .sysExOffset = 131,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         },
         {
-            .parameterId = ParameterIds::kMatrixModBus9Destination,
-            .displayName = DisplayNames::kMatrixModBusDestination,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus9,
+            .parameterId = ParameterIds::kModulationBus9Destination,
+            .displayName = ParameterDisplayNames::kModulationBusDestination,
+            .parentGroupId = ModulationBusIds::kModulationBus9,
             .choices = kDestinationChoices,
             .defaultIndex = 0,
             .sysExOffset = 133,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     }
 }};
 
-const std::array<std::vector<IntParameterDescriptor>, kMatrixModBusCount> kMatrixModBusIntParameters = {{
-    // Bus 0
+const std::array<std::vector<IntParameterDescriptor>, kModulationBusCount> kModulationBusIntParameters = {{
+    // Modulation Bus 0
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus0Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus0,
+            .parameterId = ParameterIds::kModulationBus0Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus0,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 105,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 1
+    // Modulation Bus 1
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus1Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus1,
+            .parameterId = ParameterIds::kModulationBus1Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus1,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 108,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 2
+    // Modulation Bus 2
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus2Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus2,
+            .parameterId = ParameterIds::kModulationBus2Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus2,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 111,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 3
+    // Modulation Bus 3
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus3Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus3,
+            .parameterId = ParameterIds::kModulationBus3Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus3,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 114,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 4
+    // Modulation Bus 4
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus4Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus4,
+            .parameterId = ParameterIds::kModulationBus4Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus4,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 117,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 5
+    // Modulation Bus 5
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus5Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus5,
+            .parameterId = ParameterIds::kModulationBus5Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus5,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 120,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 6
+    // Modulation Bus 6
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus6Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus6,
+            .parameterId = ParameterIds::kModulationBus6Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus6,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 123,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 7
+    // Modulation Bus 7
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus7Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus7,
+            .parameterId = ParameterIds::kModulationBus7Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus7,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 126,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 8
+    // Modulation Bus 8
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus8Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus8,
+            .parameterId = ParameterIds::kModulationBus8Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus8,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 129,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     },
-    // Bus 9
+    // Modulation Bus 9
     {
         {
-            .parameterId = ParameterIds::kMatrixModBus9Amount,
-            .displayName = DisplayNames::kMatrixModBusAmount,
-            .parentGroupId = MatrixModBusIds::kMatrixModBus9,
+            .parameterId = ParameterIds::kModulationBus9Amount,
+            .displayName = ParameterDisplayNames::kModulationBusAmount,
+            .parentGroupId = ModulationBusIds::kModulationBus9,
             .minValue = -63,
             .maxValue = 63,
             .defaultValue = 0,
             .sysExOffset = 132,
-            .sysExId = -1
+            .sysExId = kNoSysExId
         }
     }
 }};
@@ -1642,20 +1642,20 @@ const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets = {};
 // Patch Edit Standalone Widgets - DCO 1 Module
 const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kDco1Init,
-        .displayName = WidgetDisplayNames::kDco1Init,
+        .widgetId = StandaloneWidgetIds::kDco1Init,
+        .displayName = StandaloneWidgetDisplayNames::kDco1Init,
         .parentGroupId = ModuleIds::kDco1,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kDco1Copy,
-        .displayName = WidgetDisplayNames::kDco1Copy,
+        .widgetId = StandaloneWidgetIds::kDco1Copy,
+        .displayName = StandaloneWidgetDisplayNames::kDco1Copy,
         .parentGroupId = ModuleIds::kDco1,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kDco1Paste,
-        .displayName = WidgetDisplayNames::kDco1Paste,
+        .widgetId = StandaloneWidgetIds::kDco1Paste,
+        .displayName = StandaloneWidgetDisplayNames::kDco1Paste,
         .parentGroupId = ModuleIds::kDco1,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1664,20 +1664,20 @@ const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets = {
 // Patch Edit Standalone Widgets - DCO 2 Module
 const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kDco2Init,
-        .displayName = WidgetDisplayNames::kDco2Init,
+        .widgetId = StandaloneWidgetIds::kDco2Init,
+        .displayName = StandaloneWidgetDisplayNames::kDco2Init,
         .parentGroupId = ModuleIds::kDco2,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kDco2Copy,
-        .displayName = WidgetDisplayNames::kDco2Copy,
+        .widgetId = StandaloneWidgetIds::kDco2Copy,
+        .displayName = StandaloneWidgetDisplayNames::kDco2Copy,
         .parentGroupId = ModuleIds::kDco2,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kDco2Paste,
-        .displayName = WidgetDisplayNames::kDco2Paste,
+        .widgetId = StandaloneWidgetIds::kDco2Paste,
+        .displayName = StandaloneWidgetDisplayNames::kDco2Paste,
         .parentGroupId = ModuleIds::kDco2,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1686,8 +1686,8 @@ const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets = {
 // Patch Edit Standalone Widgets - VCF/VCA Module
 const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kVcfVcaInit,
-        .displayName = WidgetDisplayNames::kVcfVcaInit,
+        .widgetId = StandaloneWidgetIds::kVcfVcaInit,
+        .displayName = StandaloneWidgetDisplayNames::kVcfVcaInit,
         .parentGroupId = ModuleIds::kVcfVca,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1696,8 +1696,8 @@ const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets = {
 // Patch Edit Standalone Widgets - FM/TRACK Module
 const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kFmTrackInit,
-        .displayName = WidgetDisplayNames::kFmTrackInit,
+        .widgetId = StandaloneWidgetIds::kFmTrackInit,
+        .displayName = StandaloneWidgetDisplayNames::kFmTrackInit,
         .parentGroupId = ModuleIds::kFmTrack,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1706,8 +1706,8 @@ const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets = {
 // Patch Edit Standalone Widgets - RAMP/PORTAMENTO Module
 const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kRampPortamentoInit,
-        .displayName = WidgetDisplayNames::kRampPortamentoInit,
+        .widgetId = StandaloneWidgetIds::kRampPortamentoInit,
+        .displayName = StandaloneWidgetDisplayNames::kRampPortamentoInit,
         .parentGroupId = ModuleIds::kRampPortamento,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1716,20 +1716,20 @@ const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets =
 // Patch Edit Standalone Widgets - ENV 1 Module
 const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kEnv1Init,
-        .displayName = WidgetDisplayNames::kEnv1Init,
+        .widgetId = StandaloneWidgetIds::kEnv1Init,
+        .displayName = StandaloneWidgetDisplayNames::kEnv1Init,
         .parentGroupId = ModuleIds::kEnvelope1,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kEnv1Copy,
-        .displayName = WidgetDisplayNames::kEnv1Copy,
+        .widgetId = StandaloneWidgetIds::kEnv1Copy,
+        .displayName = StandaloneWidgetDisplayNames::kEnv1Copy,
         .parentGroupId = ModuleIds::kEnvelope1,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kEnv1Paste,
-        .displayName = WidgetDisplayNames::kEnv1Paste,
+        .widgetId = StandaloneWidgetIds::kEnv1Paste,
+        .displayName = StandaloneWidgetDisplayNames::kEnv1Paste,
         .parentGroupId = ModuleIds::kEnvelope1,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1738,20 +1738,20 @@ const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets = {
 // Patch Edit Standalone Widgets - ENV 2 Module
 const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kEnv2Init,
-        .displayName = WidgetDisplayNames::kEnv2Init,
+        .widgetId = StandaloneWidgetIds::kEnv2Init,
+        .displayName = StandaloneWidgetDisplayNames::kEnv2Init,
         .parentGroupId = ModuleIds::kEnvelope2,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kEnv2Copy,
-        .displayName = WidgetDisplayNames::kEnv2Copy,
+        .widgetId = StandaloneWidgetIds::kEnv2Copy,
+        .displayName = StandaloneWidgetDisplayNames::kEnv2Copy,
         .parentGroupId = ModuleIds::kEnvelope2,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kEnv2Paste,
-        .displayName = WidgetDisplayNames::kEnv2Paste,
+        .widgetId = StandaloneWidgetIds::kEnv2Paste,
+        .displayName = StandaloneWidgetDisplayNames::kEnv2Paste,
         .parentGroupId = ModuleIds::kEnvelope2,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1760,20 +1760,20 @@ const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets = {
 // Patch Edit Standalone Widgets - ENV 3 Module
 const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kEnv3Init,
-        .displayName = WidgetDisplayNames::kEnv3Init,
+        .widgetId = StandaloneWidgetIds::kEnv3Init,
+        .displayName = StandaloneWidgetDisplayNames::kEnv3Init,
         .parentGroupId = ModuleIds::kEnvelope3,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kEnv3Copy,
-        .displayName = WidgetDisplayNames::kEnv3Copy,
+        .widgetId = StandaloneWidgetIds::kEnv3Copy,
+        .displayName = StandaloneWidgetDisplayNames::kEnv3Copy,
         .parentGroupId = ModuleIds::kEnvelope3,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kEnv3Paste,
-        .displayName = WidgetDisplayNames::kEnv3Paste,
+        .widgetId = StandaloneWidgetIds::kEnv3Paste,
+        .displayName = StandaloneWidgetDisplayNames::kEnv3Paste,
         .parentGroupId = ModuleIds::kEnvelope3,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1782,20 +1782,20 @@ const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets = {
 // Patch Edit Standalone Widgets - LFO 1 Module
 const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kLfo1Init,
-        .displayName = WidgetDisplayNames::kLfo1Init,
+        .widgetId = StandaloneWidgetIds::kLfo1Init,
+        .displayName = StandaloneWidgetDisplayNames::kLfo1Init,
         .parentGroupId = ModuleIds::kLfo1,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kLfo1Copy,
-        .displayName = WidgetDisplayNames::kLfo1Copy,
+        .widgetId = StandaloneWidgetIds::kLfo1Copy,
+        .displayName = StandaloneWidgetDisplayNames::kLfo1Copy,
         .parentGroupId = ModuleIds::kLfo1,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kLfo1Paste,
-        .displayName = WidgetDisplayNames::kLfo1Paste,
+        .widgetId = StandaloneWidgetIds::kLfo1Paste,
+        .displayName = StandaloneWidgetDisplayNames::kLfo1Paste,
         .parentGroupId = ModuleIds::kLfo1,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1804,20 +1804,20 @@ const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets = {
 // Patch Edit Standalone Widgets - LFO 2 Module
 const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets = {
     {
-        .widgetId = WidgetIds::kLfo2Init,
-        .displayName = WidgetDisplayNames::kLfo2Init,
+        .widgetId = StandaloneWidgetIds::kLfo2Init,
+        .displayName = StandaloneWidgetDisplayNames::kLfo2Init,
         .parentGroupId = ModuleIds::kLfo2,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kLfo2Copy,
-        .displayName = WidgetDisplayNames::kLfo2Copy,
+        .widgetId = StandaloneWidgetIds::kLfo2Copy,
+        .displayName = StandaloneWidgetDisplayNames::kLfo2Copy,
         .parentGroupId = ModuleIds::kLfo2,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kLfo2Paste,
-        .displayName = WidgetDisplayNames::kLfo2Paste,
+        .widgetId = StandaloneWidgetIds::kLfo2Paste,
+        .displayName = StandaloneWidgetDisplayNames::kLfo2Paste,
         .parentGroupId = ModuleIds::kLfo2,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1826,68 +1826,68 @@ const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets = {
 // Patch Edit Standalone Widgets - Bank Utility Module
 const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets = {
     {
-        .widgetId = WidgetIds::kUnlockBank,
-        .displayName = WidgetDisplayNames::kUnlockBank,
+        .widgetId = StandaloneWidgetIds::kUnlockBank,
+        .displayName = StandaloneWidgetDisplayNames::kUnlockBank,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank0,
-        .displayName = WidgetDisplayNames::kSelectBank0,
+        .widgetId = StandaloneWidgetIds::kSelectBank0,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank0,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank1,
-        .displayName = WidgetDisplayNames::kSelectBank1,
+        .widgetId = StandaloneWidgetIds::kSelectBank1,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank1,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank2,
-        .displayName = WidgetDisplayNames::kSelectBank2,
+        .widgetId = StandaloneWidgetIds::kSelectBank2,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank2,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank3,
-        .displayName = WidgetDisplayNames::kSelectBank3,
+        .widgetId = StandaloneWidgetIds::kSelectBank3,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank3,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank4,
-        .displayName = WidgetDisplayNames::kSelectBank4,
+        .widgetId = StandaloneWidgetIds::kSelectBank4,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank4,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank5,
-        .displayName = WidgetDisplayNames::kSelectBank5,
+        .widgetId = StandaloneWidgetIds::kSelectBank5,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank5,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank6,
-        .displayName = WidgetDisplayNames::kSelectBank6,
+        .widgetId = StandaloneWidgetIds::kSelectBank6,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank6,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank7,
-        .displayName = WidgetDisplayNames::kSelectBank7,
+        .widgetId = StandaloneWidgetIds::kSelectBank7,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank7,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank8,
-        .displayName = WidgetDisplayNames::kSelectBank8,
+        .widgetId = StandaloneWidgetIds::kSelectBank8,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank8,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectBank9,
-        .displayName = WidgetDisplayNames::kSelectBank9,
+        .widgetId = StandaloneWidgetIds::kSelectBank9,
+        .displayName = StandaloneWidgetDisplayNames::kSelectBank9,
         .parentGroupId = ModuleIds::kBankUtility,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1896,50 +1896,50 @@ const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets = {
 // Patch Edit Standalone Widgets - Internal Patches Module
 const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets = {
     {
-        .widgetId = WidgetIds::kLoadPrevInternalPatch,
-        .displayName = WidgetDisplayNames::kLoadPrevInternalPatch,
+        .widgetId = StandaloneWidgetIds::kLoadPrevInternalPatch,
+        .displayName = StandaloneWidgetDisplayNames::kLoadPrevInternalPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kLoadNextInternalPatch,
-        .displayName = WidgetDisplayNames::kLoadNextInternalPatch,
+        .widgetId = StandaloneWidgetIds::kLoadNextInternalPatch,
+        .displayName = StandaloneWidgetDisplayNames::kLoadNextInternalPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kCurrentBank,
-        .displayName = WidgetDisplayNames::kCurrentBank,
+        .widgetId = StandaloneWidgetIds::kCurrentBank,
+        .displayName = StandaloneWidgetDisplayNames::kCurrentBank,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kNumber
     },
     {
-        .widgetId = WidgetIds::kCurrentPatch,
-        .displayName = WidgetDisplayNames::kCurrentPatch,
+        .widgetId = StandaloneWidgetIds::kCurrentPatch,
+        .displayName = StandaloneWidgetDisplayNames::kCurrentPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kNumber
     },
     {
-        .widgetId = WidgetIds::kInitPatch,
-        .displayName = WidgetDisplayNames::kInitPatch,
+        .widgetId = StandaloneWidgetIds::kInitPatch,
+        .displayName = StandaloneWidgetDisplayNames::kInitPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kCopyPatch,
-        .displayName = WidgetDisplayNames::kCopyPatch,
+        .widgetId = StandaloneWidgetIds::kCopyPatch,
+        .displayName = StandaloneWidgetDisplayNames::kCopyPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kPastePatch,
-        .displayName = WidgetDisplayNames::kPastePatch,
+        .widgetId = StandaloneWidgetIds::kPastePatch,
+        .displayName = StandaloneWidgetDisplayNames::kPastePatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kStorePatch,
-        .displayName = WidgetDisplayNames::kStorePatch,
+        .widgetId = StandaloneWidgetIds::kStorePatch,
+        .displayName = StandaloneWidgetDisplayNames::kStorePatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1948,38 +1948,38 @@ const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets = {
 // Patch Edit Standalone Widgets - Computer Patches Module
 const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets = {
     {
-        .widgetId = WidgetIds::kLoadPrevComputerPatch,
-        .displayName = WidgetDisplayNames::kLoadPrevComputerPatch,
+        .widgetId = StandaloneWidgetIds::kLoadPrevComputerPatch,
+        .displayName = StandaloneWidgetDisplayNames::kLoadPrevComputerPatch,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kLoadNextComputerPatch,
-        .displayName = WidgetDisplayNames::kLoadNextComputerPatch,
+        .widgetId = StandaloneWidgetIds::kLoadNextComputerPatch,
+        .displayName = StandaloneWidgetDisplayNames::kLoadNextComputerPatch,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSelectComputerPatch,
-        .displayName = WidgetDisplayNames::kSelectComputerPatch,
+        .widgetId = StandaloneWidgetIds::kSelectComputerPatch,
+        .displayName = StandaloneWidgetDisplayNames::kSelectComputerPatch,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kComboBox
     },
     {
-        .widgetId = WidgetIds::kOpenComputerPatchFolder,
-        .displayName = WidgetDisplayNames::kOpenComputerPatchFolder,
+        .widgetId = StandaloneWidgetIds::kOpenComputerPatchFolder,
+        .displayName = StandaloneWidgetDisplayNames::kOpenComputerPatchFolder,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSaveComputerPatchAs,
-        .displayName = WidgetDisplayNames::kSaveComputerPatchAs,
+        .widgetId = StandaloneWidgetIds::kSaveComputerPatchAs,
+        .displayName = StandaloneWidgetDisplayNames::kSaveComputerPatchAs,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = WidgetIds::kSaveComputerPatch,
-        .displayName = WidgetDisplayNames::kSaveComputerPatch,
+        .widgetId = StandaloneWidgetIds::kSaveComputerPatch,
+        .displayName = StandaloneWidgetDisplayNames::kSaveComputerPatch,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -1991,7 +1991,7 @@ const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets = {
 
 juce::String getGroupDisplayName(const juce::String& groupId)
 {
-    for (const auto& group : kAllGroups)
+    for (const auto& group : kAllApvtsGroups)
     {
         if (group.groupId == groupId)
         {

@@ -23,10 +23,10 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
     addAndMakeVisible(*rampPortamentoModuleName);
 
     // Standalone Widgets
-    rampPortamentoInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::WidgetIds::kRampPortamentoInit, inTheme);
+    rampPortamentoInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit, inTheme);
     rampPortamentoInitButton->onClick = [this]
     {
-        apvts.state.setProperty(SynthDescriptors::WidgetIds::kRampPortamentoInit,
+        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit,
                                 juce::Time::getCurrentTime().toMilliseconds(),
                                 nullptr);
     };

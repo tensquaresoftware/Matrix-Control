@@ -5,7 +5,7 @@
 #include <juce_core/juce_core.h>
 
 // SynthDescriptors.h
-// Central file for parameter IDs, names, values, and groups
+// Central file for parameter IDs, names, values, and APVTS groups
 // Contains ONLY data structures and declarations - no code/logic
 // Single source of truth for synth structure description
 
@@ -13,24 +13,34 @@ namespace SynthDescriptors
 {
 
 // ============================================================================
-// Group Descriptors
+// Constants
 // ============================================================================
 
-struct GroupDescriptor
+// Used for modulation bus parameters that don't have a SysEx ID
+constexpr int kNoSysExId = -1;
+
+// Used for root groups (= Synth Modes) that have no parent
+constexpr const char* kNoParentId = "";
+
+// ============================================================================
+// APVTS Group Descriptors
+// ============================================================================
+
+struct ApvtsGroupDescriptor
 {
-    juce::String parentId;  // Empty string for root groups (modes)
+    juce::String parentId;     // Empty string for root groups (= Synth Modes)
     juce::String groupId;
     juce::String displayName;
 };
 
 // ============================================================================
-// Synth Parameter Descriptors
+// Parameter Descriptors
 // ============================================================================
 
 enum class ParameterType
 {
-    kInt,      // AudioParameterInt (Slider)
-    kChoice    // AudioParameterChoice (ComboBox)
+    kInt,   // AudioParameterInt (attached to Slider)
+    kChoice // AudioParameterChoice (attached to ComboBox)
 };
 
 struct IntParameterDescriptor
@@ -77,17 +87,17 @@ struct StandaloneWidgetDescriptor
 };
 
 // ============================================================================
-// Group IDs (Modes)
+// APVTS Group IDs | Synth Modes
 // ============================================================================
 
-namespace GroupIds
+namespace ModeIds
 {
     constexpr const char* kMaster = "master";
     constexpr const char* kPatch  = "patch";
 }
 
 // ============================================================================
-// Group IDs (Sections)
+// APVTS Group IDs | Synth Sections
 // ============================================================================
 
 namespace SectionIds
@@ -99,17 +109,17 @@ namespace SectionIds
 }
 
 // ============================================================================
-// Group IDs (Modules)
+// APVTS Group IDs | Synth Modules
 // ============================================================================
 
 namespace ModuleIds
 {
-    // Master Edit modules
+    // Master Edit Modules
     constexpr const char* kMidi             = "midi";
     constexpr const char* kVibrato          = "vibrato";
     constexpr const char* kMisc             = "misc";
     
-    // Patch Edit modules
+    // Patch Edit Modules
     constexpr const char* kDco1             = "dco1";
     constexpr const char* kDco2             = "dco2";
     constexpr const char* kVcfVca           = "vcfVca";
@@ -121,30 +131,30 @@ namespace ModuleIds
     constexpr const char* kLfo1             = "lfo1";
     constexpr const char* kLfo2             = "lfo2";
 
-    // Patch Manager modules
+    // Patch Manager Modules
     constexpr const char* kBankUtility      = "bankUtility";
     constexpr const char* kInternalPatches  = "internalPatches";
     constexpr const char* kComputerPatches  = "computerPatches";
 }
 
 // ============================================================================
-// Group IDs (Matrix Modulation Busses)
+// APVTS Group IDs | Synth Modulation Busses
 // ============================================================================
 
-constexpr int kMatrixModBusCount = 10;
+constexpr int kModulationBusCount = 10;
 
-namespace MatrixModBusIds
+namespace ModulationBusIds
 {
-    constexpr const char* kMatrixModBus0    = "matrixModBus0";
-    constexpr const char* kMatrixModBus1    = "matrixModBus1";
-    constexpr const char* kMatrixModBus2    = "matrixModBus2";
-    constexpr const char* kMatrixModBus3    = "matrixModBus3";
-    constexpr const char* kMatrixModBus4    = "matrixModBus4";
-    constexpr const char* kMatrixModBus5    = "matrixModBus5";
-    constexpr const char* kMatrixModBus6    = "matrixModBus6";
-    constexpr const char* kMatrixModBus7    = "matrixModBus7";
-    constexpr const char* kMatrixModBus8    = "matrixModBus8";
-    constexpr const char* kMatrixModBus9    = "matrixModBus9";
+    constexpr const char* kModulationBus0   = "modulationBus0";
+    constexpr const char* kModulationBus1   = "modulationBus1";
+    constexpr const char* kModulationBus2   = "modulationBus2";
+    constexpr const char* kModulationBus3   = "modulationBus3";
+    constexpr const char* kModulationBus4   = "modulationBus4";
+    constexpr const char* kModulationBus5   = "modulationBus5";
+    constexpr const char* kModulationBus6   = "modulationBus6";
+    constexpr const char* kModulationBus7   = "modulationBus7";
+    constexpr const char* kModulationBus8   = "modulationBus8";
+    constexpr const char* kModulationBus9   = "modulationBus9";
 }
 
 // ============================================================================
@@ -153,7 +163,7 @@ namespace MatrixModBusIds
 
 namespace ParameterIds
 {
-    // DCO 1
+    // DCO 1 Module Parameters
     constexpr const char* kDco1Frequency              = "dco1Frequency";
     constexpr const char* kDco1FrequencyModByLfo1     = "dco1FrequencyModByLfo1";
     constexpr const char* kDco1PulseWidth             = "dco1PulseWidth";
@@ -165,7 +175,7 @@ namespace ParameterIds
     constexpr const char* kDco1KeyboardPortamento     = "dco1KeyboardPortamento";
     constexpr const char* kDco1KeyClick               = "dco1KeyClick";
 
-    // DCO 2
+    // DCO 2 Module Parameters
     constexpr const char* kDco2Frequency              = "dco2Frequency";
     constexpr const char* kDco2FrequencyModByLfo1     = "dco2FrequencyModByLfo1";
     constexpr const char* kDco2Detune                 = "dco2Detune";
@@ -177,7 +187,7 @@ namespace ParameterIds
     constexpr const char* kDco2KeyboardPortamento     = "dco2KeyboardPortamento";
     constexpr const char* kDco2KeyClick               = "dco2KeyClick";
 
-    // VCF/VCA
+    // VCF/VCA Module Parameters
     constexpr const char* kVcfBalance                 = "vcfBalance";
     constexpr const char* kVcfFequency                = "vcfFequency";
     constexpr const char* kVcfFrequencyModByEnv1      = "vcfFrequencyModByEnv1";
@@ -189,7 +199,7 @@ namespace ParameterIds
     constexpr const char* kVcfLevers                  = "vcfLevers";
     constexpr const char* kVcfKeyboardPortamento      = "vcfKeyboardPortamento";
 
-    // FM/TRACK
+    // FM/TRACK Module Parameters
     constexpr const char* kFmAmount                   = "fmAmount";
     constexpr const char* kFmModByEnv3                = "fmModByEnv3";
     constexpr const char* kFmModByPressure            = "fmModByPressure";
@@ -200,7 +210,7 @@ namespace ParameterIds
     constexpr const char* kTrackPoint5                = "trackPoint5";
     constexpr const char* kTrackInput                 = "trackInput";
 
-    // RAMP/PORTAMENTO
+    // RAMP/PORTAMENTO Module Parameters
     constexpr const char* kRamp1Rate                  = "ramp1Rate";
     constexpr const char* kRamp2Rate                  = "ramp2Rate";
     constexpr const char* kPortamentoRate             = "portamentoRate";
@@ -211,7 +221,7 @@ namespace ParameterIds
     constexpr const char* kPortamentoLegato           = "portamentoLegato";
     constexpr const char* kPortamentoKeyboardMode     = "portamentoKeyboardMode";
 
-    // ENV 1
+    // ENV 1 Module Parameters
     constexpr const char* kEnv1Delay                  = "env1Delay";
     constexpr const char* kEnv1Attack                 = "env1Attack";
     constexpr const char* kEnv1Decay                  = "env1Decay";
@@ -223,7 +233,7 @@ namespace ParameterIds
     constexpr const char* kEnv1EnvelopeMode           = "env1EnvelopeMode";
     constexpr const char* kEnv1Lfo1Trigger            = "env1Lfo1Trigger";
 
-    // ENV 2
+    // ENV 2 Module Parameters
     constexpr const char* kEnv2Delay                  = "env2Delay";
     constexpr const char* kEnv2Attack                 = "env2Attack";
     constexpr const char* kEnv2Decay                  = "env2Decay";
@@ -235,7 +245,7 @@ namespace ParameterIds
     constexpr const char* kEnv2EnvelopeMode           = "env2EnvelopeMode";
     constexpr const char* kEnv2Lfo1Trigger            = "env2Lfo1Trigger";
 
-    // ENV 3
+    // ENV 3 Module Parameters
     constexpr const char* kEnv3Delay                  = "env3Delay";
     constexpr const char* kEnv3Attack                 = "env3Attack";
     constexpr const char* kEnv3Decay                  = "env3Decay";
@@ -247,7 +257,7 @@ namespace ParameterIds
     constexpr const char* kEnv3EnvelopeMode           = "env3EnvelopeMode";
     constexpr const char* kEnv3Lfo1Trigger            = "env3Lfo1Trigger";
 
-    // LFO 1
+    // LFO 1 Module Parameters
     constexpr const char* kLfo1Speed                  = "lfo1Speed";
     constexpr const char* kLfo1SpeedModByPressure     = "lfo1SpeedModByPressure";
     constexpr const char* kLfo1RetriggerPoint         = "lfo1RetriggerPoint";
@@ -258,7 +268,7 @@ namespace ParameterIds
     constexpr const char* kLfo1Lag                    = "lfo1Lag";
     constexpr const char* kLfo1SampleInput            = "lfo1SampleInput";
 
-    // LFO 2
+    // LFO 2 Module Parameters
     constexpr const char* kLfo2Speed                  = "lfo2Speed";
     constexpr const char* kLfo2SpeedModByKeyboard     = "lfo2SpeedModByKeyboard";
     constexpr const char* kLfo2RetriggerPoint         = "lfo2RetriggerPoint";
@@ -269,55 +279,55 @@ namespace ParameterIds
     constexpr const char* kLfo2Lag                    = "lfo2Lag";
     constexpr const char* kLfo2SampleInput            = "lfo2SampleInput";
 
-    // Matrix Modulation Busses (dynamically generated, but IDs defined here)
-    constexpr const char* kMatrixModBus0Source        = "matrixModBus0Source";
-    constexpr const char* kMatrixModBus0Amount        = "matrixModBus0Amount";
-    constexpr const char* kMatrixModBus0Destination   = "matrixModBus0Destination";
+    // Modulation Busses Parameters (dynamically generated, but IDs defined here)
+    constexpr const char* kModulationBus0Source       = "modulationBus0Source";
+    constexpr const char* kModulationBus0Amount       = "modulationBus0Amount";
+    constexpr const char* kModulationBus0Destination  = "modulationBus0Destination";
 
-    constexpr const char* kMatrixModBus1Source        = "matrixModBus1Source";
-    constexpr const char* kMatrixModBus1Amount        = "matrixModBus1Amount";
-    constexpr const char* kMatrixModBus1Destination   = "matrixModBus1Destination";
+    constexpr const char* kModulationBus1Source       = "modulationBus1Source";
+    constexpr const char* kModulationBus1Amount       = "modulationBus1Amount";
+    constexpr const char* kModulationBus1Destination  = "modulationBus1Destination";
 
-    constexpr const char* kMatrixModBus2Source        = "matrixModBus2Source";
-    constexpr const char* kMatrixModBus2Amount        = "matrixModBus2Amount";
-    constexpr const char* kMatrixModBus2Destination   = "matrixModBus2Destination";
+    constexpr const char* kModulationBus2Source       = "modulationBus2Source";
+    constexpr const char* kModulationBus2Amount       = "modulationBus2Amount";
+    constexpr const char* kModulationBus2Destination  = "modulationBus2Destination";
 
-    constexpr const char* kMatrixModBus3Source        = "matrixModBus3Source";
-    constexpr const char* kMatrixModBus3Amount        = "matrixModBus3Amount";
-    constexpr const char* kMatrixModBus3Destination   = "matrixModBus3Destination";
+    constexpr const char* kModulationBus3Source       = "modulationBus3Source";
+    constexpr const char* kModulationBus3Amount       = "modulationBus3Amount";
+    constexpr const char* kModulationBus3Destination  = "modulationBus3Destination";
 
-    constexpr const char* kMatrixModBus4Source        = "matrixModBus4Source";
-    constexpr const char* kMatrixModBus4Amount        = "matrixModBus4Amount";
-    constexpr const char* kMatrixModBus4Destination   = "matrixModBus4Destination";
+    constexpr const char* kModulationBus4Source       = "modulationBus4Source";
+    constexpr const char* kModulationBus4Amount       = "modulationBus4Amount";
+    constexpr const char* kModulationBus4Destination  = "modulationBus4Destination";
 
-    constexpr const char* kMatrixModBus5Source        = "matrixModBus5Source";
-    constexpr const char* kMatrixModBus5Amount        = "matrixModBus5Amount";
-    constexpr const char* kMatrixModBus5Destination   = "matrixModBus5Destination";
+    constexpr const char* kModulationBus5Source       = "modulationBus5Source";
+    constexpr const char* kModulationBus5Amount       = "modulationBus5Amount";
+    constexpr const char* kModulationBus5Destination  = "modulationBus5Destination";
 
-    constexpr const char* kMatrixModBus6Source        = "matrixModBus6Source";
-    constexpr const char* kMatrixModBus6Amount        = "matrixModBus6Amount";
-    constexpr const char* kMatrixModBus6Destination   = "matrixModBus6Destination";
+    constexpr const char* kModulationBus6Source       = "modulationBus6Source";
+    constexpr const char* kModulationBus6Amount       = "modulationBus6Amount";
+    constexpr const char* kModulationBus6Destination  = "modulationBus6Destination";
 
-    constexpr const char* kMatrixModBus7Source        = "matrixModBus7Source";
-    constexpr const char* kMatrixModBus7Amount        = "matrixModBus7Amount";
-    constexpr const char* kMatrixModBus7Destination   = "matrixModBus7Destination";
+    constexpr const char* kModulationBus7Source       = "modulationBus7Source";
+    constexpr const char* kModulationBus7Amount       = "modulationBus7Amount";
+    constexpr const char* kModulationBus7Destination  = "modulationBus7Destination";
     
-    constexpr const char* kMatrixModBus8Source        = "matrixModBus8Source";
-    constexpr const char* kMatrixModBus8Amount        = "matrixModBus8Amount";
-    constexpr const char* kMatrixModBus8Destination   = "matrixModBus8Destination";
+    constexpr const char* kModulationBus8Source       = "modulationBus8Source";
+    constexpr const char* kModulationBus8Amount       = "modulationBus8Amount";
+    constexpr const char* kModulationBus8Destination  = "modulationBus8Destination";
 
-    constexpr const char* kMatrixModBus9Source        = "matrixModBus9Source";
-    constexpr const char* kMatrixModBus9Amount        = "matrixModBus9Amount";
-    constexpr const char* kMatrixModBus9Destination   = "matrixModBus9Destination";
+    constexpr const char* kModulationBus9Source       = "modulationBus9Source";
+    constexpr const char* kModulationBus9Amount       = "modulationBus9Amount";
+    constexpr const char* kModulationBus9Destination  = "modulationBus9Destination";
 }
 
 // ============================================================================
 // Display Names
 // ============================================================================
 
-namespace DisplayNames
+namespace ParameterDisplayNames
 {
-    // DCO 1
+    // DCO 1 Module Parameters Display Names
     constexpr const char* kDco1Frequency                = "FREQUENCY";
     constexpr const char* kDco1FrequencyModByLfo1       = "FREQ < LFO 1";
     constexpr const char* kDco1PulseWidth               = "PULSE WIDTH";
@@ -329,7 +339,7 @@ namespace DisplayNames
     constexpr const char* kDco1KeyboardPortamento       = "KEYBD/PORTA";
     constexpr const char* kDco1KeyClick                 = "KEY CLICK";
 
-    // DCO 2
+    // DCO 2 Module Parameters Display Names    
     constexpr const char* kDco2Frequency                = "FREQUENCY";
     constexpr const char* kDco2FrequencyModByLfo1       = "FREQ < LFO 1";
     constexpr const char* kDco2Detune                   = "DETUNE";
@@ -341,7 +351,7 @@ namespace DisplayNames
     constexpr const char* kDco2KeyboardPortamento       = "KEYBD/PORTA";
     constexpr const char* kDco2KeyClick                 = "KEY CLICK";
 
-    // VCF/VCA
+    // VCF/VCA Module Parameters Display Names
     constexpr const char* kVcfBalance                   = "BALANCE";
     constexpr const char* kVcfFequency                  = "FREQUENCY";
     constexpr const char* kVcfFrequencyModByEnv1        = "FREQ < ENV 1";
@@ -353,7 +363,7 @@ namespace DisplayNames
     constexpr const char* kVcfLevers                    = "LEVERS";
     constexpr const char* kVcfKeyboardPortamento        = "KEYBD/PORTA";
 
-    // FM/TRACK
+    // FM/TRACK Module Parameters Display Names
     constexpr const char* kFmAmount                     = "VCF FM AMOUNT";
     constexpr const char* kFmModByEnv3                  = "FM < ENV 3";
     constexpr const char* kFmModByPressure              = "FM < PRESSURE";
@@ -364,7 +374,7 @@ namespace DisplayNames
     constexpr const char* kTrackPoint5                  = "TRACK POINT 5";
     constexpr const char* kTrackInput                   = "TRACK INPUT";
 
-    // RAMP/PORTAMENTO
+    // RAMP/PORTAMENTO Module Parameters Display Names
     constexpr const char* kRamp1Rate                    = "RAMP 1 RATE";
     constexpr const char* kRamp2Rate                    = "RAMP 2 RATE";
     constexpr const char* kPortamentoRate               = "PORTAMENTO RATE";
@@ -375,7 +385,7 @@ namespace DisplayNames
     constexpr const char* kPortamentoLegato             = "LEGATO PORTA";
     constexpr const char* kPortamentoKeyboardMode       = "KEYBOARD MODE";
 
-    // ENV 1
+    // ENV 1 Module Parameters Display Names
     constexpr const char* kEnv1Delay                    = "DELAY";
     constexpr const char* kEnv1Attack                   = "ATTACK";
     constexpr const char* kEnv1Decay                    = "DECAY";
@@ -387,7 +397,7 @@ namespace DisplayNames
     constexpr const char* kEnv1EnvelopeMode             = "ENVELOPE MODE";
     constexpr const char* kEnv1Lfo1Trigger              = "LFO 1 TRIGGER";
 
-    // ENV 2
+    // ENV 2 Module Parameters Display Names
     constexpr const char* kEnv2Delay                    = "DELAY";
     constexpr const char* kEnv2Attack                   = "ATTACK";
     constexpr const char* kEnv2Decay                    = "DECAY";
@@ -399,7 +409,7 @@ namespace DisplayNames
     constexpr const char* kEnv2EnvelopeMode             = "ENVELOPE MODE";
     constexpr const char* kEnv2Lfo1Trigger              = "LFO 1 TRIGGER";
 
-    // ENV 3
+    // ENV 3 Module Parameters Display Names
     constexpr const char* kEnv3Delay                    = "DELAY";
     constexpr const char* kEnv3Attack                   = "ATTACK";
     constexpr const char* kEnv3Decay                    = "DECAY";
@@ -411,7 +421,7 @@ namespace DisplayNames
     constexpr const char* kEnv3EnvelopeMode             = "ENVELOPE MODE";
     constexpr const char* kEnv3Lfo1Trigger              = "LFO 1 TRIGGER";
 
-    // LFO 1
+    // LFO 1 Module Parameters Display Names
     constexpr const char* kLfo1Speed                    = "SPEED";
     constexpr const char* kLfo1SpeedModByPressure       = "SPEED < PRESSURE";
     constexpr const char* kLfo1RetriggerPoint           = "RETRIGGER POINT";
@@ -422,7 +432,7 @@ namespace DisplayNames
     constexpr const char* kLfo1Lag                      = "LAG";
     constexpr const char* kLfo1SampleInput              = "SAMPLE INPUT";
 
-    // LFO 2
+    // LFO 2 Module Parameters Display Names
     constexpr const char* kLfo2Speed                    = "SPEED";
     constexpr const char* kLfo2SpeedModByKeyboard       = "SPEED < KEYBD";
     constexpr const char* kLfo2RetriggerPoint           = "RETRIGGER POINT";
@@ -433,10 +443,10 @@ namespace DisplayNames
     constexpr const char* kLfo2Lag                      = "LAG";
     constexpr const char* kLfo2SampleInput              = "SAMPLE INPUT";
 
-    // Matrix Modulation Busses
-    constexpr const char* kMatrixModBusSource           = "SOURCE";
-    constexpr const char* kMatrixModBusDestination      = "DESTINATION";
-    constexpr const char* kMatrixModBusAmount           = "AMOUNT";
+    // Modulation Busses Header Display Names
+    constexpr const char* kModulationBusSource          = "SOURCE";
+    constexpr const char* kModulationBusDestination     = "DESTINATION";
+    constexpr const char* kModulationBusAmount          = "AMOUNT";
 }
 
 // ============================================================================
@@ -445,35 +455,35 @@ namespace DisplayNames
 
 namespace ChoiceLists
 {
-    // Sync choices
+    // Sync Choices
     constexpr const char* kSyncOff                      = "OFF";
     constexpr const char* kSyncSoft                     = "SOFT";
     constexpr const char* kSyncMedium                   = "MEDIUM";
     constexpr const char* kSyncHard                     = "HARD";
 
-    // Wave Select choices
+    // Wave Select Choices
     constexpr const char* kWaveSelectOff                = "OFF";
     constexpr const char* kWaveSelectPulse              = "PULSE";
     constexpr const char* kWaveSelectWave               = "WAVE";
     constexpr const char* kWaveSelectBoth               = "BOTH";
     constexpr const char* kWaveSelectNoise              = "NOISE";
 
-    // Levers choices
+    // Levers Choices
     constexpr const char* kLeversOff                    = "OFF";
     constexpr const char* kLeversL1Bend                 = "L1/BEND";
     constexpr const char* kLeversL2Vib                  = "L2/VIB";
     constexpr const char* kLeversBoth                   = "BOTH";
 
-    // Keyboard/Portamento choices
+    // Keyboard/Portamento Choices
     constexpr const char* kKeyboardPortamentoOff        = "OFF";
     constexpr const char* kKeyboardPortamentoKeybd      = "KEYBD";
     constexpr const char* kKeyboardPortamentoPorta      = "PORTA";
 
-    // On/Off choices
+    // On/Off Choices
     constexpr const char* kOnOffChoiceOff               = "OFF";
     constexpr const char* kOnOffChoiceOn                = "ON";
 
-    // Trigger Mode choices (ENV)
+    // Trigger Mode Choices (ENV)
     constexpr const char* kTriggerModeStrig             = "STRIG";
     constexpr const char* kTriggerModeMtrig             = "MTRIG";
     constexpr const char* kTriggerModeSreset            = "SRESET";
@@ -483,25 +493,25 @@ namespace ChoiceLists
     constexpr const char* kTriggerModeXreset            = "XRESET";
     constexpr const char* kTriggerModeXmrst             = "XMRST";
 
-    // Envelope Mode choices
+    // Envelope Mode Choices
     constexpr const char* kEnvelopeModeNormal           = "NORMAL";
     constexpr const char* kEnvelopeModeDadr             = "DADR";
     constexpr const char* kEnvelopeModeFree             = "FREE";
     constexpr const char* kEnvelopeModeBoth             = "BOTH";
 
-    // LFO 1 Trigger choices
+    // LFO 1 Trigger Choices
     constexpr const char* kLfo1TriggerNormal            = "NORMAL";
     constexpr const char* kLfo1TriggerLfo1              = "LFO 1";
     constexpr const char* kLfo1TriggerGLfo1             = "G-LFO 1";
     constexpr const char* kLfo1TriggerGatedLfo1Trigger  = "GATED LFO 1 TRIGGER";
 
-    // LFO Trigger Mode choices
+    // LFO Trigger Mode Choices
     constexpr const char* kLfoTriggerModeOff            = "OFF";
     constexpr const char* kLfoTriggerModeStrig          = "STRIG";
     constexpr const char* kLfoTriggerModeMtrig          = "MTRIG";
     constexpr const char* kLfoTriggerModeXtrig          = "XTRIG";
 
-    // LFO Waveform choices
+    // LFO Waveform Choices
     constexpr const char* kLfoWaveformTriangle          = "TRIANGLE";
     constexpr const char* kLfoWaveformUpsaw             = "UPSAW";
     constexpr const char* kLfoWaveformDnsaw             = "DNSAW";
@@ -510,24 +520,24 @@ namespace ChoiceLists
     constexpr const char* kLfoWaveformNoise             = "NOISE";
     constexpr const char* kLfoWaveformSampled           = "SAMPLED";
 
-    // Ramp Trigger choices
+    // Ramp Trigger Choices
     constexpr const char* kRampTriggerStrig             = "STRIG";
     constexpr const char* kRampTriggerMtrig             = "MTRIG";
     constexpr const char* kRampTriggerExtrig            = "EXTRIG";
     constexpr const char* kRampTriggerGatedx            = "GATEDX";
 
-    // Portamento Mode choices
+    // Portamento Mode Choices
     constexpr const char* kPortamentoModeLinear         = "LINEAR";
     constexpr const char* kPortamentoModeConst          = "CONST";
     constexpr const char* kPortamentoModeExpo           = "EXPO";
 
-    // Portamento Keyboard Mode choices
+    // Portamento Keyboard Mode Choices
     constexpr const char* kPortamentoKeyboardModeRotate = "ROTATE";
     constexpr const char* kPortamentoKeyboardModeReasgn = "REASGN";
     constexpr const char* kPortamentoKeyboardModeUnison = "UNISON";
     constexpr const char* kPortamentoKeyboardModeRearob = "REAROB";
 
-    // Source/Destination choices (for Matrix Modulation and Sample Input)
+    // Source/Destination Choices (for Matrix Modulation and Sample Input)
     constexpr const char* kSourceNone                   = "NONE";
     constexpr const char* kSourceEnv1                   = "ENV 1";
     constexpr const char* kSourceEnv2                   = "ENV 2";
@@ -550,7 +560,7 @@ namespace ChoiceLists
     constexpr const char* kSourceLever2                 = "LEVER 2";
     constexpr const char* kSourceLever3                 = "LEVER 3";
 
-    // Destination choices (for Matrix Modulation)
+    // Destination Choices (for Matrix Modulation)
     constexpr const char* kDestinationNone              = "NONE";
     constexpr const char* kDestinationDco1Frequency     = "DCO 1 FREQUENCY";
     constexpr const char* kDestinationDco1PulseWidth    = "DCO 1 PULSE WIDTH";
@@ -590,53 +600,53 @@ namespace ChoiceLists
 // Standalone Widget IDs
 // ============================================================================
 
-namespace WidgetIds
+namespace StandaloneWidgetIds
 {
-    // DCO 1 widgets
+    // DCO 1 Widgets Ids
     constexpr const char* kDco1Init                     = "dco1Init";
     constexpr const char* kDco1Copy                     = "dco1Copy";
     constexpr const char* kDco1Paste                    = "dco1Paste";
 
-    // DCO 2 widgets
+    // DCO 2 Widgets Ids
     constexpr const char* kDco2Init                     = "dco2Init";
     constexpr const char* kDco2Copy                     = "dco2Copy";
     constexpr const char* kDco2Paste                    = "dco2Paste";
 
-    // VCF/VCA widgets
+    // VCF/VCA Widgets Ids
     constexpr const char* kVcfVcaInit                   = "vcfVcaInit";
 
-    // FM/TRACK widgets
+    // FM/TRACK Widgets Ids
     constexpr const char* kFmTrackInit                  = "fmTrackInit";
 
-    // RAMP/PORTAMENTO widgets
+    // RAMP/PORTAMENTO Widgets Ids
     constexpr const char* kRampPortamentoInit           = "rampPortamentoInit";
 
-    // ENV 1 widgets
+    // ENV 1 Widgets Ids
     constexpr const char* kEnv1Init                     = "env1Init";
     constexpr const char* kEnv1Copy                     = "env1Copy";
     constexpr const char* kEnv1Paste                    = "env1Paste";
 
-    // ENV 2 widgets
+    // ENV 2 Widgets Ids
     constexpr const char* kEnv2Init                     = "env2Init";
     constexpr const char* kEnv2Copy                     = "env2Copy";
     constexpr const char* kEnv2Paste                    = "env2Paste";
 
-    // ENV 3 widgets
+    // ENV 3 Widgets Ids
     constexpr const char* kEnv3Init                     = "env3Init";
     constexpr const char* kEnv3Copy                     = "env3Copy";
     constexpr const char* kEnv3Paste                    = "env3Paste";
 
-    // LFO 1 widgets
+    // LFO 1 Widgets Ids
     constexpr const char* kLfo1Init                     = "lfo1Init";
     constexpr const char* kLfo1Copy                     = "lfo1Copy";
     constexpr const char* kLfo1Paste                    = "lfo1Paste";
 
-    // LFO 2 widgets
+    // LFO 2 Widgets Ids
     constexpr const char* kLfo2Init                     = "lfo2Init";
     constexpr const char* kLfo2Copy                     = "lfo2Copy";
     constexpr const char* kLfo2Paste                    = "lfo2Paste";
 
-    // Patch Manager widgets
+    // Patch Manager Widgets Ids
     constexpr const char* kUnlockBank                   = "unlockBank";
     constexpr const char* kSelectBank0                  = "selectBank0";
     constexpr const char* kSelectBank1                  = "selectBank1";
@@ -668,58 +678,58 @@ namespace WidgetIds
 // Standalone Widget Display Names
 // ============================================================================
 
-namespace WidgetDisplayNames
+namespace StandaloneWidgetDisplayNames
 {
-    // Action labels
+    // Action Labels
     constexpr const char* kActionLabelInit              = "I";
     constexpr const char* kActionLabelCopy              = "C";
     constexpr const char* kActionLabelPaste             = "P";
 
-    // DCO 1 widgets
+    // DCO 1 Widgets Display Names
     constexpr const char* kDco1Init                     = kActionLabelInit;
     constexpr const char* kDco1Copy                     = kActionLabelCopy;
     constexpr const char* kDco1Paste                    = kActionLabelPaste;
 
-    // DCO 2 widgets
+    // DCO 2 Widgets Display Names
     constexpr const char* kDco2Init                     = kActionLabelInit;
     constexpr const char* kDco2Copy                     = kActionLabelCopy;
     constexpr const char* kDco2Paste                    = kActionLabelPaste;
 
-    // VCF/VCA widgets
+    // VCF/VCA Widgets Display Names
     constexpr const char* kVcfVcaInit                   = kActionLabelInit;
 
-    // FM/TRACK widgets
+    // FM/TRACK Widgets Display Names
     constexpr const char* kFmTrackInit                  = kActionLabelInit;
 
-    // RAMP/PORTAMENTO widgets
+    // RAMP/PORTAMENTO Widgets Display Names
     constexpr const char* kRampPortamentoInit           = kActionLabelInit;
 
-    // ENV 1 widgets
+    // ENV 1 Widgets Display Names
     constexpr const char* kEnv1Init                     = kActionLabelInit;
     constexpr const char* kEnv1Copy                     = kActionLabelCopy;
     constexpr const char* kEnv1Paste                    = kActionLabelPaste;
 
-    // ENV 2 widgets
+    // ENV 2 Widgets Display Names
     constexpr const char* kEnv2Init                     = kActionLabelInit;
     constexpr const char* kEnv2Copy                     = kActionLabelCopy;
     constexpr const char* kEnv2Paste                    = kActionLabelPaste;
 
-    // ENV 3 widgets
+    // ENV 3 Widgets Display Names
     constexpr const char* kEnv3Init                     = kActionLabelInit;
     constexpr const char* kEnv3Copy                     = kActionLabelCopy;
     constexpr const char* kEnv3Paste                    = kActionLabelPaste;
 
-    // LFO 1 widgets
+    // LFO 1 Widgets Display Names
     constexpr const char* kLfo1Init                     = kActionLabelInit;
     constexpr const char* kLfo1Copy                     = kActionLabelCopy;
     constexpr const char* kLfo1Paste                    = kActionLabelPaste;
 
-    // LFO 2 widgets
+    // LFO 2 Widgets Display Names
     constexpr const char* kLfo2Init                     = kActionLabelInit;
     constexpr const char* kLfo2Copy                     = kActionLabelCopy;
     constexpr const char* kLfo2Paste                    = kActionLabelPaste;
 
-    // Patch Manager widgets
+    // Patch Manager Widgets Display Names
     constexpr const char* kUnlockBank                   = "UNLOCK";
     constexpr const char* kSelectBank0                  = "0";
     constexpr const char* kSelectBank1                  = "1";
@@ -733,8 +743,8 @@ namespace WidgetDisplayNames
     constexpr const char* kSelectBank9                  = "9";
     constexpr const char* kLoadPrevInternalPatch        = "<";
     constexpr const char* kLoadNextInternalPatch        = ">";
-    constexpr const char* kCurrentBank                  = ""; // TODO: approche valide ? Comment gérer la valeur Int ?
-    constexpr const char* kCurrentPatch                 = ""; // TODO: approche valide ? Comment gérer la valeur Int ?
+    constexpr const char* kCurrentBank                  = ""; // TODO: approche valide pour gérer la valeur Int ?
+    constexpr const char* kCurrentPatch                 = ""; // TODO: approche valide pour gérer la valeur Int ?
     constexpr const char* kInitPatch                    = "INIT";
     constexpr const char* kCopyPatch                    = "COPY";
     constexpr const char* kPastePatch                   = "PASTE";
@@ -751,8 +761,8 @@ namespace WidgetDisplayNames
 // Data Declarations (definitions in SynthDescriptors.cpp)
 // ============================================================================
 
-// Synth - All Groups
-extern const std::vector<GroupDescriptor> kAllGroups;
+// Synth - All APVTS Groups
+extern const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups;
 
 // Master Edit - Parameter & Standalone Widgets
 extern const std::vector<IntParameterDescriptor> kMasterEditIntParameters;
@@ -812,8 +822,8 @@ extern const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets;
 extern const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets;
 
 // Matrix Modulation - Parameter Widgets
-extern const std::array<std::vector<IntParameterDescriptor>, kMatrixModBusCount> kMatrixModBusIntParameters;
-extern const std::array<std::vector<ChoiceParameterDescriptor>, kMatrixModBusCount> kMatrixModBusChoiceParameters;
+extern const std::array<std::vector<IntParameterDescriptor>, kModulationBusCount> kModulationBusIntParameters;
+extern const std::array<std::vector<ChoiceParameterDescriptor>, kModulationBusCount> kModulationBusChoiceParameters;
 
 // Patch Manager - Standalone Widgets
 extern const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets;

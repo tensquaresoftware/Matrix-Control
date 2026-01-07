@@ -48,11 +48,11 @@ private:
     static const char* getBusId(int busNumber);
 
     static void createRootGroups(
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
         std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap);
     
     static void createChildGroups(
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
         std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap);
     
     static void addParametersToChildGroup(
@@ -110,17 +110,17 @@ private:
         juce::StringArray& errors);
     
     static void checkGroupIdUniqueness(
-        const SynthDescriptors::GroupDescriptor& group,
+        const SynthDescriptors::ApvtsGroupDescriptor& group,
         std::set<juce::String>& seenIds,
         juce::StringArray& errors);
     
     static void checkGroupParentExists(
-        const SynthDescriptors::GroupDescriptor& group,
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+        const SynthDescriptors::ApvtsGroupDescriptor& group,
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
         juce::StringArray& errors);
     
     static void checkGroupDisplayNameNotEmpty(
-        const SynthDescriptors::GroupDescriptor& group,
+        const SynthDescriptors::ApvtsGroupDescriptor& group,
         juce::StringArray& errors);
     
     static void checkParameterIdUniqueness(
@@ -172,18 +172,18 @@ private:
         juce::StringArray& errors);
     
     static std::set<juce::String> buildDefinedGroupIdsSet(
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups);
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups);
     
     static void checkParentIdReferencesPointToDefinedGroups(
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
         const std::set<juce::String>& definedGroupIds,
         juce::StringArray& errors);
     
     static std::map<juce::String, juce::String> buildGroupParentMap(
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups);
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups);
     
     static void detectCyclesInGroupHierarchy(
-        const std::vector<SynthDescriptors::GroupDescriptor>& allGroups,
+        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
         const std::map<juce::String, juce::String>& parentMap,
         juce::StringArray& errors);
 };
