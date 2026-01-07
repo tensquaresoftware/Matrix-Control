@@ -5,7 +5,7 @@
 #include "BottomPanel/BottomPanel.h"
 
 #include "../../../Themes/Theme.h"
-#include "../../../Widgets/SectionName.h"
+#include "../../../Widgets/SectionHeader.h"
 #include "../../../../Shared/SynthDescriptors.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
@@ -15,7 +15,7 @@ PatchEditPanel::~PatchEditPanel() = default;
 
 PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme(&inTheme)
-    , sectionName(std::make_unique<tss::SectionName>(
+    , sectionHeader(std::make_unique<tss::SectionHeader>(
         inTheme, 
         getWidth(), 
         SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
@@ -23,7 +23,7 @@ PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juc
     , middlePanel(std::make_unique<MiddlePanel>(inTheme))
     , bottomPanel(std::make_unique<BottomPanel>(inTheme, widgetFactory, apvts))
 {
-    addAndMakeVisible(*sectionName);
+    addAndMakeVisible(*sectionHeader);
     addAndMakeVisible(*topPanel);
     addAndMakeVisible(*middlePanel);
     addAndMakeVisible(*bottomPanel);
@@ -33,27 +33,23 @@ PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juc
 
 void PatchEditPanel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditPanelBackgroundColour());
+    if (auto* currentTheme = theme)
+        g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
 }
 
 void PatchEditPanel::resized()
 {
     const auto bounds = getLocalBounds();
     
-    const auto sectionNameY = 0;
-    sectionName->setBounds(
+    const auto sectionHeaderY = 0;
+    sectionHeader->setBounds(
         bounds.getX() + 0,
-        bounds.getY() + sectionNameY,
+        bounds.getY() + sectionHeaderY,
         bounds.getWidth(),
-        tss::SectionName::getHeight()
+        tss::SectionHeader::getHeight()
     );
     
-    const auto topPanelY = sectionNameY + tss::SectionName::getHeight();
+    const auto topPanelY = sectionHeaderY + tss::SectionHeader::getHeight();
     topPanel->setBounds(
         bounds.getX() + 0,
         bounds.getY() + topPanelY,
@@ -82,25 +78,17 @@ void PatchEditPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (sectionName != nullptr)
-    {
-        sectionName->setTheme(inTheme);
-    }
+    if (auto* header = sectionHeader.get())
+        header->setTheme(inTheme);
 
-    if (topPanel != nullptr)
-    {
-        topPanel->setTheme(inTheme);
-    }
+    if (auto* panel = topPanel.get())
+        panel->setTheme(inTheme);
 
-    if (middlePanel != nullptr)
-    {
-        middlePanel->setTheme(inTheme);
-    }
+    if (auto* panel = middlePanel.get())
+        panel->setTheme(inTheme);
 
-    if (bottomPanel != nullptr)
-    {
-        bottomPanel->setTheme(inTheme);
-    }
+    if (auto* panel = bottomPanel.get())
+        panel->setTheme(inTheme);
 
     repaint();
 }

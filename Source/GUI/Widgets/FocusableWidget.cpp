@@ -20,10 +20,8 @@ namespace tss
     void FocusableWidget::handleFocusLost(juce::Component* component)
     {
         hasFocusFlag = false;
-        if (component != nullptr)
-        {
-            component->repaint();
-        }
+        if (auto* widget = component)
+            widget->repaint();
     }
 
     void FocusableWidget::drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Theme& theme) const

@@ -32,12 +32,8 @@ TopPanel::TopPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProc
 
 void TopPanel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditPanelBackgroundColour());
+    if (auto* currentTheme = theme)
+        g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
 }
 
 void TopPanel::resized()
@@ -95,30 +91,20 @@ void TopPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (dco1Panel != nullptr)
-    {
-        dco1Panel->setTheme(inTheme);
-    }
+    if (auto* panel = dco1Panel.get())
+        panel->setTheme(inTheme);
 
-    if (dco2Panel != nullptr)
-    {
-        dco2Panel->setTheme(inTheme);
-    }
+    if (auto* panel = dco2Panel.get())
+        panel->setTheme(inTheme);
 
-    if (vcfVcaPanel != nullptr)
-    {
-        vcfVcaPanel->setTheme(inTheme);
-    }
+    if (auto* panel = vcfVcaPanel.get())
+        panel->setTheme(inTheme);
 
-    if (fmTrackPanel != nullptr)
-    {
-        fmTrackPanel->setTheme(inTheme);
-    }
+    if (auto* panel = fmTrackPanel.get())
+        panel->setTheme(inTheme);
 
-    if (rampPortamentoPanel != nullptr)
-    {
-        rampPortamentoPanel->setTheme(inTheme);
-    }
+    if (auto* panel = rampPortamentoPanel.get())
+        panel->setTheme(inTheme);
 
     repaint();
 }

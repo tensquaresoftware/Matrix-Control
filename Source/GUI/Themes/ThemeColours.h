@@ -85,69 +85,69 @@ namespace tss
             };
         }
 
-        namespace SectionName
+        namespace SectionHeader
         {
             inline constexpr ColourElement kBase = {
-                "SectionNameBase",
+                "SectionHeaderBase",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kRed
             };
 
             inline constexpr ColourElement kContentArea = {
-                "SectionNameContentArea",
+                "SectionHeaderContentArea",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kOrange
             };
 
             inline constexpr ColourElement kText = {
-                "SectionNameText",
+                "SectionHeaderText",
                 ColourChart::kLightGrey2,
                 ColourChart::kLightGrey2,
                 ColourChart::kTransparent
             };
 
             inline constexpr ColourElement kLineBlue = {
-                "SectionNameLineBlue",
+                "SectionHeaderLineBlue",
                 ColourChart::kBlue,
                 ColourChart::kBlue,
                 ColourChart::kYellow
             };
 
             inline constexpr ColourElement kLineOrange = {
-                "SectionNameLineOrange",
+                "SectionHeaderLineOrange",
                 ColourChart::kOrange,
                 ColourChart::kOrange,
                 ColourChart::kYellow
             };
         }
 
-        namespace ModuleName
+        namespace ModuleHeader
         {
             inline constexpr ColourElement kBase = {
-                "ModuleNameBase",
+                "ModuleHeaderBase",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kRed
             };
 
             inline constexpr ColourElement kText = {
-                "ModuleNameText",
+                "ModuleHeaderText",
                 ColourChart::kLightGrey2,
                 ColourChart::kLightGrey2,
                 ColourChart::kTransparent
             };
 
             inline constexpr ColourElement kLineBlue = {
-                "ModuleNameLineBlue",
+                "ModuleHeaderLineBlue",
                 ColourChart::kBlue,
                 ColourChart::kBlue,
                 ColourChart::kYellow
             };
 
             inline constexpr ColourElement kLineOrange = {
-                "ModuleNameLineOrange",
+                "ModuleHeaderLineOrange",
                 ColourChart::kOrange,
                 ColourChart::kOrange,
                 ColourChart::kYellow

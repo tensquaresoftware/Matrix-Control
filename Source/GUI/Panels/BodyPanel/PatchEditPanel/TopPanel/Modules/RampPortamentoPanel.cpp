@@ -1,8 +1,8 @@
 #include "RampPortamentoPanel.h"
 
 #include "../../../../../Themes/Theme.h"
-#include "../../../../../Widgets/ModuleName.h"
-#include "../../../../../Widgets/ParameterLabel.h"
+#include "../../../../../Widgets/ModuleHeader.h"
+#include "../../../../../Widgets/Label.h"
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
@@ -17,10 +17,10 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
     , apvts(inApvts)
 {
     // Module Name
-    rampPortamentoModuleName = std::make_unique<tss::ModuleName>(
+    rampPortamentoModuleHeader = std::make_unique<tss::ModuleHeader>(
         inTheme, 
         widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kRampPortamento));
-    addAndMakeVisible(*rampPortamentoModuleName);
+    addAndMakeVisible(*rampPortamentoModuleHeader);
 
     // Standalone Widgets
     rampPortamentoInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit, inTheme);
@@ -33,8 +33,8 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
     addAndMakeVisible(*rampPortamentoInitButton);
 
     // Ramp 1 Rate
-    ramp1RateLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    ramp1RateLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp1Rate));
     addAndMakeVisible(*ramp1RateLabel);
 
@@ -45,12 +45,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *ramp1RateSlider);
     addAndMakeVisible(*ramp1RateSlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator1);
 
     // Ramp 1 Trigger
-    ramp1TriggerLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    ramp1TriggerLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp1Trigger));
     addAndMakeVisible(*ramp1TriggerLabel);
 
@@ -61,12 +61,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *ramp1TriggerComboBox);
     addAndMakeVisible(*ramp1TriggerComboBox);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator2);
 
     // Ramp 2 Rate
-    ramp2RateLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    ramp2RateLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp2Rate));
     addAndMakeVisible(*ramp2RateLabel);
 
@@ -77,12 +77,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *ramp2RateSlider);
     addAndMakeVisible(*ramp2RateSlider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator3);
 
     // Ramp 2 Trigger
-    ramp2TriggerLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    ramp2TriggerLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp2Trigger));
     addAndMakeVisible(*ramp2TriggerLabel);
 
@@ -93,12 +93,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *ramp2TriggerComboBox);
     addAndMakeVisible(*ramp2TriggerComboBox);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator4);
 
     // Portamento Rate
-    portamentoRateLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    portamentoRateLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoRate));
     addAndMakeVisible(*portamentoRateLabel);
 
@@ -109,12 +109,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *portamentoRateSlider);
     addAndMakeVisible(*portamentoRateSlider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator5);
 
     // Portamento Mod by Velocity
-    portamentoModByVelocityLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    portamentoModByVelocityLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoModByVelocity));
     addAndMakeVisible(*portamentoModByVelocityLabel);
 
@@ -125,12 +125,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *portamentoModByVelocitySlider);
     addAndMakeVisible(*portamentoModByVelocitySlider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator6);
 
     // Portamento Mode
-    portamentoModeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    portamentoModeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoMode));
     addAndMakeVisible(*portamentoModeLabel);
 
@@ -141,12 +141,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *portamentoModeComboBox);
     addAndMakeVisible(*portamentoModeComboBox);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator7);
 
     // Portamento Legato
-    portamentoLegatoLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    portamentoLegatoLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoLegato));
     addAndMakeVisible(*portamentoLegatoLabel);
 
@@ -157,12 +157,12 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *portamentoLegatoComboBox);
     addAndMakeVisible(*portamentoLegatoComboBox);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator8);
 
     // Portamento Keyboard Mode
-    portamentoKeyboardModeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    portamentoKeyboardModeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoKeyboardMode));
     addAndMakeVisible(*portamentoKeyboardModeLabel);
 
@@ -173,10 +173,10 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
         *portamentoKeyboardModeComboBox);
     addAndMakeVisible(*portamentoKeyboardModeComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator9);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator10);
 
     setSize(getWidth(), getHeight());
@@ -186,376 +186,251 @@ RampPortamentoPanel::~RampPortamentoPanel() = default;
 
 void RampPortamentoPanel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
+        g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
 void RampPortamentoPanel::resized()
 {
-    const auto moduleNameHeight = tss::ModuleName::getHeight();
-    const auto moduleNameWidth = tss::ModuleName::getNormalWidth();
+    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
     const auto buttonWidth = tss::Button::getDefaultWidth();
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::ParameterLabel::getWidth();
-    const auto labelHeight = tss::ParameterLabel::getHeight();
+    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
     const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth();
+    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
     const auto separatorHeight = tss::ParameterSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
 
-    if (rampPortamentoModuleName != nullptr)
-    {
-        rampPortamentoModuleName->setBounds(0, y, moduleNameWidth, moduleNameHeight);
-    }
+    if (auto* header = rampPortamentoModuleHeader.get())
+        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
-    if (rampPortamentoInitButton != nullptr)
-    {
-        rampPortamentoInitButton->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = rampPortamentoInitButton.get())
+        button->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
 
-    y += moduleNameHeight;
+    y += moduleHeaderHeight;
 
-    if (ramp1RateLabel != nullptr)
-    {
-        ramp1RateLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = ramp1RateLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (ramp1RateSlider != nullptr)
-    {
-        ramp1RateSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = ramp1RateSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (ramp1TriggerLabel != nullptr)
-    {
-        ramp1TriggerLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = ramp1TriggerLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (ramp1TriggerComboBox != nullptr)
-    {
-        ramp1TriggerComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = ramp1TriggerComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (ramp2RateLabel != nullptr)
-    {
-        ramp2RateLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = ramp2RateLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (ramp2RateSlider != nullptr)
-    {
-        ramp2RateSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = ramp2RateSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (ramp2TriggerLabel != nullptr)
-    {
-        ramp2TriggerLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = ramp2TriggerLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (ramp2TriggerComboBox != nullptr)
-    {
-        ramp2TriggerComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = ramp2TriggerComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (portamentoRateLabel != nullptr)
-    {
-        portamentoRateLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = portamentoRateLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (portamentoRateSlider != nullptr)
-    {
-        portamentoRateSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = portamentoRateSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (portamentoModByVelocityLabel != nullptr)
-    {
-        portamentoModByVelocityLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = portamentoModByVelocityLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (portamentoModByVelocitySlider != nullptr)
-    {
-        portamentoModByVelocitySlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = portamentoModByVelocitySlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (portamentoModeLabel != nullptr)
-    {
-        portamentoModeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = portamentoModeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (portamentoModeComboBox != nullptr)
-    {
-        portamentoModeComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = portamentoModeComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (portamentoLegatoLabel != nullptr)
-    {
-        portamentoLegatoLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = portamentoLegatoLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (portamentoLegatoComboBox != nullptr)
-    {
-        portamentoLegatoComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = portamentoLegatoComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (portamentoKeyboardModeLabel != nullptr)
-    {
-        portamentoKeyboardModeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = portamentoKeyboardModeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (portamentoKeyboardModeComboBox != nullptr)
-    {
-        portamentoKeyboardModeComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = portamentoKeyboardModeComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
     y += labelHeight;
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
 void RampPortamentoPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (rampPortamentoModuleName != nullptr)
-    {
-        rampPortamentoModuleName->setTheme(inTheme);
-    }
+    if (auto* header = rampPortamentoModuleHeader.get())
+        header->setTheme(inTheme);
 
-    if (rampPortamentoInitButton != nullptr)
-    {
-        rampPortamentoInitButton->setTheme(inTheme);
-    }
+    if (auto* button = rampPortamentoInitButton.get())
+        button->setTheme(inTheme);
 
-    if (ramp1RateLabel != nullptr)
-    {
-        ramp1RateLabel->setTheme(inTheme);
-    }
+    if (auto* label = ramp1RateLabel.get())
+        label->setTheme(inTheme);
 
-    if (ramp1RateSlider != nullptr)
-    {
-        ramp1RateSlider->setTheme(inTheme);
-    }
+    if (auto* slider = ramp1RateSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setTheme(inTheme);
 
-    if (ramp1TriggerLabel != nullptr)
-    {
-        ramp1TriggerLabel->setTheme(inTheme);
-    }
+    if (auto* label = ramp1TriggerLabel.get())
+        label->setTheme(inTheme);
 
-    if (ramp1TriggerComboBox != nullptr)
-    {
-        ramp1TriggerComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = ramp1TriggerComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setTheme(inTheme);
 
-    if (ramp2RateLabel != nullptr)
-    {
-        ramp2RateLabel->setTheme(inTheme);
-    }
+    if (auto* label = ramp2RateLabel.get())
+        label->setTheme(inTheme);
 
-    if (ramp2RateSlider != nullptr)
-    {
-        ramp2RateSlider->setTheme(inTheme);
-    }
+    if (auto* slider = ramp2RateSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setTheme(inTheme);
 
-    if (ramp2TriggerLabel != nullptr)
-    {
-        ramp2TriggerLabel->setTheme(inTheme);
-    }
+    if (auto* label = ramp2TriggerLabel.get())
+        label->setTheme(inTheme);
 
-    if (ramp2TriggerComboBox != nullptr)
-    {
-        ramp2TriggerComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = ramp2TriggerComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setTheme(inTheme);
 
-    if (portamentoRateLabel != nullptr)
-    {
-        portamentoRateLabel->setTheme(inTheme);
-    }
+    if (auto* label = portamentoRateLabel.get())
+        label->setTheme(inTheme);
 
-    if (portamentoRateSlider != nullptr)
-    {
-        portamentoRateSlider->setTheme(inTheme);
-    }
+    if (auto* slider = portamentoRateSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setTheme(inTheme);
 
-    if (portamentoModByVelocityLabel != nullptr)
-    {
-        portamentoModByVelocityLabel->setTheme(inTheme);
-    }
+    if (auto* label = portamentoModByVelocityLabel.get())
+        label->setTheme(inTheme);
 
-    if (portamentoModByVelocitySlider != nullptr)
-    {
-        portamentoModByVelocitySlider->setTheme(inTheme);
-    }
+    if (auto* slider = portamentoModByVelocitySlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setTheme(inTheme);
 
-    if (portamentoModeLabel != nullptr)
-    {
-        portamentoModeLabel->setTheme(inTheme);
-    }
+    if (auto* label = portamentoModeLabel.get())
+        label->setTheme(inTheme);
 
-    if (portamentoModeComboBox != nullptr)
-    {
-        portamentoModeComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = portamentoModeComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setTheme(inTheme);
 
-    if (portamentoLegatoLabel != nullptr)
-    {
-        portamentoLegatoLabel->setTheme(inTheme);
-    }
+    if (auto* label = portamentoLegatoLabel.get())
+        label->setTheme(inTheme);
 
-    if (portamentoLegatoComboBox != nullptr)
-    {
-        portamentoLegatoComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = portamentoLegatoComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setTheme(inTheme);
 
-    if (portamentoKeyboardModeLabel != nullptr)
-    {
-        portamentoKeyboardModeLabel->setTheme(inTheme);
-    }
+    if (auto* label = portamentoKeyboardModeLabel.get())
+        label->setTheme(inTheme);
 
-    if (portamentoKeyboardModeComboBox != nullptr)
-    {
-        portamentoKeyboardModeComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = portamentoKeyboardModeComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setTheme(inTheme);
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setTheme(inTheme);
 
     repaint();
 }

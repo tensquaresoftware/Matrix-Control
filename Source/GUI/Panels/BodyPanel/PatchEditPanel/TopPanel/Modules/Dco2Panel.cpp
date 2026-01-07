@@ -1,8 +1,8 @@
 #include "Dco2Panel.h"
 
 #include "../../../../../Themes/Theme.h"
-#include "../../../../../Widgets/ModuleName.h"
-#include "../../../../../Widgets/ParameterLabel.h"
+#include "../../../../../Widgets/ModuleHeader.h"
+#include "../../../../../Widgets/Label.h"
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
@@ -17,10 +17,10 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     , apvts(inApvts)
 {
     // Module Name
-    dco2ModuleName = std::make_unique<tss::ModuleName>(
+    dco2ModuleHeader = std::make_unique<tss::ModuleHeader>(
         inTheme, 
         widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kDco2));
-    addAndMakeVisible(*dco2ModuleName);
+    addAndMakeVisible(*dco2ModuleHeader);
 
     // Standalone Widgets
     dco2InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kDco2Init, inTheme);
@@ -51,8 +51,8 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     addAndMakeVisible(*dco2PasteButton);
 
     // Frequency
-    dco2FrequencyLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2FrequencyLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2Frequency));
     addAndMakeVisible(*dco2FrequencyLabel);
 
@@ -63,12 +63,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2FrequencySlider);
     addAndMakeVisible(*dco2FrequencySlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator1);
 
     // Frequency Mod by LFO 1
-    dco2FrequencyModByLfo1Label = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2FrequencyModByLfo1Label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2FrequencyModByLfo1));
     addAndMakeVisible(*dco2FrequencyModByLfo1Label);
 
@@ -79,12 +79,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2FrequencyModByLfo1Slider);
     addAndMakeVisible(*dco2FrequencyModByLfo1Slider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator2);
 
     // Detune
-    dco2DetuneLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2DetuneLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2Detune));
     addAndMakeVisible(*dco2DetuneLabel);
 
@@ -95,12 +95,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2DetuneSlider);
     addAndMakeVisible(*dco2DetuneSlider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator3);
 
     // Pulse Width
-    dco2PulseWidthLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2PulseWidthLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2PulseWidth));
     addAndMakeVisible(*dco2PulseWidthLabel);
 
@@ -111,12 +111,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2PulseWidthSlider);
     addAndMakeVisible(*dco2PulseWidthSlider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator4);
 
     // Pulse Width Mod by LFO 2
-    dco2PulseWidthModByLfo2Label = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2PulseWidthModByLfo2Label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2PulseWidthModByLfo2));
     addAndMakeVisible(*dco2PulseWidthModByLfo2Label);
 
@@ -127,12 +127,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2PulseWidthModByLfo2Slider);
     addAndMakeVisible(*dco2PulseWidthModByLfo2Slider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator5);
 
     // Wave Shape
-    dco2WaveShapeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2WaveShapeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2WaveShape));
     addAndMakeVisible(*dco2WaveShapeLabel);
 
@@ -143,12 +143,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2WaveShapeSlider);
     addAndMakeVisible(*dco2WaveShapeSlider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator6);
 
     // Wave Select
-    dco2WaveSelectLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2WaveSelectLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2WaveSelect));
     addAndMakeVisible(*dco2WaveSelectLabel);
 
@@ -159,12 +159,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2WaveSelectComboBox);
     addAndMakeVisible(*dco2WaveSelectComboBox);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator7);
 
     // Levers
-    dco2LeversLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2LeversLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2Levers));
     addAndMakeVisible(*dco2LeversLabel);
 
@@ -175,12 +175,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2LeversComboBox);
     addAndMakeVisible(*dco2LeversComboBox);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator8);
 
     // Keyboard Portamento
-    dco2KeyboardPortamentoLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2KeyboardPortamentoLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2KeyboardPortamento));
     addAndMakeVisible(*dco2KeyboardPortamentoLabel);
 
@@ -191,12 +191,12 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2KeyboardPortamentoComboBox);
     addAndMakeVisible(*dco2KeyboardPortamentoComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator9);
 
     // Key Click
-    dco2KeyClickLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    dco2KeyClickLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco2KeyClick));
     addAndMakeVisible(*dco2KeyClickLabel);
 
@@ -207,7 +207,7 @@ Dco2Panel::Dco2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco2KeyClickComboBox);
     addAndMakeVisible(*dco2KeyClickComboBox);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator10);
 
     setSize(getWidth(), getHeight());
@@ -217,416 +217,275 @@ Dco2Panel::~Dco2Panel() = default;
 
 void Dco2Panel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
+        g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
 void Dco2Panel::resized()
 {
-    const auto moduleNameHeight = tss::ModuleName::getHeight();
-    const auto moduleNameWidth = tss::ModuleName::getNormalWidth();
+    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
     const auto buttonWidth = tss::Button::getDefaultWidth();
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::ParameterLabel::getWidth();
-    const auto labelHeight = tss::ParameterLabel::getHeight();
+    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
     const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth();
+    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
     const auto separatorHeight = tss::ParameterSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
 
-    if (dco2ModuleName != nullptr)
-    {
-        dco2ModuleName->setBounds(0, y, moduleNameWidth, moduleNameHeight);
-    }
+    if (auto* header = dco2ModuleHeader.get())
+        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
-    if (dco2PasteButton != nullptr)
-    {
-        dco2PasteButton->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = dco2PasteButton.get())
+        button->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
 
-    if (dco2CopyButton != nullptr)
-    {
-        dco2CopyButton->setBounds(panelWidth - buttonWidth * 2, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = dco2CopyButton.get())
+        button->setBounds(panelWidth - buttonWidth * 2, y, buttonWidth, buttonHeight);
 
-    if (dco2InitButton != nullptr)
-    {
-        dco2InitButton->setBounds(panelWidth - buttonWidth * 3, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = dco2InitButton.get())
+        button->setBounds(panelWidth - buttonWidth * 3, y, buttonWidth, buttonHeight);
 
-    y += moduleNameHeight;
+    y += moduleHeaderHeight;
 
-    if (dco2FrequencyLabel != nullptr)
-    {
-        dco2FrequencyLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2FrequencyLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2FrequencySlider != nullptr)
-    {
-        dco2FrequencySlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = dco2FrequencySlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2FrequencyModByLfo1Label != nullptr)
-    {
-        dco2FrequencyModByLfo1Label->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2FrequencyModByLfo1Label.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2FrequencyModByLfo1Slider != nullptr)
-    {
-        dco2FrequencyModByLfo1Slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = dco2FrequencyModByLfo1Slider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2DetuneLabel != nullptr)
-    {
-        dco2DetuneLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2DetuneLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2DetuneSlider != nullptr)
-    {
-        dco2DetuneSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = dco2DetuneSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2PulseWidthLabel != nullptr)
-    {
-        dco2PulseWidthLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2PulseWidthLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2PulseWidthSlider != nullptr)
-    {
-        dco2PulseWidthSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = dco2PulseWidthSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2PulseWidthModByLfo2Label != nullptr)
-    {
-        dco2PulseWidthModByLfo2Label->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2PulseWidthModByLfo2Label.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2PulseWidthModByLfo2Slider != nullptr)
-    {
-        dco2PulseWidthModByLfo2Slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = dco2PulseWidthModByLfo2Slider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2WaveShapeLabel != nullptr)
-    {
-        dco2WaveShapeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2WaveShapeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2WaveShapeSlider != nullptr)
-    {
-        dco2WaveShapeSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = dco2WaveShapeSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2WaveSelectLabel != nullptr)
-    {
-        dco2WaveSelectLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2WaveSelectLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2WaveSelectComboBox != nullptr)
-    {
-        dco2WaveSelectComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = dco2WaveSelectComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2LeversLabel != nullptr)
-    {
-        dco2LeversLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2LeversLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2LeversComboBox != nullptr)
-    {
-        dco2LeversComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = dco2LeversComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2KeyboardPortamentoLabel != nullptr)
-    {
-        dco2KeyboardPortamentoLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2KeyboardPortamentoLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2KeyboardPortamentoComboBox != nullptr)
-    {
-        dco2KeyboardPortamentoComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = dco2KeyboardPortamentoComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (dco2KeyClickLabel != nullptr)
-    {
-        dco2KeyClickLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = dco2KeyClickLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (dco2KeyClickComboBox != nullptr)
-    {
-        dco2KeyClickComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = dco2KeyClickComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
 void Dco2Panel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (dco2ModuleName != nullptr)
-    {
-        dco2ModuleName->setTheme(inTheme);
-    }
+    if (auto* header = dco2ModuleHeader.get())
+        header->setTheme(inTheme);
 
-    if (dco2InitButton != nullptr)
-    {
-        dco2InitButton->setTheme(inTheme);
-    }
+    if (auto* button = dco2InitButton.get())
+        button->setTheme(inTheme);
 
-    if (dco2CopyButton != nullptr)
-    {
-        dco2CopyButton->setTheme(inTheme);
-    }
+    if (auto* button = dco2CopyButton.get())
+        button->setTheme(inTheme);
 
-    if (dco2PasteButton != nullptr)
-    {
-        dco2PasteButton->setTheme(inTheme);
-    }
+    if (auto* button = dco2PasteButton.get())
+        button->setTheme(inTheme);
 
-    if (dco2FrequencyLabel != nullptr)
-    {
-        dco2FrequencyLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2FrequencyLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2FrequencySlider != nullptr)
-    {
-        dco2FrequencySlider->setTheme(inTheme);
-    }
+    if (auto* slider = dco2FrequencySlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setTheme(inTheme);
 
-    if (dco2FrequencyModByLfo1Label != nullptr)
-    {
-        dco2FrequencyModByLfo1Label->setTheme(inTheme);
-    }
+    if (auto* label = dco2FrequencyModByLfo1Label.get())
+        label->setTheme(inTheme);
 
-    if (dco2FrequencyModByLfo1Slider != nullptr)
-    {
-        dco2FrequencyModByLfo1Slider->setTheme(inTheme);
-    }
+    if (auto* slider = dco2FrequencyModByLfo1Slider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setTheme(inTheme);
 
-    if (dco2DetuneLabel != nullptr)
-    {
-        dco2DetuneLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2DetuneLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2DetuneSlider != nullptr)
-    {
-        dco2DetuneSlider->setTheme(inTheme);
-    }
+    if (auto* slider = dco2DetuneSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setTheme(inTheme);
 
-    if (dco2PulseWidthLabel != nullptr)
-    {
-        dco2PulseWidthLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2PulseWidthLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2PulseWidthSlider != nullptr)
-    {
-        dco2PulseWidthSlider->setTheme(inTheme);
-    }
+    if (auto* slider = dco2PulseWidthSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setTheme(inTheme);
 
-    if (dco2PulseWidthModByLfo2Label != nullptr)
-    {
-        dco2PulseWidthModByLfo2Label->setTheme(inTheme);
-    }
+    if (auto* label = dco2PulseWidthModByLfo2Label.get())
+        label->setTheme(inTheme);
 
-    if (dco2PulseWidthModByLfo2Slider != nullptr)
-    {
-        dco2PulseWidthModByLfo2Slider->setTheme(inTheme);
-    }
+    if (auto* slider = dco2PulseWidthModByLfo2Slider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setTheme(inTheme);
 
-    if (dco2WaveShapeLabel != nullptr)
-    {
-        dco2WaveShapeLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2WaveShapeLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2WaveShapeSlider != nullptr)
-    {
-        dco2WaveShapeSlider->setTheme(inTheme);
-    }
+    if (auto* slider = dco2WaveShapeSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setTheme(inTheme);
 
-    if (dco2WaveSelectLabel != nullptr)
-    {
-        dco2WaveSelectLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2WaveSelectLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2WaveSelectComboBox != nullptr)
-    {
-        dco2WaveSelectComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = dco2WaveSelectComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setTheme(inTheme);
 
-    if (dco2LeversLabel != nullptr)
-    {
-        dco2LeversLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2LeversLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2LeversComboBox != nullptr)
-    {
-        dco2LeversComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = dco2LeversComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setTheme(inTheme);
 
-    if (dco2KeyboardPortamentoLabel != nullptr)
-    {
-        dco2KeyboardPortamentoLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2KeyboardPortamentoLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2KeyboardPortamentoComboBox != nullptr)
-    {
-        dco2KeyboardPortamentoComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = dco2KeyboardPortamentoComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setTheme(inTheme);
 
-    if (dco2KeyClickLabel != nullptr)
-    {
-        dco2KeyClickLabel->setTheme(inTheme);
-    }
+    if (auto* label = dco2KeyClickLabel.get())
+        label->setTheme(inTheme);
 
-    if (dco2KeyClickComboBox != nullptr)
-    {
-        dco2KeyClickComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = dco2KeyClickComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setTheme(inTheme);
 
     repaint();
 }

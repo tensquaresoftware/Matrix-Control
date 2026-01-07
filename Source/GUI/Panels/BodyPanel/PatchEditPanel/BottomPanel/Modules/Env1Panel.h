@@ -8,8 +8,8 @@
 namespace tss
 {
     class Theme;
-    class ModuleName;
-    class ParameterLabel;
+    class ModuleHeader;
+    class Label;
     class Slider;
     class ComboBox;
     class Button;
@@ -39,7 +39,7 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleName> env1ModuleName;
+    std::unique_ptr<tss::ModuleHeader> env1ModuleHeader;
 
     // Buttons
     std::unique_ptr<tss::Button> env1InitButton;
@@ -47,16 +47,16 @@ private:
     std::unique_ptr<tss::Button> env1PasteButton;
 
     // Labels
-    std::unique_ptr<tss::ParameterLabel> env1DelayLabel;
-    std::unique_ptr<tss::ParameterLabel> env1AttackLabel;
-    std::unique_ptr<tss::ParameterLabel> env1DecayLabel;
-    std::unique_ptr<tss::ParameterLabel> env1SustainLabel;
-    std::unique_ptr<tss::ParameterLabel> env1ReleaseLabel;
-    std::unique_ptr<tss::ParameterLabel> env1AmplitudeLabel;
-    std::unique_ptr<tss::ParameterLabel> env1AmplitudeModByVelocityLabel;
-    std::unique_ptr<tss::ParameterLabel> env1TriggerModeLabel;
-    std::unique_ptr<tss::ParameterLabel> env1EnvelopeModeLabel;
-    std::unique_ptr<tss::ParameterLabel> env1Lfo1TriggerLabel;
+    std::unique_ptr<tss::Label> env1DelayLabel;
+    std::unique_ptr<tss::Label> env1AttackLabel;
+    std::unique_ptr<tss::Label> env1DecayLabel;
+    std::unique_ptr<tss::Label> env1SustainLabel;
+    std::unique_ptr<tss::Label> env1ReleaseLabel;
+    std::unique_ptr<tss::Label> env1AmplitudeLabel;
+    std::unique_ptr<tss::Label> env1AmplitudeModByVelocityLabel;
+    std::unique_ptr<tss::Label> env1TriggerModeLabel;
+    std::unique_ptr<tss::Label> env1EnvelopeModeLabel;
+    std::unique_ptr<tss::Label> env1Lfo1TriggerLabel;
 
     // Sliders
     std::unique_ptr<tss::Slider> env1DelaySlider;

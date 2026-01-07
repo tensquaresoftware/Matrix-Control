@@ -4,10 +4,11 @@
 
 namespace tss
 {
-    ParameterSeparator::ParameterSeparator(Theme& inTheme)
-        : theme(&inTheme)
+    ParameterSeparator::ParameterSeparator(Theme& inTheme, Type inType)
+        : type(inType)
+        , theme(&inTheme)
     {
-        setSize(kWidth, kHeight);
+        setSize(getWidth(inType), kHeight);
     }
 
     void ParameterSeparator::setTheme(Theme& inTheme)
@@ -43,6 +44,11 @@ namespace tss
         
         g.setColour(lineColour);
         g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, kLineThickness);
+    }
+
+    int ParameterSeparator::getWidth() const
+    {
+        return getWidth(type);
     }
 }
 

@@ -8,8 +8,8 @@
 namespace tss
 {
     class Theme;
-    class ModuleName;
-    class ParameterLabel;
+    class ModuleHeader;
+    class Label;
     class Slider;
     class ComboBox;
     class Button;
@@ -39,21 +39,21 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleName> rampPortamentoModuleName;
+    std::unique_ptr<tss::ModuleHeader> rampPortamentoModuleHeader;
 
     // Buttons
     std::unique_ptr<tss::Button> rampPortamentoInitButton;
 
     // Labels
-    std::unique_ptr<tss::ParameterLabel> ramp1RateLabel;
-    std::unique_ptr<tss::ParameterLabel> ramp1TriggerLabel;
-    std::unique_ptr<tss::ParameterLabel> ramp2RateLabel;
-    std::unique_ptr<tss::ParameterLabel> ramp2TriggerLabel;
-    std::unique_ptr<tss::ParameterLabel> portamentoRateLabel;
-    std::unique_ptr<tss::ParameterLabel> portamentoModByVelocityLabel;
-    std::unique_ptr<tss::ParameterLabel> portamentoModeLabel;
-    std::unique_ptr<tss::ParameterLabel> portamentoLegatoLabel;
-    std::unique_ptr<tss::ParameterLabel> portamentoKeyboardModeLabel;
+    std::unique_ptr<tss::Label> ramp1RateLabel;
+    std::unique_ptr<tss::Label> ramp1TriggerLabel;
+    std::unique_ptr<tss::Label> ramp2RateLabel;
+    std::unique_ptr<tss::Label> ramp2TriggerLabel;
+    std::unique_ptr<tss::Label> portamentoRateLabel;
+    std::unique_ptr<tss::Label> portamentoModByVelocityLabel;
+    std::unique_ptr<tss::Label> portamentoModeLabel;
+    std::unique_ptr<tss::Label> portamentoLegatoLabel;
+    std::unique_ptr<tss::Label> portamentoKeyboardModeLabel;
 
     // Sliders
     std::unique_ptr<tss::Slider> ramp1RateSlider;

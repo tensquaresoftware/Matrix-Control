@@ -13,14 +13,11 @@ namespace tss
         setInterceptsMouseClicks(true, true);
         setOpaque(true);
         
-        auto* parent = comboBox.getParentComponent();
-        if (parent != nullptr)
+        if (auto* parent [[maybe_unused]] = comboBox.getParentComponent())
         {
             theme = comboBox.theme;
-            if (theme != nullptr)
-            {
-                cachedFont = theme->getBaseFont();
-            }
+            if (auto* currentTheme = theme)
+                cachedFont = currentTheme->getBaseFont();
         }
         
         calculateColumnLayout();

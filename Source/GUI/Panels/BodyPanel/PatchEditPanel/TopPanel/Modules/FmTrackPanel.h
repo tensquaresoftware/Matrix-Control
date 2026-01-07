@@ -8,8 +8,8 @@
 namespace tss
 {
     class Theme;
-    class ModuleName;
-    class ParameterLabel;
+    class ModuleHeader;
+    class Label;
     class Slider;
     class ComboBox;
     class Button;
@@ -39,21 +39,21 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleName> fmTrackModuleName;
+    std::unique_ptr<tss::ModuleHeader> fmTrackModuleHeader;
 
     // Buttons
     std::unique_ptr<tss::Button> fmTrackInitButton;
 
     // Labels
-    std::unique_ptr<tss::ParameterLabel> fmAmountLabel;
-    std::unique_ptr<tss::ParameterLabel> fmModByEnv3Label;
-    std::unique_ptr<tss::ParameterLabel> fmModByPressureLabel;
-    std::unique_ptr<tss::ParameterLabel> trackPoint1Label;
-    std::unique_ptr<tss::ParameterLabel> trackPoint2Label;
-    std::unique_ptr<tss::ParameterLabel> trackPoint3Label;
-    std::unique_ptr<tss::ParameterLabel> trackPoint4Label;
-    std::unique_ptr<tss::ParameterLabel> trackPoint5Label;
-    std::unique_ptr<tss::ParameterLabel> trackInputLabel;
+    std::unique_ptr<tss::Label> fmAmountLabel;
+    std::unique_ptr<tss::Label> fmModByEnv3Label;
+    std::unique_ptr<tss::Label> fmModByPressureLabel;
+    std::unique_ptr<tss::Label> trackPoint1Label;
+    std::unique_ptr<tss::Label> trackPoint2Label;
+    std::unique_ptr<tss::Label> trackPoint3Label;
+    std::unique_ptr<tss::Label> trackPoint4Label;
+    std::unique_ptr<tss::Label> trackPoint5Label;
+    std::unique_ptr<tss::Label> trackInputLabel;
 
     // Sliders
     std::unique_ptr<tss::Slider> fmAmountSlider;

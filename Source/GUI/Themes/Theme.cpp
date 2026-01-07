@@ -78,51 +78,51 @@ namespace tss
         return getColour(ThemeColours::Panel::kMasterEditPanelBackground);
     }
 
-    // SectionName colours ----------------------------------------------------
-    juce::Colour Theme::getSectionNameBaseColour() const
+    // SectionHeader colours ----------------------------------------------------
+    juce::Colour Theme::getSectionHeaderBaseColour() const
     {
-        return getColour(ThemeColours::SectionName::kBase);
+        return getColour(ThemeColours::SectionHeader::kBase);
     }
 
-    juce::Colour Theme::getSectionNameContentAreaColour() const
+    juce::Colour Theme::getSectionHeaderContentAreaColour() const
     {
-        return getColour(ThemeColours::SectionName::kContentArea);
+        return getColour(ThemeColours::SectionHeader::kContentArea);
     }
 
-    juce::Colour Theme::getSectionNameTextColour() const
+    juce::Colour Theme::getSectionHeaderTextColour() const
     {
-        return getColour(ThemeColours::SectionName::kText);
+        return getColour(ThemeColours::SectionHeader::kText);
     }
 
-    juce::Colour Theme::getSectionNameLineColourBlue() const
+    juce::Colour Theme::getSectionHeaderLineColourBlue() const
     {
-        return getColour(ThemeColours::SectionName::kLineBlue);
+        return getColour(ThemeColours::SectionHeader::kLineBlue);
     }
 
-    juce::Colour Theme::getSectionNameLineColourOrange() const
+    juce::Colour Theme::getSectionHeaderLineColourOrange() const
     {
-        return getColour(ThemeColours::SectionName::kLineOrange);
+        return getColour(ThemeColours::SectionHeader::kLineOrange);
     }
 
-    // ModuleName colours -----------------------------------------------------
-    juce::Colour Theme::getModuleNameBaseColour() const
+    // ModuleHeader colours -----------------------------------------------------
+    juce::Colour Theme::getModuleHeaderBaseColour() const
     {
-        return getColour(ThemeColours::ModuleName::kBase);
+        return getColour(ThemeColours::ModuleHeader::kBase);
     }
 
-    juce::Colour Theme::getModuleNameTextColour() const
+    juce::Colour Theme::getModuleHeaderTextColour() const
     {
-        return getColour(ThemeColours::ModuleName::kText);
+        return getColour(ThemeColours::ModuleHeader::kText);
     }
 
-    juce::Colour Theme::getModuleNameLineColourBlue() const
+    juce::Colour Theme::getModuleHeaderLineColourBlue() const
     {
-        return getColour(ThemeColours::ModuleName::kLineBlue);
+        return getColour(ThemeColours::ModuleHeader::kLineBlue);
     }
 
-    juce::Colour Theme::getModuleNameLineColourOrange() const
+    juce::Colour Theme::getModuleHeaderLineColourOrange() const
     {
-        return getColour(ThemeColours::ModuleName::kLineOrange);
+        return getColour(ThemeColours::ModuleHeader::kLineOrange);
     }
 
     // GroupLabel colours -----------------------------------------------------

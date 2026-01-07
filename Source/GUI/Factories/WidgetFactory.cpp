@@ -74,12 +74,10 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
 
 juce::String WidgetFactory::getParameterDisplayName(const juce::String& parameterId) const
 {
-    const auto* intParam = findIntParameter(parameterId);
-    if (intParam != nullptr)
+    if (auto* intParam = findIntParameter(parameterId))
         return intParam->displayName;
     
-    const auto* choiceParam = findChoiceParameter(parameterId);
-    if (choiceParam != nullptr)
+    if (auto* choiceParam = findChoiceParameter(parameterId))
         return choiceParam->displayName;
     
     return juce::String();
@@ -92,8 +90,7 @@ juce::String WidgetFactory::getGroupDisplayName(const juce::String& groupId) con
 
 juce::String WidgetFactory::getStandaloneWidgetDisplayName(const juce::String& widgetId) const
 {
-    const auto* desc = findStandaloneWidget(widgetId);
-    if (desc != nullptr)
+    if (auto* desc = findStandaloneWidget(widgetId))
         return desc->displayName;
     
     return juce::String();

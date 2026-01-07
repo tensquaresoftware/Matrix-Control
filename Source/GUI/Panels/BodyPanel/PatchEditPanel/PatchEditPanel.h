@@ -8,7 +8,7 @@
 namespace tss
 {
     class Theme;
-    class SectionName;
+    class SectionHeader;
 }
 
 class WidgetFactory;
@@ -34,7 +34,7 @@ private:
     inline constexpr static int kHeight = 700;
     tss::Theme* theme;
 
-    std::unique_ptr<tss::SectionName> sectionName;
+    std::unique_ptr<tss::SectionHeader> sectionHeader;
     std::unique_ptr<TopPanel> topPanel;
     std::unique_ptr<MiddlePanel> middlePanel;
     std::unique_ptr<BottomPanel> bottomPanel;

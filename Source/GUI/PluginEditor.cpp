@@ -51,8 +51,8 @@ void PluginEditor::paint(juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    if (mainComponent != nullptr)
-        mainComponent->setBounds(getLocalBounds());
+    if (auto* component = mainComponent.get())
+        component->setBounds(getLocalBounds());
 }
 
 void PluginEditor::mouseDown(const juce::MouseEvent&)
@@ -62,10 +62,8 @@ void PluginEditor::mouseDown(const juce::MouseEvent&)
 
 void PluginEditor::updateTheme()
 {
-    if (mainComponent != nullptr)
-    {
-        mainComponent->setTheme(*theme);
-    }
+    if (auto* widget = mainComponent.get())
+        widget->setTheme(*theme);
     repaint();
 }
 

@@ -9,21 +9,46 @@ namespace tss
     class ParameterSeparator : public juce::Component
     {
     public:
-        explicit ParameterSeparator(Theme& inTheme);
+        enum class Type
+        {
+            PatchEditModule,
+            MasterEditModule,
+            MatrixModulationBus
+        };
+
+        ParameterSeparator(Theme& inTheme, Type inType);
         ~ParameterSeparator() override = default;
 
         void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth() { return kWidth; }
+        int getWidth() const;
         static constexpr int getHeight() { return kHeight; }
 
+        static int getWidth(Type inType)
+        {
+            switch (inType)
+            {
+                case Type::PatchEditModule:
+                    return kPatchEditModuleWidth;
+                case Type::MasterEditModule:
+                    return kMasterEditModuleWidth;
+                case Type::MatrixModulationBus:
+                    return kMatrixModulationBusWidth;
+                default:
+                    return kPatchEditModuleWidth;
+            }
+        }
+
     private:
-        inline constexpr static int kWidth = 150;
+        inline constexpr static int kPatchEditModuleWidth = 150;
+        inline constexpr static int kMasterEditModuleWidth = 160;
+        inline constexpr static int kMatrixModulationBusWidth = 275;
         inline constexpr static int kHeight = 5;
         inline constexpr static float kLineThickness = 1.0f;
 
+        Type type;
         Theme* theme = nullptr;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);

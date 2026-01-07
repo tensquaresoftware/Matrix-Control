@@ -8,8 +8,8 @@
 namespace tss
 {
     class Theme;
-    class ModuleName;
-    class ParameterLabel;
+    class ModuleHeader;
+    class Label;
     class Slider;
     class ComboBox;
     class Button;
@@ -39,22 +39,22 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleName> vcfVcaModuleName;
+    std::unique_ptr<tss::ModuleHeader> vcfVcaModuleHeader;
 
     // Buttons
     std::unique_ptr<tss::Button> vcfVcaInitButton;
 
     // Labels
-    std::unique_ptr<tss::ParameterLabel> vcfBalanceLabel;
-    std::unique_ptr<tss::ParameterLabel> vcfFrequencyLabel;
-    std::unique_ptr<tss::ParameterLabel> vcfFrequencyModByEnv1Label;
-    std::unique_ptr<tss::ParameterLabel> vcfFrequencyModByPressureLabel;
-    std::unique_ptr<tss::ParameterLabel> vcfResonanceLabel;
-    std::unique_ptr<tss::ParameterLabel> vca1VolumeLabel;
-    std::unique_ptr<tss::ParameterLabel> vca1ModByVelocityLabel;
-    std::unique_ptr<tss::ParameterLabel> vca2ModByEnv2Label;
-    std::unique_ptr<tss::ParameterLabel> vcfLeversLabel;
-    std::unique_ptr<tss::ParameterLabel> vcfKeyboardPortamentoLabel;
+    std::unique_ptr<tss::Label> vcfBalanceLabel;
+    std::unique_ptr<tss::Label> vcfFrequencyLabel;
+    std::unique_ptr<tss::Label> vcfFrequencyModByEnv1Label;
+    std::unique_ptr<tss::Label> vcfFrequencyModByPressureLabel;
+    std::unique_ptr<tss::Label> vcfResonanceLabel;
+    std::unique_ptr<tss::Label> vca1VolumeLabel;
+    std::unique_ptr<tss::Label> vca1ModByVelocityLabel;
+    std::unique_ptr<tss::Label> vca2ModByEnv2Label;
+    std::unique_ptr<tss::Label> vcfLeversLabel;
+    std::unique_ptr<tss::Label> vcfKeyboardPortamentoLabel;
 
     // Sliders
     std::unique_ptr<tss::Slider> vcfBalanceSlider;

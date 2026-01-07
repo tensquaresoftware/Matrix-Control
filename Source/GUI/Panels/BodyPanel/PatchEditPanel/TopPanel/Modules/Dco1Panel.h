@@ -8,8 +8,8 @@
 namespace tss
 {
     class Theme;
-    class ModuleName;
-    class ParameterLabel;
+    class ModuleHeader;
+    class Label;
     class Slider;
     class ComboBox;
     class Button;
@@ -39,7 +39,7 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleName> dco1ModuleName;
+    std::unique_ptr<tss::ModuleHeader> dco1ModuleHeader;
 
     // Buttons
     std::unique_ptr<tss::Button> dco1InitButton;
@@ -47,16 +47,16 @@ private:
     std::unique_ptr<tss::Button> dco1PasteButton;
 
     // Labels
-    std::unique_ptr<tss::ParameterLabel> dco1FrequencyLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1FrequencyModByLfo1Label;
-    std::unique_ptr<tss::ParameterLabel> dco1SyncLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1PulseWidthLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1PulseWidthModByLfo2Label;
-    std::unique_ptr<tss::ParameterLabel> dco1WaveShapeLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1WaveSelectLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1LeversLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1KeyboardPortamentoLabel;
-    std::unique_ptr<tss::ParameterLabel> dco1KeyClickLabel;
+    std::unique_ptr<tss::Label> dco1FrequencyLabel;
+    std::unique_ptr<tss::Label> dco1FrequencyModByLfo1Label;
+    std::unique_ptr<tss::Label> dco1SyncLabel;
+    std::unique_ptr<tss::Label> dco1PulseWidthLabel;
+    std::unique_ptr<tss::Label> dco1PulseWidthModByLfo2Label;
+    std::unique_ptr<tss::Label> dco1WaveShapeLabel;
+    std::unique_ptr<tss::Label> dco1WaveSelectLabel;
+    std::unique_ptr<tss::Label> dco1LeversLabel;
+    std::unique_ptr<tss::Label> dco1KeyboardPortamentoLabel;
+    std::unique_ptr<tss::Label> dco1KeyClickLabel;
 
     // Sliders
     std::unique_ptr<tss::Slider> dco1FrequencySlider;

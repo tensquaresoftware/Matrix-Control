@@ -32,12 +32,8 @@ BottomPanel::BottomPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
 
 void BottomPanel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditPanelBackgroundColour());
+    if (auto* currentTheme = theme)
+        g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
 }
 
 void BottomPanel::resized()
@@ -95,30 +91,20 @@ void BottomPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (env1Panel != nullptr)
-    {
-        env1Panel->setTheme(inTheme);
-    }
+    if (auto* panel = env1Panel.get())
+        panel->setTheme(inTheme);
 
-    if (env2Panel != nullptr)
-    {
-        env2Panel->setTheme(inTheme);
-    }
+    if (auto* panel = env2Panel.get())
+        panel->setTheme(inTheme);
 
-    if (env3Panel != nullptr)
-    {
-        env3Panel->setTheme(inTheme);
-    }
+    if (auto* panel = env3Panel.get())
+        panel->setTheme(inTheme);
 
-    if (lfo1Panel != nullptr)
-    {
-        lfo1Panel->setTheme(inTheme);
-    }
+    if (auto* panel = lfo1Panel.get())
+        panel->setTheme(inTheme);
 
-    if (lfo2Panel != nullptr)
-    {
-        lfo2Panel->setTheme(inTheme);
-    }
+    if (auto* panel = lfo2Panel.get())
+        panel->setTheme(inTheme);
 
     repaint();
 }

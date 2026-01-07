@@ -6,7 +6,7 @@ namespace tss
 {
     class Theme;
 
-    class ModuleName : public juce::Component
+    class ModuleHeader : public juce::Component
     {
     public:
         enum class Size
@@ -21,13 +21,13 @@ namespace tss
             Orange
         };
 
-        explicit ModuleName(Theme& inTheme, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
-        ~ModuleName() override = default;
+        explicit ModuleHeader(Theme& inTheme, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
+        ~ModuleHeader() override = default;
 
         void setTheme(Theme& inTheme);
         
         void setText(const juce::String& newText);
-        juce::String getText() const { return name; }
+        juce::String getText() const { return text; }
 
         void paint(juce::Graphics& g) override;
 
@@ -44,7 +44,7 @@ namespace tss
         inline constexpr static float kLineThickness = 4.0f;
 
         Theme* theme = nullptr;
-        juce::String name;
+        juce::String text;
         ColourVariant colourVariant;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
@@ -53,7 +53,7 @@ namespace tss
         
         juce::Colour getLineColour() const;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleName)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleHeader)
     };
 }
 

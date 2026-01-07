@@ -8,8 +8,8 @@
 namespace tss
 {
     class Theme;
-    class ModuleName;
-    class ParameterLabel;
+    class ModuleHeader;
+    class Label;
     class Slider;
     class ComboBox;
     class Button;
@@ -39,7 +39,7 @@ private:
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleName> lfo2ModuleName;
+    std::unique_ptr<tss::ModuleHeader> lfo2ModuleHeader;
 
     // Buttons
     std::unique_ptr<tss::Button> lfo2InitButton;
@@ -47,15 +47,15 @@ private:
     std::unique_ptr<tss::Button> lfo2PasteButton;
 
     // Labels
-    std::unique_ptr<tss::ParameterLabel> lfo2SpeedLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2SpeedModByKeyboardLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2RetriggerPointLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2AmplitudeLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2AmplitudeModByRamp2Label;
-    std::unique_ptr<tss::ParameterLabel> lfo2WaveformLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2TriggerModeLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2LagLabel;
-    std::unique_ptr<tss::ParameterLabel> lfo2SampleInputLabel;
+    std::unique_ptr<tss::Label> lfo2SpeedLabel;
+    std::unique_ptr<tss::Label> lfo2SpeedModByKeyboardLabel;
+    std::unique_ptr<tss::Label> lfo2RetriggerPointLabel;
+    std::unique_ptr<tss::Label> lfo2AmplitudeLabel;
+    std::unique_ptr<tss::Label> lfo2AmplitudeModByRamp2Label;
+    std::unique_ptr<tss::Label> lfo2WaveformLabel;
+    std::unique_ptr<tss::Label> lfo2TriggerModeLabel;
+    std::unique_ptr<tss::Label> lfo2LagLabel;
+    std::unique_ptr<tss::Label> lfo2SampleInputLabel;
 
     // Sliders
     std::unique_ptr<tss::Slider> lfo2SpeedSlider;

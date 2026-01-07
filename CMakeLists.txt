@@ -90,12 +90,13 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/ComboBox.cpp
     Source/GUI/Widgets/FocusableWidget.cpp
     Source/GUI/Widgets/GroupLabel.cpp
-    Source/GUI/Widgets/ModuleName.cpp
+    Source/GUI/Widgets/ModulationBusHeader.cpp
+    Source/GUI/Widgets/ModuleHeader.cpp
     Source/GUI/Widgets/PanelSeparator.cpp
-    Source/GUI/Widgets/ParameterLabel.cpp
+    Source/GUI/Widgets/Label.cpp
     Source/GUI/Widgets/ParameterSeparator.cpp
     Source/GUI/Widgets/PopupMenu.cpp
-    Source/GUI/Widgets/SectionName.cpp
+    Source/GUI/Widgets/SectionHeader.cpp
     Source/GUI/Widgets/Slider.cpp
     
     # Loggers

@@ -1,8 +1,8 @@
 #include "Lfo1Panel.h"
 
 #include "../../../../../Themes/Theme.h"
-#include "../../../../../Widgets/ModuleName.h"
-#include "../../../../../Widgets/ParameterLabel.h"
+#include "../../../../../Widgets/ModuleHeader.h"
+#include "../../../../../Widgets/Label.h"
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
@@ -17,10 +17,10 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     , apvts(inApvts)
 {
     // Module Name
-    lfo1ModuleName = std::make_unique<tss::ModuleName>(
+    lfo1ModuleHeader = std::make_unique<tss::ModuleHeader>(
         inTheme, 
         widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kLfo1));
-    addAndMakeVisible(*lfo1ModuleName);
+    addAndMakeVisible(*lfo1ModuleHeader);
 
     // Standalone Widgets
     lfo1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kLfo1Init, inTheme);
@@ -51,8 +51,8 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     addAndMakeVisible(*lfo1PasteButton);
 
     // Speed
-    lfo1SpeedLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1SpeedLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Speed));
     addAndMakeVisible(*lfo1SpeedLabel);
 
@@ -63,12 +63,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1SpeedSlider);
     addAndMakeVisible(*lfo1SpeedSlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator1);
 
     // SpeedModByPressure
-    lfo1SpeedModByPressureLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1SpeedModByPressureLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1SpeedModByPressure));
     addAndMakeVisible(*lfo1SpeedModByPressureLabel);
 
@@ -79,12 +79,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1SpeedModByPressureSlider);
     addAndMakeVisible(*lfo1SpeedModByPressureSlider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator2);
 
     // RetriggerPoint
-    lfo1RetriggerPointLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1RetriggerPointLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1RetriggerPoint));
     addAndMakeVisible(*lfo1RetriggerPointLabel);
 
@@ -95,12 +95,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1RetriggerPointSlider);
     addAndMakeVisible(*lfo1RetriggerPointSlider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator3);
 
     // Amplitude
-    lfo1AmplitudeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1AmplitudeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Amplitude));
     addAndMakeVisible(*lfo1AmplitudeLabel);
 
@@ -111,12 +111,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1AmplitudeSlider);
     addAndMakeVisible(*lfo1AmplitudeSlider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator4);
 
     // Amplitude Mod by Ramp 1
-    lfo1AmplitudeModByRamp1Label = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1AmplitudeModByRamp1Label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1));
     addAndMakeVisible(*lfo1AmplitudeModByRamp1Label);
 
@@ -127,12 +127,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1AmplitudeModByRamp1Slider);
     addAndMakeVisible(*lfo1AmplitudeModByRamp1Slider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator5);
 
     // Waveform
-    lfo1WaveformLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1WaveformLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Waveform));
     addAndMakeVisible(*lfo1WaveformLabel);
 
@@ -143,12 +143,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1WaveformComboBox);
     addAndMakeVisible(*lfo1WaveformComboBox);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator6);
 
     // Trigger Mode
-    lfo1TriggerModeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1TriggerModeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1TriggerMode));
     addAndMakeVisible(*lfo1TriggerModeLabel);
 
@@ -159,12 +159,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1TriggerModeComboBox);
     addAndMakeVisible(*lfo1TriggerModeComboBox);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator7);
 
     // Lag
-    lfo1LagLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1LagLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Lag));
     addAndMakeVisible(*lfo1LagLabel);
 
@@ -175,12 +175,12 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1LagComboBox);
     addAndMakeVisible(*lfo1LagComboBox);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator8);
 
     // Sample Input
-    lfo1SampleInputLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    lfo1SampleInputLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1SampleInput));
     addAndMakeVisible(*lfo1SampleInputLabel);
 
@@ -191,10 +191,10 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *lfo1SampleInputComboBox);
     addAndMakeVisible(*lfo1SampleInputComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator9);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator10);
 
     setSize(getWidth(), getHeight());
@@ -204,396 +204,264 @@ Lfo1Panel::~Lfo1Panel() = default;
 
 void Lfo1Panel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
+    if (auto* currentTheme = theme)
+        g.fillAll(currentTheme->getPatchEditModulePanelBackgroundColour());
 }
 
 void Lfo1Panel::resized()
 {
-    const auto moduleNameHeight = tss::ModuleName::getHeight();
-    const auto moduleNameWidth = tss::ModuleName::getNormalWidth();
+    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
     const auto buttonWidth = tss::Button::getDefaultWidth();
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::ParameterLabel::getWidth();
-    const auto labelHeight = tss::ParameterLabel::getHeight();
+    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
     const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth();
+    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
     const auto separatorHeight = tss::ParameterSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
 
-    if (lfo1ModuleName != nullptr)
-    {
-        lfo1ModuleName->setBounds(0, y, moduleNameWidth, moduleNameHeight);
-    }
+    if (auto* header = lfo1ModuleHeader.get())
+        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
-    if (lfo1PasteButton != nullptr)
-    {
-        lfo1PasteButton->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = lfo1PasteButton.get())
+        button->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
 
-    if (lfo1CopyButton != nullptr)
-    {
-        lfo1CopyButton->setBounds(panelWidth - buttonWidth * 2, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = lfo1CopyButton.get())
+        button->setBounds(panelWidth - buttonWidth * 2, y, buttonWidth, buttonHeight);
 
-    if (lfo1InitButton != nullptr)
-    {
-        lfo1InitButton->setBounds(panelWidth - buttonWidth * 3, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = lfo1InitButton.get())
+        button->setBounds(panelWidth - buttonWidth * 3, y, buttonWidth, buttonHeight);
 
-    y += moduleNameHeight;
+    y += moduleHeaderHeight;
 
-    if (lfo1SpeedLabel != nullptr)
-    {
-        lfo1SpeedLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1SpeedLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1SpeedSlider != nullptr)
-    {
-        lfo1SpeedSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = lfo1SpeedSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1SpeedModByPressureLabel != nullptr)
-    {
-        lfo1SpeedModByPressureLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1SpeedModByPressureLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1SpeedModByPressureSlider != nullptr)
-    {
-        lfo1SpeedModByPressureSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = lfo1SpeedModByPressureSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1RetriggerPointLabel != nullptr)
-    {
-        lfo1RetriggerPointLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1RetriggerPointLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1RetriggerPointSlider != nullptr)
-    {
-        lfo1RetriggerPointSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = lfo1RetriggerPointSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1AmplitudeLabel != nullptr)
-    {
-        lfo1AmplitudeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1AmplitudeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1AmplitudeSlider != nullptr)
-    {
-        lfo1AmplitudeSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = lfo1AmplitudeSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1AmplitudeModByRamp1Label != nullptr)
-    {
-        lfo1AmplitudeModByRamp1Label->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1AmplitudeModByRamp1Label.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1AmplitudeModByRamp1Slider != nullptr)
-    {
-        lfo1AmplitudeModByRamp1Slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = lfo1AmplitudeModByRamp1Slider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1WaveformLabel != nullptr)
-    {
-        lfo1WaveformLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1WaveformLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1WaveformComboBox != nullptr)
-    {
-        lfo1WaveformComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = lfo1WaveformComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1TriggerModeLabel != nullptr)
-    {
-        lfo1TriggerModeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1TriggerModeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1TriggerModeComboBox != nullptr)
-    {
-        lfo1TriggerModeComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = lfo1TriggerModeComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1LagLabel != nullptr)
-    {
-        lfo1LagLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1LagLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1LagComboBox != nullptr)
-    {
-        lfo1LagComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = lfo1LagComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (lfo1SampleInputLabel != nullptr)
-    {
-        lfo1SampleInputLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = lfo1SampleInputLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (lfo1SampleInputComboBox != nullptr)
-    {
-        lfo1SampleInputComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = lfo1SampleInputComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
     y += labelHeight;
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
 void Lfo1Panel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (lfo1ModuleName != nullptr)
-    {
-        lfo1ModuleName->setTheme(inTheme);
-    }
+    if (auto* header = lfo1ModuleHeader.get())
+        header->setTheme(inTheme);
 
-    if (lfo1InitButton != nullptr)
-    {
-        lfo1InitButton->setTheme(inTheme);
-    }
+    if (auto* button = lfo1InitButton.get())
+        button->setTheme(inTheme);
 
-    if (lfo1CopyButton != nullptr)
-    {
-        lfo1CopyButton->setTheme(inTheme);
-    }
+    if (auto* button = lfo1CopyButton.get())
+        button->setTheme(inTheme);
 
-    if (lfo1PasteButton != nullptr)
-    {
-        lfo1PasteButton->setTheme(inTheme);
-    }
+    if (auto* button = lfo1PasteButton.get())
+        button->setTheme(inTheme);
 
-    if (lfo1SpeedLabel != nullptr)
-    {
-        lfo1SpeedLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1SpeedLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1SpeedSlider != nullptr)
-    {
-        lfo1SpeedSlider->setTheme(inTheme);
-    }
+    if (auto* slider = lfo1SpeedSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1SpeedModByPressureLabel != nullptr)
-    {
-        lfo1SpeedModByPressureLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1SpeedModByPressureLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1SpeedModByPressureSlider != nullptr)
-    {
-        lfo1SpeedModByPressureSlider->setTheme(inTheme);
-    }
+    if (auto* slider = lfo1SpeedModByPressureSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1RetriggerPointLabel != nullptr)
-    {
-        lfo1RetriggerPointLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1RetriggerPointLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1RetriggerPointSlider != nullptr)
-    {
-        lfo1RetriggerPointSlider->setTheme(inTheme);
-    }
+    if (auto* slider = lfo1RetriggerPointSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1AmplitudeLabel != nullptr)
-    {
-        lfo1AmplitudeLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1AmplitudeLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1AmplitudeSlider != nullptr)
-    {
-        lfo1AmplitudeSlider->setTheme(inTheme);
-    }
+    if (auto* slider = lfo1AmplitudeSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1AmplitudeModByRamp1Label != nullptr)
-    {
-        lfo1AmplitudeModByRamp1Label->setTheme(inTheme);
-    }
+    if (auto* label = lfo1AmplitudeModByRamp1Label.get())
+        label->setTheme(inTheme);
 
-    if (lfo1AmplitudeModByRamp1Slider != nullptr)
-    {
-        lfo1AmplitudeModByRamp1Slider->setTheme(inTheme);
-    }
+    if (auto* slider = lfo1AmplitudeModByRamp1Slider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1WaveformLabel != nullptr)
-    {
-        lfo1WaveformLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1WaveformLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1WaveformComboBox != nullptr)
-    {
-        lfo1WaveformComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = lfo1WaveformComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1TriggerModeLabel != nullptr)
-    {
-        lfo1TriggerModeLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1TriggerModeLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1TriggerModeComboBox != nullptr)
-    {
-        lfo1TriggerModeComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = lfo1TriggerModeComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1LagLabel != nullptr)
-    {
-        lfo1LagLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1LagLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1LagComboBox != nullptr)
-    {
-        lfo1LagComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = lfo1LagComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setTheme(inTheme);
 
-    if (lfo1SampleInputLabel != nullptr)
-    {
-        lfo1SampleInputLabel->setTheme(inTheme);
-    }
+    if (auto* label = lfo1SampleInputLabel.get())
+        label->setTheme(inTheme);
 
-    if (lfo1SampleInputComboBox != nullptr)
-    {
-        lfo1SampleInputComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = lfo1SampleInputComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setTheme(inTheme);
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setTheme(inTheme);
 
     repaint();
 }

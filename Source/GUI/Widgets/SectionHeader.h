@@ -6,7 +6,7 @@ namespace tss
 {
     class Theme;
 
-    class SectionName : public juce::Component
+    class SectionHeader : public juce::Component
     {
     public:
         enum class ColourVariant
@@ -15,8 +15,8 @@ namespace tss
             Orange
         };
 
-        explicit SectionName(Theme& inTheme, int width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
-        ~SectionName() override = default;
+        explicit SectionHeader(Theme& inTheme, int width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        ~SectionHeader() override = default;
 
         void setTheme(Theme& inTheme);
 
@@ -29,10 +29,10 @@ namespace tss
         inline constexpr static float kContentHeight = 20.0f;
         inline constexpr static float kLineHeight = 12.0f;
         inline constexpr static float kLeftLineWidth = 20.0f;
-        inline constexpr static float kTextSpacing = 5.0f;
+        inline constexpr static float kTextSpacing = 8.0f;
 
         Theme* theme = nullptr;
-        juce::String name;
+        juce::String text;
         ColourVariant colourVariant;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
@@ -45,7 +45,7 @@ namespace tss
         juce::Rectangle<float> getContentArea(const juce::Rectangle<float>& bounds) const;
         float calculateTextWidth() const;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SectionName)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SectionHeader)
     };
 }
 

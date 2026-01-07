@@ -1,8 +1,8 @@
 #include "Env1Panel.h"
 
 #include "../../../../../Themes/Theme.h"
-#include "../../../../../Widgets/ModuleName.h"
-#include "../../../../../Widgets/ParameterLabel.h"
+#include "../../../../../Widgets/ModuleHeader.h"
+#include "../../../../../Widgets/Label.h"
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
@@ -17,10 +17,10 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     , apvts(inApvts)
 {
     // Module Name
-    env1ModuleName = std::make_unique<tss::ModuleName>(
+    env1ModuleHeader = std::make_unique<tss::ModuleHeader>(
         inTheme, 
         widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kEnvelope1));
-    addAndMakeVisible(*env1ModuleName);
+    addAndMakeVisible(*env1ModuleHeader);
 
     // Standalone Widgets
     env1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Init, inTheme);
@@ -51,8 +51,8 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     addAndMakeVisible(*env1PasteButton);
 
     // Delay
-    env1DelayLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1DelayLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Delay));
     addAndMakeVisible(*env1DelayLabel);
 
@@ -63,12 +63,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1DelaySlider);
     addAndMakeVisible(*env1DelaySlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator1);
 
     // Attack
-    env1AttackLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1AttackLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Attack));
     addAndMakeVisible(*env1AttackLabel);
 
@@ -79,12 +79,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1AttackSlider);
     addAndMakeVisible(*env1AttackSlider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator2);
 
     // Decay
-    env1DecayLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1DecayLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Decay));
     addAndMakeVisible(*env1DecayLabel);
 
@@ -95,12 +95,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1DecaySlider);
     addAndMakeVisible(*env1DecaySlider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator3);
 
     // Sustain
-    env1SustainLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1SustainLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Sustain));
     addAndMakeVisible(*env1SustainLabel);
 
@@ -111,12 +111,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1SustainSlider);
     addAndMakeVisible(*env1SustainSlider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator4);
 
     // Release
-    env1ReleaseLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1ReleaseLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Release));
     addAndMakeVisible(*env1ReleaseLabel);
 
@@ -127,12 +127,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1ReleaseSlider);
     addAndMakeVisible(*env1ReleaseSlider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator5);
 
     // Amplitude
-    env1AmplitudeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1AmplitudeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Amplitude));
     addAndMakeVisible(*env1AmplitudeLabel);
 
@@ -143,12 +143,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1AmplitudeSlider);
     addAndMakeVisible(*env1AmplitudeSlider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator6);
 
     // Amplitude Mod by Velocity
-    env1AmplitudeModByVelocityLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1AmplitudeModByVelocityLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity));
     addAndMakeVisible(*env1AmplitudeModByVelocityLabel);
 
@@ -159,12 +159,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1AmplitudeModByVelocitySlider);
     addAndMakeVisible(*env1AmplitudeModByVelocitySlider);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator7);
 
     // Trigger Mode
-    env1TriggerModeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1TriggerModeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1TriggerMode));
     addAndMakeVisible(*env1TriggerModeLabel);
 
@@ -175,12 +175,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1TriggerModeComboBox);
     addAndMakeVisible(*env1TriggerModeComboBox);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator8);
 
     // Envelope Mode
-    env1EnvelopeModeLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1EnvelopeModeLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1EnvelopeMode));
     addAndMakeVisible(*env1EnvelopeModeLabel);
 
@@ -191,12 +191,12 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1EnvelopeModeComboBox);
     addAndMakeVisible(*env1EnvelopeModeComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator9);
 
     // LFO 1 Trigger
-    env1Lfo1TriggerLabel = std::make_unique<tss::ParameterLabel>(
-        inTheme, 
+    env1Lfo1TriggerLabel = std::make_unique<tss::Label>(
+        inTheme, tss::Label::Type::Parameter, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Lfo1Trigger));
     addAndMakeVisible(*env1Lfo1TriggerLabel);
 
@@ -207,7 +207,7 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env1Lfo1TriggerComboBox);
     addAndMakeVisible(*env1Lfo1TriggerComboBox);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme);
+    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
     addAndMakeVisible(*parameterSeparator10);
 
     setSize(getWidth(), getHeight());
@@ -217,416 +217,275 @@ Env1Panel::~Env1Panel() = default;
 
 void Env1Panel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
+        g.fillAll(theme->getPatchEditModulePanelBackgroundColour());
 }
 
 void Env1Panel::resized()
 {
-    const auto moduleNameHeight = tss::ModuleName::getHeight();
-    const auto moduleNameWidth = tss::ModuleName::getNormalWidth();
+    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
     const auto buttonWidth = tss::Button::getDefaultWidth();
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::ParameterLabel::getWidth();
-    const auto labelHeight = tss::ParameterLabel::getHeight();
+    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
     const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth();
+    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
     const auto separatorHeight = tss::ParameterSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
 
-    if (env1ModuleName != nullptr)
-    {
-        env1ModuleName->setBounds(0, y, moduleNameWidth, moduleNameHeight);
-    }
+    if (auto* header = env1ModuleHeader.get())
+        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
-    if (env1PasteButton != nullptr)
-    {
-        env1PasteButton->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = env1PasteButton.get())
+        button->setBounds(panelWidth - buttonWidth, y, buttonWidth, buttonHeight);
 
-    if (env1CopyButton != nullptr)
-    {
-        env1CopyButton->setBounds(panelWidth - buttonWidth * 2, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = env1CopyButton.get())
+        button->setBounds(panelWidth - buttonWidth * 2, y, buttonWidth, buttonHeight);
 
-    if (env1InitButton != nullptr)
-    {
-        env1InitButton->setBounds(panelWidth - buttonWidth * 3, y, buttonWidth, buttonHeight);
-    }
+    if (auto* button = env1InitButton.get())
+        button->setBounds(panelWidth - buttonWidth * 3, y, buttonWidth, buttonHeight);
 
-    y += moduleNameHeight;
+    y += moduleHeaderHeight;
 
-    if (env1DelayLabel != nullptr)
-    {
-        env1DelayLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1DelayLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1DelaySlider != nullptr)
-    {
-        env1DelaySlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1DelaySlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1AttackLabel != nullptr)
-    {
-        env1AttackLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1AttackLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1AttackSlider != nullptr)
-    {
-        env1AttackSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1AttackSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1DecayLabel != nullptr)
-    {
-        env1DecayLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1DecayLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1DecaySlider != nullptr)
-    {
-        env1DecaySlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1DecaySlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1SustainLabel != nullptr)
-    {
-        env1SustainLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1SustainLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1SustainSlider != nullptr)
-    {
-        env1SustainSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1SustainSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1ReleaseLabel != nullptr)
-    {
-        env1ReleaseLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1ReleaseLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1ReleaseSlider != nullptr)
-    {
-        env1ReleaseSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1ReleaseSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1AmplitudeLabel != nullptr)
-    {
-        env1AmplitudeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1AmplitudeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1AmplitudeSlider != nullptr)
-    {
-        env1AmplitudeSlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1AmplitudeSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1AmplitudeModByVelocityLabel != nullptr)
-    {
-        env1AmplitudeModByVelocityLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1AmplitudeModByVelocityLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1AmplitudeModByVelocitySlider != nullptr)
-    {
-        env1AmplitudeModByVelocitySlider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
-    }
+    if (auto* slider = env1AmplitudeModByVelocitySlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1TriggerModeLabel != nullptr)
-    {
-        env1TriggerModeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1TriggerModeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1TriggerModeComboBox != nullptr)
-    {
-        env1TriggerModeComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = env1TriggerModeComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1EnvelopeModeLabel != nullptr)
-    {
-        env1EnvelopeModeLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1EnvelopeModeLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1EnvelopeModeComboBox != nullptr)
-    {
-        env1EnvelopeModeComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = env1EnvelopeModeComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (env1Lfo1TriggerLabel != nullptr)
-    {
-        env1Lfo1TriggerLabel->setBounds(0, y, labelWidth, labelHeight);
-    }
+    if (auto* label = env1Lfo1TriggerLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (env1Lfo1TriggerComboBox != nullptr)
-    {
-        env1Lfo1TriggerComboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
-    }
+    if (auto* comboBox = env1Lfo1TriggerComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setBounds(0, y, separatorWidth, separatorHeight);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
 void Env1Panel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (env1ModuleName != nullptr)
-    {
-        env1ModuleName->setTheme(inTheme);
-    }
+    if (auto* header = env1ModuleHeader.get())
+        header->setTheme(inTheme);
 
-    if (env1InitButton != nullptr)
-    {
-        env1InitButton->setTheme(inTheme);
-    }
+    if (auto* button = env1InitButton.get())
+        button->setTheme(inTheme);
 
-    if (env1CopyButton != nullptr)
-    {
-        env1CopyButton->setTheme(inTheme);
-    }
+    if (auto* button = env1CopyButton.get())
+        button->setTheme(inTheme);
 
-    if (env1PasteButton != nullptr)
-    {
-        env1PasteButton->setTheme(inTheme);
-    }
+    if (auto* button = env1PasteButton.get())
+        button->setTheme(inTheme);
 
-    if (env1DelayLabel != nullptr)
-    {
-        env1DelayLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1DelayLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1DelaySlider != nullptr)
-    {
-        env1DelaySlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1DelaySlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator1 != nullptr)
-    {
-        parameterSeparator1->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator1.get())
+        separator->setTheme(inTheme);
 
-    if (env1AttackLabel != nullptr)
-    {
-        env1AttackLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1AttackLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1AttackSlider != nullptr)
-    {
-        env1AttackSlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1AttackSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator2 != nullptr)
-    {
-        parameterSeparator2->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator2.get())
+        separator->setTheme(inTheme);
 
-    if (env1DecayLabel != nullptr)
-    {
-        env1DecayLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1DecayLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1DecaySlider != nullptr)
-    {
-        env1DecaySlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1DecaySlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator3 != nullptr)
-    {
-        parameterSeparator3->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator3.get())
+        separator->setTheme(inTheme);
 
-    if (env1SustainLabel != nullptr)
-    {
-        env1SustainLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1SustainLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1SustainSlider != nullptr)
-    {
-        env1SustainSlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1SustainSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator4 != nullptr)
-    {
-        parameterSeparator4->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator4.get())
+        separator->setTheme(inTheme);
 
-    if (env1ReleaseLabel != nullptr)
-    {
-        env1ReleaseLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1ReleaseLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1ReleaseSlider != nullptr)
-    {
-        env1ReleaseSlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1ReleaseSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator5 != nullptr)
-    {
-        parameterSeparator5->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator5.get())
+        separator->setTheme(inTheme);
 
-    if (env1AmplitudeLabel != nullptr)
-    {
-        env1AmplitudeLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1AmplitudeLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1AmplitudeSlider != nullptr)
-    {
-        env1AmplitudeSlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1AmplitudeSlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator6 != nullptr)
-    {
-        parameterSeparator6->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator6.get())
+        separator->setTheme(inTheme);
 
-    if (env1AmplitudeModByVelocityLabel != nullptr)
-    {
-        env1AmplitudeModByVelocityLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1AmplitudeModByVelocityLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1AmplitudeModByVelocitySlider != nullptr)
-    {
-        env1AmplitudeModByVelocitySlider->setTheme(inTheme);
-    }
+    if (auto* slider = env1AmplitudeModByVelocitySlider.get())
+        slider->setTheme(inTheme);
 
-    if (parameterSeparator7 != nullptr)
-    {
-        parameterSeparator7->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator7.get())
+        separator->setTheme(inTheme);
 
-    if (env1TriggerModeLabel != nullptr)
-    {
-        env1TriggerModeLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1TriggerModeLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1TriggerModeComboBox != nullptr)
-    {
-        env1TriggerModeComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = env1TriggerModeComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator8 != nullptr)
-    {
-        parameterSeparator8->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator8.get())
+        separator->setTheme(inTheme);
 
-    if (env1EnvelopeModeLabel != nullptr)
-    {
-        env1EnvelopeModeLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1EnvelopeModeLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1EnvelopeModeComboBox != nullptr)
-    {
-        env1EnvelopeModeComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = env1EnvelopeModeComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator9 != nullptr)
-    {
-        parameterSeparator9->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator9.get())
+        separator->setTheme(inTheme);
 
-    if (env1Lfo1TriggerLabel != nullptr)
-    {
-        env1Lfo1TriggerLabel->setTheme(inTheme);
-    }
+    if (auto* label = env1Lfo1TriggerLabel.get())
+        label->setTheme(inTheme);
 
-    if (env1Lfo1TriggerComboBox != nullptr)
-    {
-        env1Lfo1TriggerComboBox->setTheme(inTheme);
-    }
+    if (auto* comboBox = env1Lfo1TriggerComboBox.get())
+        comboBox->setTheme(inTheme);
 
-    if (parameterSeparator10 != nullptr)
-    {
-        parameterSeparator10->setTheme(inTheme);
-    }
+    if (auto* separator = parameterSeparator10.get())
+        separator->setTheme(inTheme);
 
     repaint();
 }

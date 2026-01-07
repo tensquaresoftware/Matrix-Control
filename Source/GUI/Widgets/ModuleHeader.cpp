@@ -1,34 +1,34 @@
-#include "ModuleName.h"
+#include "ModuleHeader.h"
 
 #include "../Themes/Theme.h"
 
 namespace tss
 {
-    ModuleName::ModuleName(Theme& inTheme, const juce::String& text, Size size, ColourVariant variant)
+    ModuleHeader::ModuleHeader(Theme& inTheme, const juce::String& text, Size size, ColourVariant variant)
         : theme(&inTheme)
-        , name(text)
+        , text(text)
         , colourVariant(variant)
     {
         auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
         setSize(width, kHeight);
     }
 
-    void ModuleName::setTheme(Theme& inTheme)
+    void ModuleHeader::setTheme(Theme& inTheme)
     {
         theme = &inTheme;
         repaint();
     }
 
-    void ModuleName::setText(const juce::String& newText)
+    void ModuleHeader::setText(const juce::String& newText)
     {
-        if (name != newText)
+        if (text != newText)
         {
-            name = newText;
+            text = newText;
             repaint();
         }
     }
 
-    void ModuleName::paint(juce::Graphics& g)
+    void ModuleHeader::paint(juce::Graphics& g)
     {
         if (theme == nullptr)
         {
@@ -42,21 +42,21 @@ namespace tss
         drawLine(g, bounds);
     }
 
-    void ModuleName::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void ModuleHeader::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getModuleNameBaseColour();
+        auto baseColour = theme->getModuleHeaderBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
-    void ModuleName::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void ModuleHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        if (name.isEmpty())
+        if (text.isEmpty())
         {
             return;
         }
 
-        auto textColour = theme->getModuleNameTextColour();
+        auto textColour = theme->getModuleHeaderTextColour();
         auto font = theme->getBaseFont().withHeight(16.0f).boldened();
 
         auto textBounds = bounds;
@@ -65,10 +65,10 @@ namespace tss
 
         g.setColour(textColour);
         g.setFont(font);
-        g.drawText(name, textBounds, juce::Justification::centredLeft, false);
+        g.drawText(text, textBounds, juce::Justification::centredLeft, false);
     }
 
-    void ModuleName::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void ModuleHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto lineColour = getLineColour();
         
@@ -84,11 +84,11 @@ namespace tss
         g.fillRect(lineBounds);
     }
 
-    juce::Colour ModuleName::getLineColour() const
+    juce::Colour ModuleHeader::getLineColour() const
     {
         return (colourVariant == ColourVariant::Blue) 
-            ? theme->getModuleNameLineColourBlue() 
-            : theme->getModuleNameLineColourOrange();
+            ? theme->getModuleHeaderLineColourBlue() 
+            : theme->getModuleHeaderLineColourOrange();
     }
 }
 

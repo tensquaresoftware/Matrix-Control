@@ -1,23 +1,24 @@
-#include "ParameterLabel.h"
+#include "Label.h"
 
 #include "../Themes/Theme.h"
 
 namespace tss
 {
-    ParameterLabel::ParameterLabel(Theme& inTheme, const juce::String& text)
-        : theme(&inTheme)
+    Label::Label(Theme& inTheme, Type inType, const juce::String& text)
+        : type(inType)
+        , theme(&inTheme)
         , labelText(text)
     {
-        setSize(kWidth, kHeight);
+        setSize(getWidth(inType), kHeight);
     }
 
-    void ParameterLabel::setTheme(Theme& inTheme)
+    void Label::setTheme(Theme& inTheme)
     {
         theme = &inTheme;
         repaint();
     }
 
-    void ParameterLabel::setText(const juce::String& newText)
+    void Label::setText(const juce::String& newText)
     {
         if (labelText != newText)
         {
@@ -26,7 +27,7 @@ namespace tss
         }
     }
 
-    void ParameterLabel::paint(juce::Graphics& g)
+    void Label::paint(juce::Graphics& g)
     {
         if (theme == nullptr)
         {
@@ -40,14 +41,14 @@ namespace tss
         drawText(g, bounds);
     }
 
-    void ParameterLabel::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void Label::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto baseColour = theme->getParameterLabelBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
-    void ParameterLabel::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void Label::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto backgroundColour = theme->getParameterLabelBackgroundColour();
         const auto backgroundBounds = bounds.reduced(kBackgroundPadding);
@@ -56,7 +57,7 @@ namespace tss
         g.fillRect(backgroundBounds);
     }
 
-    void ParameterLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void Label::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         if (labelText.isEmpty())
         {

@@ -20,7 +20,7 @@ BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     panelSeparator1 = std::make_unique<PanelSeparator>(inTheme);
     addAndMakeVisible(*panelSeparator1);
 
-    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(inTheme);
+    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(inTheme, widgetFactory, apvts);
     addAndMakeVisible(*matrixModulationPanel);
 
     patchManagerPanel = std::make_unique<PatchManagerPanel>(inTheme);
@@ -37,7 +37,8 @@ BodyPanel::~BodyPanel() = default;
 
 void BodyPanel::paint(juce::Graphics& g)
 {
-        g.fillAll(theme->getBodyPanelBackgroundColour());
+    if (auto* currentTheme = theme)
+        g.fillAll(currentTheme->getBodyPanelBackgroundColour());
 }
 
 void BodyPanel::resized()
@@ -98,37 +99,25 @@ void BodyPanel::resized()
 
 void BodyPanel::setTheme(Theme& inTheme)
 {
-        theme = &inTheme;
+    theme = &inTheme;
 
-    if (patchEditPanel != nullptr)
-    {
-        patchEditPanel->setTheme(*theme);
-    }
+    if (auto* panel = patchEditPanel.get())
+        panel->setTheme(inTheme);
 
-    if (panelSeparator1 != nullptr)
-    {
-        panelSeparator1->setTheme(*theme);
-    }
+    if (auto* separator = panelSeparator1.get())
+        separator->setTheme(inTheme);
 
-    if (matrixModulationPanel != nullptr)
-    {
-        matrixModulationPanel->setTheme(*theme);
-    }
+    if (auto* panel = matrixModulationPanel.get())
+        panel->setTheme(inTheme);
 
-    if (panelSeparator2 != nullptr)
-    {
-        panelSeparator2->setTheme(*theme);
-    }
+    if (auto* separator = panelSeparator2.get())
+        separator->setTheme(inTheme);
 
-    if (masterEditPanel != nullptr)
-    {
-        masterEditPanel->setTheme(*theme);
-    }
+    if (auto* panel = masterEditPanel.get())
+        panel->setTheme(inTheme);
 
-    if (patchManagerPanel != nullptr)
-    {
-        patchManagerPanel->setTheme(*theme);
-    }
+    if (auto* panel = patchManagerPanel.get())
+        panel->setTheme(inTheme);
 
     repaint();
 }

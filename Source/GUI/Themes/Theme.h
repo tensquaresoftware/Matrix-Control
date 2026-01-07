@@ -42,18 +42,18 @@ namespace tss
         juce::Colour getPatchManagerPanelBackgroundColour() const;
         juce::Colour getMasterEditPanelBackgroundColour() const;
 
-        // SectionName colours ------------------------------------------------
-        juce::Colour getSectionNameBaseColour() const;
-        juce::Colour getSectionNameContentAreaColour() const;
-        juce::Colour getSectionNameTextColour() const;
-        juce::Colour getSectionNameLineColourBlue() const;
-        juce::Colour getSectionNameLineColourOrange() const;
+        // SectionHeader colours ------------------------------------------------
+        juce::Colour getSectionHeaderBaseColour() const;
+        juce::Colour getSectionHeaderContentAreaColour() const;
+        juce::Colour getSectionHeaderTextColour() const;
+        juce::Colour getSectionHeaderLineColourBlue() const;
+        juce::Colour getSectionHeaderLineColourOrange() const;
 
-        // ModuleName colours -------------------------------------------------
-        juce::Colour getModuleNameBaseColour() const;
-        juce::Colour getModuleNameTextColour() const;
-        juce::Colour getModuleNameLineColourBlue() const;
-        juce::Colour getModuleNameLineColourOrange() const;
+        // ModuleHeader colours -------------------------------------------------
+        juce::Colour getModuleHeaderBaseColour() const;
+        juce::Colour getModuleHeaderTextColour() const;
+        juce::Colour getModuleHeaderLineColourBlue() const;
+        juce::Colour getModuleHeaderLineColourOrange() const;
 
         // GroupLabel colours -------------------------------------------------
         juce::Colour getGroupLabelBaseColour() const;
