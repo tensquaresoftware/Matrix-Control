@@ -109,9 +109,6 @@ namespace tss
         juce::Colour getPopupMenuTextColour() const;
         juce::Colour getPopupMenuBackgroundHooverColour() const;
         juce::Colour getPopupMenuTextHooverColour() const;
-
-        // EmptySlot colours --------------------------------------------------
-        juce::Colour getEmptySlotBaseColour() const;
         
         
         //---------------------------------------------------------------------

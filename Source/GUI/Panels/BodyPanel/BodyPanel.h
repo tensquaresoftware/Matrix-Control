@@ -29,11 +29,11 @@ public:
     void setTheme(tss::Theme& inTheme);
 
     static int getHeight() { return kHeight; }
-    static int getSpacing() { return kSpacing; }
+    static int getPadding() { return kPadding; }
 
 private:
-    inline constexpr static int kHeight = 760;
-    inline constexpr static int kSpacing = 15;
+    inline constexpr static int kHeight = 730;
+    inline constexpr static int kPadding = 15;
 
     tss::Theme* theme;
 

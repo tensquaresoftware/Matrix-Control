@@ -4,20 +4,19 @@
 #include "../../Themes/Theme.h"
 
 using tss::Theme;
-using tss::Button;
 
 HeaderPanel::HeaderPanel(Theme& inTheme)
     : theme(&inTheme)
-    , buttonBlack(inTheme, getButtonWidth(), "BLACK")
-    , buttonCream(inTheme, getButtonWidth(), "CREAM")
-    , buttonDebug(inTheme, getButtonWidth(), "DEBUG")
-    , buttonDisabled(inTheme, getButtonWidth(), "DISABLED")
+    , blackThemeButton(inTheme, getButtonWidth(), "BLACK")
+    , creamThemeButton(inTheme, getButtonWidth(), "CREAM")
+    , debugThemeButton(inTheme, getButtonWidth(), "DEBUG")
+    , someDisabledButton(inTheme, getButtonWidth(), "DISABLED")
 {
-    addAndMakeVisible(buttonBlack);
-    addAndMakeVisible(buttonCream);
-    addAndMakeVisible(buttonDebug);
-    buttonDisabled.setEnabled(false);
-    addAndMakeVisible(buttonDisabled);
+    addAndMakeVisible(blackThemeButton);
+    addAndMakeVisible(creamThemeButton);
+    addAndMakeVisible(debugThemeButton);
+    someDisabledButton.setEnabled(false);
+    addAndMakeVisible(someDisabledButton);
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -27,32 +26,52 @@ void HeaderPanel::paint(juce::Graphics& g)
 
 void HeaderPanel::resized()
 {
-    auto buttonSpacing = getButtonSpacing();
-    auto buttonWidth = getButtonWidth();
-    auto buttonHeight = getButtonHeight();
-    auto currentX = buttonSpacing;
-    auto buttonY = (getHeight() - buttonHeight) / 2;
-    auto buttonStep = buttonWidth + buttonSpacing;
+    const auto bounds = getLocalBounds();
+    const auto buttonSpacing = getButtonSpacing();
+    const auto buttonWidth = getButtonWidth();
+    const auto buttonHeight = getButtonHeight();
+    const auto buttonY = (getHeight() - buttonHeight) / 2;
     
-    buttonBlack.setBounds(currentX, buttonY, buttonWidth, buttonHeight);
-    currentX += buttonStep;
+    const auto blackThemeButtonX = buttonSpacing;
+    blackThemeButton.setBounds(
+        bounds.getX() + blackThemeButtonX,
+        bounds.getY() + buttonY,
+        buttonWidth,
+        buttonHeight
+    );
     
-    buttonCream.setBounds(currentX, buttonY, buttonWidth, buttonHeight);
-    currentX += buttonStep;
+    const auto creamThemeButtonX = blackThemeButtonX + buttonWidth + buttonSpacing;
+    creamThemeButton.setBounds(
+        bounds.getX() + creamThemeButtonX,
+        bounds.getY() + buttonY,
+        buttonWidth,
+        buttonHeight
+    );
     
-    buttonDebug.setBounds(currentX, buttonY, buttonWidth, buttonHeight);
-    currentX += buttonStep;
+    const auto debugThemeButtonX = creamThemeButtonX + buttonWidth + buttonSpacing;
+    debugThemeButton.setBounds(
+        bounds.getX() + debugThemeButtonX,
+        bounds.getY() + buttonY,
+        buttonWidth,
+        buttonHeight
+    );
     
-    buttonDisabled.setBounds(currentX, buttonY, buttonWidth, buttonHeight);
+    const auto someDisabledButtonX = debugThemeButtonX + buttonWidth + buttonSpacing;
+    someDisabledButton.setBounds(
+        bounds.getX() + someDisabledButtonX,
+        bounds.getY() + buttonY,
+        buttonWidth,
+        buttonHeight
+    );
 }
 
 void HeaderPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
-    buttonBlack.setTheme(inTheme);
-    buttonCream.setTheme(inTheme);
-    buttonDebug.setTheme(inTheme);
-    buttonDisabled.setTheme(inTheme);
+    blackThemeButton.setTheme(inTheme);
+    creamThemeButton.setTheme(inTheme);
+    debugThemeButton.setTheme(inTheme);
+    someDisabledButton.setTheme(inTheme);
     repaint();
 }
 

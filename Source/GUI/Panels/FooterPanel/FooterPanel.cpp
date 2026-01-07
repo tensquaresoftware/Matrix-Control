@@ -15,11 +15,11 @@ FooterPanel::FooterPanel(Theme& inTheme, juce::AudioProcessorValueTreeState& apv
     apvts.state.addListener(this);
     
     // Initialiser avec le message actuel s'il existe
-    auto messageTextVar = apvts.state.getProperty(kMessageTextId, juce::String());
-    auto severityStrVar = apvts.state.getProperty(kMessageSeverityId, juce::String());
+    const auto messageTextVar = apvts.state.getProperty(kMessageTextId, juce::String());
+    const auto severityStrVar = apvts.state.getProperty(kMessageSeverityId, juce::String());
     
-    juce::String messageText = messageTextVar.toString();
-    juce::String severityStr = severityStrVar.toString();
+    const juce::String messageText = messageTextVar.toString();
+    const juce::String severityStr = severityStrVar.toString();
     
     if (messageText.isNotEmpty())
     {
@@ -47,10 +47,10 @@ void FooterPanel::paint(juce::Graphics& g)
     g.setFont(theme->getBaseFont());
     
     // Icône (optionnel)
-    juce::String icon = getSeverityIcon(currentSeverity);
+    const juce::String icon = getSeverityIcon(currentSeverity);
     if (icon.isNotEmpty())
     {
-        auto iconBounds = bounds.removeFromLeft(kIconSize + kPadding);
+        const auto iconBounds = bounds.removeFromLeft(kIconSize + kPadding);
         g.drawText(icon, iconBounds, juce::Justification::centredLeft);
     }
     
@@ -73,8 +73,8 @@ void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
 {
     if (property == kMessageTextId || property == kMessageSeverityId)
     {
-        auto messageText = tree.getProperty(kMessageTextId, juce::String()).toString();
-        auto severityStr = tree.getProperty(kMessageSeverityId, juce::String()).toString();
+        const auto messageText = tree.getProperty(kMessageTextId, juce::String()).toString();
+        const auto severityStr = tree.getProperty(kMessageSeverityId, juce::String()).toString();
         
         currentMessage = messageText;
         currentSeverity = parseSeverity(severityStr);

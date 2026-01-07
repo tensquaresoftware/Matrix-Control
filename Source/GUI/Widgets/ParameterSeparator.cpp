@@ -23,7 +23,7 @@ namespace tss
             return;
         }
 
-        auto bounds = getLocalBounds().toFloat();
+        const auto bounds = getLocalBounds().toFloat();
 
         drawBase(g, bounds);
         drawLine(g, bounds);
@@ -31,15 +31,15 @@ namespace tss
 
     void ParameterSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getParameterSeparatorBaseColour();
+        const auto baseColour = theme->getParameterSeparatorBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ParameterSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto lineColour = theme->getParameterSeparatorLineColour();
-        auto lineY = bounds.getCentreY();
+        const auto lineColour = theme->getParameterSeparatorLineColour();
+        const auto lineY = bounds.getCentreY();
         
         g.setColour(lineColour);
         g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, kLineThickness);

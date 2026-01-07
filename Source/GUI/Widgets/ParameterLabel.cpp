@@ -33,7 +33,7 @@ namespace tss
             return;
         }
 
-        auto bounds = getLocalBounds().toFloat();
+        const auto bounds = getLocalBounds().toFloat();
 
         drawBase(g, bounds);
         drawBackground(g, bounds);
@@ -42,15 +42,15 @@ namespace tss
 
     void ParameterLabel::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getParameterLabelBaseColour();
+        const auto baseColour = theme->getParameterLabelBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ParameterLabel::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto backgroundColour = theme->getParameterLabelBackgroundColour();
-        auto backgroundBounds = bounds.reduced(kBackgroundPadding);
+        const auto backgroundColour = theme->getParameterLabelBackgroundColour();
+        const auto backgroundBounds = bounds.reduced(kBackgroundPadding);
         
         g.setColour(backgroundColour);
         g.fillRect(backgroundBounds);
@@ -63,8 +63,8 @@ namespace tss
             return;
         }
 
-        auto textColour = theme->getParameterLabelTextColour();
-        auto font = theme->getBaseFont();
+        const auto textColour = theme->getParameterLabelTextColour();
+        const auto font = theme->getBaseFont();
 
         auto textBounds = bounds.reduced(kBackgroundPadding);
         textBounds.removeFromLeft(kTextLeftPadding);

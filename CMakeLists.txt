@@ -69,12 +69,20 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/BodyPanel/BodyPanel.cpp
     Source/GUI/Panels/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
     Source/GUI/Panels/BodyPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/Dco1Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/Dco2Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/FmTrackPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/BottomPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env1Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env2Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env3Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo1Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo2Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/MiddlePanel/MiddlePanel.cpp
     Source/GUI/Panels/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/RampPortamentoPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/Modules/VcfVcaPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/TopPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco1Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco2Panel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/FmTrackPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/RampPortamentoPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/VcfVcaPanel.cpp
     Source/GUI/Panels/BodyPanel/PatchManagerPanel/PatchManagerPanel.cpp
     
     # GUI - Widgets

@@ -17,13 +17,30 @@ MainComponent::MainComponent(Theme& theme, WidgetFactory& widgetFactory, juce::A
 void MainComponent::resized()
 {
     auto bounds = getLocalBounds();
-    auto headerHeight = HeaderPanel::getHeight();
-    auto bodyPanelHeight = BodyPanel::getHeight();
-    auto footerHeight = FooterPanel::getHeight();
-
-    headerPanel.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), headerHeight);
-    bodyPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight, bounds.getWidth(), bodyPanelHeight);
-    footerPanel.setBounds(bounds.getX(), bounds.getY() + headerHeight + bodyPanelHeight, bounds.getWidth(), footerHeight);
+    
+    auto headerPanelY = 0;
+    headerPanel.setBounds(
+        bounds.getX(),
+        bounds.getY() + headerPanelY,
+        bounds.getWidth(),
+        HeaderPanel::getHeight()
+    );
+    
+    auto bodyPanelY = headerPanelY + HeaderPanel::getHeight();
+    bodyPanel.setBounds(
+        bounds.getX(),
+        bounds.getY() + bodyPanelY,
+        bounds.getWidth(),
+        BodyPanel::getHeight()
+    );
+    
+    auto footerPanelY = bodyPanelY + BodyPanel::getHeight();
+    footerPanel.setBounds(
+        bounds.getX(),
+        bounds.getY() + footerPanelY,
+        bounds.getWidth(),
+        FooterPanel::getHeight()
+    );
 }
 
 void MainComponent::setTheme(Theme& theme)

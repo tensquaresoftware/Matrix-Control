@@ -33,7 +33,7 @@ namespace tss
             return;
         }
 
-        auto bounds = getLocalBounds().toFloat();
+        const auto bounds = getLocalBounds().toFloat();
 
         drawBase(g, bounds);
         drawText(g, bounds);
@@ -54,8 +54,8 @@ namespace tss
             return;
         }
 
-        auto textArea = getContentArea(bounds);
-        auto font = theme->getBaseFont();
+        const auto textArea = getContentArea(bounds);
+        const auto font = theme->getBaseFont();
 
         g.setColour(theme->getGroupLabelTextColour());
         g.setFont(font);
@@ -69,12 +69,12 @@ namespace tss
             return;
         }
 
-        auto textArea = getContentArea(bounds);
-        auto textWidth = calculateTextWidth();
-        auto textCentreX = textArea.getCentreX();
-        auto lineY = textArea.getCentreY();
-        auto leftLineEndX = textCentreX - textWidth * 0.5f - kTextSpacing;
-        auto remainingWidth = leftLineEndX - textArea.getX();
+        const auto textArea = getContentArea(bounds);
+        const auto textWidth = calculateTextWidth();
+        const auto textCentreX = textArea.getCentreX();
+        const auto lineY = textArea.getCentreY();
+        const auto leftLineEndX = textCentreX - textWidth * 0.5f - kTextSpacing;
+        const auto remainingWidth = leftLineEndX - textArea.getX();
 
         if (remainingWidth > 0.0f)
         {
@@ -96,12 +96,12 @@ namespace tss
             return;
         }
 
-        auto textArea = getContentArea(bounds);
-        auto textWidth = calculateTextWidth();
-        auto textCentreX = textArea.getCentreX();
-        auto lineY = textArea.getCentreY();
-        auto rightLineStartX = textCentreX + textWidth * 0.5f + kTextSpacing;
-        auto remainingWidth = textArea.getRight() - rightLineStartX;
+        const auto textArea = getContentArea(bounds);
+        const auto textWidth = calculateTextWidth();
+        const auto textCentreX = textArea.getCentreX();
+        const auto lineY = textArea.getCentreY();
+        const auto rightLineStartX = textCentreX + textWidth * 0.5f + kTextSpacing;
+        const auto remainingWidth = textArea.getRight() - rightLineStartX;
 
         if (remainingWidth > 0.0f)
         {
@@ -118,8 +118,8 @@ namespace tss
 
     juce::Rectangle<float> GroupLabel::getContentArea(const juce::Rectangle<float>& bounds) const
     {
-        auto topAreaHeight = kTopAreaHeight;
-        auto contentHeight = kContentHeight;
+        const auto topAreaHeight = kTopAreaHeight;
+        const auto contentHeight = kContentHeight;
         auto textArea = bounds;
         textArea.removeFromTop(topAreaHeight);
         textArea.setHeight(contentHeight);
@@ -133,10 +133,10 @@ namespace tss
             return 0.0f;
         }
 
-        auto font = theme->getBaseFont();
+        const auto font = theme->getBaseFont();
         juce::GlyphArrangement glyphArrangement;
         glyphArrangement.addLineOfText(font, labelText, 0.0f, 0.0f);
-        auto bounds = glyphArrangement.getBoundingBox(0, -1, true);
+        const auto bounds = glyphArrangement.getBoundingBox(0, -1, true);
         return bounds.getWidth();
     }
 }

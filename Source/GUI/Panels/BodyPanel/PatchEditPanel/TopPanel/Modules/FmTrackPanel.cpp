@@ -1,14 +1,14 @@
 #include "FmTrackPanel.h"
 
-#include "../../../../Themes/Theme.h"
-#include "../../../../Widgets/ModuleName.h"
-#include "../../../../Widgets/ParameterLabel.h"
-#include "../../../../Widgets/Slider.h"
-#include "../../../../Widgets/ComboBox.h"
-#include "../../../../Widgets/Button.h"
-#include "../../../../Widgets/ParameterSeparator.h"
-#include "../../../../../Shared/SynthDescriptors.h"
-#include "../../../../../GUI/Factories/WidgetFactory.h"
+#include "../../../../../Themes/Theme.h"
+#include "../../../../../Widgets/ModuleName.h"
+#include "../../../../../Widgets/ParameterLabel.h"
+#include "../../../../../Widgets/Slider.h"
+#include "../../../../../Widgets/ComboBox.h"
+#include "../../../../../Widgets/Button.h"
+#include "../../../../../Widgets/ParameterSeparator.h"
+#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

@@ -20,10 +20,10 @@ public:
     void resized() override;
     void setTheme(tss::Theme& inTheme);
 
-    tss::Button& getButtonBlack() { return buttonBlack; }
-    tss::Button& getButtonCream() { return buttonCream; }
-    tss::Button& getButtonDebug() { return buttonDebug; }
-    tss::Button& getButtonDisabled() { return buttonDisabled; }
+    tss::Button& getButtonBlack() { return blackThemeButton; }
+    tss::Button& getButtonCream() { return creamThemeButton; }
+    tss::Button& getButtonDebug() { return debugThemeButton; }
+    tss::Button& getButtonDisabled() { return someDisabledButton; }
 
     static int getHeight() { return kHeight; }
     static int getButtonWidth() { return kButtonWidth; }
@@ -38,10 +38,10 @@ private:
 
     tss::Theme* theme;
 
-    tss::Button buttonBlack;
-    tss::Button buttonCream;
-    tss::Button buttonDebug;
-    tss::Button buttonDisabled;
+    tss::Button blackThemeButton;
+    tss::Button creamThemeButton;
+    tss::Button debugThemeButton;
+    tss::Button someDisabledButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)
 };

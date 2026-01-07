@@ -513,16 +513,6 @@ namespace tss
                 ColourChart::kTransparent
             };
         }
-
-        namespace EmptySlot
-        {
-            inline constexpr ColourElement kBase = {
-                "EmptySlotBase",
-                ColourChart::kTransparent,
-                ColourChart::kTransparent,
-                ColourChart::kRed
-            };
-        }
     }
 }
 

@@ -24,8 +24,8 @@ namespace tss
             return;
         }
 
-        auto bounds = getLocalBounds().toFloat();
-        auto enabled = isEnabled();
+        const auto bounds = getLocalBounds().toFloat();
+        const auto enabled = isEnabled();
 
         drawBase(g, bounds);
         drawBackground(g, bounds, enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
@@ -35,7 +35,7 @@ namespace tss
 
     void Button::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getButtonBaseColour();
+        const auto baseColour = theme->getButtonBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
@@ -80,12 +80,12 @@ namespace tss
         
         g.setColour(borderColour);
         
-        auto borderThickness = kBorderThickness;
+        const auto borderThickness = kBorderThickness;
         
-        auto topBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY(), bounds.getWidth(), borderThickness);
-        auto bottomBorder = juce::Rectangle<float>(bounds.getX(), bounds.getBottom() - borderThickness, bounds.getWidth(), borderThickness);
-        auto leftBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
-        auto rightBorder = juce::Rectangle<float>(bounds.getRight() - borderThickness, bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
+        const auto topBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY(), bounds.getWidth(), borderThickness);
+        const auto bottomBorder = juce::Rectangle<float>(bounds.getX(), bounds.getBottom() - borderThickness, bounds.getWidth(), borderThickness);
+        const auto leftBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
+        const auto rightBorder = juce::Rectangle<float>(bounds.getRight() - borderThickness, bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
         
         g.fillRect(topBorder);
         g.fillRect(bottomBorder);
@@ -95,7 +95,7 @@ namespace tss
 
     void Button::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown)
     {
-        auto buttonText = getButtonText();
+        const auto buttonText = getButtonText();
         if (buttonText.isEmpty())
         {
             return;
@@ -120,7 +120,7 @@ namespace tss
             textColour = theme->getButtonTextColourOn();
         }
 
-        auto font = theme->getBaseFont();
+        const auto font = theme->getBaseFont();
 
         g.setColour(textColour);
         g.setFont(font);

@@ -23,7 +23,7 @@ namespace tss
             return;
         }
 
-        auto bounds = getLocalBounds().toFloat();
+        const auto bounds = getLocalBounds().toFloat();
 
         drawBase(g, bounds);
         drawLine(g, bounds);
@@ -31,16 +31,16 @@ namespace tss
 
     void PanelSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getPanelSeparatorBaseColour();
+        const auto baseColour = theme->getPanelSeparatorBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void PanelSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto lineColour = theme->getPanelSeparatorLineColour();
-        auto lineWidth = kLineWidth;
-        auto lineX = bounds.getCentreX() - lineWidth / 2.0f;
+        const auto lineColour = theme->getPanelSeparatorLineColour();
+        const auto lineWidth = kLineWidth;
+        const auto lineX = bounds.getCentreX() - lineWidth / 2.0f;
         
         auto line = bounds;
         line.setX(lineX);

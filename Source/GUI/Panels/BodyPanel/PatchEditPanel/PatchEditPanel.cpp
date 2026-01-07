@@ -1,14 +1,11 @@
 #include "PatchEditPanel.h"
 
-#include "Modules/Dco1Panel.h"
-#include "Modules/Dco2Panel.h"
-#include "Modules/VcfVcaPanel.h"
-#include "Modules/FmTrackPanel.h"
-#include "Modules/RampPortamentoPanel.h"
+#include "TopPanel/TopPanel.h"
+#include "MiddlePanel/MiddlePanel.h"
+#include "BottomPanel/BottomPanel.h"
 
 #include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionName.h"
-#include "../BodyPanel.h"
 #include "../../../../Shared/SynthDescriptors.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
@@ -22,18 +19,14 @@ PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juc
         inTheme, 
         getWidth(), 
         SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
-    , dco1Panel(std::make_unique<Dco1Panel>(inTheme, widgetFactory, apvts))
-    , dco2Panel(std::make_unique<Dco2Panel>(inTheme, widgetFactory, apvts))
-    , vcfVcaPanel(std::make_unique<VcfVcaPanel>(inTheme, widgetFactory, apvts))
-    , fmTrackPanel(std::make_unique<FmTrackPanel>(inTheme, widgetFactory, apvts))
-    , rampPortamentoPanel(std::make_unique<RampPortamentoPanel>(inTheme, widgetFactory, apvts))
+    , topPanel(std::make_unique<TopPanel>(inTheme, widgetFactory, apvts))
+    , middlePanel(std::make_unique<MiddlePanel>(inTheme))
+    , bottomPanel(std::make_unique<BottomPanel>(inTheme, widgetFactory, apvts))
 {
     addAndMakeVisible(*sectionName);
-    addAndMakeVisible(*dco1Panel);
-    addAndMakeVisible(*dco2Panel);
-    addAndMakeVisible(*vcfVcaPanel);
-    addAndMakeVisible(*fmTrackPanel);
-    addAndMakeVisible(*rampPortamentoPanel);
+    addAndMakeVisible(*topPanel);
+    addAndMakeVisible(*middlePanel);
+    addAndMakeVisible(*bottomPanel);
 
     setSize(getWidth(), getHeight());
 }
@@ -50,47 +43,39 @@ void PatchEditPanel::paint(juce::Graphics& g)
 
 void PatchEditPanel::resized()
 {
-    const auto sectionNameHeight = tss::SectionName::getHeight();
-    const auto panelWidth = Dco1Panel::getWidth();
-    const auto panelHeight = Dco1Panel::getHeight();
-    const auto spacing = BodyPanel::getSpacing();
-
-    if (sectionName != nullptr)
-    {
-        sectionName->setBounds(0, 0, getWidth(), sectionNameHeight);
-    }
-
-    int x = 0;
-    int y = sectionNameHeight;
-
-    if (dco1Panel != nullptr)
-    {
-        dco1Panel->setBounds(x, y, panelWidth, panelHeight);
-        x += panelWidth + spacing;
-    }
-
-    if (dco2Panel != nullptr)
-    {
-        dco2Panel->setBounds(x, y, panelWidth, panelHeight);
-        x += panelWidth + spacing;
-    }
-
-    if (vcfVcaPanel != nullptr)
-    {
-        vcfVcaPanel->setBounds(x, y, panelWidth, panelHeight);
-        x += panelWidth + spacing;
-    }
-
-    if (fmTrackPanel != nullptr)
-    {
-        fmTrackPanel->setBounds(x, y, panelWidth, panelHeight);
-        x += panelWidth + spacing;
-    }
-
-    if (rampPortamentoPanel != nullptr)
-    {
-        rampPortamentoPanel->setBounds(x, y, panelWidth, panelHeight);
-    }
+    const auto bounds = getLocalBounds();
+    
+    const auto sectionNameY = 0;
+    sectionName->setBounds(
+        bounds.getX() + 0,
+        bounds.getY() + sectionNameY,
+        bounds.getWidth(),
+        tss::SectionName::getHeight()
+    );
+    
+    const auto topPanelY = sectionNameY + tss::SectionName::getHeight();
+    topPanel->setBounds(
+        bounds.getX() + 0,
+        bounds.getY() + topPanelY,
+        bounds.getWidth(),
+        TopPanel::getHeight()
+    );
+    
+    const auto middlePanelY = topPanelY + TopPanel::getHeight();
+    middlePanel->setBounds(
+        bounds.getX() + 0,
+        bounds.getY() + middlePanelY,
+        bounds.getWidth(),
+        MiddlePanel::getHeight()
+    );
+    
+    const auto bottomPanelY = middlePanelY + MiddlePanel::getHeight();
+    bottomPanel->setBounds(
+        bounds.getX() + 0,
+        bounds.getY() + bottomPanelY,
+        bounds.getWidth(),
+        BottomPanel::getHeight()
+    );
 }
 
 void PatchEditPanel::setTheme(Theme& inTheme)
@@ -102,29 +87,19 @@ void PatchEditPanel::setTheme(Theme& inTheme)
         sectionName->setTheme(inTheme);
     }
 
-    if (dco1Panel != nullptr)
+    if (topPanel != nullptr)
     {
-        dco1Panel->setTheme(inTheme);
+        topPanel->setTheme(inTheme);
     }
 
-    if (dco2Panel != nullptr)
+    if (middlePanel != nullptr)
     {
-        dco2Panel->setTheme(inTheme);
+        middlePanel->setTheme(inTheme);
     }
 
-    if (vcfVcaPanel != nullptr)
+    if (bottomPanel != nullptr)
     {
-        vcfVcaPanel->setTheme(inTheme);
-    }
-
-    if (fmTrackPanel != nullptr)
-    {
-        fmTrackPanel->setTheme(inTheme);
-    }
-
-    if (rampPortamentoPanel != nullptr)
-    {
-        rampPortamentoPanel->setTheme(inTheme);
+        bottomPanel->setTheme(inTheme);
     }
 
     repaint();

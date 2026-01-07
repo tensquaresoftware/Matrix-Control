@@ -336,12 +336,6 @@ namespace tss
         return getColour(ThemeColours::PopupMenu::kTextHoover);
     }
 
-    // EmptySlot colours -------------------------------------------------------
-    juce::Colour Theme::getEmptySlotBaseColour() const
-    {
-        return getColour(ThemeColours::EmptySlot::kBase);
-    }
-
     
     //=========================================================================
     // FONTS

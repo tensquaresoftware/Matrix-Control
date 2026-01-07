@@ -26,8 +26,8 @@ public:
     static int getHeight() { return kHeight; }
 
 private:
-    inline constexpr static int kWidth = 1325;
-    inline constexpr static int kHeight = 820;
+    inline constexpr static int kWidth = 1335;
+    inline constexpr static int kHeight = 790;
 
     PluginProcessor& pluginProcessor;
     

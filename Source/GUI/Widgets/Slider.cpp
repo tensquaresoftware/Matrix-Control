@@ -27,12 +27,12 @@ namespace tss
             return;
         }
 
-        auto bounds = getLocalBounds().toFloat();
-        auto enabled = isEnabled();
-        auto hasFocus = focusableWidget.hasFocus();
+        const auto bounds = getLocalBounds().toFloat();
+        const auto enabled = isEnabled();
+        const auto hasFocus = focusableWidget.hasFocus();
 
-        auto backgroundBounds = calculateBackgroundBounds(bounds);
-        auto trackBounds = calculateTrackBounds(backgroundBounds, enabled);
+        const auto backgroundBounds = calculateBackgroundBounds(bounds);
+        const auto trackBounds = calculateTrackBounds(backgroundBounds, enabled);
 
         drawBase(g, bounds);
         drawBackground(g, backgroundBounds, enabled);
@@ -43,10 +43,10 @@ namespace tss
 
     juce::Rectangle<float> Slider::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
-        auto backgroundWidth = static_cast<float>(kBackgroundWidth);
-        auto backgroundHeight = static_cast<float>(kBackgroundHeight);
-        auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
-        auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
+        const auto backgroundWidth = static_cast<float>(kBackgroundWidth);
+        const auto backgroundHeight = static_cast<float>(kBackgroundHeight);
+        const auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
+        const auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
         return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);
     }
 
@@ -57,46 +57,46 @@ namespace tss
             return juce::Rectangle<float>();
         }
 
-        auto range = getRange();
-        auto rangeLength = range.getLength();
+        const auto range = getRange();
+        const auto rangeLength = range.getLength();
         
         if (rangeLength <= 0.0)
         {
             return juce::Rectangle<float>();
         }
 
-        auto trackArea = backgroundBounds.reduced(1.0f);
-        auto value = getValue();
+        const auto trackArea = backgroundBounds.reduced(1.0f);
+        const auto value = getValue();
         auto normalizedValue = static_cast<float>((value - range.getStart()) / rangeLength);
         normalizedValue = juce::jlimit(0.0f, 1.0f, normalizedValue);
-        auto trackWidth = trackArea.getWidth() * normalizedValue;
+        const auto trackWidth = trackArea.getWidth() * normalizedValue;
         
         return juce::Rectangle<float>(trackArea.getX(), trackArea.getY(), trackWidth, trackArea.getHeight());
     }
 
     void Slider::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getSliderBaseColour();
+        const auto baseColour = theme->getSliderBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void Slider::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        auto backgroundColour = theme->getSliderBackgroundColour(enabled);
+        const auto backgroundColour = theme->getSliderBackgroundColour(enabled);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void Slider::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        auto borderColour = theme->getSliderBorderColour(enabled, false);
+        const auto borderColour = theme->getSliderBorderColour(enabled, false);
         g.setColour(borderColour);
         g.drawRect(bounds, 1.0f);
 
         if (hasFocus)
         {
-            auto focusBorderColour = theme->getSliderBorderColour(enabled, true);
+            const auto focusBorderColour = theme->getSliderBorderColour(enabled, true);
             g.setColour(focusBorderColour);
             g.drawRect(backgroundBounds, 1.0f);
         }
@@ -109,16 +109,16 @@ namespace tss
             return;
         }
 
-        auto trackColour = theme->getSliderTrackColour(enabled);
+        const auto trackColour = theme->getSliderTrackColour(enabled);
         g.setColour(trackColour);
         g.fillRect(bounds);
     }
 
     void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        auto valueText = juce::String(static_cast<int>(std::round(getValue())));
-        auto textColour = theme->getSliderTextColour(enabled);
-        auto font = theme->getBaseFont();
+        const auto valueText = juce::String(static_cast<int>(std::round(getValue())));
+        const auto textColour = theme->getSliderTextColour(enabled);
+        const auto font = theme->getBaseFont();
 
         g.setColour(textColour);
         g.setFont(font);
@@ -144,10 +144,10 @@ namespace tss
             return;
         }
         
-        auto dragDistance = dragStartPosition.y - e.getPosition().y;
-        auto valueDelta = dragDistance * kDragSensitivity;
+        const auto dragDistance = dragStartPosition.y - e.getPosition().y;
+        const auto valueDelta = dragDistance * kDragSensitivity;
         
-        auto range = getRange();
+        const auto range = getRange();
         auto newValue = dragStartValue + valueDelta;
         newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
         
@@ -197,11 +197,11 @@ namespace tss
             return true;
         }
         
-        auto range = getRange();
-        auto rangeLength = range.getLength();
-        auto modifiers = key.getModifiers();
-        bool isShiftPressed = modifiers.isShiftDown();
-        auto step = calculateStepForRange(rangeLength, isShiftPressed);
+        const auto range = getRange();
+        const auto rangeLength = range.getLength();
+        const auto modifiers = key.getModifiers();
+        const bool isShiftPressed = modifiers.isShiftDown();
+        const auto step = calculateStepForRange(rangeLength, isShiftPressed);
         
         if (isIncrementKey(key.getKeyCode()))
         {
@@ -245,8 +245,8 @@ namespace tss
 
     void Slider::updateValueWithStep(double step, bool increment)
     {
-        auto range = getRange();
-        auto currentValue = getValue();
+        const auto range = getRange();
+        const auto currentValue = getValue();
         auto newValue = increment ? currentValue + step : currentValue - step;
         newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
         setValue(newValue, juce::sendNotificationSync);

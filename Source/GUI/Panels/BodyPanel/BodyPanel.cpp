@@ -42,30 +42,58 @@ void BodyPanel::paint(juce::Graphics& g)
 
 void BodyPanel::resized()
 {
-    auto spacing = getSpacing();
-    auto patchEditPanelX = spacing;
-    auto patchEditPanelY = spacing;
-    patchEditPanel->setBounds(patchEditPanelX, patchEditPanelY, PatchEditPanel::getWidth(), PatchEditPanel::getHeight());
-
-    auto separatorX = patchEditPanelX + PatchEditPanel::getWidth();
-    auto separatorY = spacing;
-    panelSeparator1->setTopLeftPosition(separatorX, separatorY);
-
-    auto matrixModulationPanelX = separatorX + panelSeparator1->getWidth();
-    auto matrixModulationPanelY = spacing;
-    matrixModulationPanel->setBounds(matrixModulationPanelX, matrixModulationPanelY, MatrixModulationPanel::getWidth(), MatrixModulationPanel::getHeight());
-
-    auto patchManagerPanelX = matrixModulationPanelX;
-    auto patchManagerPanelY = matrixModulationPanelY + MatrixModulationPanel::getHeight();
-    patchManagerPanel->setBounds(patchManagerPanelX, patchManagerPanelY, PatchManagerPanel::getWidth(), PatchManagerPanel::getHeight());
-
-    auto separator2X = matrixModulationPanelX + MatrixModulationPanel::getWidth();
-    auto separator2Y = spacing;
-    panelSeparator2->setTopLeftPosition(separator2X, separator2Y);
-
-    auto masterEditPanelX = separator2X + panelSeparator2->getWidth();
-    auto masterEditPanelY = spacing;
-    masterEditPanel->setBounds(masterEditPanelX, masterEditPanelY, MasterEditPanel::getWidth(), MasterEditPanel::getHeight());
+    const auto bounds = getLocalBounds();
+    const auto padding = getPadding();
+    
+    const auto patchEditPanelX = padding;
+    const auto patchEditPanelY = padding;
+    patchEditPanel->setBounds(
+        bounds.getX() + patchEditPanelX,
+        bounds.getY() + patchEditPanelY,
+        PatchEditPanel::getWidth(),
+        PatchEditPanel::getHeight()
+    );
+    
+    const auto panelSeparator1X = patchEditPanelX + PatchEditPanel::getWidth();
+    const auto panelSeparator1Y = padding;
+    panelSeparator1->setTopLeftPosition(
+        bounds.getX() + panelSeparator1X,
+        bounds.getY() + panelSeparator1Y
+    );
+    
+    const auto matrixModulationPanelX = panelSeparator1X + panelSeparator1->getWidth();
+    const auto matrixModulationPanelY = padding;
+    matrixModulationPanel->setBounds(
+        bounds.getX() + matrixModulationPanelX,
+        bounds.getY() + matrixModulationPanelY,
+        MatrixModulationPanel::getWidth(),
+        MatrixModulationPanel::getHeight()
+    );
+    
+    const auto patchManagerPanelX = matrixModulationPanelX;
+    const auto patchManagerPanelY = matrixModulationPanelY + MatrixModulationPanel::getHeight();
+    patchManagerPanel->setBounds(
+        bounds.getX() + patchManagerPanelX,
+        bounds.getY() + patchManagerPanelY,
+        PatchManagerPanel::getWidth(),
+        PatchManagerPanel::getHeight()
+    );
+    
+    const auto panelSeparator2X = matrixModulationPanelX + MatrixModulationPanel::getWidth();
+    const auto panelSeparator2Y = padding;
+    panelSeparator2->setTopLeftPosition(
+        bounds.getX() + panelSeparator2X,
+        bounds.getY() + panelSeparator2Y
+    );
+    
+    const auto masterEditPanelX = panelSeparator2X + panelSeparator2->getWidth();
+    const auto masterEditPanelY = padding;
+    masterEditPanel->setBounds(
+        bounds.getX() + masterEditPanelX,
+        bounds.getY() + masterEditPanelY,
+        MasterEditPanel::getWidth(),
+        MasterEditPanel::getHeight()
+    );
 }
 
 void BodyPanel::setTheme(Theme& inTheme)
