@@ -16,199 +16,51 @@ Env1Panel::Env1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    // Module Name
-    env1ModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
-        widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kEnvelope1));
-    addAndMakeVisible(*env1ModuleHeader);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kEnvelope1);
+    setupInitCopyPasteButtons(inTheme, widgetFactory,
+                              SynthDescriptors::StandaloneWidgetIds::kEnv1Init,
+                              SynthDescriptors::StandaloneWidgetIds::kEnv1Copy,
+                              SynthDescriptors::StandaloneWidgetIds::kEnv1Paste);
 
-    // Standalone Widgets
-    env1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Init, inTheme);
-    env1InitButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kEnv1Init,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*env1InitButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1Delay,
+                                env1DelayLabel, env1DelaySlider, env1DelayAttachment, horizontalSeparator1);
 
-    env1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Copy, inTheme);
-    env1CopyButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kEnv1Copy,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*env1CopyButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1Attack,
+                                env1AttackLabel, env1AttackSlider, env1AttackAttachment, horizontalSeparator2);
 
-    env1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kEnv1Paste, inTheme);
-    env1PasteButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kEnv1Paste,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*env1PasteButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1Decay,
+                                env1DecayLabel, env1DecaySlider, env1DecayAttachment, horizontalSeparator3);
 
-    // Delay
-    env1DelayLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Delay));
-    addAndMakeVisible(*env1DelayLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1Sustain,
+                                env1SustainLabel, env1SustainSlider, env1SustainAttachment, horizontalSeparator4);
 
-    env1DelaySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1Delay, inTheme);
-    env1DelayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Delay,
-        *env1DelaySlider);
-    addAndMakeVisible(*env1DelaySlider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1Release,
+                                env1ReleaseLabel, env1ReleaseSlider, env1ReleaseAttachment, horizontalSeparator5);
 
-    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator1);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1Amplitude,
+                                env1AmplitudeLabel, env1AmplitudeSlider, env1AmplitudeAttachment, horizontalSeparator6);
 
-    // Attack
-    env1AttackLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Attack));
-    addAndMakeVisible(*env1AttackLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity,
+                                env1AmplitudeModByVelocityLabel, env1AmplitudeModByVelocitySlider, env1AmplitudeModByVelocityAttachment, horizontalSeparator7);
 
-    env1AttackSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1Attack, inTheme);
-    env1AttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Attack,
-        *env1AttackSlider);
-    addAndMakeVisible(*env1AttackSlider);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kEnv1TriggerMode,
+                                     env1TriggerModeLabel, env1TriggerModeComboBox, env1TriggerModeAttachment, horizontalSeparator8);
 
-    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator2);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kEnv1EnvelopeMode,
+                                     env1EnvelopeModeLabel, env1EnvelopeModeComboBox, env1EnvelopeModeAttachment, horizontalSeparator9);
 
-    // Decay
-    env1DecayLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Decay));
-    addAndMakeVisible(*env1DecayLabel);
-
-    env1DecaySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1Decay, inTheme);
-    env1DecayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Decay,
-        *env1DecaySlider);
-    addAndMakeVisible(*env1DecaySlider);
-
-    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator3);
-
-    // Sustain
-    env1SustainLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Sustain));
-    addAndMakeVisible(*env1SustainLabel);
-
-    env1SustainSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1Sustain, inTheme);
-    env1SustainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Sustain,
-        *env1SustainSlider);
-    addAndMakeVisible(*env1SustainSlider);
-
-    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator4);
-
-    // Release
-    env1ReleaseLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Release));
-    addAndMakeVisible(*env1ReleaseLabel);
-
-    env1ReleaseSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1Release, inTheme);
-    env1ReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Release,
-        *env1ReleaseSlider);
-    addAndMakeVisible(*env1ReleaseSlider);
-
-    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator5);
-
-    // Amplitude
-    env1AmplitudeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Amplitude));
-    addAndMakeVisible(*env1AmplitudeLabel);
-
-    env1AmplitudeSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1Amplitude, inTheme);
-    env1AmplitudeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Amplitude,
-        *env1AmplitudeSlider);
-    addAndMakeVisible(*env1AmplitudeSlider);
-
-    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator6);
-
-    // Amplitude Mod by Velocity
-    env1AmplitudeModByVelocityLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity));
-    addAndMakeVisible(*env1AmplitudeModByVelocityLabel);
-
-    env1AmplitudeModByVelocitySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity, inTheme);
-    env1AmplitudeModByVelocityAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity,
-        *env1AmplitudeModByVelocitySlider);
-    addAndMakeVisible(*env1AmplitudeModByVelocitySlider);
-
-    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator7);
-
-    // Trigger Mode
-    env1TriggerModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1TriggerMode));
-    addAndMakeVisible(*env1TriggerModeLabel);
-
-    env1TriggerModeComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kEnv1TriggerMode, inTheme);
-    env1TriggerModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1TriggerMode,
-        *env1TriggerModeComboBox);
-    addAndMakeVisible(*env1TriggerModeComboBox);
-
-    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator8);
-
-    // Envelope Mode
-    env1EnvelopeModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1EnvelopeMode));
-    addAndMakeVisible(*env1EnvelopeModeLabel);
-
-    env1EnvelopeModeComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kEnv1EnvelopeMode, inTheme);
-    env1EnvelopeModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1EnvelopeMode,
-        *env1EnvelopeModeComboBox);
-    addAndMakeVisible(*env1EnvelopeModeComboBox);
-
-    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator9);
-
-    // LFO 1 Trigger
-    env1Lfo1TriggerLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv1Lfo1Trigger));
-    addAndMakeVisible(*env1Lfo1TriggerLabel);
-
-    env1Lfo1TriggerComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kEnv1Lfo1Trigger, inTheme);
-    env1Lfo1TriggerAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kEnv1Lfo1Trigger,
-        *env1Lfo1TriggerComboBox);
-    addAndMakeVisible(*env1Lfo1TriggerComboBox);
-
-    horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator10);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kEnv1Lfo1Trigger,
+                                     env1Lfo1TriggerLabel, env1Lfo1TriggerComboBox, env1Lfo1TriggerAttachment, horizontalSeparator10);
 
     setSize(getWidth(), getHeight());
 }
@@ -488,4 +340,89 @@ void Env1Panel::setTheme(Theme& inTheme)
         separator->setTheme(inTheme);
 
     repaint();
+}
+
+void Env1Panel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+{
+    env1ModuleHeader = std::make_unique<tss::ModuleHeader>(
+        inTheme, 
+        widgetFactory.getGroupDisplayName(moduleId));
+    addAndMakeVisible(*env1ModuleHeader);
+}
+
+void Env1Panel::setupInitCopyPasteButtons(Theme& inTheme, WidgetFactory& widgetFactory,
+                                         const juce::String& initWidgetId, const juce::String& copyWidgetId, const juce::String& pasteWidgetId)
+{
+    env1InitButton = widgetFactory.createStandaloneButton(initWidgetId, inTheme);
+    env1InitButton->onClick = [this, initWidgetId]
+    {
+        apvts.state.setProperty(initWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*env1InitButton);
+
+    env1CopyButton = widgetFactory.createStandaloneButton(copyWidgetId, inTheme);
+    env1CopyButton->onClick = [this, copyWidgetId]
+    {
+        apvts.state.setProperty(copyWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*env1CopyButton);
+
+    env1PasteButton = widgetFactory.createStandaloneButton(pasteWidgetId, inTheme);
+    env1PasteButton->onClick = [this, pasteWidgetId]
+    {
+        apvts.state.setProperty(pasteWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*env1PasteButton);
+}
+
+void Env1Panel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                            const juce::String& parameterId,
+                                            std::unique_ptr<tss::Label>& label,
+                                            std::unique_ptr<tss::Slider>& slider,
+                                            std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                            std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        apvts,
+        parameterId,
+        *slider);
+    addAndMakeVisible(*slider);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
+}
+
+void Env1Panel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                 const juce::String& parameterId,
+                                                 std::unique_ptr<tss::Label>& label,
+                                                 std::unique_ptr<tss::ComboBox>& comboBox,
+                                                 std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                                 std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        parameterId,
+        *comboBox);
+    addAndMakeVisible(*comboBox);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
 }

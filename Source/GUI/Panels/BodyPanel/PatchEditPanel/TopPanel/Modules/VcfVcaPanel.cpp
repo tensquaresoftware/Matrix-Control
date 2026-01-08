@@ -16,181 +16,48 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    // Module Name
-    vcfVcaModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
-        widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kVcfVca));
-    addAndMakeVisible(*vcfVcaModuleHeader);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kVcfVca);
+    setupInitButton(inTheme, widgetFactory, SynthDescriptors::StandaloneWidgetIds::kVcfVcaInit);
 
-    // Standalone Widgets
-    vcfVcaInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kVcfVcaInit, inTheme);
-    vcfVcaInitButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kVcfVcaInit,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*vcfVcaInitButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVcfBalance,
+                                vcfBalanceLabel, vcfBalanceSlider, vcfBalanceAttachment, horizontalSeparator1);
 
-    // Balance
-    vcfBalanceLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfBalance));
-    addAndMakeVisible(*vcfBalanceLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVcfFequency,
+                                vcfFrequencyLabel, vcfFrequencySlider, vcfFrequencyAttachment, horizontalSeparator2);
 
-    vcfBalanceSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVcfBalance, inTheme);
-    vcfBalanceAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfBalance,
-        *vcfBalanceSlider);
-    addAndMakeVisible(*vcfBalanceSlider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVcfFrequencyModByEnv1,
+                                vcfFrequencyModByEnv1Label, vcfFrequencyModByEnv1Slider, vcfFrequencyModByEnv1Attachment, horizontalSeparator3);
 
-    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator1);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVcfFrequencyModByPressure,
+                                vcfFrequencyModByPressureLabel, vcfFrequencyModByPressureSlider, vcfFrequencyModByPressureAttachment, horizontalSeparator4);
 
-    // Frequency
-    vcfFrequencyLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfFequency));
-    addAndMakeVisible(*vcfFrequencyLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVcfResonance,
+                                vcfResonanceLabel, vcfResonanceSlider, vcfResonanceAttachment, horizontalSeparator5);
 
-    vcfFrequencySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVcfFequency, inTheme);
-    vcfFrequencyAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfFequency,
-        *vcfFrequencySlider);
-    addAndMakeVisible(*vcfFrequencySlider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVca1Volume,
+                                vca1VolumeLabel, vca1VolumeSlider, vca1VolumeAttachment, horizontalSeparator6);
 
-    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator2);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVca1ModByVelocity,
+                                vca1ModByVelocityLabel, vca1ModByVelocitySlider, vca1ModByVelocityAttachment, horizontalSeparator7);
 
-    // Frequency Mod by ENV 1
-    vcfFrequencyModByEnv1Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfFrequencyModByEnv1));
-    addAndMakeVisible(*vcfFrequencyModByEnv1Label);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVca2ModByEnv2,
+                                vca2ModByEnv2Label, vca2ModByEnv2Slider, vca2ModByEnv2Attachment, horizontalSeparator8);
 
-    vcfFrequencyModByEnv1Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVcfFrequencyModByEnv1, inTheme);
-    vcfFrequencyModByEnv1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfFrequencyModByEnv1,
-        *vcfFrequencyModByEnv1Slider);
-    addAndMakeVisible(*vcfFrequencyModByEnv1Slider);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kVcfLevers,
+                                     vcfLeversLabel, vcfLeversComboBox, vcfLeversAttachment, horizontalSeparator9);
 
-    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator3);
-
-    // Frequency Mod by Pressure
-    vcfFrequencyModByPressureLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfFrequencyModByPressure));
-    addAndMakeVisible(*vcfFrequencyModByPressureLabel);
-
-    vcfFrequencyModByPressureSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVcfFrequencyModByPressure, inTheme);
-    vcfFrequencyModByPressureAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfFrequencyModByPressure,
-        *vcfFrequencyModByPressureSlider);
-    addAndMakeVisible(*vcfFrequencyModByPressureSlider);
-
-    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator4);
-
-    // Resonance
-    vcfResonanceLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfResonance));
-    addAndMakeVisible(*vcfResonanceLabel);
-
-    vcfResonanceSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVcfResonance, inTheme);
-    vcfResonanceAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfResonance,
-        *vcfResonanceSlider);
-    addAndMakeVisible(*vcfResonanceSlider);
-
-    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator5);
-
-    // VCA 1 Volume
-    vca1VolumeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVca1Volume));
-    addAndMakeVisible(*vca1VolumeLabel);
-
-    vca1VolumeSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVca1Volume, inTheme);
-    vca1VolumeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVca1Volume,
-        *vca1VolumeSlider);
-    addAndMakeVisible(*vca1VolumeSlider);
-
-    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator6);
-
-    // VCA 1 Mod by Velocity
-    vca1ModByVelocityLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVca1ModByVelocity));
-    addAndMakeVisible(*vca1ModByVelocityLabel);
-
-    vca1ModByVelocitySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVca1ModByVelocity, inTheme);
-    vca1ModByVelocityAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVca1ModByVelocity,
-        *vca1ModByVelocitySlider);
-    addAndMakeVisible(*vca1ModByVelocitySlider);
-
-    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator7);
-
-    // VCA 2 Mod by ENV 2
-    vca2ModByEnv2Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVca2ModByEnv2));
-    addAndMakeVisible(*vca2ModByEnv2Label);
-
-    vca2ModByEnv2Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kVca2ModByEnv2, inTheme);
-    vca2ModByEnv2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVca2ModByEnv2,
-        *vca2ModByEnv2Slider);
-    addAndMakeVisible(*vca2ModByEnv2Slider);
-
-    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator8);
-
-    // Levers
-    vcfLeversLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfLevers));
-    addAndMakeVisible(*vcfLeversLabel);
-
-    vcfLeversComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kVcfLevers, inTheme);
-    vcfLeversAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfLevers,
-        *vcfLeversComboBox);
-    addAndMakeVisible(*vcfLeversComboBox);
-
-    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator9);
-
-    // Keyboard Portamento
-    vcfKeyboardPortamentoLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfKeyboardPortamento));
-    addAndMakeVisible(*vcfKeyboardPortamentoLabel);
-
-    vcfKeyboardPortamentoComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kVcfKeyboardPortamento, inTheme);
-    vcfKeyboardPortamentoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kVcfKeyboardPortamento,
-        *vcfKeyboardPortamentoComboBox);
-    addAndMakeVisible(*vcfKeyboardPortamentoComboBox);
-
-    horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator10);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kVcfKeyboardPortamento,
+                                     vcfKeyboardPortamentoLabel, vcfKeyboardPortamentoComboBox, vcfKeyboardPortamentoAttachment, horizontalSeparator10);
 
     setSize(getWidth(), getHeight());
 }
@@ -458,4 +325,70 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
         separator->setTheme(inTheme);
 
     repaint();
+}
+
+void VcfVcaPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+{
+    vcfVcaModuleHeader = std::make_unique<tss::ModuleHeader>(
+        inTheme, 
+        widgetFactory.getGroupDisplayName(moduleId));
+    addAndMakeVisible(*vcfVcaModuleHeader);
+}
+
+void VcfVcaPanel::setupInitButton(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& initWidgetId)
+{
+    vcfVcaInitButton = widgetFactory.createStandaloneButton(initWidgetId, inTheme);
+    vcfVcaInitButton->onClick = [this, initWidgetId]
+    {
+        apvts.state.setProperty(initWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*vcfVcaInitButton);
+}
+
+void VcfVcaPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                               const juce::String& parameterId,
+                                               std::unique_ptr<tss::Label>& label,
+                                               std::unique_ptr<tss::Slider>& slider,
+                                               std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                               std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        apvts,
+        parameterId,
+        *slider);
+    addAndMakeVisible(*slider);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
+}
+
+void VcfVcaPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                    const juce::String& parameterId,
+                                                    std::unique_ptr<tss::Label>& label,
+                                                    std::unique_ptr<tss::ComboBox>& comboBox,
+                                                    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                                    std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        parameterId,
+        *comboBox);
+    addAndMakeVisible(*comboBox);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
 }

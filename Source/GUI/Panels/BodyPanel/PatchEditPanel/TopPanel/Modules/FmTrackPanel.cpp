@@ -16,165 +16,44 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    // Module Name
-    fmTrackModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
-        widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kFmTrack) );
-    addAndMakeVisible(*fmTrackModuleHeader);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kFmTrack);
+    setupInitButton(inTheme, widgetFactory, SynthDescriptors::StandaloneWidgetIds::kFmTrackInit);
 
-    // Standalone Widgets
-    fmTrackInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kFmTrackInit, inTheme);
-    fmTrackInitButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kFmTrackInit,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*fmTrackInitButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kFmAmount,
+                                fmAmountLabel, fmAmountSlider, fmAmountAttachment, horizontalSeparator1);
 
-    // FM Amount
-    fmAmountLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kFmAmount));
-    addAndMakeVisible(*fmAmountLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kFmModByEnv3,
+                                fmModByEnv3Label, fmModByEnv3Slider, fmModByEnv3Attachment, horizontalSeparator2);
 
-    fmAmountSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kFmAmount, inTheme);
-    fmAmountAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kFmAmount,
-        *fmAmountSlider);
-    addAndMakeVisible(*fmAmountSlider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kFmModByPressure,
+                                fmModByPressureLabel, fmModByPressureSlider, fmModByPressureAttachment, horizontalSeparator3);
 
-    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator1);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kTrackPoint1,
+                                trackPoint1Label, trackPoint1Slider, trackPoint1Attachment, horizontalSeparator4);
 
-    // FM Mod by ENV 3
-    fmModByEnv3Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kFmModByEnv3));
-    addAndMakeVisible(*fmModByEnv3Label);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kTrackPoint2,
+                                trackPoint2Label, trackPoint2Slider, trackPoint2Attachment, horizontalSeparator5);
 
-    fmModByEnv3Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kFmModByEnv3, inTheme);
-    fmModByEnv3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kFmModByEnv3,
-        *fmModByEnv3Slider);
-    addAndMakeVisible(*fmModByEnv3Slider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kTrackPoint3,
+                                trackPoint3Label, trackPoint3Slider, trackPoint3Attachment, horizontalSeparator6);
 
-    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator2);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kTrackPoint4,
+                                trackPoint4Label, trackPoint4Slider, trackPoint4Attachment, horizontalSeparator7);
 
-    // FM Mod by Pressure
-    fmModByPressureLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kFmModByPressure));
-    addAndMakeVisible(*fmModByPressureLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kTrackPoint5,
+                                trackPoint5Label, trackPoint5Slider, trackPoint5Attachment, horizontalSeparator8);
 
-    fmModByPressureSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kFmModByPressure, inTheme);
-    fmModByPressureAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kFmModByPressure,
-        *fmModByPressureSlider);
-    addAndMakeVisible(*fmModByPressureSlider);
-
-    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator3);
-
-    // Track Point 1
-    trackPoint1Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint1));
-    addAndMakeVisible(*trackPoint1Label);
-
-    trackPoint1Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kTrackPoint1, inTheme);
-    trackPoint1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kTrackPoint1,
-        *trackPoint1Slider);
-    addAndMakeVisible(*trackPoint1Slider);
-
-    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator4);
-
-    // Track Point 2
-    trackPoint2Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint2));
-    addAndMakeVisible(*trackPoint2Label);
-
-    trackPoint2Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kTrackPoint2, inTheme);
-    trackPoint2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kTrackPoint2,
-        *trackPoint2Slider);
-    addAndMakeVisible(*trackPoint2Slider);
-
-    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator5);
-
-    // Track Point 3
-    trackPoint3Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint3));
-    addAndMakeVisible(*trackPoint3Label);
-
-    trackPoint3Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kTrackPoint3, inTheme);
-    trackPoint3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kTrackPoint3,
-        *trackPoint3Slider);
-    addAndMakeVisible(*trackPoint3Slider);
-
-    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator6);
-
-    // Track Point 4
-    trackPoint4Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint4));
-    addAndMakeVisible(*trackPoint4Label);
-
-    trackPoint4Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kTrackPoint4, inTheme);
-    trackPoint4Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kTrackPoint4,
-        *trackPoint4Slider);
-    addAndMakeVisible(*trackPoint4Slider);
-
-    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator7);
-
-    // Track Point 5
-    trackPoint5Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint5));
-    addAndMakeVisible(*trackPoint5Label);
-
-    trackPoint5Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kTrackPoint5, inTheme);
-    trackPoint5Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kTrackPoint5,
-        *trackPoint5Slider);
-    addAndMakeVisible(*trackPoint5Slider);
-
-    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator8);
-
-    // Track Input
-    trackInputLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackInput));
-    addAndMakeVisible(*trackInputLabel);
-
-    trackInputComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kTrackInput, inTheme);
-    trackInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kTrackInput,
-        *trackInputComboBox);
-    addAndMakeVisible(*trackInputComboBox);
-
-    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator9);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kTrackInput,
+                                     trackInputLabel, trackInputComboBox, trackInputAttachment, horizontalSeparator9);
 
     horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
     addAndMakeVisible(*horizontalSeparator10);
@@ -433,4 +312,70 @@ void FmTrackPanel::setTheme(Theme& inTheme)
         separator->setTheme(inTheme);
 
     repaint();
+}
+
+void FmTrackPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+{
+    fmTrackModuleHeader = std::make_unique<tss::ModuleHeader>(
+        inTheme, 
+        widgetFactory.getGroupDisplayName(moduleId));
+    addAndMakeVisible(*fmTrackModuleHeader);
+}
+
+void FmTrackPanel::setupInitButton(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& initWidgetId)
+{
+    fmTrackInitButton = widgetFactory.createStandaloneButton(initWidgetId, inTheme);
+    fmTrackInitButton->onClick = [this, initWidgetId]
+    {
+        apvts.state.setProperty(initWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*fmTrackInitButton);
+}
+
+void FmTrackPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                const juce::String& parameterId,
+                                                std::unique_ptr<tss::Label>& label,
+                                                std::unique_ptr<tss::Slider>& slider,
+                                                std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                                std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        apvts,
+        parameterId,
+        *slider);
+    addAndMakeVisible(*slider);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
+}
+
+void FmTrackPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                     const juce::String& parameterId,
+                                                     std::unique_ptr<tss::Label>& label,
+                                                     std::unique_ptr<tss::ComboBox>& comboBox,
+                                                     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                                     std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        parameterId,
+        *comboBox);
+    addAndMakeVisible(*comboBox);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
 }

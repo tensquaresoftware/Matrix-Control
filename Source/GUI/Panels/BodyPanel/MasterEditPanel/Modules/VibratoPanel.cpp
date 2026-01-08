@@ -1,4 +1,4 @@
-#include "MiscPanel.h"
+#include "VibratoPanel.h"
 
 #include "../../../../Themes/Theme.h"
 #include "../../../../Widgets/ModuleHeader.h"
@@ -11,53 +11,51 @@
 
 using tss::Theme;
 
-MiscPanel::MiscPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts)
+VibratoPanel::VibratoPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts)
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kMisc);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kVibrato);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMasterTune,
-                                masterTuneLabel, masterTuneSlider, masterTuneAttachment, horizontalSeparator1);
+                                SynthDescriptors::ParameterIds::kVibratoSpeed,
+                                vibratoSpeedLabel, vibratoSpeedSlider, vibratoSpeedAttachment, horizontalSeparator1);
+
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kVibratoWaveform,
+                                     vibratoWaveformLabel, vibratoWaveformComboBox, vibratoWaveformAttachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMasterTranspose,
-                                masterTransposeLabel, masterTransposeSlider, masterTransposeAttachment, horizontalSeparator2);
-    masterTransposeSlider->setUnit("st");
+                                SynthDescriptors::ParameterIds::kVibratoAmplitude,
+                                vibratoAmplitudeLabel, vibratoAmplitudeSlider, vibratoAmplitudeAttachment, horizontalSeparator3);
+
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kVibratoSpeedModSource,
+                                     vibratoSpeedModSourceLabel, vibratoSpeedModSourceComboBox, vibratoSpeedModSourceAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kBendRange,
-                                bendRangeLabel, bendRangeSlider, bendRangeAttachment, horizontalSeparator3);
-    bendRangeSlider->setUnit("st");
+                                SynthDescriptors::ParameterIds::kVibratoSpeedModAmount,
+                                vibratoSpeedModAmountLabel, vibratoSpeedModAmountSlider, vibratoSpeedModAmountAttachment, horizontalSeparator5);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kUnisonEnable,
-                                     unisonEnableLabel, unisonEnableComboBox, unisonEnableAttachment, horizontalSeparator4);
+                                     SynthDescriptors::ParameterIds::kVibratoAmpModSource,
+                                     vibratoAmpModSourceLabel, vibratoAmpModSourceComboBox, vibratoAmpModSourceAttachment, horizontalSeparator6);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVolumeInvertEnable,
-                                     volumeInvertEnableLabel, volumeInvertEnableComboBox, volumeInvertEnableAttachment, horizontalSeparator5);
-
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kBankLockEnable,
-                                     bankLockEnableLabel, bankLockEnableComboBox, bankLockEnableAttachment, horizontalSeparator6);
-
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMemoryProtectEnable,
-                                     memoryProtectEnableLabel, memoryProtectEnableComboBox, memoryProtectEnableAttachment, horizontalSeparator7);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kVibratoAmpModAmount,
+                                vibratoAmpModAmountLabel, vibratoAmpModAmountSlider, vibratoAmpModAmountAttachment, horizontalSeparator7);
 
     setSize(getWidth(), getHeight());
 }
 
-MiscPanel::~MiscPanel() = default;
+VibratoPanel::~VibratoPanel() = default;
 
-void MiscPanel::paint(juce::Graphics& g)
+void VibratoPanel::paint(juce::Graphics& g)
 {
     g.fillAll(theme->getMasterEditPanelBackgroundColour());
 }
 
-void MiscPanel::resized()
+void VibratoPanel::resized()
 {
     const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
     const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::MasterEdit);
@@ -72,15 +70,15 @@ void MiscPanel::resized()
 
     int y = 0;
 
-    if (auto* header = miscModuleHeader.get())
+    if (auto* header = vibratoModuleHeader.get())
         header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
     y += moduleHeaderHeight;
 
-    if (auto* label = masterTuneLabel.get())
+    if (auto* label = vibratoSpeedLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = masterTuneSlider.get())
+    if (auto* slider = vibratoSpeedSlider.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
@@ -90,11 +88,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = masterTransposeLabel.get())
+    if (auto* label = vibratoWaveformLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = masterTransposeSlider.get())
-        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
+    if (auto* comboBox = vibratoWaveformComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
@@ -103,10 +101,10 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = bendRangeLabel.get())
+    if (auto* label = vibratoAmplitudeLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = bendRangeSlider.get())
+    if (auto* slider = vibratoAmplitudeSlider.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
@@ -116,10 +114,10 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = unisonEnableLabel.get())
+    if (auto* label = vibratoSpeedModSourceLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = unisonEnableComboBox.get())
+    if (auto* comboBox = vibratoSpeedModSourceComboBox.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
@@ -129,11 +127,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = volumeInvertEnableLabel.get())
+    if (auto* label = vibratoSpeedModAmountLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = volumeInvertEnableComboBox.get())
-        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
+    if (auto* slider = vibratoSpeedModAmountSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
@@ -142,10 +140,10 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = bankLockEnableLabel.get())
+    if (auto* label = vibratoAmpModSourceLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = bankLockEnableComboBox.get())
+    if (auto* comboBox = vibratoAmpModSourceComboBox.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
@@ -155,11 +153,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = memoryProtectEnableLabel.get())
+    if (auto* label = vibratoAmpModAmountLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = memoryProtectEnableComboBox.get())
-        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
+    if (auto* slider = vibratoAmpModAmountSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
@@ -167,72 +165,72 @@ void MiscPanel::resized()
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
-void MiscPanel::setTheme(Theme& inTheme)
+void VibratoPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (auto* header = miscModuleHeader.get())
+    if (auto* header = vibratoModuleHeader.get())
         header->setTheme(inTheme);
 
-    if (auto* label = masterTuneLabel.get())
+    if (auto* label = vibratoSpeedLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* slider = masterTuneSlider.get())
+    if (auto* slider = vibratoSpeedSlider.get())
         slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator1.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = masterTransposeLabel.get())
+    if (auto* label = vibratoWaveformLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* slider = masterTransposeSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* comboBox = vibratoWaveformComboBox.get())
+        comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator2.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = bendRangeLabel.get())
+    if (auto* label = vibratoAmplitudeLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* slider = bendRangeSlider.get())
+    if (auto* slider = vibratoAmplitudeSlider.get())
         slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator3.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = unisonEnableLabel.get())
+    if (auto* label = vibratoSpeedModSourceLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = unisonEnableComboBox.get())
+    if (auto* comboBox = vibratoSpeedModSourceComboBox.get())
         comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator4.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = volumeInvertEnableLabel.get())
+    if (auto* label = vibratoSpeedModAmountLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = volumeInvertEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* slider = vibratoSpeedModAmountSlider.get())
+        slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator5.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = bankLockEnableLabel.get())
+    if (auto* label = vibratoAmpModSourceLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = bankLockEnableComboBox.get())
+    if (auto* comboBox = vibratoAmpModSourceComboBox.get())
         comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator6.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = memoryProtectEnableLabel.get())
+    if (auto* label = vibratoAmpModAmountLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = memoryProtectEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* slider = vibratoAmpModAmountSlider.get())
+        slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator7.get())
         separator->setTheme(inTheme);
@@ -240,22 +238,22 @@ void MiscPanel::setTheme(Theme& inTheme)
     repaint();
 }
 
-void MiscPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void VibratoPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
-    miscModuleHeader = std::make_unique<tss::ModuleHeader>(
+    vibratoModuleHeader = std::make_unique<tss::ModuleHeader>(
         inTheme, 
         widgetFactory.getGroupDisplayName(moduleId),
         tss::ModuleHeader::ModuleWidth::MasterEdit,
         tss::ModuleHeader::ColourVariant::Orange);
-    addAndMakeVisible(*miscModuleHeader);
+    addAndMakeVisible(*vibratoModuleHeader);
 }
 
-void MiscPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
-                                           const juce::String& parameterId,
-                                           std::unique_ptr<tss::Label>& label,
-                                           std::unique_ptr<tss::Slider>& slider,
-                                           std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
-                                           std::unique_ptr<tss::HorizontalSeparator>& separator)
+void VibratoPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                              const juce::String& parameterId,
+                                              std::unique_ptr<tss::Label>& label,
+                                              std::unique_ptr<tss::Slider>& slider,
+                                              std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                              std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
         inTheme, tss::Label::LabelWidth::MasterEditModule, 
@@ -273,12 +271,12 @@ void MiscPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widge
     addAndMakeVisible(*separator);
 }
 
-void MiscPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
-                                                 const juce::String& parameterId,
-                                                 std::unique_ptr<tss::Label>& label,
-                                                 std::unique_ptr<tss::ComboBox>& comboBox,
-                                                 std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
-                                                 std::unique_ptr<tss::HorizontalSeparator>& separator)
+void VibratoPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                    const juce::String& parameterId,
+                                                    std::unique_ptr<tss::Label>& label,
+                                                    std::unique_ptr<tss::ComboBox>& comboBox,
+                                                    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                                    std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
         inTheme, tss::Label::LabelWidth::MasterEditModule, 

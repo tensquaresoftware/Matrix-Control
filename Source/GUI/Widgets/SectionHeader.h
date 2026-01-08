@@ -23,7 +23,7 @@ namespace tss
             Orange
         };
 
-        explicit SectionHeader(Theme& inTheme, SectionWidth width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(Theme& inTheme, SectionWidth width, const juce::String& inText = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
         void setTheme(Theme& inTheme);

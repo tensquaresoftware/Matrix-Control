@@ -17,11 +17,11 @@ namespace tss
 
 class WidgetFactory;
 
-class MiscPanel : public juce::Component
+class VibratoPanel : public juce::Component
 {
 public:
-    MiscPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
-    ~MiscPanel() override;
+    VibratoPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
+    ~VibratoPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
@@ -32,33 +32,33 @@ public:
 
 private:
     inline constexpr static int kWidth = 160;
-    inline constexpr static int kHeight = 205;
+    inline constexpr static int kHeight = 220;
     
     tss::Theme* theme;
     juce::AudioProcessorValueTreeState& apvts;
 
     // Module Name
-    std::unique_ptr<tss::ModuleHeader> miscModuleHeader;
+    std::unique_ptr<tss::ModuleHeader> vibratoModuleHeader;
 
     // Labels
-    std::unique_ptr<tss::Label> masterTuneLabel;
-    std::unique_ptr<tss::Label> masterTransposeLabel;
-    std::unique_ptr<tss::Label> bendRangeLabel;
-    std::unique_ptr<tss::Label> unisonEnableLabel;
-    std::unique_ptr<tss::Label> volumeInvertEnableLabel;
-    std::unique_ptr<tss::Label> bankLockEnableLabel;
-    std::unique_ptr<tss::Label> memoryProtectEnableLabel;
+    std::unique_ptr<tss::Label> vibratoSpeedLabel;
+    std::unique_ptr<tss::Label> vibratoSpeedModSourceLabel;
+    std::unique_ptr<tss::Label> vibratoSpeedModAmountLabel;
+    std::unique_ptr<tss::Label> vibratoWaveformLabel;
+    std::unique_ptr<tss::Label> vibratoAmplitudeLabel;
+    std::unique_ptr<tss::Label> vibratoAmpModSourceLabel;
+    std::unique_ptr<tss::Label> vibratoAmpModAmountLabel;
 
     // Sliders
-    std::unique_ptr<tss::Slider> masterTuneSlider;
-    std::unique_ptr<tss::Slider> masterTransposeSlider;
-    std::unique_ptr<tss::Slider> bendRangeSlider;
+    std::unique_ptr<tss::Slider> vibratoSpeedSlider;
+    std::unique_ptr<tss::Slider> vibratoSpeedModAmountSlider;
+    std::unique_ptr<tss::Slider> vibratoAmplitudeSlider;
+    std::unique_ptr<tss::Slider> vibratoAmpModAmountSlider;
 
     // Combo Boxes
-    std::unique_ptr<tss::ComboBox> unisonEnableComboBox;
-    std::unique_ptr<tss::ComboBox> volumeInvertEnableComboBox;
-    std::unique_ptr<tss::ComboBox> bankLockEnableComboBox;
-    std::unique_ptr<tss::ComboBox> memoryProtectEnableComboBox;
+    std::unique_ptr<tss::ComboBox> vibratoSpeedModSourceComboBox;
+    std::unique_ptr<tss::ComboBox> vibratoWaveformComboBox;
+    std::unique_ptr<tss::ComboBox> vibratoAmpModSourceComboBox;
 
     // Separators
     std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
@@ -70,13 +70,13 @@ private:
     std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
 
     // Attachments
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterTuneAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterTransposeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bendRangeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> unisonEnableAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> volumeInvertEnableAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> bankLockEnableAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> memoryProtectEnableAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoSpeedAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoSpeedModSourceAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoSpeedModAmountAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoWaveformAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoAmplitudeAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoAmpModSourceAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoAmpModAmountAttachment;
 
     void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
@@ -92,5 +92,5 @@ private:
                                           std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
                                           std::unique_ptr<tss::HorizontalSeparator>& separator);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MiscPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VibratoPanel)
 };

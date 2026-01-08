@@ -16,165 +16,44 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    // Module Name
-    rampPortamentoModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
-        widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kRampPortamento));
-    addAndMakeVisible(*rampPortamentoModuleHeader);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kRampPortamento);
+    setupInitButton(inTheme, widgetFactory, SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit);
 
-    // Standalone Widgets
-    rampPortamentoInitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit, inTheme);
-    rampPortamentoInitButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*rampPortamentoInitButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kRamp1Rate,
+                                ramp1RateLabel, ramp1RateSlider, ramp1RateAttachment, horizontalSeparator1);
 
-    // Ramp 1 Rate
-    ramp1RateLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp1Rate));
-    addAndMakeVisible(*ramp1RateLabel);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kRamp1Trigger,
+                                     ramp1TriggerLabel, ramp1TriggerComboBox, ramp1TriggerAttachment, horizontalSeparator2);
 
-    ramp1RateSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kRamp1Rate, inTheme);
-    ramp1RateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kRamp1Rate,
-        *ramp1RateSlider);
-    addAndMakeVisible(*ramp1RateSlider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kRamp2Rate,
+                                ramp2RateLabel, ramp2RateSlider, ramp2RateAttachment, horizontalSeparator3);
 
-    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator1);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kRamp2Trigger,
+                                     ramp2TriggerLabel, ramp2TriggerComboBox, ramp2TriggerAttachment, horizontalSeparator4);
 
-    // Ramp 1 Trigger
-    ramp1TriggerLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp1Trigger));
-    addAndMakeVisible(*ramp1TriggerLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kPortamentoRate,
+                                portamentoRateLabel, portamentoRateSlider, portamentoRateAttachment, horizontalSeparator5);
 
-    ramp1TriggerComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kRamp1Trigger, inTheme);
-    ramp1TriggerAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kRamp1Trigger,
-        *ramp1TriggerComboBox);
-    addAndMakeVisible(*ramp1TriggerComboBox);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kPortamentoModByVelocity,
+                                portamentoModByVelocityLabel, portamentoModByVelocitySlider, portamentoModByVelocityAttachment, horizontalSeparator6);
 
-    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator2);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kPortamentoMode,
+                                     portamentoModeLabel, portamentoModeComboBox, portamentoModeAttachment, horizontalSeparator7);
 
-    // Ramp 2 Rate
-    ramp2RateLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp2Rate));
-    addAndMakeVisible(*ramp2RateLabel);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kPortamentoLegato,
+                                     portamentoLegatoLabel, portamentoLegatoComboBox, portamentoLegatoAttachment, horizontalSeparator8);
 
-    ramp2RateSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kRamp2Rate, inTheme);
-    ramp2RateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kRamp2Rate,
-        *ramp2RateSlider);
-    addAndMakeVisible(*ramp2RateSlider);
-
-    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator3);
-
-    // Ramp 2 Trigger
-    ramp2TriggerLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kRamp2Trigger));
-    addAndMakeVisible(*ramp2TriggerLabel);
-
-    ramp2TriggerComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kRamp2Trigger, inTheme);
-    ramp2TriggerAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kRamp2Trigger,
-        *ramp2TriggerComboBox);
-    addAndMakeVisible(*ramp2TriggerComboBox);
-
-    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator4);
-
-    // Portamento Rate
-    portamentoRateLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoRate));
-    addAndMakeVisible(*portamentoRateLabel);
-
-    portamentoRateSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kPortamentoRate, inTheme);
-    portamentoRateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kPortamentoRate,
-        *portamentoRateSlider);
-    addAndMakeVisible(*portamentoRateSlider);
-
-    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator5);
-
-    // Portamento Mod by Velocity
-    portamentoModByVelocityLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoModByVelocity));
-    addAndMakeVisible(*portamentoModByVelocityLabel);
-
-    portamentoModByVelocitySlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kPortamentoModByVelocity, inTheme);
-    portamentoModByVelocityAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kPortamentoModByVelocity,
-        *portamentoModByVelocitySlider);
-    addAndMakeVisible(*portamentoModByVelocitySlider);
-
-    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator6);
-
-    // Portamento Mode
-    portamentoModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoMode));
-    addAndMakeVisible(*portamentoModeLabel);
-
-    portamentoModeComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kPortamentoMode, inTheme);
-    portamentoModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kPortamentoMode,
-        *portamentoModeComboBox);
-    addAndMakeVisible(*portamentoModeComboBox);
-
-    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator7);
-
-    // Portamento Legato
-    portamentoLegatoLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoLegato));
-    addAndMakeVisible(*portamentoLegatoLabel);
-
-    portamentoLegatoComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kPortamentoLegato, inTheme);
-    portamentoLegatoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kPortamentoLegato,
-        *portamentoLegatoComboBox);
-    addAndMakeVisible(*portamentoLegatoComboBox);
-
-    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator8);
-
-    // Portamento Keyboard Mode
-    portamentoKeyboardModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kPortamentoKeyboardMode));
-    addAndMakeVisible(*portamentoKeyboardModeLabel);
-
-    portamentoKeyboardModeComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kPortamentoKeyboardMode, inTheme);
-    portamentoKeyboardModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kPortamentoKeyboardMode,
-        *portamentoKeyboardModeComboBox);
-    addAndMakeVisible(*portamentoKeyboardModeComboBox);
-
-    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator9);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kPortamentoKeyboardMode,
+                                     portamentoKeyboardModeLabel, portamentoKeyboardModeComboBox, portamentoKeyboardModeAttachment, horizontalSeparator9);
 
     horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
     addAndMakeVisible(*horizontalSeparator10);
@@ -433,4 +312,70 @@ void RampPortamentoPanel::setTheme(Theme& inTheme)
         separator->setTheme(inTheme);
 
     repaint();
+}
+
+void RampPortamentoPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+{
+    rampPortamentoModuleHeader = std::make_unique<tss::ModuleHeader>(
+        inTheme, 
+        widgetFactory.getGroupDisplayName(moduleId));
+    addAndMakeVisible(*rampPortamentoModuleHeader);
+}
+
+void RampPortamentoPanel::setupInitButton(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& initWidgetId)
+{
+    rampPortamentoInitButton = widgetFactory.createStandaloneButton(initWidgetId, inTheme);
+    rampPortamentoInitButton->onClick = [this, initWidgetId]
+    {
+        apvts.state.setProperty(initWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*rampPortamentoInitButton);
+}
+
+void RampPortamentoPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                       const juce::String& parameterId,
+                                                       std::unique_ptr<tss::Label>& label,
+                                                       std::unique_ptr<tss::Slider>& slider,
+                                                       std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                                       std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        apvts,
+        parameterId,
+        *slider);
+    addAndMakeVisible(*slider);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
+}
+
+void RampPortamentoPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                            const juce::String& parameterId,
+                                                            std::unique_ptr<tss::Label>& label,
+                                                            std::unique_ptr<tss::ComboBox>& comboBox,
+                                                            std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                                            std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        parameterId,
+        *comboBox);
+    addAndMakeVisible(*comboBox);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
 }

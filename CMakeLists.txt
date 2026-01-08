@@ -68,6 +68,9 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/HeaderPanel/HeaderPanel.cpp
     Source/GUI/Panels/BodyPanel/BodyPanel.cpp
     Source/GUI/Panels/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
+    Source/GUI/Panels/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
+    Source/GUI/Panels/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
+    Source/GUI/Panels/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
     Source/GUI/Panels/BodyPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
     Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/BottomPanel.cpp
     Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env1Panel.cpp

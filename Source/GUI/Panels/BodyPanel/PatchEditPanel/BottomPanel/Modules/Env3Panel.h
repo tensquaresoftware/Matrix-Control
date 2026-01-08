@@ -96,5 +96,21 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> env3EnvelopeModeAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> env3Lfo1TriggerAttachment;
 
+    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupInitCopyPasteButtons(tss::Theme& inTheme, WidgetFactory& widgetFactory, 
+                                   const juce::String& initWidgetId, const juce::String& copyWidgetId, const juce::String& pasteWidgetId);
+    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+                                     const juce::String& parameterId,
+                                     std::unique_ptr<tss::Label>& label,
+                                     std::unique_ptr<tss::Slider>& slider,
+                                     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                     std::unique_ptr<tss::HorizontalSeparator>& separator);
+    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+                                          const juce::String& parameterId,
+                                          std::unique_ptr<tss::Label>& label,
+                                          std::unique_ptr<tss::ComboBox>& comboBox,
+                                          std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                          std::unique_ptr<tss::HorizontalSeparator>& separator);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Env3Panel)
 };

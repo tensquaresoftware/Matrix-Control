@@ -16,183 +16,47 @@ Lfo1Panel::Lfo1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    // Module Name
-    lfo1ModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
-        widgetFactory.getGroupDisplayName(SynthDescriptors::ModuleIds::kLfo1));
-    addAndMakeVisible(*lfo1ModuleHeader);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kLfo1);
+    setupInitCopyPasteButtons(inTheme, widgetFactory,
+                              SynthDescriptors::StandaloneWidgetIds::kLfo1Init,
+                              SynthDescriptors::StandaloneWidgetIds::kLfo1Copy,
+                              SynthDescriptors::StandaloneWidgetIds::kLfo1Paste);
 
-    // Standalone Widgets
-    lfo1InitButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kLfo1Init, inTheme);
-    lfo1InitButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kLfo1Init,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*lfo1InitButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kLfo1Speed,
+                                lfo1SpeedLabel, lfo1SpeedSlider, lfo1SpeedAttachment, horizontalSeparator1);
 
-    lfo1CopyButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kLfo1Copy, inTheme);
-    lfo1CopyButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kLfo1Copy,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*lfo1CopyButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kLfo1SpeedModByPressure,
+                                lfo1SpeedModByPressureLabel, lfo1SpeedModByPressureSlider, lfo1SpeedModByPressureAttachment, horizontalSeparator2);
 
-    lfo1PasteButton = widgetFactory.createStandaloneButton(SynthDescriptors::StandaloneWidgetIds::kLfo1Paste, inTheme);
-    lfo1PasteButton->onClick = [this]
-    {
-        apvts.state.setProperty(SynthDescriptors::StandaloneWidgetIds::kLfo1Paste,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*lfo1PasteButton);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kLfo1RetriggerPoint,
+                                lfo1RetriggerPointLabel, lfo1RetriggerPointSlider, lfo1RetriggerPointAttachment, horizontalSeparator3);
 
-    // Speed
-    lfo1SpeedLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Speed));
-    addAndMakeVisible(*lfo1SpeedLabel);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kLfo1Amplitude,
+                                lfo1AmplitudeLabel, lfo1AmplitudeSlider, lfo1AmplitudeAttachment, horizontalSeparator4);
 
-    lfo1SpeedSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kLfo1Speed, inTheme);
-    lfo1SpeedAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1Speed,
-        *lfo1SpeedSlider);
-    addAndMakeVisible(*lfo1SpeedSlider);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1,
+                                lfo1AmplitudeModByRamp1Label, lfo1AmplitudeModByRamp1Slider, lfo1AmplitudeModByRamp1Attachment, horizontalSeparator5);
 
-    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator1);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kLfo1Waveform,
+                                     lfo1WaveformLabel, lfo1WaveformComboBox, lfo1WaveformAttachment, horizontalSeparator6);
 
-    // SpeedModByPressure
-    lfo1SpeedModByPressureLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1SpeedModByPressure));
-    addAndMakeVisible(*lfo1SpeedModByPressureLabel);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kLfo1TriggerMode,
+                                     lfo1TriggerModeLabel, lfo1TriggerModeComboBox, lfo1TriggerModeAttachment, horizontalSeparator7);
 
-    lfo1SpeedModByPressureSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kLfo1SpeedModByPressure, inTheme);
-    lfo1SpeedModByPressureAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1SpeedModByPressure,
-        *lfo1SpeedModByPressureSlider);
-    addAndMakeVisible(*lfo1SpeedModByPressureSlider);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kLfo1Lag,
+                                     lfo1LagLabel, lfo1LagComboBox, lfo1LagAttachment, horizontalSeparator8);
 
-    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator2);
-
-    // RetriggerPoint
-    lfo1RetriggerPointLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1RetriggerPoint));
-    addAndMakeVisible(*lfo1RetriggerPointLabel);
-
-    lfo1RetriggerPointSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kLfo1RetriggerPoint, inTheme);
-    lfo1RetriggerPointAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1RetriggerPoint,
-        *lfo1RetriggerPointSlider);
-    addAndMakeVisible(*lfo1RetriggerPointSlider);
-
-    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator3);
-
-    // Amplitude
-    lfo1AmplitudeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Amplitude));
-    addAndMakeVisible(*lfo1AmplitudeLabel);
-
-    lfo1AmplitudeSlider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kLfo1Amplitude, inTheme);
-    lfo1AmplitudeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1Amplitude,
-        *lfo1AmplitudeSlider);
-    addAndMakeVisible(*lfo1AmplitudeSlider);
-
-    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator4);
-
-    // Amplitude Mod by Ramp 1
-    lfo1AmplitudeModByRamp1Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1));
-    addAndMakeVisible(*lfo1AmplitudeModByRamp1Label);
-
-    lfo1AmplitudeModByRamp1Slider = widgetFactory.createIntParameterSlider(SynthDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1, inTheme);
-    lfo1AmplitudeModByRamp1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1,
-        *lfo1AmplitudeModByRamp1Slider);
-    addAndMakeVisible(*lfo1AmplitudeModByRamp1Slider);
-
-    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator5);
-
-    // Waveform
-    lfo1WaveformLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Waveform));
-    addAndMakeVisible(*lfo1WaveformLabel);
-
-    lfo1WaveformComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kLfo1Waveform, inTheme);
-    lfo1WaveformAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1Waveform,
-        *lfo1WaveformComboBox);
-    addAndMakeVisible(*lfo1WaveformComboBox);
-
-    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator6);
-
-    // Trigger Mode
-    lfo1TriggerModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1TriggerMode));
-    addAndMakeVisible(*lfo1TriggerModeLabel);
-
-    lfo1TriggerModeComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kLfo1TriggerMode, inTheme);
-    lfo1TriggerModeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1TriggerMode,
-        *lfo1TriggerModeComboBox);
-    addAndMakeVisible(*lfo1TriggerModeComboBox);
-
-    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator7);
-
-    // Lag
-    lfo1LagLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1Lag));
-    addAndMakeVisible(*lfo1LagLabel);
-
-    lfo1LagComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kLfo1Lag, inTheme);
-    lfo1LagAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1Lag,
-        *lfo1LagComboBox);
-    addAndMakeVisible(*lfo1LagComboBox);
-
-    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator8);
-
-    // Sample Input
-    lfo1SampleInputLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::PatchEditModule, 
-        widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kLfo1SampleInput));
-    addAndMakeVisible(*lfo1SampleInputLabel);
-
-    lfo1SampleInputComboBox = widgetFactory.createChoiceParameterComboBox(SynthDescriptors::ParameterIds::kLfo1SampleInput, inTheme);
-    lfo1SampleInputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
-        SynthDescriptors::ParameterIds::kLfo1SampleInput,
-        *lfo1SampleInputComboBox);
-    addAndMakeVisible(*lfo1SampleInputComboBox);
-
-    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
-    addAndMakeVisible(*horizontalSeparator9);
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kLfo1SampleInput,
+                                     lfo1SampleInputLabel, lfo1SampleInputComboBox, lfo1SampleInputAttachment, horizontalSeparator9);
 
     horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
     addAndMakeVisible(*horizontalSeparator10);
@@ -464,4 +328,89 @@ void Lfo1Panel::setTheme(Theme& inTheme)
         separator->setTheme(inTheme);
 
     repaint();
+}
+
+void Lfo1Panel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+{
+    lfo1ModuleHeader = std::make_unique<tss::ModuleHeader>(
+        inTheme, 
+        widgetFactory.getGroupDisplayName(moduleId));
+    addAndMakeVisible(*lfo1ModuleHeader);
+}
+
+void Lfo1Panel::setupInitCopyPasteButtons(Theme& inTheme, WidgetFactory& widgetFactory,
+                                         const juce::String& initWidgetId, const juce::String& copyWidgetId, const juce::String& pasteWidgetId)
+{
+    lfo1InitButton = widgetFactory.createStandaloneButton(initWidgetId, inTheme);
+    lfo1InitButton->onClick = [this, initWidgetId]
+    {
+        apvts.state.setProperty(initWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*lfo1InitButton);
+
+    lfo1CopyButton = widgetFactory.createStandaloneButton(copyWidgetId, inTheme);
+    lfo1CopyButton->onClick = [this, copyWidgetId]
+    {
+        apvts.state.setProperty(copyWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*lfo1CopyButton);
+
+    lfo1PasteButton = widgetFactory.createStandaloneButton(pasteWidgetId, inTheme);
+    lfo1PasteButton->onClick = [this, pasteWidgetId]
+    {
+        apvts.state.setProperty(pasteWidgetId,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
+    addAndMakeVisible(*lfo1PasteButton);
+}
+
+void Lfo1Panel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                            const juce::String& parameterId,
+                                            std::unique_ptr<tss::Label>& label,
+                                            std::unique_ptr<tss::Slider>& slider,
+                                            std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                            std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        apvts,
+        parameterId,
+        *slider);
+    addAndMakeVisible(*slider);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
+}
+
+void Lfo1Panel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+                                                 const juce::String& parameterId,
+                                                 std::unique_ptr<tss::Label>& label,
+                                                 std::unique_ptr<tss::ComboBox>& comboBox,
+                                                 std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                                 std::unique_ptr<tss::HorizontalSeparator>& separator)
+{
+    label = std::make_unique<tss::Label>(
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
+        widgetFactory.getParameterDisplayName(parameterId));
+    addAndMakeVisible(*label);
+
+    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        parameterId,
+        *comboBox);
+    addAndMakeVisible(*comboBox);
+
+    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*separator);
 }

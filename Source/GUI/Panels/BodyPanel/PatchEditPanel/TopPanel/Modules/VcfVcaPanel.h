@@ -94,5 +94,20 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vcfLeversAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vcfKeyboardPortamentoAttachment;
 
+    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupInitButton(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& initWidgetId);
+    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+                                     const juce::String& parameterId,
+                                     std::unique_ptr<tss::Label>& label,
+                                     std::unique_ptr<tss::Slider>& slider,
+                                     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                     std::unique_ptr<tss::HorizontalSeparator>& separator);
+    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+                                          const juce::String& parameterId,
+                                          std::unique_ptr<tss::Label>& label,
+                                          std::unique_ptr<tss::ComboBox>& comboBox,
+                                          std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
+                                          std::unique_ptr<tss::HorizontalSeparator>& separator);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VcfVcaPanel)
 };

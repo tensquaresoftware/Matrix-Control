@@ -1,4 +1,4 @@
-#include "MiscPanel.h"
+#include "MidiPanel.h"
 
 #include "../../../../Themes/Theme.h"
 #include "../../../../Widgets/ModuleHeader.h"
@@ -11,53 +11,55 @@
 
 using tss::Theme;
 
-MiscPanel::MiscPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts)
+MidiPanel::MidiPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts)
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kMisc);
+    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kMidi);
+
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kMidiChannel,
+                                     midiChannelLabel, midiChannelComboBox, midiChannelAttachment, horizontalSeparator1);
+
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kMidiEcho,
+                                     midiEchoLabel, midiEchoComboBox, midiEchoAttachment, horizontalSeparator2);
+
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kMidiControllers,
+                                     midiControllersLabel, midiControllersComboBox, midiControllersAttachment, horizontalSeparator3);
+
+    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+                                     SynthDescriptors::ParameterIds::kMidiPatchChanges,
+                                     midiPatchChangesLabel, midiPatchChangesComboBox, midiPatchChangesAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMasterTune,
-                                masterTuneLabel, masterTuneSlider, masterTuneAttachment, horizontalSeparator1);
+                                SynthDescriptors::ParameterIds::kMidiPedal1Select,
+                                midiPedal1SelectLabel, midiPedal1SelectSlider, midiPedal1SelectAttachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMasterTranspose,
-                                masterTransposeLabel, masterTransposeSlider, masterTransposeAttachment, horizontalSeparator2);
-    masterTransposeSlider->setUnit("st");
+                                SynthDescriptors::ParameterIds::kMidiPedal2Select,
+                                midiPedal2SelectLabel, midiPedal2SelectSlider, midiPedal2SelectAttachment, horizontalSeparator6);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kBendRange,
-                                bendRangeLabel, bendRangeSlider, bendRangeAttachment, horizontalSeparator3);
-    bendRangeSlider->setUnit("st");
+                                SynthDescriptors::ParameterIds::kMidiLever2Select,
+                                midiLever2SelectLabel, midiLever2SelectSlider, midiLever2SelectAttachment, horizontalSeparator7);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kUnisonEnable,
-                                     unisonEnableLabel, unisonEnableComboBox, unisonEnableAttachment, horizontalSeparator4);
-
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVolumeInvertEnable,
-                                     volumeInvertEnableLabel, volumeInvertEnableComboBox, volumeInvertEnableAttachment, horizontalSeparator5);
-
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kBankLockEnable,
-                                     bankLockEnableLabel, bankLockEnableComboBox, bankLockEnableAttachment, horizontalSeparator6);
-
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMemoryProtectEnable,
-                                     memoryProtectEnableLabel, memoryProtectEnableComboBox, memoryProtectEnableAttachment, horizontalSeparator7);
+    setupIntParameterWithSlider(inTheme, widgetFactory,
+                                SynthDescriptors::ParameterIds::kMidiLever3Select,
+                                midiLever3SelectLabel, midiLever3SelectSlider, midiLever3SelectAttachment, horizontalSeparator8);
 
     setSize(getWidth(), getHeight());
 }
 
-MiscPanel::~MiscPanel() = default;
+MidiPanel::~MidiPanel() = default;
 
-void MiscPanel::paint(juce::Graphics& g)
+void MidiPanel::paint(juce::Graphics& g)
 {
     g.fillAll(theme->getMasterEditPanelBackgroundColour());
 }
 
-void MiscPanel::resized()
+void MidiPanel::resized()
 {
     const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
     const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::MasterEdit);
@@ -72,16 +74,16 @@ void MiscPanel::resized()
 
     int y = 0;
 
-    if (auto* header = miscModuleHeader.get())
+    if (auto* header = midiModuleHeader.get())
         header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
     y += moduleHeaderHeight;
 
-    if (auto* label = masterTuneLabel.get())
+    if (auto* label = midiChannelLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = masterTuneSlider.get())
-        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
+    if (auto* comboBox = midiChannelComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
@@ -90,11 +92,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = masterTransposeLabel.get())
+    if (auto* label = midiEchoLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = masterTransposeSlider.get())
-        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
+    if (auto* comboBox = midiEchoComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
@@ -103,11 +105,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = bendRangeLabel.get())
+    if (auto* label = midiControllersLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = bendRangeSlider.get())
-        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
+    if (auto* comboBox = midiControllersComboBox.get())
+        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
@@ -116,10 +118,10 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = unisonEnableLabel.get())
+    if (auto* label = midiPatchChangesLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = unisonEnableComboBox.get())
+    if (auto* comboBox = midiPatchChangesComboBox.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
@@ -129,11 +131,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = volumeInvertEnableLabel.get())
+    if (auto* label = midiPedal1SelectLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = volumeInvertEnableComboBox.get())
-        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
+    if (auto* slider = midiPedal1SelectSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
@@ -142,11 +144,11 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = bankLockEnableLabel.get())
+    if (auto* label = midiPedal2SelectLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = bankLockEnableComboBox.get())
-        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
+    if (auto* slider = midiPedal2SelectSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
@@ -155,107 +157,129 @@ void MiscPanel::resized()
 
     y += separatorHeight;
 
-    if (auto* label = memoryProtectEnableLabel.get())
+    if (auto* label = midiLever2SelectLabel.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = memoryProtectEnableComboBox.get())
-        comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
+    if (auto* slider = midiLever2SelectSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
     if (auto* separator = horizontalSeparator7.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
+
+    y += separatorHeight;
+
+    if (auto* label = midiLever3SelectLabel.get())
+        label->setBounds(0, y, labelWidth, labelHeight);
+
+    if (auto* slider = midiLever3SelectSlider.get())
+        slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
+
+    y += labelHeight;
+
+    if (auto* separator = horizontalSeparator8.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
-void MiscPanel::setTheme(Theme& inTheme)
+void MidiPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
 
-    if (auto* header = miscModuleHeader.get())
+    if (auto* header = midiModuleHeader.get())
         header->setTheme(inTheme);
 
-    if (auto* label = masterTuneLabel.get())
+    if (auto* label = midiChannelLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* slider = masterTuneSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* comboBox = midiChannelComboBox.get())
+        comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator1.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = masterTransposeLabel.get())
+    if (auto* label = midiEchoLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* slider = masterTransposeSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* comboBox = midiEchoComboBox.get())
+        comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator2.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = bendRangeLabel.get())
+    if (auto* label = midiControllersLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* slider = bendRangeSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* comboBox = midiControllersComboBox.get())
+        comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator3.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = unisonEnableLabel.get())
+    if (auto* label = midiPatchChangesLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = unisonEnableComboBox.get())
+    if (auto* comboBox = midiPatchChangesComboBox.get())
         comboBox->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator4.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = volumeInvertEnableLabel.get())
+    if (auto* label = midiPedal1SelectLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = volumeInvertEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* slider = midiPedal1SelectSlider.get())
+        slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator5.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = bankLockEnableLabel.get())
+    if (auto* label = midiPedal2SelectLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = bankLockEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* slider = midiPedal2SelectSlider.get())
+        slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator6.get())
         separator->setTheme(inTheme);
 
-    if (auto* label = memoryProtectEnableLabel.get())
+    if (auto* label = midiLever2SelectLabel.get())
         label->setTheme(inTheme);
 
-    if (auto* comboBox = memoryProtectEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* slider = midiLever2SelectSlider.get())
+        slider->setTheme(inTheme);
 
     if (auto* separator = horizontalSeparator7.get())
+        separator->setTheme(inTheme);
+
+    if (auto* label = midiLever3SelectLabel.get())
+        label->setTheme(inTheme);
+
+    if (auto* slider = midiLever3SelectSlider.get())
+        slider->setTheme(inTheme);
+
+    if (auto* separator = horizontalSeparator8.get())
         separator->setTheme(inTheme);
 
     repaint();
 }
 
-void MiscPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void MidiPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
-    miscModuleHeader = std::make_unique<tss::ModuleHeader>(
+    midiModuleHeader = std::make_unique<tss::ModuleHeader>(
         inTheme, 
         widgetFactory.getGroupDisplayName(moduleId),
         tss::ModuleHeader::ModuleWidth::MasterEdit,
         tss::ModuleHeader::ColourVariant::Orange);
-    addAndMakeVisible(*miscModuleHeader);
+    addAndMakeVisible(*midiModuleHeader);
 }
 
-void MiscPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
-                                           const juce::String& parameterId,
-                                           std::unique_ptr<tss::Label>& label,
-                                           std::unique_ptr<tss::Slider>& slider,
-                                           std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
-                                           std::unique_ptr<tss::HorizontalSeparator>& separator)
+void MidiPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+                                            const juce::String& parameterId,
+                                            std::unique_ptr<tss::Label>& label,
+                                            std::unique_ptr<tss::Slider>& slider,
+                                            std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
+                                            std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
         inTheme, tss::Label::LabelWidth::MasterEditModule, 
@@ -273,7 +297,7 @@ void MiscPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widge
     addAndMakeVisible(*separator);
 }
 
-void MiscPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+void MidiPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
                                                  const juce::String& parameterId,
                                                  std::unique_ptr<tss::Label>& label,
                                                  std::unique_ptr<tss::ComboBox>& comboBox,

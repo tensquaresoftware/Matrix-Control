@@ -29,7 +29,7 @@ BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     verticalSeparator2 = std::make_unique<VerticalSeparator>(inTheme);
     addAndMakeVisible(*verticalSeparator2);
 
-    masterEditPanel = std::make_unique<MasterEditPanel>(inTheme);
+    masterEditPanel = std::make_unique<MasterEditPanel>(inTheme, widgetFactory, apvts);
     addAndMakeVisible(*masterEditPanel);
 }
 
