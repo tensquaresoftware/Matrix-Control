@@ -9,7 +9,15 @@ namespace tss
     class GroupLabel : public juce::Component
     {
     public:
-        explicit GroupLabel(Theme& inTheme, int width, const juce::String& text = juce::String());
+        enum class GroupWidth
+        {
+            InternalPatchesBrowser,
+            InternalPatchesUtility,
+            ComputerPatchesBrowser,
+            ComputerPatchesFolderAndFiles
+        };
+
+        explicit GroupLabel(Theme& inTheme, GroupWidth width, const juce::String& text = juce::String());
         ~GroupLabel() override = default;
 
         void setTheme(Theme& inTheme);
@@ -19,7 +27,28 @@ namespace tss
 
         void paint(juce::Graphics& g) override;
 
+        static constexpr int getWidth(GroupWidth width)
+        {
+            switch (width)
+            {
+                case GroupWidth::InternalPatchesBrowser:
+                    return kInternalPatchesBrowserWidth;
+                case GroupWidth::InternalPatchesUtility:
+                    return kInternalPatchesUtilityWidth;
+                case GroupWidth::ComputerPatchesBrowser:
+                    return kComputerPatchesBrowserWidth;
+                case GroupWidth::ComputerPatchesFolderAndFiles:
+                    return kComputerPatchesFolderAndFilesWidth;
+                default:
+                    return kInternalPatchesBrowserWidth;
+            }
+        }
+
     private:
+        inline constexpr static int kInternalPatchesBrowserWidth = 115;
+        inline constexpr static int kInternalPatchesUtilityWidth = 155;
+        inline constexpr static int kComputerPatchesBrowserWidth = 140;
+        inline constexpr static int kComputerPatchesFolderAndFilesWidth = 130;
         inline constexpr static int kHeight = 40;
         inline constexpr static float kTopAreaHeight = 15.0f;
         inline constexpr static float kContentHeight = 20.0f;

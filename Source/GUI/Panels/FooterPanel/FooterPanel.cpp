@@ -102,7 +102,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
     switch (severity)
     {
         case MessageSeverity::None:
-            return theme->getParameterLabelTextColour();
+            return theme->getLabelTextColour();
         case MessageSeverity::Info:
             return juce::Colour(0xFF808080);  // Gris
         case MessageSeverity::Success:
@@ -112,7 +112,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::Error:
             return juce::Colour(0xFFFF0000);  // Rouge
         default:
-            return theme->getParameterLabelTextColour();
+            return theme->getLabelTextColour();
     }
 }
 

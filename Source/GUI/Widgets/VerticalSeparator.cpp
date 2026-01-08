@@ -1,22 +1,22 @@
-#include "PanelSeparator.h"
+#include "VerticalSeparator.h"
 
 #include "../Themes/Theme.h"
 
 namespace tss
 {
-    PanelSeparator::PanelSeparator(Theme& inTheme)
+    VerticalSeparator::VerticalSeparator(Theme& inTheme)
         : theme(&inTheme)
     {
         setSize(kWidth, kHeight);
     }
 
-    void PanelSeparator::setTheme(Theme& inTheme)
+    void VerticalSeparator::setTheme(Theme& inTheme)
     {
         theme = &inTheme;
         repaint();
     }
 
-    void PanelSeparator::paint(juce::Graphics& g)
+    void VerticalSeparator::paint(juce::Graphics& g)
     {
         if (theme == nullptr)
         {
@@ -29,16 +29,16 @@ namespace tss
         drawLine(g, bounds);
     }
 
-    void PanelSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void VerticalSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto baseColour = theme->getPanelSeparatorBaseColour();
+        const auto baseColour = theme->getVerticalSeparatorBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
-    void PanelSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void VerticalSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto lineColour = theme->getPanelSeparatorLineColour();
+        const auto lineColour = theme->getVerticalSeparatorLineColour();
         const auto lineWidth = kLineWidth;
         const auto lineX = bounds.getCentreX() - lineWidth / 2.0f;
         

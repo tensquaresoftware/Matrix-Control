@@ -7,7 +7,7 @@
 #include "../../../Widgets/ComboBox.h"
 #include "../../../Widgets/Slider.h"
 #include "../../../Widgets/Button.h"
-#include "../../../Widgets/ParameterSeparator.h"
+#include "../../../Widgets/HorizontalSeparator.h"
 #include "../../../../Shared/SynthDescriptors.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
@@ -20,7 +20,7 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& inTheme, WidgetFactory& widg
     , apvts(inApvts)
     , sectionHeader(std::make_unique<tss::SectionHeader>(
         inTheme,
-        getWidth(),
+        tss::SectionHeader::SectionWidth::MatrixModulation,
         SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kMatrixModulation)))
     , modulationBusHeader(std::make_unique<tss::ModulationBusHeader>(inTheme))
 {
@@ -115,7 +115,7 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
 
 void MatrixModulationPanel::createInitAllBussesButton(Theme& inTheme)
 {
-    initAllBussesButton = std::make_unique<tss::Button>(inTheme, tss::Button::getDefaultWidth(), "I");
+    initAllBussesButton = std::make_unique<tss::Button>(inTheme, tss::Button::ButtonWidth::InitCopyPaste, "I");
     initAllBussesButton->onClick = [this]
     {
         const auto busIds = createBusIds();
@@ -142,7 +142,7 @@ void MatrixModulationPanel::createModulationBus(int busNumber, WidgetFactory& wi
 
 void MatrixModulationPanel::createBusNumberLabel(ModulationBus& bus, int busNumber, Theme& inTheme)
 {
-    bus.busNumberLabel = std::make_unique<tss::Label>(inTheme, tss::Label::Type::BusNumber, juce::String(busNumber));
+    bus.busNumberLabel = std::make_unique<tss::Label>(inTheme, tss::Label::LabelWidth::ModulationBusNumber, juce::String(busNumber));
     addAndMakeVisible(*bus.busNumberLabel);
 }
 
@@ -165,7 +165,7 @@ void MatrixModulationPanel::createAmountSlider(ModulationBus& bus, size_t busNum
 void MatrixModulationPanel::createDestinationComboBox(ModulationBus& bus, size_t busNumberAsSizeT, Theme& inTheme, const ModulationBusParameterArrays& parameterArrays)
 {
     const auto& destinationDesc = SynthDescriptors::kModulationBusChoiceParameters[busNumberAsSizeT][1];
-    bus.destinationComboBox = std::make_unique<tss::ComboBox>(inTheme, tss::ComboBox::Size::Large);
+    bus.destinationComboBox = std::make_unique<tss::ComboBox>(inTheme, tss::ComboBox::ComboBoxWidth::MatrixModulationDestination);
     for (const auto& choice : destinationDesc.choices)
     {
         bus.destinationComboBox->addItem(choice, bus.destinationComboBox->getNumItems() + 1);
@@ -178,7 +178,7 @@ void MatrixModulationPanel::createDestinationComboBox(ModulationBus& bus, size_t
 
 void MatrixModulationPanel::createInitButton(ModulationBus& bus, size_t busNumberAsSizeT, Theme& inTheme, const ModulationBusParameterArrays& parameterArrays)
 {
-    bus.initButton = std::make_unique<tss::Button>(inTheme, tss::Button::getDefaultWidth(), "I");
+    bus.initButton = std::make_unique<tss::Button>(inTheme, tss::Button::ButtonWidth::InitCopyPaste, "I");
     bus.initButton->onClick = [this, busId = parameterArrays.busIds[busNumberAsSizeT]]
     {
         apvts.state.setProperty(busId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -188,7 +188,7 @@ void MatrixModulationPanel::createInitButton(ModulationBus& bus, size_t busNumbe
 
 void MatrixModulationPanel::createBusSeparator(ModulationBus& bus, Theme& inTheme)
 {
-    bus.separator = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::MatrixModulationBus);
+    bus.separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::MatrixModulationBus);
     addAndMakeVisible(*bus.separator);
 }
 
@@ -216,29 +216,29 @@ void MatrixModulationPanel::resized()
 
     if (auto* initButton = initAllBussesButton.get())
     {
-        const auto initAllButtonWidth = tss::Button::getDefaultWidth();
+        const auto initAllButtonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
         const auto initAllButtonHeight = tss::Button::getHeight();
         const auto initAllButtonX = getWidth() - initAllButtonWidth;
         initButton->setBounds(initAllButtonX, sectionHeaderHeight, initAllButtonWidth, initAllButtonHeight);
     }
 
-    const auto busNumberLabelWidth = tss::Label::getWidth(tss::Label::Type::BusNumber);
+    const auto busNumberLabelWidth = tss::Label::getWidth(tss::Label::LabelWidth::ModulationBusNumber);
     const auto busNumberLabelHeight = tss::Label::getHeight();
 
-    const auto sourceComboBoxWidth = tss::ComboBox::getNormalWidth();
+    const auto sourceComboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::MatrixModulationAmount);
     const auto sourceComboBoxHeight = tss::ComboBox::getHeight();
     
     const auto amountSliderWidth = tss::Slider::getWidth();
     const auto amountSliderHeight = tss::Slider::getHeight();
 
-    constexpr auto destinationComboBoxWidth = 105;
+    const auto destinationComboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::MatrixModulationDestination);
     const auto destinationComboBoxHeight = tss::ComboBox::getHeight();
 
-    const auto initButtonWidth = tss::Button::getDefaultWidth();
+    const auto initButtonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
     const auto initButtonHeight = tss::Button::getHeight();
 
-    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::MatrixModulationBus);
-    const auto separatorHeight = tss::ParameterSeparator::getHeight();
+    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::MatrixModulationBus);
+    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
 
     const auto modulationBusStartY = sectionHeaderHeight + modulationBusHeaderHeight;
     
@@ -250,34 +250,43 @@ void MatrixModulationPanel::resized()
     {
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
         auto& bus = modulationBuses[busNumberAsSizeT];
-        int x = 0;
 
-        if (auto* label = bus.busNumberLabel.get())
-            label->setBounds(x, y, busNumberLabelWidth, busNumberLabelHeight);
-        x += busNumberLabelWidth;
-
-        if (auto* comboBox = bus.sourceComboBox.get())
-            comboBox->setBounds(x, y, sourceComboBoxWidth, sourceComboBoxHeight);
-        x += sourceComboBoxWidth + kSpacing;
-
-        if (auto* slider = bus.amountSlider.get())
-            slider->setBounds(x, y, amountSliderWidth, amountSliderHeight);
-        x += amountSliderWidth + kSpacing;
-
-        if (auto* comboBox = bus.destinationComboBox.get())
-            comboBox->setBounds(x, y, destinationComboBoxWidth, destinationComboBoxHeight);
-        x += destinationComboBoxWidth + kSpacing;
-
-        if (auto* button = bus.initButton.get())
-            button->setBounds(x, y, initButtonWidth, initButtonHeight);
-
+        positionModulationBusWidgetsRow(bus, y, busNumberLabelWidth, busNumberLabelHeight, sourceComboBoxWidth, sourceComboBoxHeight, amountSliderWidth, amountSliderHeight, destinationComboBoxWidth, destinationComboBoxHeight, initButtonWidth, initButtonHeight);
         y += widgetRowHeight;
 
-        if (auto* separator = bus.separator.get())
-            separator->setBounds(0, y, separatorWidth, separatorHeight);
-
+        positionModulationBusSeparator(bus, y, separatorWidth, separatorHeight);
         y += separatorHeight;
     }
+}
+
+void MatrixModulationPanel::positionModulationBusWidgetsRow(ModulationBus& bus, int y, int busNumberLabelWidth, int busNumberLabelHeight, int sourceComboBoxWidth, int sourceComboBoxHeight, int amountSliderWidth, int amountSliderHeight, int destinationComboBoxWidth, int destinationComboBoxHeight, int initButtonWidth, int initButtonHeight)
+{
+    int x = 0;
+
+    if (auto* label = bus.busNumberLabel.get())
+        label->setBounds(x, y, busNumberLabelWidth, busNumberLabelHeight);
+    x += busNumberLabelWidth;
+
+    if (auto* comboBox = bus.sourceComboBox.get())
+        comboBox->setBounds(x, y, sourceComboBoxWidth, sourceComboBoxHeight);
+    x += sourceComboBoxWidth + kSpacing;
+
+    if (auto* slider = bus.amountSlider.get())
+        slider->setBounds(x, y, amountSliderWidth, amountSliderHeight);
+    x += amountSliderWidth + kSpacing;
+
+    if (auto* comboBox = bus.destinationComboBox.get())
+        comboBox->setBounds(x, y, destinationComboBoxWidth, destinationComboBoxHeight);
+    x += destinationComboBoxWidth + kSpacing;
+
+    if (auto* button = bus.initButton.get())
+        button->setBounds(x, y, initButtonWidth, initButtonHeight);
+}
+
+void MatrixModulationPanel::positionModulationBusSeparator(ModulationBus& bus, int y, int separatorWidth, int separatorHeight)
+{
+    if (auto* separator = bus.separator.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
 void MatrixModulationPanel::setTheme(Theme& inTheme)

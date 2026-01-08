@@ -12,13 +12,15 @@ namespace tss
     class ComboBox : public juce::ComboBox
     {
     public:
-        enum class Size
+        enum class ComboBoxWidth
         {
-            Normal,
-            Large
+            PatchEditModule,
+            MasterEditModule,
+            MatrixModulationAmount,
+            MatrixModulationDestination
         };
 
-        explicit ComboBox(Theme& inTheme, Size size = Size::Normal);
+        explicit ComboBox(Theme& inTheme, ComboBoxWidth width = ComboBoxWidth::PatchEditModule);
         ~ComboBox() override = default;
 
         void setTheme(Theme& inTheme);
@@ -31,7 +33,21 @@ namespace tss
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        static constexpr int getNormalWidth() { return kNormalWidth; }
+        static constexpr int getWidth(ComboBoxWidth width)
+        {
+            switch (width)
+            {
+                case ComboBoxWidth::PatchEditModule:
+                case ComboBoxWidth::MasterEditModule:
+                case ComboBoxWidth::MatrixModulationAmount:
+                    return kNormalWidth;
+                case ComboBoxWidth::MatrixModulationDestination:
+                    return kLargeWidth;
+                default:
+                    return kNormalWidth;
+            }
+        }
+
         static constexpr int getHeight() { return kHeight; }
         static constexpr int getVerticalMargin() { return kVerticalMargin; }
 
@@ -53,7 +69,7 @@ namespace tss
 
         Theme* theme = nullptr;
         FocusableWidget focusableWidget;
-        Size comboSize;
+        ComboBoxWidth comboWidth;
         bool isPopupOpen = false;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);

@@ -17,7 +17,7 @@ PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juc
     : theme(&inTheme)
     , sectionHeader(std::make_unique<tss::SectionHeader>(
         inTheme, 
-        getWidth(), 
+        tss::SectionHeader::SectionWidth::PatchEdit, 
         SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
     , topPanel(std::make_unique<TopPanel>(inTheme, widgetFactory, apvts))
     , middlePanel(std::make_unique<MiddlePanel>(inTheme))

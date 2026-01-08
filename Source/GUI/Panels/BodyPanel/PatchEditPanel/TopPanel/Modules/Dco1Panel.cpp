@@ -6,7 +6,7 @@
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
-#include "../../../../../Widgets/ParameterSeparator.h"
+#include "../../../../../Widgets/HorizontalSeparator.h"
 #include "../../../../../../Shared/SynthDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
@@ -52,7 +52,7 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
 
     // Frequency
     dco1FrequencyLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Frequency));
     addAndMakeVisible(*dco1FrequencyLabel);
 
@@ -63,12 +63,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1FrequencySlider);
     addAndMakeVisible(*dco1FrequencySlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator1);
+    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator1);
 
     // Frequency Mod by LFO 1
     dco1FrequencyModByLfo1Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1));
     addAndMakeVisible(*dco1FrequencyModByLfo1Label);
 
@@ -79,12 +79,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1FrequencyModByLfo1Slider);
     addAndMakeVisible(*dco1FrequencyModByLfo1Slider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator2);
+    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator2);
 
     // Sync
     dco1SyncLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Sync));
     addAndMakeVisible(*dco1SyncLabel);
 
@@ -95,12 +95,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1SyncComboBox);
     addAndMakeVisible(*dco1SyncComboBox);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator3);
+    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator3);
 
     // Pulse Width
     dco1PulseWidthLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1PulseWidth));
     addAndMakeVisible(*dco1PulseWidthLabel);
 
@@ -111,12 +111,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1PulseWidthSlider);
     addAndMakeVisible(*dco1PulseWidthSlider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator4);
+    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator4);
 
     // Pulse Width Mod by LFO 2
     dco1PulseWidthModByLfo2Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2));
     addAndMakeVisible(*dco1PulseWidthModByLfo2Label);
 
@@ -127,12 +127,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1PulseWidthModByLfo2Slider);
     addAndMakeVisible(*dco1PulseWidthModByLfo2Slider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator5);
+    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator5);
 
     // Wave Shape
     dco1WaveShapeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1WaveShape));
     addAndMakeVisible(*dco1WaveShapeLabel);
 
@@ -143,12 +143,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1WaveShapeSlider);
     addAndMakeVisible(*dco1WaveShapeSlider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator6);
+    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator6);
 
     // Wave Select
     dco1WaveSelectLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1WaveSelect));
     addAndMakeVisible(*dco1WaveSelectLabel);
 
@@ -159,12 +159,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1WaveSelectComboBox);
     addAndMakeVisible(*dco1WaveSelectComboBox);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator7);
+    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator7);
 
     // Levers
     dco1LeversLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1Levers));
     addAndMakeVisible(*dco1LeversLabel);
 
@@ -175,12 +175,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1LeversComboBox);
     addAndMakeVisible(*dco1LeversComboBox);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator8);
+    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator8);
 
     // Keyboard Portamento
     dco1KeyboardPortamentoLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1KeyboardPortamento));
     addAndMakeVisible(*dco1KeyboardPortamentoLabel);
 
@@ -191,12 +191,12 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1KeyboardPortamentoComboBox);
     addAndMakeVisible(*dco1KeyboardPortamentoComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator9);
+    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator9);
 
     // Key Click
     dco1KeyClickLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kDco1KeyClick));
     addAndMakeVisible(*dco1KeyClickLabel);
 
@@ -207,8 +207,8 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *dco1KeyClickComboBox);
     addAndMakeVisible(*dco1KeyClickComboBox);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator10);
+    horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator10);
 
     setSize(getWidth(), getHeight());
 }
@@ -223,17 +223,17 @@ void Dco1Panel::paint(juce::Graphics& g)
 void Dco1Panel::resized()
 {
     const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
-    const auto buttonWidth = tss::Button::getDefaultWidth();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::PatchEdit);
+    const auto buttonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelWidth = tss::Label::getWidth(tss::Label::LabelWidth::PatchEditModule);
     const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
+    const auto comboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::PatchEditModule);
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
-    const auto separatorHeight = tss::ParameterSeparator::getHeight();
+    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
@@ -260,7 +260,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -273,7 +273,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -286,7 +286,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -299,7 +299,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -312,7 +312,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -325,7 +325,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -338,7 +338,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -351,7 +351,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -364,7 +364,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -377,7 +377,7 @@ void Dco1Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
@@ -403,7 +403,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* slider = dco1FrequencySlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1FrequencyModByLfo1Label.get())
@@ -412,7 +412,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* slider = dco1FrequencyModByLfo1Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1SyncLabel.get())
@@ -421,7 +421,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = dco1SyncComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1PulseWidthLabel.get())
@@ -430,7 +430,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* slider = dco1PulseWidthSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1PulseWidthModByLfo2Label.get())
@@ -439,7 +439,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* slider = dco1PulseWidthModByLfo2Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1WaveShapeLabel.get())
@@ -448,7 +448,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* slider = dco1WaveShapeSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1WaveSelectLabel.get())
@@ -457,7 +457,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = dco1WaveSelectComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1LeversLabel.get())
@@ -466,7 +466,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = dco1LeversComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1KeyboardPortamentoLabel.get())
@@ -475,7 +475,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = dco1KeyboardPortamentoComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setTheme(inTheme);
 
     if (auto* label = dco1KeyClickLabel.get())
@@ -484,7 +484,7 @@ void Dco1Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = dco1KeyClickComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setTheme(inTheme);
 
     repaint();

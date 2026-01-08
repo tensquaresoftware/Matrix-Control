@@ -60,18 +60,18 @@ namespace tss
         juce::Colour getGroupLabelTextColour() const;
         juce::Colour getGroupLabelLineColour() const;
 
-        // ParameterLabel colours ---------------------------------------------
-        juce::Colour getParameterLabelBackgroundColour() const;
-        juce::Colour getParameterLabelTextColour() const;
-        juce::Colour getParameterLabelBaseColour() const;
+        // Label colours ------------------------------------------------------
+        juce::Colour getLabelBackgroundColour() const;
+        juce::Colour getLabelTextColour() const;
+        juce::Colour getLabelBaseColour() const;
 
-        // PanelSeparator colours ---------------------------------------------
-        juce::Colour getPanelSeparatorBaseColour() const;
-        juce::Colour getPanelSeparatorLineColour() const;
+        // VerticalSeparator colours ------------------------------------------
+        juce::Colour getVerticalSeparatorBaseColour() const;
+        juce::Colour getVerticalSeparatorLineColour() const;
 
-        // ParameterSeparator colours -----------------------------------------
-        juce::Colour getParameterSeparatorBaseColour() const;
-        juce::Colour getParameterSeparatorLineColour() const;
+        // HorizontalSeparator colours -----------------------------------------
+        juce::Colour getHorizontalSeparatorBaseColour() const;
+        juce::Colour getHorizontalSeparatorLineColour() const;
 
         // Button colours -----------------------------------------------------
         juce::Colour getButtonBaseColour() const;

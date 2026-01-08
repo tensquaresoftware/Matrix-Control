@@ -67,7 +67,7 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     
     return std::make_unique<tss::Button>(
         theme, 
-        tss::Button::getDefaultWidth(), 
+        tss::Button::ButtonWidth::InitCopyPaste, 
         desc->displayName
     );
 }

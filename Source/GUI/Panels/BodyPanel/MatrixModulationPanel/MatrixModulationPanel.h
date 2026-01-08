@@ -17,7 +17,7 @@ namespace tss
     class ComboBox;
     class Slider;
     class Button;
-    class ParameterSeparator;
+    class HorizontalSeparator;
 }
 
 class WidgetFactory;
@@ -43,7 +43,7 @@ private:
         std::unique_ptr<tss::Slider> amountSlider;
         std::unique_ptr<tss::ComboBox> destinationComboBox;
         std::unique_ptr<tss::Button> initButton;
-        std::unique_ptr<tss::ParameterSeparator> separator;
+        std::unique_ptr<tss::HorizontalSeparator> separator;
 
         std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> sourceAttachment;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> amountAttachment;
@@ -77,6 +77,9 @@ private:
     void createDestinationComboBox(ModulationBus& bus, size_t busNumberAsSizeT, tss::Theme& inTheme, const ModulationBusParameterArrays& parameterArrays);
     void createInitButton(ModulationBus& bus, size_t busNumberAsSizeT, tss::Theme& inTheme, const ModulationBusParameterArrays& parameterArrays);
     void createBusSeparator(ModulationBus& bus, tss::Theme& inTheme);
+
+    void positionModulationBusWidgetsRow(ModulationBus& bus, int y, int busNumberLabelWidth, int busNumberLabelHeight, int sourceComboBoxWidth, int sourceComboBoxHeight, int amountSliderWidth, int amountSliderHeight, int destinationComboBoxWidth, int destinationComboBoxHeight, int initButtonWidth, int initButtonHeight);
+    void positionModulationBusSeparator(ModulationBus& bus, int y, int separatorWidth, int separatorHeight);
 
     tss::Theme* theme;
     juce::AudioProcessorValueTreeState& apvts;

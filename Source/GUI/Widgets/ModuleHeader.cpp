@@ -4,13 +4,12 @@
 
 namespace tss
 {
-    ModuleHeader::ModuleHeader(Theme& inTheme, const juce::String& text, Size size, ColourVariant variant)
+    ModuleHeader::ModuleHeader(Theme& inTheme, const juce::String& inText, ModuleWidth width, ColourVariant variant)
         : theme(&inTheme)
-        , text(text)
+        , text(inText)
         , colourVariant(variant)
     {
-        auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
-        setSize(width, kHeight);
+        setSize(getWidth(width), kHeight);
     }
 
     void ModuleHeader::setTheme(Theme& inTheme)

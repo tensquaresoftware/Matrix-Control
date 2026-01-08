@@ -9,22 +9,49 @@ namespace tss
     class SectionHeader : public juce::Component
     {
     public:
+        enum class SectionWidth
+        {
+            PatchEdit,
+            MatrixModulation,
+            PatchManager,
+            MasterEdit
+        };
+
         enum class ColourVariant
         {
             Blue,
             Orange
         };
 
-        explicit SectionHeader(Theme& inTheme, int width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(Theme& inTheme, SectionWidth width, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
         void setTheme(Theme& inTheme);
 
         void paint(juce::Graphics& g) override;
 
+        static constexpr int getWidth(SectionWidth width)
+        {
+            switch (width)
+            {
+                case SectionWidth::PatchEdit:
+                    return kPatchEditWidth;
+                case SectionWidth::MatrixModulation:
+                case SectionWidth::PatchManager:
+                    return kMatrixModulationWidth;
+                case SectionWidth::MasterEdit:
+                    return kMasterEditWidth;
+                default:
+                    return kPatchEditWidth;
+            }
+        }
+
         static constexpr int getHeight() { return kHeight; }
 
     private:
+        inline constexpr static int kPatchEditWidth = 810;
+        inline constexpr static int kMatrixModulationWidth = 275;
+        inline constexpr static int kMasterEditWidth = 160;
         inline constexpr static int kHeight = 30;
         inline constexpr static float kContentHeight = 20.0f;
         inline constexpr static float kLineHeight = 12.0f;

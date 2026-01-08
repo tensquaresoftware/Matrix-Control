@@ -6,7 +6,7 @@
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
-#include "../../../../../Widgets/ParameterSeparator.h"
+#include "../../../../../Widgets/HorizontalSeparator.h"
 #include "../../../../../../Shared/SynthDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
@@ -34,7 +34,7 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
 
     // FM Amount
     fmAmountLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kFmAmount));
     addAndMakeVisible(*fmAmountLabel);
 
@@ -45,12 +45,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *fmAmountSlider);
     addAndMakeVisible(*fmAmountSlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator1);
+    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator1);
 
     // FM Mod by ENV 3
     fmModByEnv3Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kFmModByEnv3));
     addAndMakeVisible(*fmModByEnv3Label);
 
@@ -61,12 +61,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *fmModByEnv3Slider);
     addAndMakeVisible(*fmModByEnv3Slider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator2);
+    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator2);
 
     // FM Mod by Pressure
     fmModByPressureLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kFmModByPressure));
     addAndMakeVisible(*fmModByPressureLabel);
 
@@ -77,12 +77,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *fmModByPressureSlider);
     addAndMakeVisible(*fmModByPressureSlider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator3);
+    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator3);
 
     // Track Point 1
     trackPoint1Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint1));
     addAndMakeVisible(*trackPoint1Label);
 
@@ -93,12 +93,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *trackPoint1Slider);
     addAndMakeVisible(*trackPoint1Slider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator4);
+    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator4);
 
     // Track Point 2
     trackPoint2Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint2));
     addAndMakeVisible(*trackPoint2Label);
 
@@ -109,12 +109,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *trackPoint2Slider);
     addAndMakeVisible(*trackPoint2Slider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator5);
+    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator5);
 
     // Track Point 3
     trackPoint3Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint3));
     addAndMakeVisible(*trackPoint3Label);
 
@@ -125,12 +125,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *trackPoint3Slider);
     addAndMakeVisible(*trackPoint3Slider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator6);
+    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator6);
 
     // Track Point 4
     trackPoint4Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint4));
     addAndMakeVisible(*trackPoint4Label);
 
@@ -141,12 +141,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *trackPoint4Slider);
     addAndMakeVisible(*trackPoint4Slider);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator7);
+    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator7);
 
     // Track Point 5
     trackPoint5Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackPoint5));
     addAndMakeVisible(*trackPoint5Label);
 
@@ -157,12 +157,12 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *trackPoint5Slider);
     addAndMakeVisible(*trackPoint5Slider);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator8);
+    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator8);
 
     // Track Input
     trackInputLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kTrackInput));
     addAndMakeVisible(*trackInputLabel);
 
@@ -173,11 +173,11 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
         *trackInputComboBox);
     addAndMakeVisible(*trackInputComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator9);
+    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator9);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator10);
+    horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator10);
 
     setSize(getWidth(), getHeight());
 }
@@ -192,17 +192,17 @@ void FmTrackPanel::paint(juce::Graphics& g)
 void FmTrackPanel::resized()
 {
     const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
-    const auto buttonWidth = tss::Button::getDefaultWidth();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::PatchEdit);
+    const auto buttonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelWidth = tss::Label::getWidth(tss::Label::LabelWidth::PatchEditModule);
     const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
+    const auto comboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::PatchEditModule);
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
-    const auto separatorHeight = tss::ParameterSeparator::getHeight();
+    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
@@ -223,7 +223,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -236,7 +236,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -249,7 +249,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -262,7 +262,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -275,7 +275,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -288,7 +288,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -301,7 +301,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -314,7 +314,7 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -327,14 +327,14 @@ void FmTrackPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
@@ -354,7 +354,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = fmAmountSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setTheme(inTheme);
 
     if (auto* label = fmModByEnv3Label.get())
@@ -363,7 +363,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = fmModByEnv3Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setTheme(inTheme);
 
     if (auto* label = fmModByPressureLabel.get())
@@ -372,7 +372,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = fmModByPressureSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setTheme(inTheme);
 
     if (auto* label = trackPoint1Label.get())
@@ -381,7 +381,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = trackPoint1Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setTheme(inTheme);
 
     if (auto* label = trackPoint2Label.get())
@@ -390,7 +390,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = trackPoint2Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setTheme(inTheme);
 
     if (auto* label = trackPoint3Label.get())
@@ -399,7 +399,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = trackPoint3Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setTheme(inTheme);
 
     if (auto* label = trackPoint4Label.get())
@@ -408,7 +408,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = trackPoint4Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setTheme(inTheme);
 
     if (auto* label = trackPoint5Label.get())
@@ -417,7 +417,7 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* slider = trackPoint5Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setTheme(inTheme);
 
     if (auto* label = trackInputLabel.get())
@@ -426,10 +426,10 @@ void FmTrackPanel::setTheme(Theme& inTheme)
     if (auto* comboBox = trackInputComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setTheme(inTheme);
 
     repaint();

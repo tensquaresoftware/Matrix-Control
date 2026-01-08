@@ -13,7 +13,7 @@ namespace tss
     class Slider;
     class ComboBox;
     class Button;
-    class ParameterSeparator;
+    class HorizontalSeparator;
 }
 
 class WidgetFactory;
@@ -69,16 +69,16 @@ private:
     std::unique_ptr<tss::ComboBox> trackInputComboBox;
 
     // Separators
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator1;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator2;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator3;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator4;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator5;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator6;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator7;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator8;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator9;
-    std::unique_ptr<tss::ParameterSeparator> parameterSeparator10;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator8;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator9;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator10;
 
     // Attachments
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> fmAmountAttachment;

@@ -141,42 +141,42 @@ namespace tss
         return getColour(ThemeColours::GroupLabel::kLine);
     }
 
-    // ParameterLabel colours -------------------------------------------------
-    juce::Colour Theme::getParameterLabelBackgroundColour() const
+    // Label colours ----------------------------------------------------------
+    juce::Colour Theme::getLabelBackgroundColour() const
     {
-        return getColour(ThemeColours::ParameterLabel::kBackground);
+        return getColour(ThemeColours::Label::kBackground);
     }
 
-    juce::Colour Theme::getParameterLabelTextColour() const
+    juce::Colour Theme::getLabelTextColour() const
     {
-        return getColour(ThemeColours::ParameterLabel::kText);
+        return getColour(ThemeColours::Label::kText);
     }
 
-    juce::Colour Theme::getParameterLabelBaseColour() const
+    juce::Colour Theme::getLabelBaseColour() const
     {
-        return getColour(ThemeColours::ParameterLabel::kBase);
+        return getColour(ThemeColours::Label::kBase);
     }
 
-    // PanelSeparator colours -------------------------------------------------
-    juce::Colour Theme::getPanelSeparatorBaseColour() const
+    // VerticalSeparator colours ----------------------------------------------
+    juce::Colour Theme::getVerticalSeparatorBaseColour() const
     {
-        return getColour(ThemeColours::PanelSeparator::kBase);
+        return getColour(ThemeColours::VerticalSeparator::kBase);
     }
 
-    juce::Colour Theme::getPanelSeparatorLineColour() const
+    juce::Colour Theme::getVerticalSeparatorLineColour() const
     {
-        return getColour(ThemeColours::PanelSeparator::kLine);
+        return getColour(ThemeColours::VerticalSeparator::kLine);
     }
 
-    // ParameterSeparator colours ---------------------------------------------
-    juce::Colour Theme::getParameterSeparatorBaseColour() const
+    // HorizontalSeparator colours --------------------------------------------
+    juce::Colour Theme::getHorizontalSeparatorBaseColour() const
     {
-        return getColour(ThemeColours::ParameterSeparator::kBase);
+        return getColour(ThemeColours::HorizontalSeparator::kBase);
     }
 
-    juce::Colour Theme::getParameterSeparatorLineColour() const
+    juce::Colour Theme::getHorizontalSeparatorLineColour() const
     {
-        return getColour(ThemeColours::ParameterSeparator::kLine);
+        return getColour(ThemeColours::HorizontalSeparator::kLine);
     }
 
     // Button colours ---------------------------------------------------------

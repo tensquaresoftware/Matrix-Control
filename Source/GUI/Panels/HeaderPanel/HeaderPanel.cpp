@@ -7,10 +7,10 @@ using tss::Theme;
 
 HeaderPanel::HeaderPanel(Theme& inTheme)
     : theme(&inTheme)
-    , blackThemeButton(inTheme, getButtonWidth(), "BLACK")
-    , creamThemeButton(inTheme, getButtonWidth(), "CREAM")
-    , debugThemeButton(inTheme, getButtonWidth(), "DEBUG")
-    , someDisabledButton(inTheme, getButtonWidth(), "DISABLED")
+    , blackThemeButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "BLACK")
+    , creamThemeButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "CREAM")
+    , debugThemeButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "DEBUG")
+    , someDisabledButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "DISABLED")
 {
     addAndMakeVisible(blackThemeButton);
     addAndMakeVisible(creamThemeButton);
@@ -28,8 +28,8 @@ void HeaderPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const auto buttonSpacing = getButtonSpacing();
-    const auto buttonWidth = getButtonWidth();
-    const auto buttonHeight = getButtonHeight();
+    const auto buttonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::HeaderPanelTheme);
+    const auto buttonHeight = tss::Button::getHeight();
     const auto buttonY = (getHeight() - buttonHeight) / 2;
     
     const auto blackThemeButtonX = buttonSpacing;

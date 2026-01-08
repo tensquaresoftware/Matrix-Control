@@ -6,18 +6,18 @@ namespace tss
 {
     class Theme;
 
-    class ParameterSeparator : public juce::Component
+    class HorizontalSeparator : public juce::Component
     {
     public:
-        enum class Type
+        enum class SeparatorWidth
         {
             PatchEditModule,
             MasterEditModule,
             MatrixModulationBus
         };
 
-        ParameterSeparator(Theme& inTheme, Type inType);
-        ~ParameterSeparator() override = default;
+        HorizontalSeparator(Theme& inTheme, SeparatorWidth width);
+        ~HorizontalSeparator() override = default;
 
         void setTheme(Theme& inTheme);
 
@@ -26,15 +26,15 @@ namespace tss
         int getWidth() const;
         static constexpr int getHeight() { return kHeight; }
 
-        static int getWidth(Type inType)
+        static constexpr int getWidth(SeparatorWidth width)
         {
-            switch (inType)
+            switch (width)
             {
-                case Type::PatchEditModule:
+                case SeparatorWidth::PatchEditModule:
                     return kPatchEditModuleWidth;
-                case Type::MasterEditModule:
+                case SeparatorWidth::MasterEditModule:
                     return kMasterEditModuleWidth;
-                case Type::MatrixModulationBus:
+                case SeparatorWidth::MatrixModulationBus:
                     return kMatrixModulationBusWidth;
                 default:
                     return kPatchEditModuleWidth;
@@ -48,13 +48,13 @@ namespace tss
         inline constexpr static int kHeight = 5;
         inline constexpr static float kLineThickness = 1.0f;
 
-        Type type;
+        SeparatorWidth separatorWidth;
         Theme* theme = nullptr;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterSeparator)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HorizontalSeparator)
     };
 }
 

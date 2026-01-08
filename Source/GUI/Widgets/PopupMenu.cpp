@@ -141,7 +141,7 @@ namespace tss
         
         columnCount = calculateColumnCount(numItems);
         itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
-        columnWidth = comboBox.getWidth();
+        columnWidth = comboBox.getBounds().getWidth();
         
         // Note: setSize() is now called in show() after adding to parent
         // to avoid triggering expensive events before the component is in the hierarchy
@@ -665,7 +665,7 @@ namespace tss
         // Adjust X position
         if (desiredPopupTopLeft.getX() + popupWidth > topLevelScreenBounds.getRight())
         {
-            desiredPopupTopLeft.setX(comboBoxRef.localPointToGlobal(juce::Point<int>(comboBoxRef.getWidth() - popupWidth, 0)).getX());
+            desiredPopupTopLeft.setX(comboBoxRef.localPointToGlobal(juce::Point<int>(comboBoxRef.getBounds().getWidth() - popupWidth, 0)).getX());
         }
 
         // Adjust Y position

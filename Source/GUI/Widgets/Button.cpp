@@ -4,11 +4,11 @@
 
 namespace tss
 {
-    Button::Button(Theme& inTheme, int width, const juce::String& text)
+    Button::Button(Theme& inTheme, ButtonWidth width, const juce::String& text)
         : juce::Button(text)
         , theme(&inTheme)
     {
-        setSize(width, kHeight);
+        setSize(getWidth(width), kHeight);
     }
 
     void Button::setTheme(Theme& inTheme)

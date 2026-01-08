@@ -9,10 +9,11 @@ namespace tss
     class ModuleHeader : public juce::Component
     {
     public:
-        enum class Size
+        enum class ModuleWidth
         {
-            Normal,
-            Large
+            PatchEdit,
+            MasterEdit,
+            PatchManager
         };
 
         enum class ColourVariant
@@ -21,7 +22,7 @@ namespace tss
             Orange
         };
 
-        explicit ModuleHeader(Theme& inTheme, const juce::String& text = juce::String(), Size size = Size::Normal, ColourVariant variant = ColourVariant::Blue);
+        explicit ModuleHeader(Theme& inTheme, const juce::String& inText = juce::String(), ModuleWidth width = ModuleWidth::PatchEdit, ColourVariant variant = ColourVariant::Blue);
         ~ModuleHeader() override = default;
 
         void setTheme(Theme& inTheme);
@@ -31,12 +32,27 @@ namespace tss
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getNormalWidth() { return kNormalWidth; }
+        static constexpr int getWidth(ModuleWidth width)
+        {
+            switch (width)
+            {
+                case ModuleWidth::PatchEdit:
+                    return kPatchEditWidth;
+                case ModuleWidth::MasterEdit:
+                    return kMasterEditWidth;
+                case ModuleWidth::PatchManager:
+                    return kPatchManagerWidth;
+                default:
+                    return kPatchEditWidth;
+            }
+        }
+
         static constexpr int getHeight() { return kHeight; }
 
     private:
-        inline constexpr static int kNormalWidth = 150;
-        inline constexpr static int kLargeWidth = 225;
+        inline constexpr static int kPatchEditWidth = 150;
+        inline constexpr static int kMasterEditWidth = 160;
+        inline constexpr static int kPatchManagerWidth = 275;
         inline constexpr static int kHeight = 30;
         
         inline constexpr static float kTextLeftPadding = 2.0f;

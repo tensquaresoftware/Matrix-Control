@@ -5,13 +5,12 @@
 
 namespace tss
 {
-    ComboBox::ComboBox(Theme& inTheme, Size size)
+    ComboBox::ComboBox(Theme& inTheme, ComboBoxWidth width)
         : juce::ComboBox()
         , theme(&inTheme)
-        , comboSize(size)
+        , comboWidth(width)
     {
-        const auto width = (size == Size::Normal) ? kNormalWidth : kLargeWidth;
-        setSize(width, kHeight);
+        setSize(getWidth(width), kHeight);
         setWantsKeyboardFocus(true);
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
@@ -126,9 +125,9 @@ namespace tss
 
     juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
-        const auto backgroundWidth = static_cast<float>((comboSize == Size::Normal) 
-            ? kNormalBackgroundWidth 
-            : kLargeBackgroundWidth);
+        const auto backgroundWidth = static_cast<float>((comboWidth == ComboBoxWidth::MatrixModulationDestination) 
+            ? kLargeBackgroundWidth 
+            : kNormalBackgroundWidth);
         const auto backgroundHeight = static_cast<float>(kBackgroundHeight);
         const auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
         const auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;

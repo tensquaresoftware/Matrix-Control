@@ -6,15 +6,18 @@ namespace tss
 {
     class Theme;
 
-    class PanelSeparator : public juce::Component
+    class VerticalSeparator : public juce::Component
     {
     public:
-        explicit PanelSeparator(Theme& inTheme);
-        ~PanelSeparator() override = default;
+        explicit VerticalSeparator(Theme& inTheme);
+        ~VerticalSeparator() override = default;
 
         void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
+
+        static constexpr int getWidth() { return kWidth; }
+        static constexpr int getHeight() { return kHeight; }
 
     private:
         inline constexpr static int kWidth = 30;
@@ -26,7 +29,7 @@ namespace tss
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PanelSeparator)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VerticalSeparator)
     };
 }
 

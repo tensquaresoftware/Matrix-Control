@@ -6,7 +6,7 @@
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
-#include "../../../../../Widgets/ParameterSeparator.h"
+#include "../../../../../Widgets/HorizontalSeparator.h"
 #include "../../../../../../Shared/SynthDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
@@ -34,7 +34,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
 
     // Balance
     vcfBalanceLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfBalance));
     addAndMakeVisible(*vcfBalanceLabel);
 
@@ -45,12 +45,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfBalanceSlider);
     addAndMakeVisible(*vcfBalanceSlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator1);
+    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator1);
 
     // Frequency
     vcfFrequencyLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfFequency));
     addAndMakeVisible(*vcfFrequencyLabel);
 
@@ -61,12 +61,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfFrequencySlider);
     addAndMakeVisible(*vcfFrequencySlider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator2);
+    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator2);
 
     // Frequency Mod by ENV 1
     vcfFrequencyModByEnv1Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfFrequencyModByEnv1));
     addAndMakeVisible(*vcfFrequencyModByEnv1Label);
 
@@ -77,12 +77,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfFrequencyModByEnv1Slider);
     addAndMakeVisible(*vcfFrequencyModByEnv1Slider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator3);
+    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator3);
 
     // Frequency Mod by Pressure
     vcfFrequencyModByPressureLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfFrequencyModByPressure));
     addAndMakeVisible(*vcfFrequencyModByPressureLabel);
 
@@ -93,12 +93,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfFrequencyModByPressureSlider);
     addAndMakeVisible(*vcfFrequencyModByPressureSlider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator4);
+    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator4);
 
     // Resonance
     vcfResonanceLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfResonance));
     addAndMakeVisible(*vcfResonanceLabel);
 
@@ -109,12 +109,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfResonanceSlider);
     addAndMakeVisible(*vcfResonanceSlider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator5);
+    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator5);
 
     // VCA 1 Volume
     vca1VolumeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVca1Volume));
     addAndMakeVisible(*vca1VolumeLabel);
 
@@ -125,12 +125,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vca1VolumeSlider);
     addAndMakeVisible(*vca1VolumeSlider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator6);
+    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator6);
 
     // VCA 1 Mod by Velocity
     vca1ModByVelocityLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVca1ModByVelocity));
     addAndMakeVisible(*vca1ModByVelocityLabel);
 
@@ -141,12 +141,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vca1ModByVelocitySlider);
     addAndMakeVisible(*vca1ModByVelocitySlider);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator7);
+    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator7);
 
     // VCA 2 Mod by ENV 2
     vca2ModByEnv2Label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVca2ModByEnv2));
     addAndMakeVisible(*vca2ModByEnv2Label);
 
@@ -157,12 +157,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vca2ModByEnv2Slider);
     addAndMakeVisible(*vca2ModByEnv2Slider);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator8);
+    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator8);
 
     // Levers
     vcfLeversLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfLevers));
     addAndMakeVisible(*vcfLeversLabel);
 
@@ -173,12 +173,12 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfLeversComboBox);
     addAndMakeVisible(*vcfLeversComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator9);
+    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator9);
 
     // Keyboard Portamento
     vcfKeyboardPortamentoLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kVcfKeyboardPortamento));
     addAndMakeVisible(*vcfKeyboardPortamentoLabel);
 
@@ -189,8 +189,8 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
         *vcfKeyboardPortamentoComboBox);
     addAndMakeVisible(*vcfKeyboardPortamentoComboBox);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator10);
+    horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator10);
 
     setSize(getWidth(), getHeight());
 }
@@ -205,17 +205,17 @@ void VcfVcaPanel::paint(juce::Graphics& g)
 void VcfVcaPanel::resized()
 {
     const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
-    const auto buttonWidth = tss::Button::getDefaultWidth();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::PatchEdit);
+    const auto buttonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelWidth = tss::Label::getWidth(tss::Label::LabelWidth::PatchEditModule);
     const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
+    const auto comboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::PatchEditModule);
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
-    const auto separatorHeight = tss::ParameterSeparator::getHeight();
+    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
@@ -236,7 +236,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -249,7 +249,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -262,7 +262,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -275,7 +275,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -288,7 +288,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -301,7 +301,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -314,7 +314,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -327,7 +327,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -340,7 +340,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -353,7 +353,7 @@ void VcfVcaPanel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
@@ -373,7 +373,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vcfBalanceSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vcfFrequencyLabel.get())
@@ -382,7 +382,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vcfFrequencySlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vcfFrequencyModByEnv1Label.get())
@@ -391,7 +391,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vcfFrequencyModByEnv1Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vcfFrequencyModByPressureLabel.get())
@@ -400,7 +400,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vcfFrequencyModByPressureSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vcfResonanceLabel.get())
@@ -409,7 +409,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vcfResonanceSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vca1VolumeLabel.get())
@@ -418,7 +418,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vca1VolumeSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vca1ModByVelocityLabel.get())
@@ -427,7 +427,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vca1ModByVelocitySlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vca2ModByEnv2Label.get())
@@ -436,7 +436,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* slider = vca2ModByEnv2Slider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vcfLeversLabel.get())
@@ -445,7 +445,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* comboBox = vcfLeversComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setTheme(inTheme);
 
     if (auto* label = vcfKeyboardPortamentoLabel.get())
@@ -454,7 +454,7 @@ void VcfVcaPanel::setTheme(Theme& inTheme)
     if (auto* comboBox = vcfKeyboardPortamentoComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setTheme(inTheme);
 
     repaint();

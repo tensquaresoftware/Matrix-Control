@@ -4,7 +4,7 @@
 
 - **Author:** Guillaume DUPONT
 - **Organization:** Ten Square Software
-- **Revision date:** 2025-12-30
+- **Revision date:** 2026-01-08
 
 ---
 
@@ -30,7 +30,7 @@ Each mode contains sections :
 
 - MASTER mode : MASTER EDIT
 
-### PATCH EDIT
+### PATCH EDIT Section
 
 The PATCH EDIT section is divided into 10 parameter blocks :
 
@@ -45,7 +45,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 - LFO 1
 - LFO 2
 
-#### DCO 1
+#### DCO 1 Module
 
 | Parameter               | Type | Values                                                         | SysEx Offset | SysEx ID  | GUI Component                                    | Displayed Name      |
 | ----------------------- | ---- | -------------------------------------------------------------- | ------------ | --------- | ------------------------------------------------ | ------------------- |
@@ -60,7 +60,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | dco1KeyboardPortamento  | enum | Items:<br>Keyboard, (Default)<br>Portamento                    | 21           | 8<br>0x08 | ComboBox:<br>KEYBD,<br>PORTA,                    | KEYBOARD/PORTAMENTO |
 | dco1KeyClick            | enum | Items:<br>Off, (Default)<br>On                                 | 22           | 9<br>0x09 | ComboBox:<br>OFF,<br>ON                          | KEY CLICK           |
 
-#### DCO 2
+#### DCO 2 Module
 
 | Parameter               | Type | Values                                                         | SysEx Offset | SysEx ID   | GUI Component                                          | Displayed Name      |
 | ----------------------- | ---- | -------------------------------------------------------------- | ------------ | ---------- | ------------------------------------------------------ | ------------------- |
@@ -75,7 +75,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | dco2KeyboardPortamento  | enum | Items:<br>Off,<br>Portamento,<br>Keyboard (Default)            | 23           | 18<br>0x12 | ComboBox:<br>OFF,<br>PORTA,<br>KEYBD                   | KEYBOARD/PORTAMENTO |
 | dco2KeyClick            | enum | Items:<br>Off, (Default)<br>On                                 | 24           | 19<br>0x13 | ComboBox:<br>OFF,<br>ON                                | KEY CLICK           |
 
-#### VCF/VCA
+#### VCF/VCA Module
 
 | Parameter                 | Type | Values                                                         | SysEx Offset | SysEx ID   | GUI Component                                    | Displayed Name        |
 | ------------------------- | ---- | -------------------------------------------------------------- | ------------ | ---------- | ------------------------------------------------ | --------------------- |
@@ -90,7 +90,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | vca1ModByVelocity         | int  | Min = -63<br>Max = 63<br>Default = 0                           | 92           | 28<br>0x1C | Slider                                           | VCA 1 MOD BY VELOCITY |
 | vca2ModByEnv2             | int  | Min = -63<br>Max = 63<br>Default = 63                          | 93           | 29<br>0x1D | Slider                                           | VCA 2 MOD BY ENV 2    |
 
-#### FM/TRACK
+#### FM/TRACK Module
 
 | Parameter       | Type | Values                                                                                                                                                                                                                                                                                       | SysEx Offset | SysEx ID   | GUI Component                                                                                                                                                                                                                                     | Displayed Name     |
 | --------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
@@ -104,7 +104,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | trackPoint4     | int  | Min = 0<br>Max = 63<br>Default = 47                                                                                                                                                                                                                                                          | 80           | 37<br>0x25 | Slider                                                                                                                                                                                                                                            | TRACK POINT 4      |
 | trackPoint5     | int  | Min = 0<br>Max = 63<br>Default = 63                                                                                                                                                                                                                                                          | 81           | 38<br>0x26 | Slider                                                                                                                                                                                                                                            | TRACK POINT 5      |
 
-#### RAMP/PORTAMENTO
+#### RAMP/PORTAMENTO Module
 
 | Parameter               | Type | Values                                                                                                         | SysEx Offset | SysEx ID   | GUI Component                                        | Displayed Name       |
 | ----------------------- | ---- | -------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | ---------------------------------------------------- | -------------------- |
@@ -118,7 +118,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | portamentoLegato        | enum | Items:<br>Off, (Default)<br>On                                                                                 | 34           | 47<br>0x2F | ComboBox:<br>OFF,<br>ON                              | LEGATO PORTAMENTO    |
 | portamentoKeyboardMode  | enum | Items:<br>Rotate,<br>Reassign, (Default)<br>Unison,<br>ReassignRob                                             | 8            | 48<br>0x30 | ComboBox:<br>ROTATE,<br>REASGN,<br>UNISON,<br>REAROB | KEYBOARD MODE        |
 
-#### ENV 1
+#### ENV 1 Module
 
 | Parameter                  | Type | Values                                                                                                                                                                                                                | SysEx Offset | SysEx ID   | GUI Component                                                                                | Displayed Name      |
 | -------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | -------------------------------------------------------------------------------------------- | ------------------- |
@@ -133,7 +133,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | env1EnvelopeMode           | enum | Items:<br>Normal, (Default)<br>DelayAttackDecayRelease,<br>Freerun,<br>Both                                                                                                                                           | 57           | 58<br>0x3A | ComboBox:<br>NORMAL,<br>DADR,<br>FREE,<br>BOTH                                               | ENVELOPE MODE       |
 | env1Lfo1Trigger            | enum | Items:<br>Normal, (Default)<br>Lfo1,<br>GatedLfo1Trigger                                                                                                                                                              | 56           | 59<br>0x3B | ComboBox:<br>NORMAL,<br>LFO 1,<br>G-LFO 1                                                    | LFO 1 TRIGGER       |
 
-#### ENV 2
+#### ENV 2 Module
 
 | Parameter                  | Type | Values                                                                                                                                                                                                                | SysEx Offset | SysEx ID   | GUI Component                                                                                | Displayed Name      |
 | -------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | -------------------------------------------------------------------------------------------- | ------------------- |
@@ -148,7 +148,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | env2EnvelopeMode           | enum | Items:<br>Normal, (Default)<br>DelayAttackDecayRelease,<br>Freerun,<br>Both                                                                                                                                           | 66           | 68<br>0x44 | ComboBox:<br>NORMAL,<br>DADR,<br>FREE,<br>BOTH                                               | ENVELOPE MODE       |
 | env2Lfo1Trigger            | enum | Items:<br>Normal, (Default)<br>Lfo1,<br>GatedLfo1Trigger                                                                                                                                                              | 65           | 69<br>0x45 | ComboBox:<br>NORMAL,<br>LFO 1,<br>G-LFO 1                                                    | LFO 1 TRIGGER       |
 
-#### ENV 3
+#### ENV 3 Module
 
 | Parameter                  | Type | Values                                                                                                                                                                                                                | SysEx Offset | SysEx ID   | GUI Component                                                                                | Displayed Name      |
 | -------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | -------------------------------------------------------------------------------------------- | ------------------- |
@@ -163,7 +163,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | env3EnvelopeMode           | enum | Items:<br>Normal, (Default)<br>DelayAttackDecayRelease,<br>Freerun,<br>Both                                                                                                                                           | 75           | 78<br>0x4E | ComboBox:<br>NORMAL,<br>DADR,<br>FREE,<br>BOTH                                               | ENVELOPE MODE       |
 | env3Lfo1Trigger            | enum | Items:<br>Normal, (Default)<br>Lfo1,<br>GatedLfo1Trigger                                                                                                                                                              | 74           | 79<br>0x4F | ComboBox:<br>NORMAL,<br>LFO 1,<br>GATED LFO 1 TRIGGER                                        | LFO 1 TRIGGER       |
 
-#### LFO 1
+#### LFO 1 Module
 
 | Parameter               | Type | Values                                                                                                                                                                                                                                                                                       | SysEx Offset | SysEx ID   | GUI Component                                                                                                                                                                                                                                     | Displayed Name        |
 | ----------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
@@ -177,7 +177,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 | lfo1Lag                 | enum | Items:<br>Off, (Default)<br>On                                                                                                                                                                                                                                                               | 37           | 87<br>0x57 | ComboBox:<br>OFF,<br>ON                                                                                                                                                                                                                           | LAG                   |
 | lfo1SampleInput         | enum | Items:<br>None,<br>Envelope1,<br>Envelope2,<br>Envelope3,<br>Lfo1,<br>Lfo2,<br>Vibrato,<br>Ramp1,<br>Ramp2,<br>Keyboard, (Default)<br>Portamento,<br>TrackingGenerator,<br>KeyboardGate,<br>Velocity,<br>ReleaseVelocity,<br>Pressure,<br>Pedal1,<br>Pedal2,<br>Lever1,<br>Lever2,<br>Lever3 | 40           | 88<br>0x58 | ComboBox:<br>NONE,<br>ENV 1,<br>ENV 2,<br>ENV 3,<br>LFO 1,<br>LFO 2,<br>VIBRATO,<br>RAMP 1,<br>RAMP 2,<br>KEYBD,<br>PORTA,<br>TRACK,<br>KB GATE,<br>VELOCITY,<br>REL VEL,<br>PRESSURE,<br>PEDAL 1,<br>PEDAL 2,<br>LEVER 1,<br>LEVER 2,<br>LEVER 3 | SAMPLE INPUT          |
 
-#### LFO 2
+#### LFO 2 Module
 
 | Parameter               | Type | Values                                                                                                                                                                                                                                                                                       | SysEx Offset | SysEx ID   | GUI Component                                                                                                                                                                                                                                     | Displayed Name     |
 | ----------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
@@ -195,7 +195,7 @@ The PATCH EDIT section is divided into 10 parameter blocks :
 
 The MATRIX MODULATION section is composed of 10 modulation busses, numbered from 0 to 9. These bussess are identical in their structure and operation.
 
-#### Bus 0
+#### Modulation Bus 0
 
 | Parameter                | Type | Values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | SysEx Offset | GUI Component                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Displayed Name |
 | ------------------------ | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
@@ -203,7 +203,7 @@ The MATRIX MODULATION section is composed of 10 modulation busses, numbered from
 | matrixModBus0Amount      | int  | Min = -63<br>Max = 63<br>Default = 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 105          | Slider                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | AMOUNT         |
 | matrixModBus0Destination | enum | Items:<br>None, (Default)<br>Dco1Frequency,<br>Dco1PulseWidth,<br>Dco1WaveShape,<br>Dco2Frequency,<br>Dco2PulseWidth,<br>Dco2WaveShape,<br>VcfBalance,<br>VcfFmAmount,<br>VcfFrequency,<br>VcfResonance,<br>Vca1Volume,<br>Vca2Volume,<br>Env1Delay,<br>Env1Attack,<br>Env1Decay,<br>Env1Release,<br>Env1Amplitude,<br>Env2Delay,<br>Env2Attack,<br>Env2Decay,<br>Env2Release,<br>Env2Amplitude,<br>Env3Delay,<br>Env3Attack,<br>Env3Decay,<br>Env3Release,<br>Env3Amplitude,<br>Lfo1Speed,<br>Lfo1Amplitude,<br>Lfo2Speed,<br>Lfo2Amplitude,<br>PortamentoRate | 106          | ComboBox:<br>NONE,<br>DCO 1 FREQUENCY,<br>DCO 1 PULSE WIDTH,<br>DCO 1 WAVE SHAPE,<br>DCO 2 FREQUENCY,<br>DCO 2 PULSE WIDTH,<br>DCO 2 WAVE SHAPE,<br>DCO 1 - DCO 2 MIX,<br>VCF FM BY DCO 1,<br>VCF FREQUENCY,<br>VCF RESONANCE,<br>VCA 1 VOLUME,<br>VCA 2 VOLUME,<br>ENV 1 DELAY,<br>ENV 1 ATTACK,<br>ENV 1 DECAY,<br>ENV 1 RELEASE,<br>ENV 1 AMPLITUDE,<br>ENV 2 DELAY,<br>ENV 2 ATTACK,<br>ENV 2 DECAY,<br>ENV 2 RELEASE,<br>ENV 2 AMPLITUDE,<br>ENV 3 DELAY,<br>ENV 3 ATTACK,<br>ENV 3 DECAY,<br>ENV 3 RELEASE,<br>ENV 3 AMPLITUDE,<br>LFO 1 SPEED,<br>LFO 1 AMPLITUDE,<br>LFO 2 SPEED,<br>LFO 2 AMPLITUDE,<br>PORTAMENTO RATE | DESTINATION    |
 
-#### Bus 1 to 9
+#### Modulation Bus 1 to 9
 
 Same Type, Values, GUI Component and Display Name per parameter, only SysEx Offsets change.
 
@@ -236,6 +236,55 @@ Same Type, Values, GUI Component and Display Name per parameter, only SysEx Offs
 | matrixModBus9Source      | 131          |
 | matrixModBus9Amount      | 132          |
 | matrixModBus9Destination | 133          |
+
+### MASTER EDIT
+
+#### MIDI Module
+
+| Parameter        | Type | Values                                                                                                                                                                                                                             | SysEx Offset                  | GUI Component                                                                                                                                                                                                                        | Displayed Name |
+| ---------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| midiChannel      | enum | Items:<br>Omni, (Default)<br>1,<br>2,<br>3,<br>4,<br>5,<br>6,<br>7,<br>8,<br>9,<br>10,<br>11,<br>12,<br>13,<br>14,<br>15,<br>16,<br>MonoG1,<br>MonoG2,<br>MonoG3,<br>MonoG4,<br>MonoG5,<br>MonoG6,<br>MonoG7,<br>MonoG8,<br>MonoG9 | Combination<br>of 11, 12 & 35 | ComboBox:<br>OMNI,<br>1,<br>2,<br>3,<br>4,<br>5,<br>6,<br>7,<br>8,<br>9,<br>10,<br>11,<br>12,<br>13,<br>14,<br>15,<br>16,<br>MONO G1,<br>MONO G2,<br>MONO G3,<br>MONO G4,<br>MONO G5,<br>MONO G6,<br>MONO G7,<br>MONO G8,<br>MONO G9 | CHANNEL        |
+| midiEcho         | enum | Items:<br>Off, (Default)<br>On                                                                                                                                                                                                     | 32                            | ComboBox:<br>OFF,<br>ON                                                                                                                                                                                                              | MIDI ECHO      |
+| midiControllers  | enum | Items:<br>Off,<br>On (Default)                                                                                                                                                                                                     | 13                            | ComboBox:<br>OFF,<br>ON                                                                                                                                                                                                              | CONTROLLERS    |
+| midiPatchChanges | enum | Items:<br>Off,<br>On (Default)                                                                                                                                                                                                     | 14                            | ComboBox:<br>OFF,<br>ON                                                                                                                                                                                                              | PATCH CHANGES  |
+| midiPedal1Select | int  | Min = 0<br>Max = 121<br>Default = 4                                                                                                                                                                                                | 17                            | Slider                                                                                                                                                                                                                               | PEDAL 1 SELECT |
+| midiPedal2Select | int  | Min = 0<br>Max = 121<br>Default = 64                                                                                                                                                                                               | 18                            | Slider                                                                                                                                                                                                                               | PEDAL 2 SELECT |
+| midiLever2Select | int  | Min = 0<br>Max = 121<br>Default = 1                                                                                                                                                                                                | 19                            | Slider                                                                                                                                                                                                                               | LEVER 2 SELECT |
+| midiLever3Select | int  | Min = 0<br>Max = 121<br>Default = 2                                                                                                                                                                                                | 20                            | Slider                                                                                                                                                                                                                               | LEVER 3 SELECT |
+
+**MIDI Channel Menu Mapping**
+
+The `MIDI Channel` menu combines three SysEx parameters (Basic Channel, Omni Mode Enable, and Mono Mode Enable) into a single user-friendly control. The mapping logic is as follows:
+
+- **OMNI** → Basic Channel: 1, Omni: 1, Mono: 0
+- **1-16** → Basic Channel: 1-16, Omni: 0, Mono: 0
+- **MONO G1-G9** → Basic Channel: 1-9, Omni: 0, Mono: 1
+
+When reading SysEx data, the plugin converts these three parameters into a single menu value. When writing SysEx data, the plugin decomposes the menu selection into the three corresponding parameters. Note that when Mono Mode is enabled, Omni Mode is automatically ignored by the synth (as per Oberheim specification: "Omni assumed Off in Mono On").
+
+#### VIBRATO Module
+
+| Parameter             | Type | Values                                                                                                             | SysEx Offset | GUI Component                                                                         | Displayed Name   |
+| --------------------- | ---- | ------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------- | ---------------- |
+| vibratoSpeed          | int  | Min = 0<br>Max = 63<br>Default = 0                                                                                 | 1            | Slider                                                                                | SPEED            |
+| vibratoSpeedModSource | enum | Items:<br>None, (Default)<br>Lever1,<br>Lever2,<br>Lever3                                                          | 2            | ComboBox:<br>NONE,<br>LEVER 1,<br>LEVER 2,<br>LEVER 3                                 | SPEED MOD SOURCE |
+| vibratoSpeedModAmount | int  | Min = -63<br>Max = 63<br>Default = 0                                                                               | 3            | Slider                                                                                | SPEED MOD AMOUNT |
+| vibratoWaveform       | enum | Items:<br>Triangle, (Default)<br>UpSawtooth,<br>DownSawtooth,<br>Square,<br>Random,<br>Noise,<br>SampledModulation | 4            | ComboBox:<br>TRIANGLE,<br>UPSAW,<br>DNSAW,<br>SQUARE,<br>RANDOM,<br>NOISE,<br>SAMPLED | WAVEFORM         |
+| vibratoAmplitude      | int  | Min = 0<br>Max = 63<br>Default = 0                                                                                 | 5            | Slider                                                                                | AMPLITUDE        |
+| vibratoAmpModSource   | enum | Items:<br>None, (Default)<br>Lever1,<br>Lever2,<br>Lever3                                                          | 6            | ComboBox:<br>NONE,<br>LEVER 1,<br>LEVER 2,<br>LEVER 3                                 | AMP MOD SOURCE   |
+| vibratoAmpModAmount   | int  | Min = -63<br>Max = 63<br>Default = 0                                                                               | 7            | Slider                                                                                | AMP MOD AMOUNT   |
+
+#### MISC Module
+
+| Parameter           | Type | Values                               | SysEx Offset | GUI Component               | Displayed Name   |
+| ------------------- | ---- | ------------------------------------ | ------------ | --------------------------- | ---------------- |
+| masterTune          | int  | Min = -31<br>Max = 31<br>Default = 0 | 8            | Slider                      | MASTER TUNE      |
+| masterTranspose     | int  | Min = -31<br>Max = 31<br>Default = 0 | 34           | Slider                      | MASTER TRANSPOSE |
+| bendRange           | enum | Items:<br>+/-2, (Default)<br>+/-12   | 164          | ComboBox:<br>+/-2,<br>+/-12 | BEND RANGE (+/-) |
+| unisonEnable        | enum | Items:<br>Off, (Default)<br>On       | 169          | ComboBox:<br>OFF,<br>ON     | UNISON           |
+| volumeInvertEnable  | enum | Items:<br>Off, (Default)<br>On       | 170          | ComboBox:<br>OFF,<br>ON     | VOLUME INVERT    |
+| bankLockEnable      | enum | Items:<br>Off, (Default)<br>On       | 165          | ComboBox:<br>OFF,<br>ON     | BANK LOCK        |
+| memoryProtectEnable | enum | Items:<br>Off, (Default)<br>On       | 171          | ComboBox:<br>OFF,<br>ON     | MEMORY PROTECT   |
 
 ## Additional GUI Controls
 

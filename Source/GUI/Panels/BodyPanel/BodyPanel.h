@@ -9,7 +9,7 @@
 namespace tss
 {
     class Theme;
-    class PanelSeparator;
+    class VerticalSeparator;
 }
 
 class PatchEditPanel;
@@ -38,10 +38,10 @@ private:
     tss::Theme* theme;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel;
-    std::unique_ptr<tss::PanelSeparator> panelSeparator1;
+    std::unique_ptr<tss::VerticalSeparator> verticalSeparator1;
     std::unique_ptr<MatrixModulationPanel> matrixModulationPanel;
     std::unique_ptr<PatchManagerPanel> patchManagerPanel;
-    std::unique_ptr<tss::PanelSeparator> panelSeparator2;
+    std::unique_ptr<tss::VerticalSeparator> verticalSeparator2;
     std::unique_ptr<MasterEditPanel> masterEditPanel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BodyPanel)

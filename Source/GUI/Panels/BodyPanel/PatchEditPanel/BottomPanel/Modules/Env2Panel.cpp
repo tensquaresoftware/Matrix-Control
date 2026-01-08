@@ -6,7 +6,7 @@
 #include "../../../../../Widgets/Slider.h"
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
-#include "../../../../../Widgets/ParameterSeparator.h"
+#include "../../../../../Widgets/HorizontalSeparator.h"
 #include "../../../../../../Shared/SynthDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
@@ -52,7 +52,7 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
 
     // Delay
     env2DelayLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Delay));
     addAndMakeVisible(*env2DelayLabel);
 
@@ -63,12 +63,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2DelaySlider);
     addAndMakeVisible(*env2DelaySlider);
 
-    parameterSeparator1 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator1);
+    horizontalSeparator1 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator1);
 
     // Attack
     env2AttackLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Attack));
     addAndMakeVisible(*env2AttackLabel);
 
@@ -79,12 +79,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2AttackSlider);
     addAndMakeVisible(*env2AttackSlider);
 
-    parameterSeparator2 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator2);
+    horizontalSeparator2 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator2);
 
     // Decay
     env2DecayLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Decay));
     addAndMakeVisible(*env2DecayLabel);
 
@@ -95,12 +95,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2DecaySlider);
     addAndMakeVisible(*env2DecaySlider);
 
-    parameterSeparator3 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator3);
+    horizontalSeparator3 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator3);
 
     // Sustain
     env2SustainLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Sustain));
     addAndMakeVisible(*env2SustainLabel);
 
@@ -111,12 +111,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2SustainSlider);
     addAndMakeVisible(*env2SustainSlider);
 
-    parameterSeparator4 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator4);
+    horizontalSeparator4 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator4);
 
     // Release
     env2ReleaseLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Release));
     addAndMakeVisible(*env2ReleaseLabel);
 
@@ -127,12 +127,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2ReleaseSlider);
     addAndMakeVisible(*env2ReleaseSlider);
 
-    parameterSeparator5 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator5);
+    horizontalSeparator5 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator5);
 
     // Amplitude
     env2AmplitudeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Amplitude));
     addAndMakeVisible(*env2AmplitudeLabel);
 
@@ -143,12 +143,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2AmplitudeSlider);
     addAndMakeVisible(*env2AmplitudeSlider);
 
-    parameterSeparator6 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator6);
+    horizontalSeparator6 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator6);
 
     // Amplitude Mod by Velocity
     env2AmplitudeModByVelocityLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2AmplitudeModByVelocity));
     addAndMakeVisible(*env2AmplitudeModByVelocityLabel);
 
@@ -159,12 +159,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2AmplitudeModByVelocitySlider);
     addAndMakeVisible(*env2AmplitudeModByVelocitySlider);
 
-    parameterSeparator7 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator7);
+    horizontalSeparator7 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator7);
 
     // Trigger Mode
     env2TriggerModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2TriggerMode));
     addAndMakeVisible(*env2TriggerModeLabel);
 
@@ -175,12 +175,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2TriggerModeComboBox);
     addAndMakeVisible(*env2TriggerModeComboBox);
 
-    parameterSeparator8 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator8);
+    horizontalSeparator8 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator8);
 
     // Envelope Mode
     env2EnvelopeModeLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2EnvelopeMode));
     addAndMakeVisible(*env2EnvelopeModeLabel);
 
@@ -191,12 +191,12 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2EnvelopeModeComboBox);
     addAndMakeVisible(*env2EnvelopeModeComboBox);
 
-    parameterSeparator9 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator9);
+    horizontalSeparator9 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator9);
 
     // LFO 1 Trigger
     env2Lfo1TriggerLabel = std::make_unique<tss::Label>(
-        inTheme, tss::Label::Type::Parameter, 
+        inTheme, tss::Label::LabelWidth::PatchEditModule, 
         widgetFactory.getParameterDisplayName(SynthDescriptors::ParameterIds::kEnv2Lfo1Trigger));
     addAndMakeVisible(*env2Lfo1TriggerLabel);
 
@@ -207,8 +207,8 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
         *env2Lfo1TriggerComboBox);
     addAndMakeVisible(*env2Lfo1TriggerComboBox);
 
-    parameterSeparator10 = std::make_unique<tss::ParameterSeparator>(inTheme, tss::ParameterSeparator::Type::PatchEditModule);
-    addAndMakeVisible(*parameterSeparator10);
+    horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    addAndMakeVisible(*horizontalSeparator10);
 
     setSize(getWidth(), getHeight());
 }
@@ -223,17 +223,17 @@ void Env2Panel::paint(juce::Graphics& g)
 void Env2Panel::resized()
 {
     const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getNormalWidth();
-    const auto buttonWidth = tss::Button::getDefaultWidth();
+    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::PatchEdit);
+    const auto buttonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
     const auto buttonHeight = tss::Button::getHeight();
-    const auto labelWidth = tss::Label::getWidth(tss::Label::Type::Parameter);
+    const auto labelWidth = tss::Label::getWidth(tss::Label::LabelWidth::PatchEditModule);
     const auto labelHeight = tss::Label::getHeight();
     const auto sliderWidth = tss::Slider::getWidth();
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = tss::ComboBox::getNormalWidth();
+    const auto comboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::PatchEditModule);
     const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::ParameterSeparator::getWidth(tss::ParameterSeparator::Type::PatchEditModule);
-    const auto separatorHeight = tss::ParameterSeparator::getHeight();
+    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);
+    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
     const auto panelWidth = getWidth();
 
     int y = 0;
@@ -260,7 +260,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -273,7 +273,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -286,7 +286,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -299,7 +299,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -312,7 +312,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -325,7 +325,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -338,7 +338,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -351,7 +351,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -364,7 +364,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
@@ -377,7 +377,7 @@ void Env2Panel::resized()
 
     y += labelHeight;
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
@@ -403,7 +403,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2DelaySlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator1.get())
+    if (auto* separator = horizontalSeparator1.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2AttackLabel.get())
@@ -412,7 +412,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2AttackSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator2.get())
+    if (auto* separator = horizontalSeparator2.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2DecayLabel.get())
@@ -421,7 +421,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2DecaySlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator3.get())
+    if (auto* separator = horizontalSeparator3.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2SustainLabel.get())
@@ -430,7 +430,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2SustainSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator4.get())
+    if (auto* separator = horizontalSeparator4.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2ReleaseLabel.get())
@@ -439,7 +439,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2ReleaseSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator5.get())
+    if (auto* separator = horizontalSeparator5.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2AmplitudeLabel.get())
@@ -448,7 +448,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2AmplitudeSlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator6.get())
+    if (auto* separator = horizontalSeparator6.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2AmplitudeModByVelocityLabel.get())
@@ -457,7 +457,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* slider = env2AmplitudeModByVelocitySlider.get())
         slider->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator7.get())
+    if (auto* separator = horizontalSeparator7.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2TriggerModeLabel.get())
@@ -466,7 +466,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = env2TriggerModeComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator8.get())
+    if (auto* separator = horizontalSeparator8.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2EnvelopeModeLabel.get())
@@ -475,7 +475,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = env2EnvelopeModeComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator9.get())
+    if (auto* separator = horizontalSeparator9.get())
         separator->setTheme(inTheme);
 
     if (auto* label = env2Lfo1TriggerLabel.get())
@@ -484,7 +484,7 @@ void Env2Panel::setTheme(Theme& inTheme)
     if (auto* comboBox = env2Lfo1TriggerComboBox.get())
         comboBox->setTheme(inTheme);
 
-    if (auto* separator = parameterSeparator10.get())
+    if (auto* separator = horizontalSeparator10.get())
         separator->setTheme(inTheme);
 
     repaint();

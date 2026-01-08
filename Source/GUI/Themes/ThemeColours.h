@@ -178,58 +178,58 @@ namespace tss
             };
         }
 
-        namespace ParameterLabel
+        namespace Label
         {
             inline constexpr ColourElement kBase = {
-                "ParameterLabelBase",
+                "LabelBase",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kRed
             };
 
             inline constexpr ColourElement kBackground = {
-                "ParameterLabelBackground",
+                "LabelBackground",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kOrange
             };
 
             inline constexpr ColourElement kText = {
-                "ParameterLabelText",
+                "LabelText",
                 ColourChart::kLightGrey2,
                 ColourChart::kDarkGrey1,
                 ColourChart::kTransparent
             };
         }
 
-        namespace PanelSeparator
+        namespace VerticalSeparator
         {
             inline constexpr ColourElement kBase = {
-                "PanelSeparatorBase",
+                "VerticalSeparatorBase",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kYellow
             };
 
             inline constexpr ColourElement kLine = {
-                "PanelSeparatorLine",
+                "VerticalSeparatorLine",
                 ColourChart::kDarkGrey5,
                 ColourChart::kDarkGrey5,
                 ColourChart::kOrange
             };
         }
 
-        namespace ParameterSeparator
+        namespace HorizontalSeparator
         {
             inline constexpr ColourElement kBase = {
-                "ParameterSeparatorBase",
+                "HorizontalSeparatorBase",
                 ColourChart::kTransparent,
                 ColourChart::kTransparent,
                 ColourChart::kYellow
             };
 
             inline constexpr ColourElement kLine = {
-                "ParameterSeparatorLine",
+                "HorizontalSeparatorLine",
                 ColourChart::kDarkGrey5,
                 ColourChart::kDarkGrey5,
                 ColourChart::kRed

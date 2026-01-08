@@ -4,12 +4,12 @@
 
 namespace tss
 {
-    SectionHeader::SectionHeader(Theme& inTheme, int width, const juce::String& text, ColourVariant variant)
+    SectionHeader::SectionHeader(Theme& inTheme, SectionWidth width, const juce::String& text, ColourVariant variant)
         : theme(&inTheme)
         , text(text)
         , colourVariant(variant)
     {
-        setSize(width, kHeight);
+        setSize(getWidth(width), kHeight);
     }
 
     void SectionHeader::setTheme(Theme& inTheme)

@@ -1,7 +1,7 @@
 #include "BodyPanel.h"
 
 #include "../../Themes/Theme.h"
-#include "../../Widgets/PanelSeparator.h"
+#include "../../Widgets/VerticalSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MatrixModulationPanel/MatrixModulationPanel.h"
 #include "MasterEditPanel/MasterEditPanel.h"
@@ -9,7 +9,7 @@
 #include "../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
-using tss::PanelSeparator;
+using tss::VerticalSeparator;
 
 BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme(&inTheme)
@@ -17,8 +17,8 @@ BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     patchEditPanel = std::make_unique<PatchEditPanel>(inTheme, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel);
 
-    panelSeparator1 = std::make_unique<PanelSeparator>(inTheme);
-    addAndMakeVisible(*panelSeparator1);
+    verticalSeparator1 = std::make_unique<VerticalSeparator>(inTheme);
+    addAndMakeVisible(*verticalSeparator1);
 
     matrixModulationPanel = std::make_unique<MatrixModulationPanel>(inTheme, widgetFactory, apvts);
     addAndMakeVisible(*matrixModulationPanel);
@@ -26,8 +26,8 @@ BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     patchManagerPanel = std::make_unique<PatchManagerPanel>(inTheme);
     addAndMakeVisible(*patchManagerPanel);
 
-    panelSeparator2 = std::make_unique<PanelSeparator>(inTheme);
-    addAndMakeVisible(*panelSeparator2);
+    verticalSeparator2 = std::make_unique<VerticalSeparator>(inTheme);
+    addAndMakeVisible(*verticalSeparator2);
 
     masterEditPanel = std::make_unique<MasterEditPanel>(inTheme);
     addAndMakeVisible(*masterEditPanel);
@@ -55,14 +55,14 @@ void BodyPanel::resized()
         PatchEditPanel::getHeight()
     );
     
-    const auto panelSeparator1X = patchEditPanelX + PatchEditPanel::getWidth();
-    const auto panelSeparator1Y = padding;
-    panelSeparator1->setTopLeftPosition(
-        bounds.getX() + panelSeparator1X,
-        bounds.getY() + panelSeparator1Y
+    const auto verticalSeparator1X = patchEditPanelX + PatchEditPanel::getWidth();
+    const auto verticalSeparator1Y = padding;
+    verticalSeparator1->setTopLeftPosition(
+        bounds.getX() + verticalSeparator1X,
+        bounds.getY() + verticalSeparator1Y
     );
     
-    const auto matrixModulationPanelX = panelSeparator1X + panelSeparator1->getWidth();
+    const auto matrixModulationPanelX = verticalSeparator1X + VerticalSeparator::getWidth();
     const auto matrixModulationPanelY = padding;
     matrixModulationPanel->setBounds(
         bounds.getX() + matrixModulationPanelX,
@@ -80,14 +80,14 @@ void BodyPanel::resized()
         PatchManagerPanel::getHeight()
     );
     
-    const auto panelSeparator2X = matrixModulationPanelX + MatrixModulationPanel::getWidth();
-    const auto panelSeparator2Y = padding;
-    panelSeparator2->setTopLeftPosition(
-        bounds.getX() + panelSeparator2X,
-        bounds.getY() + panelSeparator2Y
+    const auto verticalSeparator2X = matrixModulationPanelX + MatrixModulationPanel::getWidth();
+    const auto verticalSeparator2Y = padding;
+    verticalSeparator2->setTopLeftPosition(
+        bounds.getX() + verticalSeparator2X,
+        bounds.getY() + verticalSeparator2Y
     );
     
-    const auto masterEditPanelX = panelSeparator2X + panelSeparator2->getWidth();
+    const auto masterEditPanelX = verticalSeparator2X + VerticalSeparator::getWidth();
     const auto masterEditPanelY = padding;
     masterEditPanel->setBounds(
         bounds.getX() + masterEditPanelX,
@@ -104,13 +104,13 @@ void BodyPanel::setTheme(Theme& inTheme)
     if (auto* panel = patchEditPanel.get())
         panel->setTheme(inTheme);
 
-    if (auto* separator = panelSeparator1.get())
+    if (auto* separator = verticalSeparator1.get())
         separator->setTheme(inTheme);
 
     if (auto* panel = matrixModulationPanel.get())
         panel->setTheme(inTheme);
 
-    if (auto* separator = panelSeparator2.get())
+    if (auto* separator = verticalSeparator2.get())
         separator->setTheme(inTheme);
 
     if (auto* panel = masterEditPanel.get())

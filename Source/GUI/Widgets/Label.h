@@ -9,13 +9,15 @@ namespace tss
     class Label : public juce::Component
     {
     public:
-        enum class Type
+        enum class LabelWidth
         {
-            Parameter,
-            BusNumber
+            PatchEditModule,
+            MasterEditModule,
+            ModulationBusNumber,
+            PatchManagerBankSelect
         };
 
-        explicit Label(Theme& inTheme, Type inType, const juce::String& text = juce::String());
+        explicit Label(Theme& inTheme, LabelWidth inWidth, const juce::String& text = juce::String());
         ~Label() override = default;
 
         void setTheme(Theme& inTheme);
@@ -25,20 +27,35 @@ namespace tss
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth(Type inType)
+        static constexpr int getWidth(LabelWidth width)
         {
-            return inType == Type::Parameter ? kParameterWidth : kBusNumberWidth;
+            switch (width)
+            {
+                case LabelWidth::ModulationBusNumber:
+                    return kBusNumberWidth;
+                case LabelWidth::PatchManagerBankSelect:
+                    return kPatchManagerBankSelectWidth;
+                case LabelWidth::PatchEditModule:
+                    return kPatchEditModuleWidth;
+                case LabelWidth::MasterEditModule:
+                    return kMasterEditModuleWidth;
+                default:
+                    return kPatchEditModuleWidth;
+            }
         }
+
         static constexpr int getHeight() { return kHeight; }
 
     private:
-        inline constexpr static int kParameterWidth = 90;
         inline constexpr static int kBusNumberWidth = 15;
+        inline constexpr static int kPatchManagerBankSelectWidth = 75;
+        inline constexpr static int kPatchEditModuleWidth = 90;
+        inline constexpr static int kMasterEditModuleWidth = 100;
         inline constexpr static int kHeight = 20;
         inline constexpr static float kBackgroundPadding = 1.0f;
         inline constexpr static float kTextLeftPadding = 2.0f;
 
-        Type type;
+        LabelWidth width;
         Theme* theme = nullptr;
         juce::String labelText;
 
@@ -48,9 +65,5 @@ namespace tss
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)
     };
-
-    // Type aliases pour faciliter l'utilisation
-    using ParameterLabel = Label;
-    using ModulationBusLabel = Label;
 }
 

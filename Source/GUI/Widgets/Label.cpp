@@ -4,12 +4,12 @@
 
 namespace tss
 {
-    Label::Label(Theme& inTheme, Type inType, const juce::String& text)
-        : type(inType)
+    Label::Label(Theme& inTheme, LabelWidth inWidth, const juce::String& text)
+        : width(inWidth)
         , theme(&inTheme)
         , labelText(text)
     {
-        setSize(getWidth(inType), kHeight);
+        setSize(getWidth(width), kHeight);
     }
 
     void Label::setTheme(Theme& inTheme)
@@ -43,14 +43,14 @@ namespace tss
 
     void Label::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto baseColour = theme->getParameterLabelBaseColour();
+        const auto baseColour = theme->getLabelBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void Label::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = theme->getParameterLabelBackgroundColour();
+        const auto backgroundColour = theme->getLabelBackgroundColour();
         const auto backgroundBounds = bounds.reduced(kBackgroundPadding);
         
         g.setColour(backgroundColour);
@@ -64,7 +64,7 @@ namespace tss
             return;
         }
 
-        const auto textColour = theme->getParameterLabelTextColour();
+        const auto textColour = theme->getLabelTextColour();
         const auto font = theme->getBaseFont();
 
         auto textBounds = bounds.reduced(kBackgroundPadding);
