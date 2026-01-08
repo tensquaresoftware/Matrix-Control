@@ -20,6 +20,17 @@ namespace tss
         repaint();
     }
 
+    void Slider::setUnit(const juce::String& inUnit)
+    {
+        unit = inUnit;
+        repaint();
+    }
+
+    juce::String Slider::getUnit() const
+    {
+        return unit;
+    }
+
     void Slider::paint(juce::Graphics& g)
     {
         if (theme == nullptr)
@@ -116,7 +127,13 @@ namespace tss
 
     void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        const auto valueText = juce::String(static_cast<int>(std::round(getValue())));
+        auto valueText = juce::String(static_cast<int>(std::round(getValue())));
+        
+        if (unit.isNotEmpty())
+        {
+            valueText += " " + unit;
+        }
+        
         const auto textColour = theme->getSliderTextColour(enabled);
         const auto font = theme->getBaseFont();
 

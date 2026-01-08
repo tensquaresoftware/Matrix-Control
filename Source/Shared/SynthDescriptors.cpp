@@ -205,9 +205,234 @@ const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups = {
 // Data Definitions - Master Edit Parameters
 // ============================================================================
 
-const std::vector<IntParameterDescriptor> kMasterEditIntParameters = {};
+const std::vector<IntParameterDescriptor> kMasterEditIntParameters = {
+    // MIDI Module Int Parameters
+    {
+        .parameterId = ParameterIds::kMidiPedal1Select,
+        .displayName = ParameterDisplayNames::kMidiPedal1Select,
+        .parentGroupId = ModuleIds::kMidi,
+        .minValue = 0,
+        .maxValue = 121,
+        .defaultValue = 4,
+        .sysExOffset = 17,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMidiPedal2Select,
+        .displayName = ParameterDisplayNames::kMidiPedal2Select,
+        .parentGroupId = ModuleIds::kMidi,
+        .minValue = 0,
+        .maxValue = 121,
+        .defaultValue = 64,
+        .sysExOffset = 18,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMidiLever2Select,
+        .displayName = ParameterDisplayNames::kMidiLever2Select,
+        .parentGroupId = ModuleIds::kMidi,
+        .minValue = 0,
+        .maxValue = 121,
+        .defaultValue = 1,
+        .sysExOffset = 19,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMidiLever3Select,
+        .displayName = ParameterDisplayNames::kMidiLever3Select,
+        .parentGroupId = ModuleIds::kMidi,
+        .minValue = 0,
+        .maxValue = 121,
+        .defaultValue = 2,
+        .sysExOffset = 20,
+        .sysExId = kNoSysExId
+    },
+    // VIBRATO Module Int Parameters
+    {
+        .parameterId = ParameterIds::kVibratoSpeed,
+        .displayName = ParameterDisplayNames::kVibratoSpeed,
+        .parentGroupId = ModuleIds::kVibrato,
+        .minValue = 0,
+        .maxValue = 63,
+        .defaultValue = 0,
+        .sysExOffset = 1,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kVibratoSpeedModAmount,
+        .displayName = ParameterDisplayNames::kVibratoSpeedModAmount,
+        .parentGroupId = ModuleIds::kVibrato,
+        .minValue = -63,
+        .maxValue = 63,
+        .defaultValue = 0,
+        .sysExOffset = 3,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kVibratoAmplitude,
+        .displayName = ParameterDisplayNames::kVibratoAmplitude,
+        .parentGroupId = ModuleIds::kVibrato,
+        .minValue = 0,
+        .maxValue = 63,
+        .defaultValue = 0,
+        .sysExOffset = 5,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kVibratoAmpModAmount,
+        .displayName = ParameterDisplayNames::kVibratoAmpModAmount,
+        .parentGroupId = ModuleIds::kVibrato,
+        .minValue = -63,
+        .maxValue = 63,
+        .defaultValue = 0,
+        .sysExOffset = 7,
+        .sysExId = kNoSysExId
+    },
+    // MISC Module Int Parameters
+    {
+        .parameterId = ParameterIds::kMasterTune,
+        .displayName = ParameterDisplayNames::kMasterTune,
+        .parentGroupId = ModuleIds::kMisc,
+        .minValue = -31,
+        .maxValue = 31,
+        .defaultValue = 0,
+        .sysExOffset = 8,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMasterTranspose,
+        .displayName = ParameterDisplayNames::kMasterTranspose,
+        .parentGroupId = ModuleIds::kMisc,
+        .minValue = -24,
+        .maxValue = 24,
+        .defaultValue = 0,
+        .sysExOffset = 34,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kBendRange,
+        .displayName = ParameterDisplayNames::kBendRange,
+        .parentGroupId = ModuleIds::kMisc,
+        .minValue = -24,
+        .maxValue = 24,
+        .defaultValue = 2,
+        .sysExOffset = 164,
+        .sysExId = kNoSysExId
+    }
+};
 
-const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters = {};
+const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters = {
+    // MIDI Module Choice Parameters
+    {
+        .parameterId = ParameterIds::kMidiChannel,
+        .displayName = ParameterDisplayNames::kMidiChannel,
+        .parentGroupId = ModuleIds::kMidi,
+        .choices = makeStringArray({ ChoiceLists::kMidiChannelOmni, ChoiceLists::kMidiChannel1, ChoiceLists::kMidiChannel2, ChoiceLists::kMidiChannel3,
+                                     ChoiceLists::kMidiChannel4, ChoiceLists::kMidiChannel5, ChoiceLists::kMidiChannel6, ChoiceLists::kMidiChannel7,
+                                     ChoiceLists::kMidiChannel8, ChoiceLists::kMidiChannel9, ChoiceLists::kMidiChannel10, ChoiceLists::kMidiChannel11,
+                                     ChoiceLists::kMidiChannel12, ChoiceLists::kMidiChannel13, ChoiceLists::kMidiChannel14, ChoiceLists::kMidiChannel15,
+                                     ChoiceLists::kMidiChannel16, ChoiceLists::kMidiChannelMonoG1, ChoiceLists::kMidiChannelMonoG2, ChoiceLists::kMidiChannelMonoG3,
+                                     ChoiceLists::kMidiChannelMonoG4, ChoiceLists::kMidiChannelMonoG5, ChoiceLists::kMidiChannelMonoG6, ChoiceLists::kMidiChannelMonoG7,
+                                     ChoiceLists::kMidiChannelMonoG8, ChoiceLists::kMidiChannelMonoG9 }),
+        .defaultIndex = 0,
+        .sysExOffset = 11, // Combination of offsets 11, 12, 35
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMidiEcho,
+        .displayName = ParameterDisplayNames::kMidiEcho,
+        .parentGroupId = ModuleIds::kMidi,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 0,
+        .sysExOffset = 32,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMidiControllers,
+        .displayName = ParameterDisplayNames::kMidiControllers,
+        .parentGroupId = ModuleIds::kMidi,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 1,
+        .sysExOffset = 13,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMidiPatchChanges,
+        .displayName = ParameterDisplayNames::kMidiPatchChanges,
+        .parentGroupId = ModuleIds::kMidi,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 1,
+        .sysExOffset = 14,
+        .sysExId = kNoSysExId
+    },
+    // VIBRATO Module Choice Parameters
+    {
+        .parameterId = ParameterIds::kVibratoSpeedModSource,
+        .displayName = ParameterDisplayNames::kVibratoSpeedModSource,
+        .parentGroupId = ModuleIds::kVibrato,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kSourceLever2, ChoiceLists::kSourcePedal1 }),
+        .defaultIndex = 0,
+        .sysExOffset = 2,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kVibratoWaveform,
+        .displayName = ParameterDisplayNames::kVibratoWaveform,
+        .parentGroupId = ModuleIds::kVibrato,
+        .choices = makeStringArray({ ChoiceLists::kLfoWaveformTriangle, ChoiceLists::kLfoWaveformUpsaw, ChoiceLists::kLfoWaveformDnsaw,
+                                     ChoiceLists::kLfoWaveformSquare, ChoiceLists::kLfoWaveformRandom, ChoiceLists::kLfoWaveformNoise, 
+                                     ChoiceLists::kLfoWaveformSampled }),
+        .defaultIndex = 0,
+        .sysExOffset = 4,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kVibratoAmpModSource,
+        .displayName = ParameterDisplayNames::kVibratoAmpModSource,
+        .parentGroupId = ModuleIds::kVibrato,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kSourceLever2, ChoiceLists::kSourcePedal1 }),
+        .defaultIndex = 0,
+        .sysExOffset = 6,
+        .sysExId = kNoSysExId
+    },
+    // MISC Module Choice Parameters
+    {
+        .parameterId = ParameterIds::kUnisonEnable,
+        .displayName = ParameterDisplayNames::kUnisonEnable,
+        .parentGroupId = ModuleIds::kMisc,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 0,
+        .sysExOffset = 169,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kVolumeInvertEnable,
+        .displayName = ParameterDisplayNames::kVolumeInvertEnable,
+        .parentGroupId = ModuleIds::kMisc,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 0,
+        .sysExOffset = 170,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kBankLockEnable,
+        .displayName = ParameterDisplayNames::kBankLockEnable,
+        .parentGroupId = ModuleIds::kMisc,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 0,
+        .sysExOffset = 165,
+        .sysExId = kNoSysExId
+    },
+    {
+        .parameterId = ParameterIds::kMemoryProtectEnable,
+        .displayName = ParameterDisplayNames::kMemoryProtectEnable,
+        .parentGroupId = ModuleIds::kMisc,
+        .choices = makeStringArray({ ChoiceLists::kOnOffChoiceOff, ChoiceLists::kOnOffChoiceOn }),
+        .defaultIndex = 0,
+        .sysExOffset = 171,
+        .sysExId = kNoSysExId
+    }
+};
 
 // ============================================================================
 // Data Definitions - Patch Edit Parameters - DCO 1 Module

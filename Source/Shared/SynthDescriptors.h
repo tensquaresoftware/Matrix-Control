@@ -319,6 +319,34 @@ namespace ParameterIds
     constexpr const char* kModulationBus9Source       = "modulationBus9Source";
     constexpr const char* kModulationBus9Amount       = "modulationBus9Amount";
     constexpr const char* kModulationBus9Destination  = "modulationBus9Destination";
+
+    // Master Edit - MIDI Module Parameter Ids
+    constexpr const char* kMidiChannel                = "midiChannel";
+    constexpr const char* kMidiEcho                   = "midiEcho";
+    constexpr const char* kMidiControllers            = "midiControllers";
+    constexpr const char* kMidiPatchChanges           = "midiPatchChanges";
+    constexpr const char* kMidiPedal1Select           = "midiPedal1Select";
+    constexpr const char* kMidiPedal2Select           = "midiPedal2Select";
+    constexpr const char* kMidiLever2Select           = "midiLever2Select";
+    constexpr const char* kMidiLever3Select           = "midiLever3Select";
+
+    // Master Edit - VIBRATO Module Parameter Ids
+    constexpr const char* kVibratoSpeed               = "vibratoSpeed";
+    constexpr const char* kVibratoSpeedModSource      = "vibratoSpeedModSource";
+    constexpr const char* kVibratoSpeedModAmount      = "vibratoSpeedModAmount";
+    constexpr const char* kVibratoWaveform            = "vibratoWaveform";
+    constexpr const char* kVibratoAmplitude           = "vibratoAmplitude";
+    constexpr const char* kVibratoAmpModSource        = "vibratoAmpModSource";
+    constexpr const char* kVibratoAmpModAmount        = "vibratoAmpModAmount";
+
+    // Master Edit - MISC Module Parameter Ids
+    constexpr const char* kMasterTune                 = "masterTune";
+    constexpr const char* kMasterTranspose            = "masterTranspose";
+    constexpr const char* kBendRange                  = "bendRange";
+    constexpr const char* kUnisonEnable               = "unisonEnable";
+    constexpr const char* kVolumeInvertEnable        = "volumeInvertEnable";
+    constexpr const char* kBankLockEnable             = "bankLockEnable";
+    constexpr const char* kMemoryProtectEnable        = "memoryProtectEnable";
 }
 
 // ============================================================================
@@ -448,6 +476,34 @@ namespace ParameterDisplayNames
     constexpr const char* kModulationBusSource          = "SOURCE";
     constexpr const char* kModulationBusDestination     = "DESTINATION";
     constexpr const char* kModulationBusAmount          = "AMOUNT";
+
+    // Master Edit - MIDI Module Parameters Display Names
+    constexpr const char* kMidiChannel                  = "CHANNEL";
+    constexpr const char* kMidiEcho                     = "MIDI ECHO";
+    constexpr const char* kMidiControllers              = "CONTROLLERS";
+    constexpr const char* kMidiPatchChanges              = "PATCH CHANGES";
+    constexpr const char* kMidiPedal1Select             = "PEDAL 1 SELECT";
+    constexpr const char* kMidiPedal2Select              = "PEDAL 2 SELECT";
+    constexpr const char* kMidiLever2Select             = "LEVER 2 SELECT";
+    constexpr const char* kMidiLever3Select             = "LEVER 3 SELECT";
+
+    // Master Edit - VIBRATO Module Parameters Display Names
+    constexpr const char* kVibratoSpeed                 = "SPEED";
+    constexpr const char* kVibratoSpeedModSource        = "SPEED MOD SOURCE";
+    constexpr const char* kVibratoSpeedModAmount       = "SPEED MOD AMOUNT";
+    constexpr const char* kVibratoWaveform              = "WAVEFORM";
+    constexpr const char* kVibratoAmplitude             = "AMPLITUDE";
+    constexpr const char* kVibratoAmpModSource          = "AMP MOD SOURCE";
+    constexpr const char* kVibratoAmpModAmount          = "AMP MOD AMOUNT";
+
+    // Master Edit - MISC Module Parameters Display Names
+    constexpr const char* kMasterTune                   = "MASTER TUNE";
+    constexpr const char* kMasterTranspose              = "MASTER TRANSPOSE";
+    constexpr const char* kBendRange                    = "BEND RANGE (+/-)";
+    constexpr const char* kUnisonEnable                 = "UNISON";
+    constexpr const char* kVolumeInvertEnable           = "VOLUME INVERT";
+    constexpr const char* kBankLockEnable               = "BANK LOCK";
+    constexpr const char* kMemoryProtectEnable          = "MEMORY PROTECT";
 }
 
 // ============================================================================
@@ -595,6 +651,44 @@ namespace ChoiceLists
     constexpr const char* kDestinationLfo2Speed         = "LFO 2 SPEED";
     constexpr const char* kDestinationLfo2Amplitude     = "LFO 2 AMPLITUDE";
     constexpr const char* kDestinationPortamentoRate    = "PORTAMENTO RATE";
+
+    // MIDI Channel Choices
+    constexpr const char* kMidiChannelOmni             = "OMNI";
+    constexpr const char* kMidiChannel1                 = "1";
+    constexpr const char* kMidiChannel2                 = "2";
+    constexpr const char* kMidiChannel3                 = "3";
+    constexpr const char* kMidiChannel4                 = "4";
+    constexpr const char* kMidiChannel5                 = "5";
+    constexpr const char* kMidiChannel6                 = "6";
+    constexpr const char* kMidiChannel7                 = "7";
+    constexpr const char* kMidiChannel8                 = "8";
+    constexpr const char* kMidiChannel9                 = "9";
+    constexpr const char* kMidiChannel10                = "10";
+    constexpr const char* kMidiChannel11                = "11";
+    constexpr const char* kMidiChannel12                = "12";
+    constexpr const char* kMidiChannel13                = "13";
+    constexpr const char* kMidiChannel14                = "14";
+    constexpr const char* kMidiChannel15                = "15";
+    constexpr const char* kMidiChannel16                = "16";
+    constexpr const char* kMidiChannelMonoG1            = "MONO G1";
+    constexpr const char* kMidiChannelMonoG2            = "MONO G2";
+    constexpr const char* kMidiChannelMonoG3            = "MONO G3";
+    constexpr const char* kMidiChannelMonoG4            = "MONO G4";
+    constexpr const char* kMidiChannelMonoG5            = "MONO G5";
+    constexpr const char* kMidiChannelMonoG6            = "MONO G6";
+    constexpr const char* kMidiChannelMonoG7            = "MONO G7";
+    constexpr const char* kMidiChannelMonoG8            = "MONO G8";
+    constexpr const char* kMidiChannelMonoG9            = "MONO G9";
+
+    // Vibrato Mod Source Choices
+    constexpr const char* kVibratoModSourceNone         = "NONE";
+    constexpr const char* kVibratoModSourceLever1       = "LEVER 1";
+    constexpr const char* kVibratoModSourceLever2       = "LEVER 2";
+    constexpr const char* kVibratoModSourceLever3       = "LEVER 3";
+
+    // Bend Range Choices
+    constexpr const char* kBendRangePlusMinus2          = "+/-2";
+    constexpr const char* kBendRangePlusMinus12         = "+/-12";
 }
 
 // ============================================================================

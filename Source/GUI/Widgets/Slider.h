@@ -16,6 +16,9 @@ namespace tss
 
         void setTheme(Theme& inTheme);
 
+        void setUnit(const juce::String& inUnit);
+        juce::String getUnit() const;
+
         void paint(juce::Graphics& g) override;
 
         void mouseDown(const juce::MouseEvent& e) override;
@@ -45,6 +48,7 @@ namespace tss
         double defaultValue = 0.0;
         double dragStartValue = 0.0;
         juce::Point<int> dragStartPosition;
+        juce::String unit;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

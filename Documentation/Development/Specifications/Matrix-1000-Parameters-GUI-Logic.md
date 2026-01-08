@@ -267,11 +267,11 @@ When reading SysEx data, the plugin converts these three parameters into a singl
 | Parameter             | Type | Values                                                                                                             | SysEx Offset | GUI Component                                                                         | Displayed Name   |
 | --------------------- | ---- | ------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------- | ---------------- |
 | vibratoSpeed          | int  | Min = 0<br>Max = 63<br>Default = 0                                                                                 | 1            | Slider                                                                                | SPEED            |
-| vibratoSpeedModSource | enum | Items:<br>None, (Default)<br>Lever1,<br>Lever2,<br>Lever3                                                          | 2            | ComboBox:<br>NONE,<br>LEVER 1,<br>LEVER 2,<br>LEVER 3                                 | SPEED MOD SOURCE |
+| vibratoSpeedModSource | enum | Items:<br>OFF, (Default)<br>LEVER 2,<br>PEDAL 1                                                          | 2            | ComboBox:<br>OFF,<br>LEVER 2,<br>PEDAL 1                                 | SPEED MOD SOURCE |
 | vibratoSpeedModAmount | int  | Min = -63<br>Max = 63<br>Default = 0                                                                               | 3            | Slider                                                                                | SPEED MOD AMOUNT |
 | vibratoWaveform       | enum | Items:<br>Triangle, (Default)<br>UpSawtooth,<br>DownSawtooth,<br>Square,<br>Random,<br>Noise,<br>SampledModulation | 4            | ComboBox:<br>TRIANGLE,<br>UPSAW,<br>DNSAW,<br>SQUARE,<br>RANDOM,<br>NOISE,<br>SAMPLED | WAVEFORM         |
 | vibratoAmplitude      | int  | Min = 0<br>Max = 63<br>Default = 0                                                                                 | 5            | Slider                                                                                | AMPLITUDE        |
-| vibratoAmpModSource   | enum | Items:<br>None, (Default)<br>Lever1,<br>Lever2,<br>Lever3                                                          | 6            | ComboBox:<br>NONE,<br>LEVER 1,<br>LEVER 2,<br>LEVER 3                                 | AMP MOD SOURCE   |
+| vibratoAmpModSource   | enum | Items:<br>OFF, (Default)<br>LEVER 2,<br>PEDAL 1                                                          | 6            | ComboBox:<br>OFF,<br>LEVER 2,<br>PEDAL 1                                 | AMP MOD SOURCE   |
 | vibratoAmpModAmount   | int  | Min = -63<br>Max = 63<br>Default = 0                                                                               | 7            | Slider                                                                                | AMP MOD AMOUNT   |
 
 #### MISC Module
@@ -279,8 +279,8 @@ When reading SysEx data, the plugin converts these three parameters into a singl
 | Parameter           | Type | Values                               | SysEx Offset | GUI Component               | Displayed Name   |
 | ------------------- | ---- | ------------------------------------ | ------------ | --------------------------- | ---------------- |
 | masterTune          | int  | Min = -31<br>Max = 31<br>Default = 0 | 8            | Slider                      | MASTER TUNE      |
-| masterTranspose     | int  | Min = -31<br>Max = 31<br>Default = 0 | 34           | Slider                      | MASTER TRANSPOSE |
-| bendRange           | enum | Items:<br>+/-2, (Default)<br>+/-12   | 164          | ComboBox:<br>+/-2,<br>+/-12 | BEND RANGE (+/-) |
+| masterTranspose     | int  | Min = -24<br>Max = 24<br>Default = 0 | 34           | Slider (unit: st)                      | MASTER TRANSPOSE |
+| bendRange           | int  | Min = -24<br>Max = 24<br>Default = 2   | 164          | Slider (unit: st) | BEND RANGE (+/-) |
 | unisonEnable        | enum | Items:<br>Off, (Default)<br>On       | 169          | ComboBox:<br>OFF,<br>ON     | UNISON           |
 | volumeInvertEnable  | enum | Items:<br>Off, (Default)<br>On       | 170          | ComboBox:<br>OFF,<br>ON     | VOLUME INVERT    |
 | bankLockEnable      | enum | Items:<br>Off, (Default)<br>On       | 165          | ComboBox:<br>OFF,<br>ON     | BANK LOCK        |
