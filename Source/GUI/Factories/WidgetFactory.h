@@ -6,7 +6,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "../../Shared/SynthDescriptors.h"
+#include "../../Shared/PluginDescriptors.h"
 #include "WidgetFactoryValidator.h"
 
 namespace tss
@@ -49,10 +49,10 @@ public:
 private:
     WidgetFactoryValidator validator;
     
-    std::map<juce::String, const SynthDescriptors::IntParameterDescriptor*> intParameterMap;
-    std::map<juce::String, const SynthDescriptors::ChoiceParameterDescriptor*> choiceParameterMap;
-    std::map<juce::String, const SynthDescriptors::StandaloneWidgetDescriptor*> standaloneWidgetMap;
-    std::map<juce::String, const SynthDescriptors::ApvtsGroupDescriptor*> groupMap;
+    std::map<juce::String, const PluginDescriptors::IntParameterDescriptor*> intParameterMap;
+    std::map<juce::String, const PluginDescriptors::ChoiceParameterDescriptor*> choiceParameterMap;
+    std::map<juce::String, const PluginDescriptors::StandaloneWidgetDescriptor*> standaloneWidgetMap;
+    std::map<juce::String, const PluginDescriptors::ApvtsGroupDescriptor*> groupMap;
     
     void buildSearchMaps();
     void buildIntParameterMap();
@@ -69,16 +69,16 @@ private:
     void addPatchManagerStandaloneWidgetsToMap();
     void addMasterEditStandaloneWidgetsToMap();
     
-    const SynthDescriptors::IntParameterDescriptor* findIntParameter(const juce::String& parameterId) const;
-    const SynthDescriptors::ChoiceParameterDescriptor* findChoiceParameter(const juce::String& parameterId) const;
-    const SynthDescriptors::StandaloneWidgetDescriptor* findStandaloneWidget(const juce::String& widgetId) const;
-    const SynthDescriptors::ApvtsGroupDescriptor* findGroup(const juce::String& groupId) const;
+    const PluginDescriptors::IntParameterDescriptor* findIntParameter(const juce::String& parameterId) const;
+    const PluginDescriptors::ChoiceParameterDescriptor* findChoiceParameter(const juce::String& parameterId) const;
+    const PluginDescriptors::StandaloneWidgetDescriptor* findStandaloneWidget(const juce::String& widgetId) const;
+    const PluginDescriptors::ApvtsGroupDescriptor* findGroup(const juce::String& groupId) const;
     
-    void addIntParametersToMap(const std::vector<SynthDescriptors::IntParameterDescriptor>& parameters);
-    void addChoiceParametersToMap(const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& parameters);
-    void addStandaloneWidgetsToMap(const std::vector<SynthDescriptors::StandaloneWidgetDescriptor>& widgets);
+    void addIntParametersToMap(const std::vector<PluginDescriptors::IntParameterDescriptor>& parameters);
+    void addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters);
+    void addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets);
     
-    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const SynthDescriptors::IntParameterDescriptor* desc, tss::Theme& theme);
-    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const SynthDescriptors::ChoiceParameterDescriptor* desc, tss::Theme& theme);
+    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::Theme& theme);
+    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::Theme& theme);
 };
 

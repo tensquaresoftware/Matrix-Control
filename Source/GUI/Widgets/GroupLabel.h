@@ -52,7 +52,7 @@ namespace tss
         inline constexpr static int kHeight = 40;
         inline constexpr static float kTopAreaHeight = 15.0f;
         inline constexpr static float kContentHeight = 20.0f;
-        inline constexpr static float kTextSpacing = 20.0f;
+        inline constexpr static float kTextSpacing = 8.0f;
         inline constexpr static float kLineThickness = 1.0f;
 
         Theme* theme = nullptr;

@@ -1,16 +1,16 @@
 #include "ModulationBusHeader.h"
 
 #include "../Themes/Theme.h"
-#include "../../Shared/SynthDescriptors.h"
+#include "../../Shared/PluginDescriptors.h"
 
 namespace tss
 {
     ModulationBusHeader::ModulationBusHeader(Theme& inTheme, ColourVariant variant)
         : theme(&inTheme)
-        , busNumberText(SynthDescriptors::ParameterDisplayNames::kModulationBusNumber)
-        , busSourceText(SynthDescriptors::ParameterDisplayNames::kModulationBusSource)
-        , busAmountText(SynthDescriptors::ParameterDisplayNames::kModulationBusAmount)
-        , busDestinationText(SynthDescriptors::ParameterDisplayNames::kModulationBusDestination)
+        , busNumberText(PluginDescriptors::ParameterDisplayNames::kModulationBusNumber)
+        , busSourceText(PluginDescriptors::ParameterDisplayNames::kModulationBusSource)
+        , busAmountText(PluginDescriptors::ParameterDisplayNames::kModulationBusAmount)
+        , busDestinationText(PluginDescriptors::ParameterDisplayNames::kModulationBusDestination)
         , colourVariant(variant)
     {
         setSize(kWidth, kHeight);

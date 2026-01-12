@@ -14,7 +14,7 @@ namespace tss
             PatchEditModule,
             MasterEditModule,
             ModulationBusNumber,
-            PatchManagerBankSelect
+            PatchManagerBankSelector
         };
 
         explicit Label(Theme& inTheme, LabelWidth inWidth, const juce::String& text = juce::String());
@@ -33,7 +33,7 @@ namespace tss
             {
                 case LabelWidth::ModulationBusNumber:
                     return kBusNumberWidth;
-                case LabelWidth::PatchManagerBankSelect:
+                case LabelWidth::PatchManagerBankSelector:
                     return kPatchManagerBankSelectWidth;
                 case LabelWidth::PatchEditModule:
                     return kPatchEditModuleWidth;

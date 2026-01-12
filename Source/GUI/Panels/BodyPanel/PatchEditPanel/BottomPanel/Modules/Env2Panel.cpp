@@ -7,7 +7,7 @@
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
 #include "../../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../Shared/PluginDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,50 +16,50 @@ Env2Panel::Env2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kEnvelope2);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kEnvelope2);
     setupInitCopyPasteButtons(inTheme, widgetFactory,
-                              SynthDescriptors::StandaloneWidgetIds::kEnv2Init,
-                              SynthDescriptors::StandaloneWidgetIds::kEnv2Copy,
-                              SynthDescriptors::StandaloneWidgetIds::kEnv2Paste);
+                              PluginDescriptors::StandaloneWidgetIds::kEnv2Init,
+                              PluginDescriptors::StandaloneWidgetIds::kEnv2Copy,
+                              PluginDescriptors::StandaloneWidgetIds::kEnv2Paste);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2Delay,
+                                PluginDescriptors::ParameterIds::kEnv2Delay,
                                 env2DelayLabel, env2DelaySlider, env2DelayAttachment, horizontalSeparator1);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2Attack,
+                                PluginDescriptors::ParameterIds::kEnv2Attack,
                                 env2AttackLabel, env2AttackSlider, env2AttackAttachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2Decay,
+                                PluginDescriptors::ParameterIds::kEnv2Decay,
                                 env2DecayLabel, env2DecaySlider, env2DecayAttachment, horizontalSeparator3);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2Sustain,
+                                PluginDescriptors::ParameterIds::kEnv2Sustain,
                                 env2SustainLabel, env2SustainSlider, env2SustainAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2Release,
+                                PluginDescriptors::ParameterIds::kEnv2Release,
                                 env2ReleaseLabel, env2ReleaseSlider, env2ReleaseAttachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2Amplitude,
+                                PluginDescriptors::ParameterIds::kEnv2Amplitude,
                                 env2AmplitudeLabel, env2AmplitudeSlider, env2AmplitudeAttachment, horizontalSeparator6);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kEnv2AmplitudeModByVelocity,
+                                PluginDescriptors::ParameterIds::kEnv2AmplitudeModByVelocity,
                                 env2AmplitudeModByVelocityLabel, env2AmplitudeModByVelocitySlider, env2AmplitudeModByVelocityAttachment, horizontalSeparator7);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kEnv2TriggerMode,
+                                     PluginDescriptors::ParameterIds::kEnv2TriggerMode,
                                      env2TriggerModeLabel, env2TriggerModeComboBox, env2TriggerModeAttachment, horizontalSeparator8);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kEnv2EnvelopeMode,
+                                     PluginDescriptors::ParameterIds::kEnv2EnvelopeMode,
                                      env2EnvelopeModeLabel, env2EnvelopeModeComboBox, env2EnvelopeModeAttachment, horizontalSeparator9);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kEnv2Lfo1Trigger,
+                                     PluginDescriptors::ParameterIds::kEnv2Lfo1Trigger,
                                      env2Lfo1TriggerLabel, env2Lfo1TriggerComboBox, env2Lfo1TriggerAttachment, horizontalSeparator10);
 
     setSize(getWidth(), getHeight());

@@ -3,7 +3,8 @@
 #include "../Widgets/Slider.h"
 #include "../Widgets/ComboBox.h"
 #include "../Widgets/Button.h"
-#include "../../Shared/SynthDescriptors.h"
+#include "../../Shared/PluginDescriptors.h"
+#include "../../Shared/PluginIDs.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     : validator(inApvts)
@@ -12,7 +13,7 @@ WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
 }
 
 std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
-    const SynthDescriptors::IntParameterDescriptor* desc,
+    const PluginDescriptors::IntParameterDescriptor* desc,
     tss::Theme& theme)
 {
     auto slider = std::make_unique<tss::Slider>(theme, static_cast<double>(desc->defaultValue));
@@ -22,7 +23,7 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
 }
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
-    const SynthDescriptors::ChoiceParameterDescriptor* desc,
+    const PluginDescriptors::ChoiceParameterDescriptor* desc,
     tss::Theme& theme)
 {
     auto comboBox = std::make_unique<tss::ComboBox>(theme);
@@ -85,7 +86,7 @@ juce::String WidgetFactory::getParameterDisplayName(const juce::String& paramete
 
 juce::String WidgetFactory::getGroupDisplayName(const juce::String& groupId) const
 {
-    return SynthDescriptors::getGroupDisplayName(groupId);
+    return PluginDescriptors::getGroupDisplayName(groupId);
 }
 
 juce::String WidgetFactory::getStandaloneWidgetDisplayName(const juce::String& widgetId) const
@@ -96,19 +97,19 @@ juce::String WidgetFactory::getStandaloneWidgetDisplayName(const juce::String& w
     return juce::String();
 }
 
-const SynthDescriptors::IntParameterDescriptor* WidgetFactory::findIntParameter(const juce::String& parameterId) const
+const PluginDescriptors::IntParameterDescriptor* WidgetFactory::findIntParameter(const juce::String& parameterId) const
 {
     auto it = intParameterMap.find(parameterId);
     return (it != intParameterMap.end()) ? it->second : nullptr;
 }
 
-const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactory::findChoiceParameter(const juce::String& parameterId) const
+const PluginDescriptors::ChoiceParameterDescriptor* WidgetFactory::findChoiceParameter(const juce::String& parameterId) const
 {
     auto it = choiceParameterMap.find(parameterId);
     return (it != choiceParameterMap.end()) ? it->second : nullptr;
 }
 
-const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::findStandaloneWidget(const juce::String& widgetId) const
+const PluginDescriptors::StandaloneWidgetDescriptor* WidgetFactory::findStandaloneWidget(const juce::String& widgetId) const
 {
     auto it = standaloneWidgetMap.find(widgetId);
     return (it != standaloneWidgetMap.end()) ? it->second : nullptr;
@@ -116,11 +117,11 @@ const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactory::findStandalon
 
 void WidgetFactory::buildGroupMap()
 {
-    for (const auto& group : SynthDescriptors::kAllApvtsGroups)
+    for (const auto& group : PluginDescriptors::kAllApvtsGroups)
         groupMap[group.groupId] = &group;
 }
 
-const SynthDescriptors::ApvtsGroupDescriptor* WidgetFactory::findGroup(const juce::String& groupId) const
+const PluginDescriptors::ApvtsGroupDescriptor* WidgetFactory::findGroup(const juce::String& groupId) const
 {
     auto it = groupMap.find(groupId);
     return (it != groupMap.end()) ? it->second : nullptr;
@@ -155,7 +156,7 @@ void WidgetFactory::buildStandaloneWidgetMap()
     addMasterEditStandaloneWidgetsToMap();
 }
 
-void WidgetFactory::addIntParametersToMap(const std::vector<SynthDescriptors::IntParameterDescriptor>& parameters)
+void WidgetFactory::addIntParametersToMap(const std::vector<PluginDescriptors::IntParameterDescriptor>& parameters)
 {
     for (const auto& param : parameters)
         intParameterMap[param.parameterId] = &param;
@@ -163,30 +164,30 @@ void WidgetFactory::addIntParametersToMap(const std::vector<SynthDescriptors::In
 
 void WidgetFactory::addPatchEditModuleIntParametersToMap()
 {
-    addIntParametersToMap(SynthDescriptors::kDco1IntParameters);
-    addIntParametersToMap(SynthDescriptors::kDco2IntParameters);
-    addIntParametersToMap(SynthDescriptors::kVcfVcaIntParameters);
-    addIntParametersToMap(SynthDescriptors::kFmTrackIntParameters);
-    addIntParametersToMap(SynthDescriptors::kRampPortamentoIntParameters);
-    addIntParametersToMap(SynthDescriptors::kEnv1IntParameters);
-    addIntParametersToMap(SynthDescriptors::kEnv2IntParameters);
-    addIntParametersToMap(SynthDescriptors::kEnv3IntParameters);
-    addIntParametersToMap(SynthDescriptors::kLfo1IntParameters);
-    addIntParametersToMap(SynthDescriptors::kLfo2IntParameters);
+    addIntParametersToMap(PluginDescriptors::kDco1IntParameters);
+    addIntParametersToMap(PluginDescriptors::kDco2IntParameters);
+    addIntParametersToMap(PluginDescriptors::kVcfVcaIntParameters);
+    addIntParametersToMap(PluginDescriptors::kFmTrackIntParameters);
+    addIntParametersToMap(PluginDescriptors::kRampPortamentoIntParameters);
+    addIntParametersToMap(PluginDescriptors::kEnv1IntParameters);
+    addIntParametersToMap(PluginDescriptors::kEnv2IntParameters);
+    addIntParametersToMap(PluginDescriptors::kEnv3IntParameters);
+    addIntParametersToMap(PluginDescriptors::kLfo1IntParameters);
+    addIntParametersToMap(PluginDescriptors::kLfo2IntParameters);
 }
 
 void WidgetFactory::addMatrixModulationBusIntParametersToMap()
 {
-    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
-        addIntParametersToMap(SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)]);
+    for (int bus = 0; bus < PluginDescriptors::kModulationBusCount; ++bus)
+        addIntParametersToMap(PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addMasterEditIntParametersToMap()
 {
-    addIntParametersToMap(SynthDescriptors::kMasterEditIntParameters);
+    addIntParametersToMap(PluginDescriptors::kMasterEditIntParameters);
 }
 
-void WidgetFactory::addChoiceParametersToMap(const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& parameters)
+void WidgetFactory::addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters)
 {
     for (const auto& param : parameters)
         choiceParameterMap[param.parameterId] = &param;
@@ -194,30 +195,30 @@ void WidgetFactory::addChoiceParametersToMap(const std::vector<SynthDescriptors:
 
 void WidgetFactory::addPatchEditModuleChoiceParametersToMap()
 {
-    addChoiceParametersToMap(SynthDescriptors::kDco1ChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kDco2ChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kVcfVcaChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kFmTrackChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kRampPortamentoChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kEnv1ChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kEnv2ChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kEnv3ChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kLfo1ChoiceParameters);
-    addChoiceParametersToMap(SynthDescriptors::kLfo2ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kDco1ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kDco2ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kVcfVcaChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kFmTrackChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kRampPortamentoChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kEnv1ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kEnv2ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kEnv3ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kLfo1ChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kLfo2ChoiceParameters);
 }
 
 void WidgetFactory::addMatrixModulationBusChoiceParametersToMap()
 {
-    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
-        addChoiceParametersToMap(SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)]);
+    for (int bus = 0; bus < PluginDescriptors::kModulationBusCount; ++bus)
+        addChoiceParametersToMap(PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)]);
 }
 
 void WidgetFactory::addMasterEditChoiceParametersToMap()
 {
-    addChoiceParametersToMap(SynthDescriptors::kMasterEditChoiceParameters);
+    addChoiceParametersToMap(PluginDescriptors::kMasterEditChoiceParameters);
 }
 
-void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<SynthDescriptors::StandaloneWidgetDescriptor>& widgets)
+void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets)
 {
     for (const auto& widget : widgets)
         standaloneWidgetMap[widget.widgetId] = &widget;
@@ -225,27 +226,27 @@ void WidgetFactory::addStandaloneWidgetsToMap(const std::vector<SynthDescriptors
 
 void WidgetFactory::addPatchEditStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(SynthDescriptors::kDco1StandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kDco2StandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kVcfVcaStandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kFmTrackStandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kRampPortamentoStandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kEnv1StandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kEnv2StandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kEnv3StandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kLfo1StandaloneWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kLfo2StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kDco1StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kDco2StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kVcfVcaStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kFmTrackStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kRampPortamentoStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kEnv1StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kEnv2StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kEnv3StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kLfo1StandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kLfo2StandaloneWidgets);
 }
 
 void WidgetFactory::addPatchManagerStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(SynthDescriptors::kBankUtilityWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kInternalPatchesWidgets);
-    addStandaloneWidgetsToMap(SynthDescriptors::kComputerPatchesWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kBankUtilityWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kInternalPatchesWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kComputerPatchesWidgets);
 }
 
 void WidgetFactory::addMasterEditStandaloneWidgetsToMap()
 {
-    addStandaloneWidgetsToMap(SynthDescriptors::kMasterEditStandaloneWidgets);
+    addStandaloneWidgetsToMap(PluginDescriptors::kMasterEditStandaloneWidgets);
 }
 

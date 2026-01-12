@@ -8,7 +8,7 @@
 #include "../../../Widgets/Slider.h"
 #include "../../../Widgets/Button.h"
 #include "../../../Widgets/HorizontalSeparator.h"
-#include "../../../../Shared/SynthDescriptors.h"
+#include "../../../../Shared/PluginDescriptors.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -21,7 +21,7 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& inTheme, WidgetFactory& widg
     , sectionHeader(std::make_unique<tss::SectionHeader>(
         inTheme,
         tss::SectionHeader::SectionWidth::MatrixModulation,
-        SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kMatrixModulation)))
+        PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMatrixModulation)))
     , modulationBusHeader(std::make_unique<tss::ModulationBusHeader>(inTheme))
 {
     addAndMakeVisible(*sectionHeader);
@@ -31,7 +31,7 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& inTheme, WidgetFactory& widg
 
     createInitAllBussesButton(inTheme);
 
-    for (int busNumber = 0; busNumber < SynthDescriptors::kModulationBusCount; ++busNumber)
+    for (int busNumber = 0; busNumber < PluginDescriptors::kModulationBusCount; ++busNumber)
     {
         createModulationBus(busNumber, widgetFactory, inTheme, parameterArrays);
     }
@@ -39,67 +39,67 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& inTheme, WidgetFactory& widg
     setSize(getWidth(), getHeight());
 }
 
-std::array<const char*, SynthDescriptors::kModulationBusCount> MatrixModulationPanel::createBusIds() const
+std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createBusIds() const
 {
     return {
-        SynthDescriptors::ModulationBusIds::kModulationBus0,
-        SynthDescriptors::ModulationBusIds::kModulationBus1,
-        SynthDescriptors::ModulationBusIds::kModulationBus2,
-        SynthDescriptors::ModulationBusIds::kModulationBus3,
-        SynthDescriptors::ModulationBusIds::kModulationBus4,
-        SynthDescriptors::ModulationBusIds::kModulationBus5,
-        SynthDescriptors::ModulationBusIds::kModulationBus6,
-        SynthDescriptors::ModulationBusIds::kModulationBus7,
-        SynthDescriptors::ModulationBusIds::kModulationBus8,
-        SynthDescriptors::ModulationBusIds::kModulationBus9
+        PluginDescriptors::ModulationBusIds::kModulationBus0,
+        PluginDescriptors::ModulationBusIds::kModulationBus1,
+        PluginDescriptors::ModulationBusIds::kModulationBus2,
+        PluginDescriptors::ModulationBusIds::kModulationBus3,
+        PluginDescriptors::ModulationBusIds::kModulationBus4,
+        PluginDescriptors::ModulationBusIds::kModulationBus5,
+        PluginDescriptors::ModulationBusIds::kModulationBus6,
+        PluginDescriptors::ModulationBusIds::kModulationBus7,
+        PluginDescriptors::ModulationBusIds::kModulationBus8,
+        PluginDescriptors::ModulationBusIds::kModulationBus9
     };
 }
 
-std::array<const char*, SynthDescriptors::kModulationBusCount> MatrixModulationPanel::createSourceParameterIds() const
+std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createSourceParameterIds() const
 {
     return {
-        SynthDescriptors::ParameterIds::kModulationBus0Source,
-        SynthDescriptors::ParameterIds::kModulationBus1Source,
-        SynthDescriptors::ParameterIds::kModulationBus2Source,
-        SynthDescriptors::ParameterIds::kModulationBus3Source,
-        SynthDescriptors::ParameterIds::kModulationBus4Source,
-        SynthDescriptors::ParameterIds::kModulationBus5Source,
-        SynthDescriptors::ParameterIds::kModulationBus6Source,
-        SynthDescriptors::ParameterIds::kModulationBus7Source,
-        SynthDescriptors::ParameterIds::kModulationBus8Source,
-        SynthDescriptors::ParameterIds::kModulationBus9Source
+        PluginDescriptors::ParameterIds::kModulationBus0Source,
+        PluginDescriptors::ParameterIds::kModulationBus1Source,
+        PluginDescriptors::ParameterIds::kModulationBus2Source,
+        PluginDescriptors::ParameterIds::kModulationBus3Source,
+        PluginDescriptors::ParameterIds::kModulationBus4Source,
+        PluginDescriptors::ParameterIds::kModulationBus5Source,
+        PluginDescriptors::ParameterIds::kModulationBus6Source,
+        PluginDescriptors::ParameterIds::kModulationBus7Source,
+        PluginDescriptors::ParameterIds::kModulationBus8Source,
+        PluginDescriptors::ParameterIds::kModulationBus9Source
     };
 }
 
-std::array<const char*, SynthDescriptors::kModulationBusCount> MatrixModulationPanel::createAmountParameterIds() const
+std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createAmountParameterIds() const
 {
     return {
-        SynthDescriptors::ParameterIds::kModulationBus0Amount,
-        SynthDescriptors::ParameterIds::kModulationBus1Amount,
-        SynthDescriptors::ParameterIds::kModulationBus2Amount,
-        SynthDescriptors::ParameterIds::kModulationBus3Amount,
-        SynthDescriptors::ParameterIds::kModulationBus4Amount,
-        SynthDescriptors::ParameterIds::kModulationBus5Amount,
-        SynthDescriptors::ParameterIds::kModulationBus6Amount,
-        SynthDescriptors::ParameterIds::kModulationBus7Amount,
-        SynthDescriptors::ParameterIds::kModulationBus8Amount,
-        SynthDescriptors::ParameterIds::kModulationBus9Amount
+        PluginDescriptors::ParameterIds::kModulationBus0Amount,
+        PluginDescriptors::ParameterIds::kModulationBus1Amount,
+        PluginDescriptors::ParameterIds::kModulationBus2Amount,
+        PluginDescriptors::ParameterIds::kModulationBus3Amount,
+        PluginDescriptors::ParameterIds::kModulationBus4Amount,
+        PluginDescriptors::ParameterIds::kModulationBus5Amount,
+        PluginDescriptors::ParameterIds::kModulationBus6Amount,
+        PluginDescriptors::ParameterIds::kModulationBus7Amount,
+        PluginDescriptors::ParameterIds::kModulationBus8Amount,
+        PluginDescriptors::ParameterIds::kModulationBus9Amount
     };
 }
 
-std::array<const char*, SynthDescriptors::kModulationBusCount> MatrixModulationPanel::createDestinationParameterIds() const
+std::array<const char*, PluginDescriptors::kModulationBusCount> MatrixModulationPanel::createDestinationParameterIds() const
 {
     return {
-        SynthDescriptors::ParameterIds::kModulationBus0Destination,
-        SynthDescriptors::ParameterIds::kModulationBus1Destination,
-        SynthDescriptors::ParameterIds::kModulationBus2Destination,
-        SynthDescriptors::ParameterIds::kModulationBus3Destination,
-        SynthDescriptors::ParameterIds::kModulationBus4Destination,
-        SynthDescriptors::ParameterIds::kModulationBus5Destination,
-        SynthDescriptors::ParameterIds::kModulationBus6Destination,
-        SynthDescriptors::ParameterIds::kModulationBus7Destination,
-        SynthDescriptors::ParameterIds::kModulationBus8Destination,
-        SynthDescriptors::ParameterIds::kModulationBus9Destination
+        PluginDescriptors::ParameterIds::kModulationBus0Destination,
+        PluginDescriptors::ParameterIds::kModulationBus1Destination,
+        PluginDescriptors::ParameterIds::kModulationBus2Destination,
+        PluginDescriptors::ParameterIds::kModulationBus3Destination,
+        PluginDescriptors::ParameterIds::kModulationBus4Destination,
+        PluginDescriptors::ParameterIds::kModulationBus5Destination,
+        PluginDescriptors::ParameterIds::kModulationBus6Destination,
+        PluginDescriptors::ParameterIds::kModulationBus7Destination,
+        PluginDescriptors::ParameterIds::kModulationBus8Destination,
+        PluginDescriptors::ParameterIds::kModulationBus9Destination
     };
 }
 
@@ -164,7 +164,7 @@ void MatrixModulationPanel::createAmountSlider(ModulationBus& bus, size_t busNum
 
 void MatrixModulationPanel::createDestinationComboBox(ModulationBus& bus, size_t busNumberAsSizeT, Theme& inTheme, const ModulationBusParameterArrays& parameterArrays)
 {
-    const auto& destinationDesc = SynthDescriptors::kModulationBusChoiceParameters[busNumberAsSizeT][1];
+    const auto& destinationDesc = PluginDescriptors::kModulationBusChoiceParameters[busNumberAsSizeT][1];
     bus.destinationComboBox = std::make_unique<tss::ComboBox>(inTheme, tss::ComboBox::ComboBoxWidth::MatrixModulationDestination);
     for (const auto& choice : destinationDesc.choices)
     {
@@ -246,7 +246,7 @@ void MatrixModulationPanel::resized()
 
     int y = modulationBusStartY;
 
-    for (int busNumber = 0; busNumber < SynthDescriptors::kModulationBusCount; ++busNumber)
+    for (int busNumber = 0; busNumber < PluginDescriptors::kModulationBusCount; ++busNumber)
     {
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
         auto& bus = modulationBuses[busNumberAsSizeT];

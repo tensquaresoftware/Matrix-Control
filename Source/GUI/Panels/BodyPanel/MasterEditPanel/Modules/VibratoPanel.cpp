@@ -6,7 +6,7 @@
 #include "../../../../Widgets/Slider.h"
 #include "../../../../Widgets/ComboBox.h"
 #include "../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../Shared/PluginDescriptors.h"
 #include "../../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -15,34 +15,34 @@ VibratoPanel::VibratoPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kVibrato);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kVibrato);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVibratoSpeed,
+                                PluginDescriptors::ParameterIds::kVibratoSpeed,
                                 vibratoSpeedLabel, vibratoSpeedSlider, vibratoSpeedAttachment, horizontalSeparator1);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVibratoWaveform,
+                                     PluginDescriptors::ParameterIds::kVibratoWaveform,
                                      vibratoWaveformLabel, vibratoWaveformComboBox, vibratoWaveformAttachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVibratoAmplitude,
+                                PluginDescriptors::ParameterIds::kVibratoAmplitude,
                                 vibratoAmplitudeLabel, vibratoAmplitudeSlider, vibratoAmplitudeAttachment, horizontalSeparator3);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVibratoSpeedModSource,
+                                     PluginDescriptors::ParameterIds::kVibratoSpeedModSource,
                                      vibratoSpeedModSourceLabel, vibratoSpeedModSourceComboBox, vibratoSpeedModSourceAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVibratoSpeedModAmount,
+                                PluginDescriptors::ParameterIds::kVibratoSpeedModAmount,
                                 vibratoSpeedModAmountLabel, vibratoSpeedModAmountSlider, vibratoSpeedModAmountAttachment, horizontalSeparator5);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVibratoAmpModSource,
+                                     PluginDescriptors::ParameterIds::kVibratoAmpModSource,
                                      vibratoAmpModSourceLabel, vibratoAmpModSourceComboBox, vibratoAmpModSourceAttachment, horizontalSeparator6);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVibratoAmpModAmount,
+                                PluginDescriptors::ParameterIds::kVibratoAmpModAmount,
                                 vibratoAmpModAmountLabel, vibratoAmpModAmountSlider, vibratoAmpModAmountAttachment, horizontalSeparator7);
 
     setSize(getWidth(), getHeight());

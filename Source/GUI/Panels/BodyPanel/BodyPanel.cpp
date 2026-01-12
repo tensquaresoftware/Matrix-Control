@@ -23,7 +23,7 @@ BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     matrixModulationPanel = std::make_unique<MatrixModulationPanel>(inTheme, widgetFactory, apvts);
     addAndMakeVisible(*matrixModulationPanel);
 
-    patchManagerPanel = std::make_unique<PatchManagerPanel>(inTheme);
+    patchManagerPanel = std::make_unique<PatchManagerPanel>(inTheme, widgetFactory);
     addAndMakeVisible(*patchManagerPanel);
 
     verticalSeparator2 = std::make_unique<VerticalSeparator>(inTheme);

@@ -6,7 +6,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "../../Shared/SynthDescriptors.h"
+#include "../../Shared/PluginDescriptors.h"
+#include "../../Shared/PluginIDs.h"
 
 class ApvtsFactory
 {
@@ -17,9 +18,9 @@ public:
     // Helper Methods
     // ============================================================================
     
-    static std::vector<SynthDescriptors::IntParameterDescriptor> getAllIntParameters();
-    static std::vector<SynthDescriptors::ChoiceParameterDescriptor> getAllChoiceParameters();
-    static std::vector<SynthDescriptors::StandaloneWidgetDescriptor> getAllStandaloneWidgets();
+    static std::vector<PluginDescriptors::IntParameterDescriptor> getAllIntParameters();
+    static std::vector<PluginDescriptors::ChoiceParameterDescriptor> getAllChoiceParameters();
+    static std::vector<PluginDescriptors::StandaloneWidgetDescriptor> getAllStandaloneWidgets();
 
     // ============================================================================
     // Validation Methods
@@ -32,7 +33,7 @@ public:
         juce::StringArray warnings;
     };
     
-    static ValidationResult validateSynthDescriptors();
+    static ValidationResult validatePluginDescriptors();
     
     // Individual validation methods
     static juce::StringArray validateGroups();
@@ -48,11 +49,11 @@ private:
     static const char* getBusId(int busNumber);
 
     static void createRootGroups(
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
         std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap);
     
     static void createChildGroups(
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
         std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap);
     
     static void addParametersToChildGroup(
@@ -65,27 +66,27 @@ private:
     
     static void addIntParameter(
         juce::AudioProcessorParameterGroup& group,
-        const SynthDescriptors::IntParameterDescriptor& desc);
+        const PluginDescriptors::IntParameterDescriptor& desc);
     
     static void addChoiceParameter(
         juce::AudioProcessorParameterGroup& group,
-        const SynthDescriptors::ChoiceParameterDescriptor& desc);
+        const PluginDescriptors::ChoiceParameterDescriptor& desc);
     
     static void addModuleParameters(
         juce::AudioProcessorParameterGroup& parentGroup,
         const char* moduleId,
         const char* moduleDisplayName,
-        const std::vector<SynthDescriptors::IntParameterDescriptor>& intParams,
-        const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& choiceParams);
+        const std::vector<PluginDescriptors::IntParameterDescriptor>& intParams,
+        const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& choiceParams);
     
     static void addPatchEditParameters(juce::AudioProcessorParameterGroup& patchEditGroup);
     static void addMatrixModulationParameters(juce::AudioProcessorParameterGroup& matrixModulationGroup);
     
     static void addMatrixModulationBusIntParameters(
-        std::vector<SynthDescriptors::IntParameterDescriptor>& allParams);
+        std::vector<PluginDescriptors::IntParameterDescriptor>& allParams);
     
     static void addMatrixModulationBusChoiceParameters(
-        std::vector<SynthDescriptors::ChoiceParameterDescriptor>& allParams);
+        std::vector<PluginDescriptors::ChoiceParameterDescriptor>& allParams);
     
     static void addValidationErrorsToResult(
         const juce::StringArray& errors,
@@ -101,26 +102,26 @@ private:
     
     // Validation helper methods
     static void checkWidgetIdUniqueness(
-        const SynthDescriptors::StandaloneWidgetDescriptor& widget,
+        const PluginDescriptors::StandaloneWidgetDescriptor& widget,
         std::set<juce::String>& seenWidgetIds,
         juce::StringArray& errors);
     
     static void checkWidgetParentGroupExists(
-        const SynthDescriptors::StandaloneWidgetDescriptor& widget,
+        const PluginDescriptors::StandaloneWidgetDescriptor& widget,
         juce::StringArray& errors);
     
     static void checkGroupIdUniqueness(
-        const SynthDescriptors::ApvtsGroupDescriptor& group,
+        const PluginDescriptors::ApvtsGroupDescriptor& group,
         std::set<juce::String>& seenIds,
         juce::StringArray& errors);
     
     static void checkGroupParentExists(
-        const SynthDescriptors::ApvtsGroupDescriptor& group,
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+        const PluginDescriptors::ApvtsGroupDescriptor& group,
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
         juce::StringArray& errors);
     
     static void checkGroupDisplayNameNotEmpty(
-        const SynthDescriptors::ApvtsGroupDescriptor& group,
+        const PluginDescriptors::ApvtsGroupDescriptor& group,
         juce::StringArray& errors);
     
     static void checkParameterIdUniqueness(
@@ -129,31 +130,31 @@ private:
         juce::StringArray& errors);
     
     static void checkIntParameterParentGroupExists(
-        const SynthDescriptors::IntParameterDescriptor& param,
+        const PluginDescriptors::IntParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkIntParameterDisplayNameNotEmpty(
-        const SynthDescriptors::IntParameterDescriptor& param,
+        const PluginDescriptors::IntParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkIntParameterValueRange(
-        const SynthDescriptors::IntParameterDescriptor& param,
+        const PluginDescriptors::IntParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkChoiceParameterParentGroupExists(
-        const SynthDescriptors::ChoiceParameterDescriptor& param,
+        const PluginDescriptors::ChoiceParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkChoiceParameterDisplayNameNotEmpty(
-        const SynthDescriptors::ChoiceParameterDescriptor& param,
+        const PluginDescriptors::ChoiceParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkChoiceParameterChoicesNotEmpty(
-        const SynthDescriptors::ChoiceParameterDescriptor& param,
+        const PluginDescriptors::ChoiceParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkChoiceParameterDefaultIndexValid(
-        const SynthDescriptors::ChoiceParameterDescriptor& param,
+        const PluginDescriptors::ChoiceParameterDescriptor& param,
         juce::StringArray& errors);
     
     static void checkGroupIdCollisions(
@@ -172,18 +173,18 @@ private:
         juce::StringArray& errors);
     
     static std::set<juce::String> buildDefinedGroupIdsSet(
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups);
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups);
     
     static void checkParentIdReferencesPointToDefinedGroups(
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
         const std::set<juce::String>& definedGroupIds,
         juce::StringArray& errors);
     
     static std::map<juce::String, juce::String> buildGroupParentMap(
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups);
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups);
     
     static void detectCyclesInGroupHierarchy(
-        const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+        const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
         const std::map<juce::String, juce::String>& parentMap,
         juce::StringArray& errors);
 };

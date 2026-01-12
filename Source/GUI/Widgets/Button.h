@@ -51,7 +51,7 @@ namespace tss
     private:
         inline constexpr static int kInitCopyPasteWidth = 20;
         inline constexpr static int kPatchManagerBankSelectWidth = 35;
-        inline constexpr static int kInternalPatchesUtilityWidth = 50;
+        inline constexpr static int kInternalPatchesUtilityWidth = 35;
         inline constexpr static int kPatchManagerUnlockWidth = 75;
         inline constexpr static int kHeaderPanelThemeWidth = 70;
         inline constexpr static int kHeight = 20;

@@ -6,7 +6,7 @@
 #include "../../../../Widgets/Slider.h"
 #include "../../../../Widgets/ComboBox.h"
 #include "../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../Shared/PluginDescriptors.h"
 #include "../../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -15,38 +15,38 @@ MidiPanel::MidiPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kMidi);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kMidi);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMidiChannel,
+                                     PluginDescriptors::ParameterIds::kMidiChannel,
                                      midiChannelLabel, midiChannelComboBox, midiChannelAttachment, horizontalSeparator1);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMidiEcho,
+                                     PluginDescriptors::ParameterIds::kMidiEcho,
                                      midiEchoLabel, midiEchoComboBox, midiEchoAttachment, horizontalSeparator2);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMidiControllers,
+                                     PluginDescriptors::ParameterIds::kMidiControllers,
                                      midiControllersLabel, midiControllersComboBox, midiControllersAttachment, horizontalSeparator3);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMidiPatchChanges,
+                                     PluginDescriptors::ParameterIds::kMidiPatchChanges,
                                      midiPatchChangesLabel, midiPatchChangesComboBox, midiPatchChangesAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMidiPedal1Select,
+                                PluginDescriptors::ParameterIds::kMidiPedal1Select,
                                 midiPedal1SelectLabel, midiPedal1SelectSlider, midiPedal1SelectAttachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMidiPedal2Select,
+                                PluginDescriptors::ParameterIds::kMidiPedal2Select,
                                 midiPedal2SelectLabel, midiPedal2SelectSlider, midiPedal2SelectAttachment, horizontalSeparator6);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMidiLever2Select,
+                                PluginDescriptors::ParameterIds::kMidiLever2Select,
                                 midiLever2SelectLabel, midiLever2SelectSlider, midiLever2SelectAttachment, horizontalSeparator7);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMidiLever3Select,
+                                PluginDescriptors::ParameterIds::kMidiLever3Select,
                                 midiLever3SelectLabel, midiLever3SelectSlider, midiLever3SelectAttachment, horizontalSeparator8);
 
     setSize(getWidth(), getHeight());

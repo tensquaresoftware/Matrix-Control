@@ -7,7 +7,7 @@
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
 #include "../../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../Shared/PluginDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,50 +16,50 @@ Dco1Panel::Dco1Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kDco1);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kDco1);
     setupInitCopyPasteButtons(inTheme, widgetFactory,
-                              SynthDescriptors::StandaloneWidgetIds::kDco1Init,
-                              SynthDescriptors::StandaloneWidgetIds::kDco1Copy,
-                              SynthDescriptors::StandaloneWidgetIds::kDco1Paste);
+                              PluginDescriptors::StandaloneWidgetIds::kDco1Init,
+                              PluginDescriptors::StandaloneWidgetIds::kDco1Copy,
+                              PluginDescriptors::StandaloneWidgetIds::kDco1Paste);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kDco1Frequency,
+                                PluginDescriptors::ParameterIds::kDco1Frequency,
                                 dco1FrequencyLabel, dco1FrequencySlider, dco1FrequencyAttachment, horizontalSeparator1);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kDco1FrequencyModByLfo1,
+                                PluginDescriptors::ParameterIds::kDco1FrequencyModByLfo1,
                                 dco1FrequencyModByLfo1Label, dco1FrequencyModByLfo1Slider, dco1FrequencyModByLfo1Attachment, horizontalSeparator2);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kDco1Sync,
+                                     PluginDescriptors::ParameterIds::kDco1Sync,
                                      dco1SyncLabel, dco1SyncComboBox, dco1SyncAttachment, horizontalSeparator3);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kDco1PulseWidth,
+                                PluginDescriptors::ParameterIds::kDco1PulseWidth,
                                 dco1PulseWidthLabel, dco1PulseWidthSlider, dco1PulseWidthAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kDco1PulseWidthModByLfo2,
+                                PluginDescriptors::ParameterIds::kDco1PulseWidthModByLfo2,
                                 dco1PulseWidthModByLfo2Label, dco1PulseWidthModByLfo2Slider, dco1PulseWidthModByLfo2Attachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kDco1WaveShape,
+                                PluginDescriptors::ParameterIds::kDco1WaveShape,
                                 dco1WaveShapeLabel, dco1WaveShapeSlider, dco1WaveShapeAttachment, horizontalSeparator6);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kDco1WaveSelect,
+                                     PluginDescriptors::ParameterIds::kDco1WaveSelect,
                                      dco1WaveSelectLabel, dco1WaveSelectComboBox, dco1WaveSelectAttachment, horizontalSeparator7);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kDco1Levers,
+                                     PluginDescriptors::ParameterIds::kDco1Levers,
                                      dco1LeversLabel, dco1LeversComboBox, dco1LeversAttachment, horizontalSeparator8);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kDco1KeyboardPortamento,
+                                     PluginDescriptors::ParameterIds::kDco1KeyboardPortamento,
                                      dco1KeyboardPortamentoLabel, dco1KeyboardPortamentoComboBox, dco1KeyboardPortamentoAttachment, horizontalSeparator9);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kDco1KeyClick,
+                                     PluginDescriptors::ParameterIds::kDco1KeyClick,
                                      dco1KeyClickLabel, dco1KeyClickComboBox, dco1KeyClickAttachment, horizontalSeparator10);
 
     setSize(getWidth(), getHeight());

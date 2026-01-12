@@ -42,7 +42,7 @@ set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
     Source/Core/Factories/ApvtsFactory.cpp
-    Source/Shared/SynthDescriptors.cpp
+    Source/Shared/PluginDescriptors.cpp
     Source/GUI/PluginEditor.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
@@ -87,6 +87,9 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/RampPortamentoPanel.cpp
     Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/VcfVcaPanel.cpp
     Source/GUI/Panels/BodyPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
+    Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
     
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp

@@ -7,7 +7,7 @@
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
 #include "../../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../Shared/PluginDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,47 +16,47 @@ VcfVcaPanel::VcfVcaPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::Aud
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kVcfVca);
-    setupInitButton(inTheme, widgetFactory, SynthDescriptors::StandaloneWidgetIds::kVcfVcaInit);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kVcfVca);
+    setupInitButton(inTheme, widgetFactory, PluginDescriptors::StandaloneWidgetIds::kVcfVcaInit);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVcfBalance,
+                                PluginDescriptors::ParameterIds::kVcfBalance,
                                 vcfBalanceLabel, vcfBalanceSlider, vcfBalanceAttachment, horizontalSeparator1);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVcfFequency,
+                                PluginDescriptors::ParameterIds::kVcfFequency,
                                 vcfFrequencyLabel, vcfFrequencySlider, vcfFrequencyAttachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVcfFrequencyModByEnv1,
+                                PluginDescriptors::ParameterIds::kVcfFrequencyModByEnv1,
                                 vcfFrequencyModByEnv1Label, vcfFrequencyModByEnv1Slider, vcfFrequencyModByEnv1Attachment, horizontalSeparator3);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVcfFrequencyModByPressure,
+                                PluginDescriptors::ParameterIds::kVcfFrequencyModByPressure,
                                 vcfFrequencyModByPressureLabel, vcfFrequencyModByPressureSlider, vcfFrequencyModByPressureAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVcfResonance,
+                                PluginDescriptors::ParameterIds::kVcfResonance,
                                 vcfResonanceLabel, vcfResonanceSlider, vcfResonanceAttachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVca1Volume,
+                                PluginDescriptors::ParameterIds::kVca1Volume,
                                 vca1VolumeLabel, vca1VolumeSlider, vca1VolumeAttachment, horizontalSeparator6);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVca1ModByVelocity,
+                                PluginDescriptors::ParameterIds::kVca1ModByVelocity,
                                 vca1ModByVelocityLabel, vca1ModByVelocitySlider, vca1ModByVelocityAttachment, horizontalSeparator7);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kVca2ModByEnv2,
+                                PluginDescriptors::ParameterIds::kVca2ModByEnv2,
                                 vca2ModByEnv2Label, vca2ModByEnv2Slider, vca2ModByEnv2Attachment, horizontalSeparator8);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVcfLevers,
+                                     PluginDescriptors::ParameterIds::kVcfLevers,
                                      vcfLeversLabel, vcfLeversComboBox, vcfLeversAttachment, horizontalSeparator9);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVcfKeyboardPortamento,
+                                     PluginDescriptors::ParameterIds::kVcfKeyboardPortamento,
                                      vcfKeyboardPortamentoLabel, vcfKeyboardPortamentoComboBox, vcfKeyboardPortamentoAttachment, horizontalSeparator10);
 
     setSize(getWidth(), getHeight());

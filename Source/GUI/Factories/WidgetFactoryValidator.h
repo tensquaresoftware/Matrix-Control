@@ -2,7 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "../../Shared/SynthDescriptors.h"
+#include "../../Shared/PluginDescriptors.h"
 #include "../../Core/Exceptions/WidgetFactoryExceptions.h"
 
 class WidgetFactoryValidator
@@ -13,33 +13,33 @@ public:
     void throwIfParameterIdEmpty(const juce::String& inParameterId);
     void throwIfWidgetIdEmpty(const juce::String& inWidgetId);
     
-    const SynthDescriptors::IntParameterDescriptor* getIntParameterDescriptorOrThrow(
-        const SynthDescriptors::IntParameterDescriptor* inDescriptor,
+    const PluginDescriptors::IntParameterDescriptor* getIntParameterDescriptorOrThrow(
+        const PluginDescriptors::IntParameterDescriptor* inDescriptor,
         const juce::String& inParameterId) const;
     
-    const SynthDescriptors::ChoiceParameterDescriptor* getChoiceParameterDescriptorOrThrow(
-        const SynthDescriptors::ChoiceParameterDescriptor* inDescriptor,
+    const PluginDescriptors::ChoiceParameterDescriptor* getChoiceParameterDescriptorOrThrow(
+        const PluginDescriptors::ChoiceParameterDescriptor* inDescriptor,
         const juce::String& inParameterId) const;
     
-    const SynthDescriptors::StandaloneWidgetDescriptor* getStandaloneWidgetDescriptorOrThrow(
-        const SynthDescriptors::StandaloneWidgetDescriptor* inDescriptor,
+    const PluginDescriptors::StandaloneWidgetDescriptor* getStandaloneWidgetDescriptorOrThrow(
+        const PluginDescriptors::StandaloneWidgetDescriptor* inDescriptor,
         const juce::String& inWidgetId) const;
     
     void validateIntParameterValues(
-        const SynthDescriptors::IntParameterDescriptor* inDescriptor,
+        const PluginDescriptors::IntParameterDescriptor* inDescriptor,
         const juce::String& inParameterId) const;
     
     void validateChoiceParameterValues(
-        const SynthDescriptors::ChoiceParameterDescriptor* inDescriptor,
+        const PluginDescriptors::ChoiceParameterDescriptor* inDescriptor,
         const juce::String& inParameterId) const;
     
     void validateWidgetType(
-        const SynthDescriptors::StandaloneWidgetDescriptor* inDescriptor,
+        const PluginDescriptors::StandaloneWidgetDescriptor* inDescriptor,
         const juce::String& inWidgetId) const;
 
 private:
     juce::AudioProcessorValueTreeState& apvts;
     
-    juce::String getWidgetTypeString(SynthDescriptors::StandaloneWidgetType inWidgetType) const;
+    juce::String getWidgetTypeString(PluginDescriptors::StandaloneWidgetType inWidgetType) const;
 };
 

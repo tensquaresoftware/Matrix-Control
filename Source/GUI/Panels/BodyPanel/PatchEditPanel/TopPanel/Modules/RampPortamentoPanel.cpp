@@ -7,7 +7,7 @@
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
 #include "../../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../Shared/PluginDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,43 +16,43 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& inTheme, WidgetFactory& widgetFa
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kRampPortamento);
-    setupInitButton(inTheme, widgetFactory, SynthDescriptors::StandaloneWidgetIds::kRampPortamentoInit);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kRampPortamento);
+    setupInitButton(inTheme, widgetFactory, PluginDescriptors::StandaloneWidgetIds::kRampPortamentoInit);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kRamp1Rate,
+                                PluginDescriptors::ParameterIds::kRamp1Rate,
                                 ramp1RateLabel, ramp1RateSlider, ramp1RateAttachment, horizontalSeparator1);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kRamp1Trigger,
+                                     PluginDescriptors::ParameterIds::kRamp1Trigger,
                                      ramp1TriggerLabel, ramp1TriggerComboBox, ramp1TriggerAttachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kRamp2Rate,
+                                PluginDescriptors::ParameterIds::kRamp2Rate,
                                 ramp2RateLabel, ramp2RateSlider, ramp2RateAttachment, horizontalSeparator3);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kRamp2Trigger,
+                                     PluginDescriptors::ParameterIds::kRamp2Trigger,
                                      ramp2TriggerLabel, ramp2TriggerComboBox, ramp2TriggerAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kPortamentoRate,
+                                PluginDescriptors::ParameterIds::kPortamentoRate,
                                 portamentoRateLabel, portamentoRateSlider, portamentoRateAttachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kPortamentoModByVelocity,
+                                PluginDescriptors::ParameterIds::kPortamentoModByVelocity,
                                 portamentoModByVelocityLabel, portamentoModByVelocitySlider, portamentoModByVelocityAttachment, horizontalSeparator6);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kPortamentoMode,
+                                     PluginDescriptors::ParameterIds::kPortamentoMode,
                                      portamentoModeLabel, portamentoModeComboBox, portamentoModeAttachment, horizontalSeparator7);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kPortamentoLegato,
+                                     PluginDescriptors::ParameterIds::kPortamentoLegato,
                                      portamentoLegatoLabel, portamentoLegatoComboBox, portamentoLegatoAttachment, horizontalSeparator8);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kPortamentoKeyboardMode,
+                                     PluginDescriptors::ParameterIds::kPortamentoKeyboardMode,
                                      portamentoKeyboardModeLabel, portamentoKeyboardModeComboBox, portamentoKeyboardModeAttachment, horizontalSeparator9);
 
     horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);

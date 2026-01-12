@@ -1,9 +1,11 @@
-#include "SynthDescriptors.h"
+#include "PluginDescriptors.h"
 
 #include <array>
 #include <initializer_list>
 
-namespace SynthDescriptors
+#include "PluginDisplayNames.h"
+
+namespace PluginDescriptors
 {
 
 // ============================================================================
@@ -24,185 +26,180 @@ namespace
 }
 
 // ============================================================================
-// Data Definitions - Groups
+// Data Definitions | APVTS Groups
 // ============================================================================
 
 const std::vector<ApvtsGroupDescriptor> kAllApvtsGroups = {
-    // Synth Modes
+    // Plugin Modes
     {
         .parentId = kNoParentId,
         .groupId = ModeIds::kMaster,
-        .displayName = "MASTER"
+        .displayName = ModeDisplayNames::kMaster
     },
     {
         .parentId = kNoParentId,
         .groupId = ModeIds::kPatch,
-        .displayName = "PATCH"
+        .displayName = ModeDisplayNames::kPatch
     },
-
-    // Synth Sections
+    // Plugin Sections
     {
         .parentId = ModeIds::kMaster,
         .groupId = SectionIds::kMasterEdit,
-        .displayName = "MASTER EDIT"
+        .displayName = SectionDisplayNames::kMasterEdit
     },
     {
         .parentId = ModeIds::kPatch,
         .groupId = SectionIds::kPatchEdit,
-        .displayName = "PATCH EDIT"
+        .displayName = SectionDisplayNames::kPatchEdit
     },
     {
         .parentId = ModeIds::kPatch,
         .groupId = SectionIds::kMatrixModulation,
-        .displayName = "MATRIX MODULATION"
+        .displayName = SectionDisplayNames::kMatrixModulation
     },
     {
         .parentId = ModeIds::kPatch,
         .groupId = SectionIds::kPatchManager,
-        .displayName = "PATCH MANAGER"
+        .displayName = SectionDisplayNames::kPatchManager
     },
-
     // Master Edit Modules
     {
         .parentId = SectionIds::kMasterEdit,
         .groupId = ModuleIds::kMidi,
-        .displayName = "MIDI"
+        .displayName = ModuleDisplayNames::kMidi
     },
     {
         .parentId = SectionIds::kMasterEdit,
         .groupId = ModuleIds::kVibrato,
-        .displayName = "VIBRATO"
+        .displayName = ModuleDisplayNames::kVibrato
     },
     {
         .parentId = SectionIds::kMasterEdit,
         .groupId = ModuleIds::kMisc,
-        .displayName = "MISC"
+        .displayName = ModuleDisplayNames::kMisc
     },
-
     // Patch Edit Modules
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kDco1,
-        .displayName = "DCO 1"
+        .displayName = ModuleDisplayNames::kDco1
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kDco2,
-        .displayName = "DCO 2"
+        .displayName = ModuleDisplayNames::kDco2
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kVcfVca,
-        .displayName = "VCF/VCA"
+        .displayName = ModuleDisplayNames::kVcfVca
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kFmTrack,
-        .displayName = "FM/TRACK"
+        .displayName = ModuleDisplayNames::kFmTrack
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kRampPortamento,
-        .displayName = "RAMP/PORTAMENTO"
+        .displayName = ModuleDisplayNames::kRampPortamento
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kEnvelope1,
-        .displayName = "ENV 1"
+        .displayName = ModuleDisplayNames::kEnvelope1
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kEnvelope2,
-        .displayName = "ENV 2"
+        .displayName = ModuleDisplayNames::kEnvelope2
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kEnvelope3,
-        .displayName = "ENV 3"
+        .displayName = ModuleDisplayNames::kEnvelope3
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kLfo1,
-        .displayName = "LFO 1"
+        .displayName = ModuleDisplayNames::kLfo1
     },
     {
         .parentId = SectionIds::kPatchEdit,
         .groupId = ModuleIds::kLfo2,
-        .displayName = "LFO 2"
+        .displayName = ModuleDisplayNames::kLfo2
     },
-
     // Matrix Modulation Busses
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus0,
-        .displayName = "MODULATION BUS 0"
+        .displayName = ModulationBusDisplayNames::kModulationBus0
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus1,
-        .displayName = "MODULATION BUS 1"
+        .displayName = ModulationBusDisplayNames::kModulationBus1
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus2,
-        .displayName = "MODULATION BUS 2"
+        .displayName = ModulationBusDisplayNames::kModulationBus2
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus3,
-        .displayName = "MODULATION BUS 3"
+        .displayName = ModulationBusDisplayNames::kModulationBus3
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus4,
-        .displayName = "MODULATION BUS 4"
+        .displayName = ModulationBusDisplayNames::kModulationBus4
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus5,
-        .displayName = "MODULATION BUS 5"
+        .displayName = ModulationBusDisplayNames::kModulationBus5
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus6,
-        .displayName = "MODULATION BUS 6"
+        .displayName = ModulationBusDisplayNames::kModulationBus6
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus7,
-        .displayName = "MODULATION BUS 7"
+        .displayName = ModulationBusDisplayNames::kModulationBus7
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus8,
-        .displayName = "MODULATION BUS 8"
+        .displayName = ModulationBusDisplayNames::kModulationBus8
     },
     {
         .parentId = SectionIds::kMatrixModulation,
         .groupId = ModulationBusIds::kModulationBus9,
-        .displayName = "MODULATION BUS 9"
+        .displayName = ModulationBusDisplayNames::kModulationBus9
     },
-
     // Patch Manager Modules
     {
         .parentId = SectionIds::kPatchManager,
         .groupId = ModuleIds::kBankUtility,
-        .displayName = "BANK UTILITY"
+        .displayName = ModuleDisplayNames::kBankUtility
     },
     {
         .parentId = SectionIds::kPatchManager,
         .groupId = ModuleIds::kInternalPatches,
-        .displayName = "INTERNAL PATCHES"
+        .displayName = ModuleDisplayNames::kInternalPatches
     },
     {
         .parentId = SectionIds::kPatchManager,
         .groupId = ModuleIds::kComputerPatches,
-        .displayName = "COMPUTER PATCHES"
+        .displayName = ModuleDisplayNames::kComputerPatches
     }
 };
 
 // ============================================================================
-// Data Definitions - Master Edit Parameters
+// Data Definitions | Master Edit | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kMasterEditIntParameters = {
@@ -313,13 +310,17 @@ const std::vector<IntParameterDescriptor> kMasterEditIntParameters = {
         .parameterId = ParameterIds::kBendRange,
         .displayName = ParameterDisplayNames::kBendRange,
         .parentGroupId = ModuleIds::kMisc,
-        .minValue = -24,
+        .minValue = 0,
         .maxValue = 24,
         .defaultValue = 2,
         .sysExOffset = 164,
         .sysExId = kNoSysExId
     }
 };
+
+// ============================================================================
+// Data Definitions | Master Edit | Choice Parameters
+// ============================================================================
 
 const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters = {
     // MIDI Module Choice Parameters
@@ -435,7 +436,7 @@ const std::vector<ChoiceParameterDescriptor> kMasterEditChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - DCO 1 Module
+// Data Definitions | Patch Edit | DCO 1 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kDco1IntParameters = {
@@ -491,6 +492,10 @@ const std::vector<IntParameterDescriptor> kDco1IntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | DCO 1 Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
     {
         .parameterId = ParameterIds::kDco1Sync,
@@ -540,7 +545,7 @@ const std::vector<ChoiceParameterDescriptor> kDco1ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - DCO 2 Module
+// Data Definitions | Patch Edit | DCO 2 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kDco2IntParameters = {
@@ -606,6 +611,10 @@ const std::vector<IntParameterDescriptor> kDco2IntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | DCO 2 Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
     {
         .parameterId = ParameterIds::kDco2WaveSelect,
@@ -646,7 +655,7 @@ const std::vector<ChoiceParameterDescriptor> kDco2ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - VCF/VCA Module
+// Data Definitions | Patch Edit | VCF/VCA Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
@@ -732,6 +741,10 @@ const std::vector<IntParameterDescriptor> kVcfVcaIntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | VCF/VCA Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters = {
     {
         .parameterId = ParameterIds::kVcfLevers,
@@ -754,7 +767,7 @@ const std::vector<ChoiceParameterDescriptor> kVcfVcaChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - FM/TRACK Module
+// Data Definitions | Patch Edit | FM/TRACK Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
@@ -840,6 +853,10 @@ const std::vector<IntParameterDescriptor> kFmTrackIntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | FM/TRACK Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kFmTrackChoiceParameters = {
     {
         .parameterId = ParameterIds::kTrackInput,
@@ -857,7 +874,7 @@ const std::vector<ChoiceParameterDescriptor> kFmTrackChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - RAMP/PORTAMENTO Module
+// Data Definitions | Patch Edit | RAMP/PORTAMENTO Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
@@ -902,6 +919,10 @@ const std::vector<IntParameterDescriptor> kRampPortamentoIntParameters = {
         .sysExId = 45
     }
 };
+
+// ============================================================================
+// Data Definitions | Patch Edit | RAMP/PORTAMENTO Module | Choice Parameters
+// ============================================================================
 
 const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
     {
@@ -953,7 +974,7 @@ const std::vector<ChoiceParameterDescriptor> kRampPortamentoChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - ENV 1 Module
+// Data Definitions | Patch Edit | ENV 1 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
@@ -1029,6 +1050,10 @@ const std::vector<IntParameterDescriptor> kEnv1IntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | ENV 1 Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters = {
     {
         .parameterId = ParameterIds::kEnv1TriggerMode,
@@ -1062,7 +1087,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv1ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - ENV 2 Module
+// Data Definitions | Patch Edit | ENV 2 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
@@ -1138,6 +1163,10 @@ const std::vector<IntParameterDescriptor> kEnv2IntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | ENV 2 Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters = {
     {
         .parameterId = ParameterIds::kEnv2TriggerMode,
@@ -1171,7 +1200,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv2ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - ENV 3 Module
+// Data Definitions | Patch Edit | ENV 3 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
@@ -1247,6 +1276,10 @@ const std::vector<IntParameterDescriptor> kEnv3IntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | ENV 3 Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters = {
     {
         .parameterId = ParameterIds::kEnv3TriggerMode,
@@ -1280,7 +1313,7 @@ const std::vector<ChoiceParameterDescriptor> kEnv3ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - LFO 1 Module
+// Data Definitions | Patch Edit | LFO 1 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kLfo1IntParameters = {
@@ -1381,7 +1414,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo1ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit Parameters - LFO 2 Module
+// Data Definitions | Patch Edit | LFO 2 Module | Int Parameters
 // ============================================================================
 
 const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
@@ -1437,6 +1470,10 @@ const std::vector<IntParameterDescriptor> kLfo2IntParameters = {
     }
 };
 
+// ============================================================================
+// Data Definitions | Patch Edit | LFO 2 Module | Choice Parameters
+// ============================================================================
+
 const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters = {
     {
         .parameterId = ParameterIds::kLfo2Waveform,
@@ -1482,7 +1519,7 @@ const std::vector<ChoiceParameterDescriptor> kLfo2ChoiceParameters = {
 };
 
 // ============================================================================
-// Data Definitions - Patch Edit - Matrix Modulation Busses
+// Data Definitions | Matrix Modulation | Source/Destination Choices
 // ============================================================================
 
 namespace
@@ -1510,6 +1547,10 @@ namespace
         ChoiceLists::kDestinationPortamentoRate
     });
 }
+
+// ============================================================================
+// Data Definitions | Matrix Modulation | Choices Parameters
+// ============================================================================
 
 const std::array<std::vector<ChoiceParameterDescriptor>, kModulationBusCount> kModulationBusChoiceParameters = {{
     // Modulation Bus 0
@@ -1724,6 +1765,10 @@ const std::array<std::vector<ChoiceParameterDescriptor>, kModulationBusCount> kM
     }
 }};
 
+// ============================================================================
+// Data Definitions | Matrix Modulation | Int Parameters
+// ============================================================================
+
 const std::array<std::vector<IntParameterDescriptor>, kModulationBusCount> kModulationBusIntParameters = {{
     // Modulation Bus 0
     {
@@ -1858,13 +1903,17 @@ const std::array<std::vector<IntParameterDescriptor>, kModulationBusCount> kModu
 }};
 
 // ============================================================================
-// Data Definitions - Standalone Widgets
+// Data Definitions | Standalone Widgets | Master Edit
 // ============================================================================
 
 // Master Edit Standalone Widgets
 const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets = {};
 
-// Patch Edit Standalone Widgets - DCO 1 Module
+// ============================================================================
+// Data Definitions | Standalone Widgets | Patch Edit
+// ============================================================================
+
+// DCO 1 Module
 const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kDco1Init,
@@ -1886,7 +1935,7 @@ const std::vector<StandaloneWidgetDescriptor> kDco1StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - DCO 2 Module
+// DCO 2 Module
 const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kDco2Init,
@@ -1908,7 +1957,7 @@ const std::vector<StandaloneWidgetDescriptor> kDco2StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - VCF/VCA Module
+// VCF/VCA Module
 const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kVcfVcaInit,
@@ -1918,7 +1967,7 @@ const std::vector<StandaloneWidgetDescriptor> kVcfVcaStandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - FM/TRACK Module
+// FM/TRACK Module
 const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kFmTrackInit,
@@ -1928,7 +1977,7 @@ const std::vector<StandaloneWidgetDescriptor> kFmTrackStandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - RAMP/PORTAMENTO Module
+// RAMP/PORTAMENTO Module
 const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kRampPortamentoInit,
@@ -1938,7 +1987,7 @@ const std::vector<StandaloneWidgetDescriptor> kRampPortamentoStandaloneWidgets =
     }
 };
 
-// Patch Edit Standalone Widgets - ENV 1 Module
+// ENV 1 Module
 const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kEnv1Init,
@@ -1960,7 +2009,7 @@ const std::vector<StandaloneWidgetDescriptor> kEnv1StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - ENV 2 Module
+// ENV 2 Module
 const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kEnv2Init,
@@ -1982,7 +2031,7 @@ const std::vector<StandaloneWidgetDescriptor> kEnv2StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - ENV 3 Module
+// ENV 3 Module
 const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kEnv3Init,
@@ -2004,7 +2053,7 @@ const std::vector<StandaloneWidgetDescriptor> kEnv3StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - LFO 1 Module
+// LFO 1 Module
 const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kLfo1Init,
@@ -2026,7 +2075,7 @@ const std::vector<StandaloneWidgetDescriptor> kLfo1StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - LFO 2 Module
+// LFO 2 Module
 const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kLfo2Init,
@@ -2048,7 +2097,11 @@ const std::vector<StandaloneWidgetDescriptor> kLfo2StandaloneWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - Bank Utility Module
+// ============================================================================
+// Data Definitions | Standalone Widgets | Patch Manager
+// ============================================================================
+
+// Bank Utility Module
 const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets = {
     {
         .widgetId = StandaloneWidgetIds::kUnlockBank,
@@ -2118,29 +2171,29 @@ const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - Internal Patches Module
+// Internal Patches Module
 const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets = {
     {
-        .widgetId = StandaloneWidgetIds::kLoadPrevInternalPatch,
-        .displayName = StandaloneWidgetDisplayNames::kLoadPrevInternalPatch,
+        .widgetId = StandaloneWidgetIds::kLoadPreviousPatch,
+        .displayName = StandaloneWidgetDisplayNames::kLoadPreviousPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kLoadNextInternalPatch,
-        .displayName = StandaloneWidgetDisplayNames::kLoadNextInternalPatch,
+        .widgetId = StandaloneWidgetIds::kLoadNextPatch,
+        .displayName = StandaloneWidgetDisplayNames::kLoadNextPatch,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kCurrentBank,
-        .displayName = StandaloneWidgetDisplayNames::kCurrentBank,
+        .widgetId = StandaloneWidgetIds::kCurrentBankNumber,
+        .displayName = StandaloneWidgetDisplayNames::kCurrentBankNumber,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kNumber
     },
     {
-        .widgetId = StandaloneWidgetIds::kCurrentPatch,
-        .displayName = StandaloneWidgetDisplayNames::kCurrentPatch,
+        .widgetId = StandaloneWidgetIds::kCurrentPatchNumber,
+        .displayName = StandaloneWidgetDisplayNames::kCurrentPatchNumber,
         .parentGroupId = ModuleIds::kInternalPatches,
         .widgetType = StandaloneWidgetType::kNumber
     },
@@ -2170,41 +2223,41 @@ const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets = {
     }
 };
 
-// Patch Edit Standalone Widgets - Computer Patches Module
+// Computer Patches Module
 const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets = {
     {
-        .widgetId = StandaloneWidgetIds::kLoadPrevComputerPatch,
-        .displayName = StandaloneWidgetDisplayNames::kLoadPrevComputerPatch,
+        .widgetId = StandaloneWidgetIds::kLoadPreviousPatchFile,
+        .displayName = StandaloneWidgetDisplayNames::kLoadPreviousPatchFile,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kLoadNextComputerPatch,
-        .displayName = StandaloneWidgetDisplayNames::kLoadNextComputerPatch,
+        .widgetId = StandaloneWidgetIds::kLoadNextPatchFile,
+        .displayName = StandaloneWidgetDisplayNames::kLoadNextPatchFile,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kSelectComputerPatch,
-        .displayName = StandaloneWidgetDisplayNames::kSelectComputerPatch,
+        .widgetId = StandaloneWidgetIds::kSelectPatchFile,
+        .displayName = StandaloneWidgetDisplayNames::kSelectPatchFile,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kComboBox
     },
     {
-        .widgetId = StandaloneWidgetIds::kOpenComputerPatchFolder,
-        .displayName = StandaloneWidgetDisplayNames::kOpenComputerPatchFolder,
+        .widgetId = StandaloneWidgetIds::kOpenPatchFolder,
+        .displayName = StandaloneWidgetDisplayNames::kOpenPatchFolder,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kSaveComputerPatchAs,
-        .displayName = StandaloneWidgetDisplayNames::kSaveComputerPatchAs,
+        .widgetId = StandaloneWidgetIds::kSavePatchAs,
+        .displayName = StandaloneWidgetDisplayNames::kSavePatchAsFile,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kSaveComputerPatch,
-        .displayName = StandaloneWidgetDisplayNames::kSaveComputerPatch,
+        .widgetId = StandaloneWidgetIds::kSavePatch,
+        .displayName = StandaloneWidgetDisplayNames::kSavePatch,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton
     }
@@ -2231,5 +2284,5 @@ juce::String getSectionDisplayName(const char* sectionId)
     return getGroupDisplayName(sectionId);
 }
 
-} // namespace SynthDescriptors
+} // namespace PluginDescriptors
 

@@ -6,7 +6,7 @@
 #include "../../../../Widgets/Slider.h"
 #include "../../../../Widgets/ComboBox.h"
 #include "../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../Shared/PluginDescriptors.h"
 #include "../../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -15,36 +15,36 @@ MiscPanel::MiscPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kMisc);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kMisc);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMasterTune,
+                                PluginDescriptors::ParameterIds::kMasterTune,
                                 masterTuneLabel, masterTuneSlider, masterTuneAttachment, horizontalSeparator1);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kMasterTranspose,
+                                PluginDescriptors::ParameterIds::kMasterTranspose,
                                 masterTransposeLabel, masterTransposeSlider, masterTransposeAttachment, horizontalSeparator2);
     masterTransposeSlider->setUnit("st");
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kBendRange,
+                                PluginDescriptors::ParameterIds::kBendRange,
                                 bendRangeLabel, bendRangeSlider, bendRangeAttachment, horizontalSeparator3);
     bendRangeSlider->setUnit("st");
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kUnisonEnable,
+                                     PluginDescriptors::ParameterIds::kUnisonEnable,
                                      unisonEnableLabel, unisonEnableComboBox, unisonEnableAttachment, horizontalSeparator4);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kVolumeInvertEnable,
+                                     PluginDescriptors::ParameterIds::kVolumeInvertEnable,
                                      volumeInvertEnableLabel, volumeInvertEnableComboBox, volumeInvertEnableAttachment, horizontalSeparator5);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kBankLockEnable,
+                                     PluginDescriptors::ParameterIds::kBankLockEnable,
                                      bankLockEnableLabel, bankLockEnableComboBox, bankLockEnableAttachment, horizontalSeparator6);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kMemoryProtectEnable,
+                                     PluginDescriptors::ParameterIds::kMemoryProtectEnable,
                                      memoryProtectEnableLabel, memoryProtectEnableComboBox, memoryProtectEnableAttachment, horizontalSeparator7);
 
     setSize(getWidth(), getHeight());

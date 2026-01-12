@@ -6,7 +6,8 @@
 
 #include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionHeader.h"
-#include "../../../../Shared/SynthDescriptors.h"
+#include "../../../../Shared/PluginDescriptors.h"
+#include "../../../../Shared/PluginIDs.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,7 +17,7 @@ MasterEditPanel::MasterEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, j
     , sectionHeader(std::make_unique<tss::SectionHeader>(
         inTheme, 
         tss::SectionHeader::SectionWidth::MasterEdit, 
-        SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kMasterEdit),
+        PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMasterEdit),
         tss::SectionHeader::ColourVariant::Orange))
     , midiPanel(std::make_unique<MidiPanel>(inTheme, widgetFactory, apvts))
     , vibratoPanel(std::make_unique<VibratoPanel>(inTheme, widgetFactory, apvts))

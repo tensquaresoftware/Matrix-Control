@@ -7,7 +7,7 @@
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
 #include "../../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../Shared/PluginDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,43 +16,43 @@ FmTrackPanel::FmTrackPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::A
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kFmTrack);
-    setupInitButton(inTheme, widgetFactory, SynthDescriptors::StandaloneWidgetIds::kFmTrackInit);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kFmTrack);
+    setupInitButton(inTheme, widgetFactory, PluginDescriptors::StandaloneWidgetIds::kFmTrackInit);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kFmAmount,
+                                PluginDescriptors::ParameterIds::kFmAmount,
                                 fmAmountLabel, fmAmountSlider, fmAmountAttachment, horizontalSeparator1);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kFmModByEnv3,
+                                PluginDescriptors::ParameterIds::kFmModByEnv3,
                                 fmModByEnv3Label, fmModByEnv3Slider, fmModByEnv3Attachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kFmModByPressure,
+                                PluginDescriptors::ParameterIds::kFmModByPressure,
                                 fmModByPressureLabel, fmModByPressureSlider, fmModByPressureAttachment, horizontalSeparator3);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kTrackPoint1,
+                                PluginDescriptors::ParameterIds::kTrackPoint1,
                                 trackPoint1Label, trackPoint1Slider, trackPoint1Attachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kTrackPoint2,
+                                PluginDescriptors::ParameterIds::kTrackPoint2,
                                 trackPoint2Label, trackPoint2Slider, trackPoint2Attachment, horizontalSeparator5);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kTrackPoint3,
+                                PluginDescriptors::ParameterIds::kTrackPoint3,
                                 trackPoint3Label, trackPoint3Slider, trackPoint3Attachment, horizontalSeparator6);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kTrackPoint4,
+                                PluginDescriptors::ParameterIds::kTrackPoint4,
                                 trackPoint4Label, trackPoint4Slider, trackPoint4Attachment, horizontalSeparator7);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kTrackPoint5,
+                                PluginDescriptors::ParameterIds::kTrackPoint5,
                                 trackPoint5Label, trackPoint5Slider, trackPoint5Attachment, horizontalSeparator8);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kTrackInput,
+                                     PluginDescriptors::ParameterIds::kTrackInput,
                                      trackInputLabel, trackInputComboBox, trackInputAttachment, horizontalSeparator9);
 
     horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);

@@ -6,7 +6,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "../../../../Shared/SynthDescriptors.h"
+#include "../../../../Shared/PluginDescriptors.h"
+#include "../../../../Shared/PluginIDs.h"
 
 namespace tss
 {
@@ -52,20 +53,20 @@ private:
 
     struct ModulationBusParameterArrays
     {
-        std::array<const char*, SynthDescriptors::kModulationBusCount> busIds;
-        std::array<const char*, SynthDescriptors::kModulationBusCount> sourceParameterIds;
-        std::array<const char*, SynthDescriptors::kModulationBusCount> amountParameterIds;
-        std::array<const char*, SynthDescriptors::kModulationBusCount> destinationParameterIds;
+        std::array<const char*, PluginDescriptors::kModulationBusCount> busIds;
+        std::array<const char*, PluginDescriptors::kModulationBusCount> sourceParameterIds;
+        std::array<const char*, PluginDescriptors::kModulationBusCount> amountParameterIds;
+        std::array<const char*, PluginDescriptors::kModulationBusCount> destinationParameterIds;
     };
 
     inline constexpr static int kWidth = 275;
     inline constexpr static int kHeight = 325;
     inline constexpr static int kSpacing = 5;
 
-        std::array<const char*, SynthDescriptors::kModulationBusCount> createBusIds() const;
-    std::array<const char*, SynthDescriptors::kModulationBusCount> createSourceParameterIds() const;
-    std::array<const char*, SynthDescriptors::kModulationBusCount> createAmountParameterIds() const;
-    std::array<const char*, SynthDescriptors::kModulationBusCount> createDestinationParameterIds() const;    
+        std::array<const char*, PluginDescriptors::kModulationBusCount> createBusIds() const;
+    std::array<const char*, PluginDescriptors::kModulationBusCount> createSourceParameterIds() const;
+    std::array<const char*, PluginDescriptors::kModulationBusCount> createAmountParameterIds() const;
+    std::array<const char*, PluginDescriptors::kModulationBusCount> createDestinationParameterIds() const;    
     ModulationBusParameterArrays createModulationBusParameterArrays() const;
     
     void createInitAllBussesButton(tss::Theme& inTheme);
@@ -87,7 +88,7 @@ private:
     std::unique_ptr<tss::SectionHeader> sectionHeader;
     std::unique_ptr<tss::ModulationBusHeader> modulationBusHeader;
     std::unique_ptr<tss::Button> initAllBussesButton;
-    std::array<ModulationBus, SynthDescriptors::kModulationBusCount> modulationBuses;
+    std::array<ModulationBus, PluginDescriptors::kModulationBusCount> modulationBuses;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)
 };

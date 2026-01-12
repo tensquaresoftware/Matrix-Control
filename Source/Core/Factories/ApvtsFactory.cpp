@@ -3,11 +3,13 @@
 #include <set>
 #include <functional>
 
+#include "../../Shared/PluginIDs.h"
+
 juce::AudioProcessorValueTreeState::ParameterLayout ApvtsFactory::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout parameterLayout;
     
-    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
+    const auto& allGroups = PluginDescriptors::kAllApvtsGroups;
     std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>> groupMap;
     
     createRootGroups(allGroups, groupMap);
@@ -18,7 +20,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ApvtsFactory::createParamete
 }
 
 void ApvtsFactory::createRootGroups(
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
     std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap)
 {
     for (const auto& group : allGroups)
@@ -33,7 +35,7 @@ void ApvtsFactory::createRootGroups(
 }
 
 void ApvtsFactory::createChildGroups(
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
     std::map<juce::String, std::unique_ptr<juce::AudioProcessorParameterGroup>>& groupMap)
 {
     for (const auto& group : allGroups)
@@ -55,15 +57,15 @@ void ApvtsFactory::addParametersToChildGroup(
     const juce::String& childGroupId,
     juce::AudioProcessorParameterGroup& childGroup)
 {
-    if (childGroupId == SynthDescriptors::SectionIds::kPatchEdit)
+    if (childGroupId == PluginDescriptors::SectionIds::kPatchEdit)
     {
         addPatchEditParameters(childGroup);
     }
-    else if (childGroupId == SynthDescriptors::SectionIds::kMatrixModulation)
+    else if (childGroupId == PluginDescriptors::SectionIds::kMatrixModulation)
     {
         addMatrixModulationParameters(childGroup);
     }
-    else if (childGroupId == SynthDescriptors::SectionIds::kPatchManager)
+    else if (childGroupId == PluginDescriptors::SectionIds::kPatchManager)
     {
         // Patch Manager uses ValueTree properties, not APVTS parameters
     }
@@ -85,7 +87,7 @@ void ApvtsFactory::addRootGroupsToLayout(
 
 void ApvtsFactory::addIntParameter(
     juce::AudioProcessorParameterGroup& group,
-    const SynthDescriptors::IntParameterDescriptor& desc)
+    const PluginDescriptors::IntParameterDescriptor& desc)
 {
     auto param = std::make_unique<juce::AudioParameterInt>(
         juce::ParameterID(desc.parameterId, 1),
@@ -99,7 +101,7 @@ void ApvtsFactory::addIntParameter(
 
 void ApvtsFactory::addChoiceParameter(
     juce::AudioProcessorParameterGroup& group,
-    const SynthDescriptors::ChoiceParameterDescriptor& desc)
+    const PluginDescriptors::ChoiceParameterDescriptor& desc)
 {
     auto param = std::make_unique<juce::AudioParameterChoice>(
         juce::ParameterID(desc.parameterId, 1),
@@ -110,80 +112,80 @@ void ApvtsFactory::addChoiceParameter(
     group.addChild(std::move(param));
 }
 
-std::vector<SynthDescriptors::IntParameterDescriptor> ApvtsFactory::getAllIntParameters()
+std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsFactory::getAllIntParameters()
 {
-    std::vector<SynthDescriptors::IntParameterDescriptor> allParams;
+    std::vector<PluginDescriptors::IntParameterDescriptor> allParams;
 
-    auto addParams = [&allParams](const std::vector<SynthDescriptors::IntParameterDescriptor>& params)
+    auto addParams = [&allParams](const std::vector<PluginDescriptors::IntParameterDescriptor>& params)
     {
         allParams.insert(allParams.end(), params.begin(), params.end());
     };
 
-    addParams(SynthDescriptors::kDco1IntParameters);
-    addParams(SynthDescriptors::kDco2IntParameters);
-    addParams(SynthDescriptors::kVcfVcaIntParameters);
-    addParams(SynthDescriptors::kFmTrackIntParameters);
-    addParams(SynthDescriptors::kRampPortamentoIntParameters);
-    addParams(SynthDescriptors::kEnv1IntParameters);
-    addParams(SynthDescriptors::kEnv2IntParameters);
-    addParams(SynthDescriptors::kEnv3IntParameters);
-    addParams(SynthDescriptors::kLfo1IntParameters);
-    addParams(SynthDescriptors::kLfo2IntParameters);
+    addParams(PluginDescriptors::kDco1IntParameters);
+    addParams(PluginDescriptors::kDco2IntParameters);
+    addParams(PluginDescriptors::kVcfVcaIntParameters);
+    addParams(PluginDescriptors::kFmTrackIntParameters);
+    addParams(PluginDescriptors::kRampPortamentoIntParameters);
+    addParams(PluginDescriptors::kEnv1IntParameters);
+    addParams(PluginDescriptors::kEnv2IntParameters);
+    addParams(PluginDescriptors::kEnv3IntParameters);
+    addParams(PluginDescriptors::kLfo1IntParameters);
+    addParams(PluginDescriptors::kLfo2IntParameters);
 
     addMatrixModulationBusIntParameters(allParams);
 
-    addParams(SynthDescriptors::kMasterEditIntParameters);
+    addParams(PluginDescriptors::kMasterEditIntParameters);
 
     return allParams;
 }
 
-std::vector<SynthDescriptors::ChoiceParameterDescriptor> ApvtsFactory::getAllChoiceParameters()
+std::vector<PluginDescriptors::ChoiceParameterDescriptor> ApvtsFactory::getAllChoiceParameters()
 {
-    std::vector<SynthDescriptors::ChoiceParameterDescriptor> allParams;
+    std::vector<PluginDescriptors::ChoiceParameterDescriptor> allParams;
 
-    auto addParams = [&allParams](const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& params)
+    auto addParams = [&allParams](const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& params)
     {
         allParams.insert(allParams.end(), params.begin(), params.end());
     };
 
-    addParams(SynthDescriptors::kDco1ChoiceParameters);
-    addParams(SynthDescriptors::kDco2ChoiceParameters);
-    addParams(SynthDescriptors::kVcfVcaChoiceParameters);
-    addParams(SynthDescriptors::kFmTrackChoiceParameters);
-    addParams(SynthDescriptors::kRampPortamentoChoiceParameters);
-    addParams(SynthDescriptors::kEnv1ChoiceParameters);
-    addParams(SynthDescriptors::kEnv2ChoiceParameters);
-    addParams(SynthDescriptors::kEnv3ChoiceParameters);
-    addParams(SynthDescriptors::kLfo1ChoiceParameters);
-    addParams(SynthDescriptors::kLfo2ChoiceParameters);
+    addParams(PluginDescriptors::kDco1ChoiceParameters);
+    addParams(PluginDescriptors::kDco2ChoiceParameters);
+    addParams(PluginDescriptors::kVcfVcaChoiceParameters);
+    addParams(PluginDescriptors::kFmTrackChoiceParameters);
+    addParams(PluginDescriptors::kRampPortamentoChoiceParameters);
+    addParams(PluginDescriptors::kEnv1ChoiceParameters);
+    addParams(PluginDescriptors::kEnv2ChoiceParameters);
+    addParams(PluginDescriptors::kEnv3ChoiceParameters);
+    addParams(PluginDescriptors::kLfo1ChoiceParameters);
+    addParams(PluginDescriptors::kLfo2ChoiceParameters);
 
     addMatrixModulationBusChoiceParameters(allParams);
 
-    addParams(SynthDescriptors::kMasterEditChoiceParameters);
+    addParams(PluginDescriptors::kMasterEditChoiceParameters);
 
     return allParams;
 }
 
-std::vector<SynthDescriptors::StandaloneWidgetDescriptor> ApvtsFactory::getAllStandaloneWidgets()
+std::vector<PluginDescriptors::StandaloneWidgetDescriptor> ApvtsFactory::getAllStandaloneWidgets()
 {
-    std::vector<SynthDescriptors::StandaloneWidgetDescriptor> allWidgets;
+    std::vector<PluginDescriptors::StandaloneWidgetDescriptor> allWidgets;
 
-    auto addWidgets = [&allWidgets](const std::vector<SynthDescriptors::StandaloneWidgetDescriptor>& widgets)
+    auto addWidgets = [&allWidgets](const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets)
     {
         allWidgets.insert(allWidgets.end(), widgets.begin(), widgets.end());
     };
 
-    addWidgets(SynthDescriptors::kDco1StandaloneWidgets);
-    addWidgets(SynthDescriptors::kDco2StandaloneWidgets);
-    addWidgets(SynthDescriptors::kEnv1StandaloneWidgets);
-    addWidgets(SynthDescriptors::kEnv2StandaloneWidgets);
-    addWidgets(SynthDescriptors::kEnv3StandaloneWidgets);
-    addWidgets(SynthDescriptors::kLfo1StandaloneWidgets);
-    addWidgets(SynthDescriptors::kLfo2StandaloneWidgets);
-    addWidgets(SynthDescriptors::kBankUtilityWidgets);
-    addWidgets(SynthDescriptors::kInternalPatchesWidgets);
-    addWidgets(SynthDescriptors::kComputerPatchesWidgets);
-    addWidgets(SynthDescriptors::kMasterEditStandaloneWidgets);
+    addWidgets(PluginDescriptors::kDco1StandaloneWidgets);
+    addWidgets(PluginDescriptors::kDco2StandaloneWidgets);
+    addWidgets(PluginDescriptors::kEnv1StandaloneWidgets);
+    addWidgets(PluginDescriptors::kEnv2StandaloneWidgets);
+    addWidgets(PluginDescriptors::kEnv3StandaloneWidgets);
+    addWidgets(PluginDescriptors::kLfo1StandaloneWidgets);
+    addWidgets(PluginDescriptors::kLfo2StandaloneWidgets);
+    addWidgets(PluginDescriptors::kBankUtilityWidgets);
+    addWidgets(PluginDescriptors::kInternalPatchesWidgets);
+    addWidgets(PluginDescriptors::kComputerPatchesWidgets);
+    addWidgets(PluginDescriptors::kMasterEditStandaloneWidgets);
 
     return allWidgets;
 }
@@ -192,19 +194,19 @@ const char* ApvtsFactory::getBusId(int busNumber)
 {
     static constexpr const char* busIds[] =
     {
-        SynthDescriptors::ModulationBusIds::kModulationBus0,
-        SynthDescriptors::ModulationBusIds::kModulationBus1,
-        SynthDescriptors::ModulationBusIds::kModulationBus2,
-        SynthDescriptors::ModulationBusIds::kModulationBus3,
-        SynthDescriptors::ModulationBusIds::kModulationBus4,
-        SynthDescriptors::ModulationBusIds::kModulationBus5,
-        SynthDescriptors::ModulationBusIds::kModulationBus6,
-        SynthDescriptors::ModulationBusIds::kModulationBus7,
-        SynthDescriptors::ModulationBusIds::kModulationBus8,
-        SynthDescriptors::ModulationBusIds::kModulationBus9
+        PluginDescriptors::ModulationBusIds::kModulationBus0,
+        PluginDescriptors::ModulationBusIds::kModulationBus1,
+        PluginDescriptors::ModulationBusIds::kModulationBus2,
+        PluginDescriptors::ModulationBusIds::kModulationBus3,
+        PluginDescriptors::ModulationBusIds::kModulationBus4,
+        PluginDescriptors::ModulationBusIds::kModulationBus5,
+        PluginDescriptors::ModulationBusIds::kModulationBus6,
+        PluginDescriptors::ModulationBusIds::kModulationBus7,
+        PluginDescriptors::ModulationBusIds::kModulationBus8,
+        PluginDescriptors::ModulationBusIds::kModulationBus9
     };
     
-    jassert(busNumber >= 0 && busNumber < SynthDescriptors::kModulationBusCount);
+    jassert(busNumber >= 0 && busNumber < PluginDescriptors::kModulationBusCount);
     return busIds[busNumber];
 }
 
@@ -212,8 +214,8 @@ void ApvtsFactory::addModuleParameters(
     juce::AudioProcessorParameterGroup& parentGroup,
     const char* moduleId,
     const char* moduleDisplayName,
-    const std::vector<SynthDescriptors::IntParameterDescriptor>& intParams,
-    const std::vector<SynthDescriptors::ChoiceParameterDescriptor>& choiceParams)
+    const std::vector<PluginDescriptors::IntParameterDescriptor>& intParams,
+    const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& choiceParams)
 {
     auto moduleGroup = std::make_unique<juce::AudioProcessorParameterGroup>(
         moduleId, moduleDisplayName, kSubgroupSeparator
@@ -236,102 +238,102 @@ void ApvtsFactory::addPatchEditParameters(juce::AudioProcessorParameterGroup& pa
 {
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kDco1,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kDco1).toRawUTF8(),
-        SynthDescriptors::kDco1IntParameters,
-        SynthDescriptors::kDco1ChoiceParameters
+        PluginDescriptors::ModuleIds::kDco1,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kDco1).toRawUTF8(),
+        PluginDescriptors::kDco1IntParameters,
+        PluginDescriptors::kDco1ChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kDco2,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kDco2).toRawUTF8(),
-        SynthDescriptors::kDco2IntParameters,
-        SynthDescriptors::kDco2ChoiceParameters
+        PluginDescriptors::ModuleIds::kDco2,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kDco2).toRawUTF8(),
+        PluginDescriptors::kDco2IntParameters,
+        PluginDescriptors::kDco2ChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kVcfVca,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kVcfVca).toRawUTF8(),
-        SynthDescriptors::kVcfVcaIntParameters,
-        SynthDescriptors::kVcfVcaChoiceParameters
+        PluginDescriptors::ModuleIds::kVcfVca,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kVcfVca).toRawUTF8(),
+        PluginDescriptors::kVcfVcaIntParameters,
+        PluginDescriptors::kVcfVcaChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kFmTrack,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kFmTrack).toRawUTF8(),
-        SynthDescriptors::kFmTrackIntParameters,
-        SynthDescriptors::kFmTrackChoiceParameters
+        PluginDescriptors::ModuleIds::kFmTrack,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kFmTrack).toRawUTF8(),
+        PluginDescriptors::kFmTrackIntParameters,
+        PluginDescriptors::kFmTrackChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kRampPortamento,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kRampPortamento).toRawUTF8(),
-        SynthDescriptors::kRampPortamentoIntParameters,
-        SynthDescriptors::kRampPortamentoChoiceParameters
+        PluginDescriptors::ModuleIds::kRampPortamento,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kRampPortamento).toRawUTF8(),
+        PluginDescriptors::kRampPortamentoIntParameters,
+        PluginDescriptors::kRampPortamentoChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kEnvelope1,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kEnvelope1).toRawUTF8(),
-        SynthDescriptors::kEnv1IntParameters,
-        SynthDescriptors::kEnv1ChoiceParameters
+        PluginDescriptors::ModuleIds::kEnvelope1,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kEnvelope1).toRawUTF8(),
+        PluginDescriptors::kEnv1IntParameters,
+        PluginDescriptors::kEnv1ChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kEnvelope2,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kEnvelope2).toRawUTF8(),
-        SynthDescriptors::kEnv2IntParameters,
-        SynthDescriptors::kEnv2ChoiceParameters
+        PluginDescriptors::ModuleIds::kEnvelope2,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kEnvelope2).toRawUTF8(),
+        PluginDescriptors::kEnv2IntParameters,
+        PluginDescriptors::kEnv2ChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kEnvelope3,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kEnvelope3).toRawUTF8(),
-        SynthDescriptors::kEnv3IntParameters,
-        SynthDescriptors::kEnv3ChoiceParameters
+        PluginDescriptors::ModuleIds::kEnvelope3,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kEnvelope3).toRawUTF8(),
+        PluginDescriptors::kEnv3IntParameters,
+        PluginDescriptors::kEnv3ChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kLfo1,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kLfo1).toRawUTF8(),
-        SynthDescriptors::kLfo1IntParameters,
-        SynthDescriptors::kLfo1ChoiceParameters
+        PluginDescriptors::ModuleIds::kLfo1,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kLfo1).toRawUTF8(),
+        PluginDescriptors::kLfo1IntParameters,
+        PluginDescriptors::kLfo1ChoiceParameters
     );
     
     addModuleParameters(
         patchEditGroup,
-        SynthDescriptors::ModuleIds::kLfo2,
-        SynthDescriptors::getGroupDisplayName(SynthDescriptors::ModuleIds::kLfo2).toRawUTF8(),
-        SynthDescriptors::kLfo2IntParameters,
-        SynthDescriptors::kLfo2ChoiceParameters
+        PluginDescriptors::ModuleIds::kLfo2,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kLfo2).toRawUTF8(),
+        PluginDescriptors::kLfo2IntParameters,
+        PluginDescriptors::kLfo2ChoiceParameters
     );
 }
 
 void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGroup& matrixModulationGroup)
 {
-    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
+    for (int bus = 0; bus < PluginDescriptors::kModulationBusCount; ++bus)
     {
         const juce::String busId = getBusId(bus);
-        const juce::String busDisplayName = SynthDescriptors::getGroupDisplayName(busId);
+        const juce::String busDisplayName = PluginDescriptors::getGroupDisplayName(busId);
         
         auto busGroup = std::make_unique<juce::AudioProcessorParameterGroup>(
             busId, busDisplayName, kSubgroupSeparator
         );
         
-        for (const auto& paramDesc : SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)])
+        for (const auto& paramDesc : PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)])
         {
             ApvtsFactory::addIntParameter(*busGroup, paramDesc);
         }
         
-        for (const auto& paramDesc : SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)])
+        for (const auto& paramDesc : PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)])
         {
             ApvtsFactory::addChoiceParameter(*busGroup, paramDesc);
         }
@@ -341,24 +343,24 @@ void ApvtsFactory::addMatrixModulationParameters(juce::AudioProcessorParameterGr
 }
 
 void ApvtsFactory::addMatrixModulationBusIntParameters(
-    std::vector<SynthDescriptors::IntParameterDescriptor>& allParams)
+    std::vector<PluginDescriptors::IntParameterDescriptor>& allParams)
 {
-    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
+    for (int bus = 0; bus < PluginDescriptors::kModulationBusCount; ++bus)
     {
         allParams.insert(allParams.end(),
-                        SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].begin(),
-                        SynthDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].end());
+                        PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].begin(),
+                        PluginDescriptors::kModulationBusIntParameters[static_cast<size_t>(bus)].end());
     }
 }
 
 void ApvtsFactory::addMatrixModulationBusChoiceParameters(
-    std::vector<SynthDescriptors::ChoiceParameterDescriptor>& allParams)
+    std::vector<PluginDescriptors::ChoiceParameterDescriptor>& allParams)
 {
-    for (int bus = 0; bus < SynthDescriptors::kModulationBusCount; ++bus)
+    for (int bus = 0; bus < PluginDescriptors::kModulationBusCount; ++bus)
     {
         allParams.insert(allParams.end(),
-                        SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].begin(),
-                        SynthDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].end());
+                        PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].begin(),
+                        PluginDescriptors::kModulationBusChoiceParameters[static_cast<size_t>(bus)].end());
     }
 }
 
@@ -377,7 +379,7 @@ void ApvtsFactory::addValidationErrorsToResult(
 // Validation Implementation
 // ============================================================================
 
-ApvtsFactory::ValidationResult ApvtsFactory::validateSynthDescriptors()
+ApvtsFactory::ValidationResult ApvtsFactory::validatePluginDescriptors()
 {
     ValidationResult result;
     
@@ -394,7 +396,7 @@ ApvtsFactory::ValidationResult ApvtsFactory::validateSynthDescriptors()
 juce::StringArray ApvtsFactory::validateGroups()
 {
     juce::StringArray errors;
-    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
+    const auto& allGroups = PluginDescriptors::kAllApvtsGroups;
     std::set<juce::String> seenIds;
     
     for (const auto& group : allGroups)
@@ -467,7 +469,7 @@ juce::StringArray ApvtsFactory::checkForDuplicateIds()
 juce::StringArray ApvtsFactory::checkForOrphanedReferences()
 {
     juce::StringArray errors;
-    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
+    const auto& allGroups = PluginDescriptors::kAllApvtsGroups;
     std::set<juce::String> definedGroupIds = buildDefinedGroupIdsSet(allGroups);
     
     checkParentIdReferencesPointToDefinedGroups(allGroups, definedGroupIds, errors);
@@ -478,7 +480,7 @@ juce::StringArray ApvtsFactory::checkForOrphanedReferences()
 juce::StringArray ApvtsFactory::checkForCircularReferences()
 {
     juce::StringArray errors;
-    const auto& allGroups = SynthDescriptors::kAllApvtsGroups;
+    const auto& allGroups = PluginDescriptors::kAllApvtsGroups;
     std::map<juce::String, juce::String> parentMap = buildGroupParentMap(allGroups);
     
     detectCyclesInGroupHierarchy(allGroups, parentMap, errors);
@@ -487,7 +489,7 @@ juce::StringArray ApvtsFactory::checkForCircularReferences()
 }
 
 void ApvtsFactory::checkWidgetIdUniqueness(
-    const SynthDescriptors::StandaloneWidgetDescriptor& widget,
+    const PluginDescriptors::StandaloneWidgetDescriptor& widget,
     std::set<juce::String>& seenWidgetIds,
     juce::StringArray& errors)
 {
@@ -499,7 +501,7 @@ void ApvtsFactory::checkWidgetIdUniqueness(
 }
 
 void ApvtsFactory::checkWidgetParentGroupExists(
-    const SynthDescriptors::StandaloneWidgetDescriptor& widget,
+    const PluginDescriptors::StandaloneWidgetDescriptor& widget,
     juce::StringArray& errors)
 {
     if (!groupExists(widget.parentGroupId))
@@ -509,7 +511,7 @@ void ApvtsFactory::checkWidgetParentGroupExists(
 }
 
 void ApvtsFactory::checkGroupIdUniqueness(
-    const SynthDescriptors::ApvtsGroupDescriptor& group,
+    const PluginDescriptors::ApvtsGroupDescriptor& group,
     std::set<juce::String>& seenIds,
     juce::StringArray& errors)
 {
@@ -521,8 +523,8 @@ void ApvtsFactory::checkGroupIdUniqueness(
 }
 
 void ApvtsFactory::checkGroupParentExists(
-    const SynthDescriptors::ApvtsGroupDescriptor& group,
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+    const PluginDescriptors::ApvtsGroupDescriptor& group,
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
     juce::StringArray& errors)
 {
     if (group.parentId.isEmpty())
@@ -538,7 +540,7 @@ void ApvtsFactory::checkGroupParentExists(
 }
 
 void ApvtsFactory::checkGroupDisplayNameNotEmpty(
-    const SynthDescriptors::ApvtsGroupDescriptor& group,
+    const PluginDescriptors::ApvtsGroupDescriptor& group,
     juce::StringArray& errors)
 {
     if (group.displayName.isEmpty())
@@ -560,7 +562,7 @@ void ApvtsFactory::checkParameterIdUniqueness(
 }
 
 void ApvtsFactory::checkIntParameterParentGroupExists(
-    const SynthDescriptors::IntParameterDescriptor& param,
+    const PluginDescriptors::IntParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (!groupExists(param.parentGroupId))
@@ -570,7 +572,7 @@ void ApvtsFactory::checkIntParameterParentGroupExists(
 }
 
 void ApvtsFactory::checkIntParameterDisplayNameNotEmpty(
-    const SynthDescriptors::IntParameterDescriptor& param,
+    const PluginDescriptors::IntParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (param.displayName.isEmpty())
@@ -580,7 +582,7 @@ void ApvtsFactory::checkIntParameterDisplayNameNotEmpty(
 }
 
 void ApvtsFactory::checkIntParameterValueRange(
-    const SynthDescriptors::IntParameterDescriptor& param,
+    const PluginDescriptors::IntParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (param.minValue > param.maxValue)
@@ -595,7 +597,7 @@ void ApvtsFactory::checkIntParameterValueRange(
 }
 
 void ApvtsFactory::checkChoiceParameterParentGroupExists(
-    const SynthDescriptors::ChoiceParameterDescriptor& param,
+    const PluginDescriptors::ChoiceParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (!groupExists(param.parentGroupId))
@@ -605,7 +607,7 @@ void ApvtsFactory::checkChoiceParameterParentGroupExists(
 }
 
 void ApvtsFactory::checkChoiceParameterDisplayNameNotEmpty(
-    const SynthDescriptors::ChoiceParameterDescriptor& param,
+    const PluginDescriptors::ChoiceParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (param.displayName.isEmpty())
@@ -615,7 +617,7 @@ void ApvtsFactory::checkChoiceParameterDisplayNameNotEmpty(
 }
 
 void ApvtsFactory::checkChoiceParameterChoicesNotEmpty(
-    const SynthDescriptors::ChoiceParameterDescriptor& param,
+    const PluginDescriptors::ChoiceParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (param.choices.isEmpty())
@@ -625,7 +627,7 @@ void ApvtsFactory::checkChoiceParameterChoicesNotEmpty(
 }
 
 void ApvtsFactory::checkChoiceParameterDefaultIndexValid(
-    const SynthDescriptors::ChoiceParameterDescriptor& param,
+    const PluginDescriptors::ChoiceParameterDescriptor& param,
     juce::StringArray& errors)
 {
     if (param.defaultIndex < 0 || param.defaultIndex >= param.choices.size())
@@ -681,7 +683,7 @@ void ApvtsFactory::checkWidgetIdCollisions(
 }
 
 std::set<juce::String> ApvtsFactory::buildDefinedGroupIdsSet(
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups)
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups)
 {
     std::set<juce::String> definedGroupIds;
     for (const auto& group : allGroups)
@@ -692,7 +694,7 @@ std::set<juce::String> ApvtsFactory::buildDefinedGroupIdsSet(
 }
 
 void ApvtsFactory::checkParentIdReferencesPointToDefinedGroups(
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
     const std::set<juce::String>& definedGroupIds,
     juce::StringArray& errors)
 {
@@ -706,7 +708,7 @@ void ApvtsFactory::checkParentIdReferencesPointToDefinedGroups(
 }
 
 std::map<juce::String, juce::String> ApvtsFactory::buildGroupParentMap(
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups)
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups)
 {
     std::map<juce::String, juce::String> parentMap;
     for (const auto& group : allGroups)
@@ -720,7 +722,7 @@ std::map<juce::String, juce::String> ApvtsFactory::buildGroupParentMap(
 }
 
 void ApvtsFactory::detectCyclesInGroupHierarchy(
-    const std::vector<SynthDescriptors::ApvtsGroupDescriptor>& allGroups,
+    const std::vector<PluginDescriptors::ApvtsGroupDescriptor>& allGroups,
     const std::map<juce::String, juce::String>& parentMap,
     juce::StringArray& errors)
 {
@@ -765,7 +767,7 @@ void ApvtsFactory::detectCyclesInGroupHierarchy(
 juce::StringArray ApvtsFactory::collectAllGroupIds()
 {
     juce::StringArray ids;
-    for (const auto& group : SynthDescriptors::kAllApvtsGroups)
+    for (const auto& group : PluginDescriptors::kAllApvtsGroups)
     {
         ids.add(group.groupId);
     }
@@ -808,7 +810,7 @@ juce::StringArray ApvtsFactory::collectAllWidgetIds()
 
 bool ApvtsFactory::groupExists(const juce::String& groupId)
 {
-    for (const auto& group : SynthDescriptors::kAllApvtsGroups)
+    for (const auto& group : PluginDescriptors::kAllApvtsGroups)
     {
         if (group.groupId == groupId)
         {

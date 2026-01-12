@@ -7,7 +7,7 @@
 #include "../../../../../Widgets/ComboBox.h"
 #include "../../../../../Widgets/Button.h"
 #include "../../../../../Widgets/HorizontalSeparator.h"
-#include "../../../../../../Shared/SynthDescriptors.h"
+#include "../../../../../../Shared/PluginDescriptors.h"
 #include "../../../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -16,46 +16,46 @@ Lfo2Panel::Lfo2Panel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioPr
     : theme(&inTheme)
     , apvts(inApvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, SynthDescriptors::ModuleIds::kLfo2);
+    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kLfo2);
     setupInitCopyPasteButtons(inTheme, widgetFactory,
-                              SynthDescriptors::StandaloneWidgetIds::kLfo2Init,
-                              SynthDescriptors::StandaloneWidgetIds::kLfo2Copy,
-                              SynthDescriptors::StandaloneWidgetIds::kLfo2Paste);
+                              PluginDescriptors::StandaloneWidgetIds::kLfo2Init,
+                              PluginDescriptors::StandaloneWidgetIds::kLfo2Copy,
+                              PluginDescriptors::StandaloneWidgetIds::kLfo2Paste);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kLfo2Speed,
+                                PluginDescriptors::ParameterIds::kLfo2Speed,
                                 lfo2SpeedLabel, lfo2SpeedSlider, lfo2SpeedAttachment, horizontalSeparator1);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kLfo2SpeedModByKeyboard,
+                                PluginDescriptors::ParameterIds::kLfo2SpeedModByKeyboard,
                                 lfo2SpeedModByKeyboardLabel, lfo2SpeedModByKeyboardSlider, lfo2SpeedModByKeyboardAttachment, horizontalSeparator2);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kLfo2RetriggerPoint,
+                                PluginDescriptors::ParameterIds::kLfo2RetriggerPoint,
                                 lfo2RetriggerPointLabel, lfo2RetriggerPointSlider, lfo2RetriggerPointAttachment, horizontalSeparator3);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kLfo2Amplitude,
+                                PluginDescriptors::ParameterIds::kLfo2Amplitude,
                                 lfo2AmplitudeLabel, lfo2AmplitudeSlider, lfo2AmplitudeAttachment, horizontalSeparator4);
 
     setupIntParameterWithSlider(inTheme, widgetFactory,
-                                SynthDescriptors::ParameterIds::kLfo2AmplitudeModByRamp2,
+                                PluginDescriptors::ParameterIds::kLfo2AmplitudeModByRamp2,
                                 lfo2AmplitudeModByRamp2Label, lfo2AmplitudeModByRamp2Slider, lfo2AmplitudeModByRamp2Attachment, horizontalSeparator5);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kLfo2Waveform,
+                                     PluginDescriptors::ParameterIds::kLfo2Waveform,
                                      lfo2WaveformLabel, lfo2WaveformComboBox, lfo2WaveformAttachment, horizontalSeparator6);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kLfo2TriggerMode,
+                                     PluginDescriptors::ParameterIds::kLfo2TriggerMode,
                                      lfo2TriggerModeLabel, lfo2TriggerModeComboBox, lfo2TriggerModeAttachment, horizontalSeparator7);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kLfo2Lag,
+                                     PluginDescriptors::ParameterIds::kLfo2Lag,
                                      lfo2LagLabel, lfo2LagComboBox, lfo2LagAttachment, horizontalSeparator8);
 
     setupChoiceParameterWithComboBox(inTheme, widgetFactory,
-                                     SynthDescriptors::ParameterIds::kLfo2SampleInput,
+                                     PluginDescriptors::ParameterIds::kLfo2SampleInput,
                                      lfo2SampleInputLabel, lfo2SampleInputComboBox, lfo2SampleInputAttachment, horizontalSeparator9);
 
     horizontalSeparator10 = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::PatchEditModule);

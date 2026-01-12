@@ -6,7 +6,7 @@
 
 #include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionHeader.h"
-#include "../../../../Shared/SynthDescriptors.h"
+#include "../../../../Shared/PluginDescriptors.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
@@ -18,7 +18,7 @@ PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juc
     , sectionHeader(std::make_unique<tss::SectionHeader>(
         inTheme, 
         tss::SectionHeader::SectionWidth::PatchEdit, 
-        SynthDescriptors::getSectionDisplayName(SynthDescriptors::SectionIds::kPatchEdit)))
+        PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchEdit)))
     , topPanel(std::make_unique<TopPanel>(inTheme, widgetFactory, apvts))
     , middlePanel(std::make_unique<MiddlePanel>(inTheme))
     , bottomPanel(std::make_unique<BottomPanel>(inTheme, widgetFactory, apvts))

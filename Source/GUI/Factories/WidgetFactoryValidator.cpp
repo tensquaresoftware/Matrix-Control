@@ -27,8 +27,8 @@ void WidgetFactoryValidator::throwIfWidgetIdEmpty(const juce::String& inWidgetId
     }
 }
 
-const SynthDescriptors::IntParameterDescriptor* WidgetFactoryValidator::getIntParameterDescriptorOrThrow(
-    const SynthDescriptors::IntParameterDescriptor* inDescriptor,
+const PluginDescriptors::IntParameterDescriptor* WidgetFactoryValidator::getIntParameterDescriptorOrThrow(
+    const PluginDescriptors::IntParameterDescriptor* inDescriptor,
     const juce::String& inParameterId) const
 {
     if (inDescriptor == nullptr)
@@ -40,8 +40,8 @@ const SynthDescriptors::IntParameterDescriptor* WidgetFactoryValidator::getIntPa
     return inDescriptor;
 }
 
-const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactoryValidator::getChoiceParameterDescriptorOrThrow(
-    const SynthDescriptors::ChoiceParameterDescriptor* inDescriptor,
+const PluginDescriptors::ChoiceParameterDescriptor* WidgetFactoryValidator::getChoiceParameterDescriptorOrThrow(
+    const PluginDescriptors::ChoiceParameterDescriptor* inDescriptor,
     const juce::String& inParameterId) const
 {
     if (inDescriptor == nullptr)
@@ -53,8 +53,8 @@ const SynthDescriptors::ChoiceParameterDescriptor* WidgetFactoryValidator::getCh
     return inDescriptor;
 }
 
-const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactoryValidator::getStandaloneWidgetDescriptorOrThrow(
-    const SynthDescriptors::StandaloneWidgetDescriptor* inDescriptor,
+const PluginDescriptors::StandaloneWidgetDescriptor* WidgetFactoryValidator::getStandaloneWidgetDescriptorOrThrow(
+    const PluginDescriptors::StandaloneWidgetDescriptor* inDescriptor,
     const juce::String& inWidgetId) const
 {
     if (inDescriptor == nullptr)
@@ -67,7 +67,7 @@ const SynthDescriptors::StandaloneWidgetDescriptor* WidgetFactoryValidator::getS
 }
 
 void WidgetFactoryValidator::validateIntParameterValues(
-    const SynthDescriptors::IntParameterDescriptor* inDescriptor,
+    const PluginDescriptors::IntParameterDescriptor* inDescriptor,
     const juce::String& inParameterId) const
 {
     if (inDescriptor->minValue > inDescriptor->maxValue)
@@ -98,7 +98,7 @@ void WidgetFactoryValidator::validateIntParameterValues(
 }
 
 void WidgetFactoryValidator::validateChoiceParameterValues(
-    const SynthDescriptors::ChoiceParameterDescriptor* inDescriptor,
+    const PluginDescriptors::ChoiceParameterDescriptor* inDescriptor,
     const juce::String& inParameterId) const
 {
     if (inDescriptor->choices.isEmpty())
@@ -127,10 +127,10 @@ void WidgetFactoryValidator::validateChoiceParameterValues(
 }
 
 void WidgetFactoryValidator::validateWidgetType(
-    const SynthDescriptors::StandaloneWidgetDescriptor* inDescriptor,
+    const PluginDescriptors::StandaloneWidgetDescriptor* inDescriptor,
     const juce::String& inWidgetId) const
 {
-    if (inDescriptor->widgetType != SynthDescriptors::StandaloneWidgetType::kButton)
+    if (inDescriptor->widgetType != PluginDescriptors::StandaloneWidgetType::kButton)
     {
         juce::String actualType = getWidgetTypeString(inDescriptor->widgetType);
         InvalidWidgetTypeException exception(
@@ -143,17 +143,17 @@ void WidgetFactoryValidator::validateWidgetType(
     }
 }
 
-juce::String WidgetFactoryValidator::getWidgetTypeString(SynthDescriptors::StandaloneWidgetType inWidgetType) const
+juce::String WidgetFactoryValidator::getWidgetTypeString(PluginDescriptors::StandaloneWidgetType inWidgetType) const
 {
     switch (inWidgetType)
     {
-        case SynthDescriptors::StandaloneWidgetType::kButton:
+        case PluginDescriptors::StandaloneWidgetType::kButton:
             return "Button";
-        case SynthDescriptors::StandaloneWidgetType::kComboBox:
+        case PluginDescriptors::StandaloneWidgetType::kComboBox:
             return "ComboBox";
-        case SynthDescriptors::StandaloneWidgetType::kNumber:
+        case PluginDescriptors::StandaloneWidgetType::kNumber:
             return "Number";
-        case SynthDescriptors::StandaloneWidgetType::kLabel:
+        case PluginDescriptors::StandaloneWidgetType::kLabel:
             return "Label";
     }
 }
