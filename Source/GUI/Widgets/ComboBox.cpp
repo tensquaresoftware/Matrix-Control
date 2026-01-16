@@ -5,11 +5,12 @@
 
 namespace tss
 {
-    ComboBox::ComboBox(Theme& theme, int width, int height)
+    ComboBox::ComboBox(Theme& theme, int width, int height, Style style)
         : juce::ComboBox()
         , theme_(&theme)
         , width_(width)
         , height_(height)
+        , style_(style)
     {
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
@@ -51,19 +52,55 @@ namespace tss
 
     void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        const auto backgroundColour = theme_->getComboBoxBackgroundColour(enabled);
+        juce::Colour backgroundColour;
+        
+        if (style_ == Style::ButtonLike)
+        {
+            backgroundColour = theme_->getButtonBackgroundColourOn();
+        }
+        else
+        {
+            backgroundColour = theme_->getComboBoxBackgroundColour(enabled);
+        }
+        
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void ComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        const auto borderColour = theme_->getComboBoxBorderColour(enabled, false);
-        g.setColour(borderColour);
-        const auto borderThickness = kBorderThickness_;
-        g.drawRect(bounds, borderThickness);
+        const auto borderStyle = getBorderColourAndThickness(enabled);
+        drawMainBorder(g, bounds, borderStyle);
+        drawFocusBorderIfNeeded(g, backgroundBounds, enabled, hasFocus, borderStyle.thickness);
+    }
 
-        if (hasFocus)
+    ComboBox::BorderStyle ComboBox::getBorderColourAndThickness(bool enabled) const
+    {
+        BorderStyle style;
+        
+        if (style_ == Style::ButtonLike)
+        {
+            style.colour = theme_->getButtonBorderColourOn();
+            style.thickness = kBorderThicknessButtonLike_;
+        }
+        else
+        {
+            style.colour = theme_->getComboBoxBorderColour(enabled, false);
+            style.thickness = kBorderThickness_;
+        }
+        
+        return style;
+    }
+
+    void ComboBox::drawMainBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const BorderStyle& borderStyle) const
+    {
+        g.setColour(borderStyle.colour);
+        g.drawRect(bounds, borderStyle.thickness);
+    }
+
+    void ComboBox::drawFocusBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus, float borderThickness) const
+    {
+        if (hasFocus && style_ != Style::ButtonLike)
         {
             const auto focusBorderColour = theme_->getComboBoxBorderColour(enabled, true);
             g.setColour(focusBorderColour);
@@ -73,24 +110,42 @@ namespace tss
 
     void ComboBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        juce::String text;
-        
+        const auto text = getSelectedItemText();
+        const auto textColour = getTextColourForCurrentStyle(enabled);
+        const auto textBounds = calculateTextBounds(bounds);
+        drawTextInBounds(g, text, textBounds, textColour);
+    }
+
+    juce::String ComboBox::getSelectedItemText() const
+    {
         const auto selectedIndex = getSelectedItemIndex();
         if (selectedIndex >= 0)
         {
-            text = getItemText(selectedIndex);
+            return getItemText(selectedIndex);
         }
+        return juce::String();
+    }
 
-        const auto textColour = theme_->getComboBoxTextColour(enabled);
-        const auto font = theme_->getBaseFont();
+    juce::Colour ComboBox::getTextColourForCurrentStyle(bool enabled) const
+    {
+        if (style_ == Style::ButtonLike)
+        {
+            return theme_->getButtonTextColourOn();
+        }
+        return theme_->getComboBoxTextColour(enabled);
+    }
 
-        const auto leftPadding = kLeftPadding_;
-        const auto rightPadding = kRightPadding_;
-        const auto triangleBaseSize = kTriangleBaseSize_;
+    juce::Rectangle<float> ComboBox::calculateTextBounds(const juce::Rectangle<float>& bounds) const
+    {
         auto textBounds = bounds;
-        textBounds.removeFromLeft(leftPadding);
-        textBounds.removeFromRight(triangleBaseSize + rightPadding);
+        textBounds.removeFromLeft(kLeftPadding_);
+        textBounds.removeFromRight(kTriangleBaseSize_ + kRightPadding_);
+        return textBounds;
+    }
 
+    void ComboBox::drawTextInBounds(juce::Graphics& g, const juce::String& text, const juce::Rectangle<float>& textBounds, const juce::Colour& textColour) const
+    {
+        const auto font = theme_->getBaseFont();
         g.setColour(textColour);
         g.setFont(font);
         g.drawText(text, textBounds, juce::Justification::centredLeft, false);
@@ -135,23 +190,40 @@ namespace tss
 
     void ComboBox::showPopup()
     {
-        if (! isEnabled() || getNumItems() == 0)
+        if (! canShowPopup())
         {
             return;
         }
 
-        // Defer popup creation and display asynchronously, just like JUCE does
-        // This prevents blocking the message thread during popup creation
-        juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this)]()
+        const auto displayMode = determineDisplayMode();
+        showPopupAsynchronously(displayMode);
+        repaint();
+    }
+
+    bool ComboBox::canShowPopup() const
+    {
+        return isEnabled() && getNumItems() > 0;
+    }
+
+    PopupMenu::DisplayMode ComboBox::determineDisplayMode() const
+    {
+        if (style_ == Style::ButtonLike)
         {
-            if (safePointer != nullptr && safePointer->isEnabled() && safePointer->getNumItems() > 0)
+            return PopupMenu::DisplayMode::SingleColumnScrollable;
+        }
+        return PopupMenu::DisplayMode::MultiColumn;
+    }
+
+    void ComboBox::showPopupAsynchronously(PopupMenu::DisplayMode displayMode)
+    {
+        juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this), displayMode]()
+        {
+            if (safePointer != nullptr && safePointer->canShowPopup())
             {
                 safePointer->isPopupOpen_ = true;
-                PopupMenu::show(*safePointer);
+                PopupMenu::show(*safePointer, displayMode);
             }
         });
-        
-        repaint();
     }
 
     void ComboBox::mouseDown(const juce::MouseEvent& e)

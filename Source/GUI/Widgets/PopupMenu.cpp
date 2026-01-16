@@ -5,8 +5,25 @@
 
 namespace tss
 {
-    PopupMenu::PopupMenu(ComboBox& comboBoxRef)
+    class PopupMenu::ScrollableContentComponent : public juce::Component
+    {
+    public:
+        explicit ScrollableContentComponent(PopupMenu& popupMenu)
+            : popupMenu_(popupMenu)
+        {
+        }
+
+        void paint(juce::Graphics& g) override
+        {
+            popupMenu_.drawItems(g, getLocalBounds());
+        }
+
+    private:
+        PopupMenu& popupMenu_;
+    };
+    PopupMenu::PopupMenu(ComboBox& comboBoxRef, DisplayMode displayMode)
         : comboBox(comboBoxRef)
+        , displayMode_(displayMode)
     {
         setWantsKeyboardFocus(true);
         setAlwaysOnTop(true);
@@ -22,6 +39,11 @@ namespace tss
         
         calculateColumnLayout();
         
+        if (displayMode_ == DisplayMode::SingleColumnScrollable)
+        {
+            setupScrollableContent();
+        }
+        
         auto selectedIndex = comboBox.getSelectedItemIndex();
         if (isValidItemIndex(selectedIndex))
         {
@@ -30,6 +52,12 @@ namespace tss
         else if (comboBox.getNumItems() > 0)
         {
             highlightedItemIndex = 0;
+        }
+        
+        if (displayMode_ == DisplayMode::SingleColumnScrollable && viewport_ != nullptr && highlightedItemIndex >= 0)
+        {
+            auto itemY = highlightedItemIndex * kItemHeight_;
+            viewport_->setViewPosition(0, itemY);
         }
     }
 
@@ -47,12 +75,19 @@ namespace tss
         drawBase(g, bounds);
         drawBackground(g, bounds.reduced(borderThicknessInt));
         
-        auto contentBounds = bounds.reduced(borderThicknessInt);
-        drawItems(g, contentBounds);
-        
-        if (columnCount > 1)
+        if (displayMode_ == DisplayMode::SingleColumnScrollable)
         {
-            drawVerticalSeparators(g, contentBounds);
+            // Content is drawn by ScrollableContentComponent
+        }
+        else
+        {
+            auto contentBounds = bounds.reduced(borderThicknessInt);
+            drawItems(g, contentBounds);
+            
+            if (columnCount > 1)
+            {
+                drawVerticalSeparators(g, contentBounds);
+            }
         }
         
         drawBorder(g, bounds);
@@ -60,12 +95,36 @@ namespace tss
 
     void PopupMenu::resized()
     {
+        if (displayMode_ == DisplayMode::SingleColumnScrollable && viewport_ != nullptr)
+        {
+            auto borderThickness = static_cast<int>(kBorderThickness_);
+            auto contentBounds = getLocalBounds().reduced(borderThickness);
+            viewport_->setBounds(contentBounds);
+        }
     }
 
     void PopupMenu::mouseMove(const juce::MouseEvent& e)
     {
-        auto itemIndex = getItemIndexAt(e.getPosition().x, e.getPosition().y);
-        updateHighlightedItem(itemIndex);
+        if (displayMode_ == DisplayMode::SingleColumnScrollable && viewport_ != nullptr)
+        {
+            auto viewportPoint = e.getPosition();
+            if (viewport_->getBounds().contains(viewportPoint))
+            {
+                auto localPoint = viewport_->getLocalPoint(this, viewportPoint);
+                auto contentPoint = viewport_->getViewPosition() + localPoint;
+                auto itemIndex = getItemIndexAt(contentPoint.getX(), contentPoint.getY());
+                updateHighlightedItem(itemIndex);
+            }
+            else
+            {
+                updateHighlightedItem(-1);
+            }
+        }
+        else
+        {
+            auto itemIndex = getItemIndexAt(e.getPosition().x, e.getPosition().y);
+            updateHighlightedItem(itemIndex);
+        }
     }
 
     void PopupMenu::mouseExit(const juce::MouseEvent&)
@@ -75,10 +134,27 @@ namespace tss
 
     void PopupMenu::mouseUp(const juce::MouseEvent& e)
     {
-        auto itemIndex = getItemIndexAt(e.getPosition().x, e.getPosition().y);
-        if (itemIndex >= 0)
+        if (displayMode_ == DisplayMode::SingleColumnScrollable && viewport_ != nullptr)
         {
-            selectItem(itemIndex);
+            auto viewportPoint = e.getPosition();
+            if (viewport_->getBounds().contains(viewportPoint))
+            {
+                auto localPoint = viewport_->getLocalPoint(this, viewportPoint);
+                auto contentPoint = viewport_->getViewPosition() + localPoint;
+                auto itemIndex = getItemIndexAt(contentPoint.getX(), contentPoint.getY());
+                if (itemIndex >= 0)
+                {
+                    selectItem(itemIndex);
+                }
+            }
+        }
+        else
+        {
+            auto itemIndex = getItemIndexAt(e.getPosition().x, e.getPosition().y);
+            if (itemIndex >= 0)
+            {
+                selectItem(itemIndex);
+            }
         }
     }
 
@@ -139,9 +215,19 @@ namespace tss
             return;
         }
         
-        columnCount = calculateColumnCount(numItems);
-        itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
-        columnWidth = comboBox.getBounds().getWidth();
+        if (displayMode_ == DisplayMode::SingleColumnScrollable)
+        {
+            columnCount = 1;
+            itemsPerColumn = numItems;
+            columnWidth = comboBox.getBounds().getWidth();
+            scrollableContentHeight = numItems * kItemHeight_;
+        }
+        else
+        {
+            columnCount = calculateColumnCount(numItems);
+            itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
+            columnWidth = comboBox.getBounds().getWidth();
+        }
         
         // Note: setSize() is now called in show() after adding to parent
         // to avoid triggering expensive events before the component is in the hierarchy
@@ -227,9 +313,20 @@ namespace tss
             return juce::Rectangle<int>();
         }
         
-        auto borderThickness = kBorderThickness_;
         auto itemHeight = kItemHeight_;
         auto separatorWidth = kSeparatorWidth_;
+        
+        if (displayMode_ == DisplayMode::SingleColumnScrollable)
+        {
+            if (contentComponent_ != nullptr)
+            {
+                auto y = itemIndex * itemHeight;
+                return juce::Rectangle<int>(0, y, contentComponent_->getWidth(), itemHeight);
+            }
+            return juce::Rectangle<int>();
+        }
+        
+        auto borderThickness = kBorderThickness_;
         auto contentBounds = getLocalBounds().reduced(static_cast<int>(borderThickness));
         
         if (columnCount == 1)
@@ -251,6 +348,23 @@ namespace tss
 
     int PopupMenu::getItemIndexAt(int x, int y) const
     {
+        if (displayMode_ == DisplayMode::SingleColumnScrollable)
+        {
+            if (contentComponent_ != nullptr)
+            {
+                // Coordinates are already in content component space
+                if (contentComponent_->getBounds().contains(x, y))
+                {
+                    auto row = y / kItemHeight_;
+                    if (row >= 0 && row < comboBox.getNumItems())
+                    {
+                        return row;
+                    }
+                }
+            }
+            return -1;
+        }
+        
         auto contentBounds = getLocalBounds().reduced(static_cast<int>(kBorderThickness_));
         
         if (! contentBounds.contains(x, y))
@@ -336,7 +450,27 @@ namespace tss
         if (highlightedItemIndex != itemIndex)
         {
             highlightedItemIndex = itemIndex;
-            repaint();
+            
+            if (displayMode_ == DisplayMode::SingleColumnScrollable && contentComponent_ != nullptr)
+            {
+                contentComponent_->repaint();
+                
+                if (itemIndex >= 0 && viewport_ != nullptr)
+                {
+                    auto itemY = itemIndex * kItemHeight_;
+                    auto viewportY = viewport_->getViewPositionY();
+                    auto viewportHeight = viewport_->getHeight();
+                    
+                    if (itemY < viewportY || itemY + kItemHeight_ > viewportY + viewportHeight)
+                    {
+                        viewport_->setViewPosition(0, juce::jmax(0, itemY - viewportHeight / 2));
+                    }
+                }
+            }
+            else
+            {
+                repaint();
+            }
         }
     }
 
@@ -614,7 +748,19 @@ namespace tss
         return getParentComponent() != nullptr;
     }
 
-    void PopupMenu::show(ComboBox& comboBoxRef)
+    void PopupMenu::setupScrollableContent()
+    {
+        contentComponent_ = std::make_unique<ScrollableContentComponent>(*this);
+        contentComponent_->setSize(columnWidth, scrollableContentHeight);
+        
+        viewport_ = std::make_unique<juce::Viewport>();
+        viewport_->setViewedComponent(contentComponent_.get(), false);
+        viewport_->setScrollBarsShown(true, false);
+        viewport_->setScrollBarThickness(8);
+        addAndMakeVisible(*viewport_);
+    }
+
+    void PopupMenu::show(ComboBox& comboBoxRef, DisplayMode displayMode)
     {
         if (comboBoxRef.getNumItems() == 0)
         {
@@ -639,7 +785,7 @@ namespace tss
             return;
         }
 
-        auto popupMenu = std::make_unique<PopupMenu>(comboBoxRef);
+        auto popupMenu = std::make_unique<PopupMenu>(comboBoxRef, displayMode);
         auto* rawPtr = popupMenu.get();
         
         // Calculate size before adding to parent (layout is already calculated in constructor)
@@ -650,7 +796,17 @@ namespace tss
         auto itemHeight = kItemHeight_;
         auto borderThickness = kBorderThickness_;
         auto totalWidth = columnCount * columnWidth + (columnCount - 1) * separatorWidth;
-        auto totalHeight = itemsPerColumn * itemHeight;
+        
+        int totalHeight;
+        if (displayMode == DisplayMode::SingleColumnScrollable)
+        {
+            totalHeight = juce::jmin(rawPtr->scrollableContentHeight, kMaxScrollableHeight_);
+        }
+        else
+        {
+            totalHeight = itemsPerColumn * itemHeight;
+        }
+        
         auto popupSize = juce::Point<int>(totalWidth + static_cast<int>(borderThickness * 2.0f),
                                           totalHeight + static_cast<int>(borderThickness * 2.0f));
         
@@ -682,6 +838,12 @@ namespace tss
         // Use setBounds() instead of separate setSize() and setTopLeftPosition() calls
         // This is more efficient as it combines both operations
         rawPtr->setBounds(popupPosition.getX(), popupPosition.getY(), popupSize.getX(), popupSize.getY());
+        
+        if (displayMode == DisplayMode::SingleColumnScrollable && rawPtr->viewport_ != nullptr)
+        {
+            rawPtr->resized();
+        }
+        
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         

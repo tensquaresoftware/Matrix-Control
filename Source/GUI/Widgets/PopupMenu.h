@@ -10,8 +10,19 @@ namespace tss
     class PopupMenu : public juce::Component
     {
     public:
-        explicit PopupMenu(ComboBox& comboBox);
+        enum class DisplayMode
+        {
+            MultiColumn,
+            SingleColumnScrollable
+        };
+
+        explicit PopupMenu(ComboBox& comboBox, DisplayMode displayMode = DisplayMode::MultiColumn);
         ~PopupMenu() override = default;
+
+        static void show(ComboBox& comboBox, DisplayMode displayMode = DisplayMode::MultiColumn);
+
+    private:
+        class ScrollableContentComponent;
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -23,27 +34,32 @@ namespace tss
         void inputAttemptWhenModal() override;
         bool keyPressed(const juce::KeyPress& key) override;
 
-        static void show(ComboBox& comboBox);
-
     private:
         inline constexpr static int kItemHeight_ = 20;
         inline constexpr static float kBorderThickness_ = 1.0f;
         inline constexpr static int kSeparatorWidth_ = 1;
         inline constexpr static int kTextLeftPadding_ = 3;
         inline constexpr static int kColumnThreshold_ = 10;
+        inline constexpr static int kMaxScrollableHeight_ = 300;
 
         ComboBox& comboBox;
         Theme* theme = nullptr;
+        DisplayMode displayMode_;
         int highlightedItemIndex = -1;
         juce::Font cachedFont { juce::FontOptions() };
         
         int columnCount = 1;
         int itemsPerColumn = 0;
         int columnWidth = 0;
+        int scrollableContentHeight = 0;
+        
+        std::unique_ptr<juce::Viewport> viewport_;
+        std::unique_ptr<ScrollableContentComponent> contentComponent_;
 
         void calculateColumnLayout();
         int calculateColumnCount(int totalItems) const;
         int calculateItemsPerColumn(int totalItems, int columnCount) const;
+        void setupScrollableContent();
         
         juce::Point<int> calculatePopupPosition(juce::Component* topLevelComponent) const;
         juce::Component* findTopLevelComponent() const;
@@ -73,6 +89,8 @@ namespace tss
         bool isValidItemIndex(int itemIndex) const;
         bool hasValidLookAndFeel() const;
         bool hasValidParent() const;
+
+        friend class ScrollableContentComponent;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PopupMenu)
     };
