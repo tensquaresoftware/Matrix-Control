@@ -3,9 +3,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "Panels/HeaderPanel/HeaderPanel.h"
-#include "Panels/BodyPanel/BodyPanel.h"
-#include "Panels/FooterPanel/FooterPanel.h"
+#include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "Panels/MainComponent/BodyPanel/BodyPanel.h"
+#include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 
 namespace tss
 {

@@ -66,32 +66,32 @@ set(PLUGIN_SOURCES
     Source/GUI/MainComponent.cpp
     
     # GUI - Panels
-    Source/GUI/Panels/FooterPanel/FooterPanel.cpp
-    Source/GUI/Panels/HeaderPanel/HeaderPanel.cpp
-    Source/GUI/Panels/BodyPanel/BodyPanel.cpp
-    Source/GUI/Panels/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
-    Source/GUI/Panels/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
-    Source/GUI/Panels/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
-    Source/GUI/Panels/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
-    Source/GUI/Panels/BodyPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/BottomPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env1Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env2Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env3Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo1Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo2Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/MiddlePanel/MiddlePanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/TopPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco1Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco2Panel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/FmTrackPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/RampPortamentoPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchEditPanel/TopPanel/Modules/VcfVcaPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchManagerPanel/PatchManagerPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
-    Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp
+    Source/GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/BodyPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MidiPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/MiscPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/Modules/VibratoPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/MatrixModulationPanel/MatrixModulationPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/BottomPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Env3Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/BottomPanel/Modules/Lfo2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/MiddlePanel/MiddlePanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/TopPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco1Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/Dco2Panel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/FmTrackPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/RampPortamentoPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/TopPanel/Modules/VcfVcaPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/PatchManagerPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
     
     # GUI - Panels - Reusable
     Source/GUI/Panels/Reusable/ModuleHeaderPanel.cpp

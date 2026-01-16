@@ -5,9 +5,9 @@
 
 #include "../Core/PluginProcessor.h"
 #include "Themes/Theme.h"
-#include "Panels/HeaderPanel/HeaderPanel.h"
-#include "Panels/BodyPanel/BodyPanel.h"
-#include "Panels/FooterPanel/FooterPanel.h"
+#include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "Panels/MainComponent/BodyPanel/BodyPanel.h"
+#include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "MainComponent.h"
 
 class WidgetFactory;

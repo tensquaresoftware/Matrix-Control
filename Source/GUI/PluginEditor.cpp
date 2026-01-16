@@ -1,9 +1,9 @@
 #include "../Core/PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Themes/Theme.h"
-#include "Panels/HeaderPanel/HeaderPanel.h"
-#include "Panels/BodyPanel/BodyPanel.h"
-#include "Panels/FooterPanel/FooterPanel.h"
+#include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "Panels/MainComponent/BodyPanel/BodyPanel.h"
+#include "Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "Factories/WidgetFactory.h"
 
 PluginEditor::PluginEditor(PluginProcessor& p)
