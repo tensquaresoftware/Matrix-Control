@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-#include "../GUI/Factories/WidgetFactory.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

@@ -1,7 +1,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include "PluginProcessor.h"
-#include "../GUI/PluginEditor.h"
+#include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
 #include "Loggers/MidiLogger.h"
 #include "Loggers/ApvtsLogger.h"

@@ -1,6 +1,6 @@
 #include "WidgetFactoryValidator.h"
 
-#include "../../Core/Exceptions/ExceptionPropagator.h"
+#include "Core/Exceptions/ExceptionPropagator.h"
 
 WidgetFactoryValidator::WidgetFactoryValidator(juce::AudioProcessorValueTreeState& inApvts)
     : apvts(inApvts)

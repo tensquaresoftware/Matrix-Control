@@ -1,6 +1,6 @@
 #include "FooterPanel.h"
 
-#include "../../../Themes/Theme.h"
+#include "GUI/Themes/Theme.h"
 
 using tss::Theme;
 

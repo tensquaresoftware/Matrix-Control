@@ -6,8 +6,8 @@
 #include "Modules/FmTrackPanel.h"
 #include "Modules/RampPortamentoPanel.h"
 
-#include "../../../../../Themes/Theme.h"
-#include "../../../../../../GUI/Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

@@ -3,7 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "../Core/PluginProcessor.h"
+#include "Core/PluginProcessor.h"
 #include "Themes/Theme.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"

@@ -6,6 +6,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Shared/PluginDimensions.h"
+
 namespace tss
 {
     class Theme;
@@ -25,12 +27,10 @@ public:
     void resized() override;
     void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth_; }
-    static int getHeight() { return kHeight_; }
+    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::Lfo1Panel::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::Lfo1Panel::kHeight; }
 
 private:
-    inline constexpr static int kWidth_ = 150;
-    inline constexpr static int kHeight_ = 280;
     
     tss::Theme* theme_;
     juce::AudioProcessorValueTreeState& apvts_;

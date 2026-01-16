@@ -1,6 +1,6 @@
 #include "ModuleHeader.h"
 
-#include "../Themes/Theme.h"
+#include "GUI/Themes/Theme.h"
 
 namespace tss
 {

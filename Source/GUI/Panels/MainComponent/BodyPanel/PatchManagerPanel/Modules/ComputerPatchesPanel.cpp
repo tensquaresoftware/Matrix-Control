@@ -1,10 +1,10 @@
 #include "ComputerPatchesPanel.h"
 
-#include "../../../../../Themes/Theme.h"
-#include "../../../../../Widgets/ModuleHeader.h"
-#include "../../../../../../Shared/PluginDescriptors.h"
-#include "../../../../../../Shared/PluginDimensions.h"
-#include "../../../../../Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Widgets/ModuleHeader.h"
+#include "Shared/PluginDescriptors.h"
+#include "Shared/PluginDimensions.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

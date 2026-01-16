@@ -1,13 +1,13 @@
 #include "MatrixModulationPanel.h"
 
-#include "../../../../Themes/Theme.h"
-#include "../../../../Widgets/SectionHeader.h"
-#include "../../../../Widgets/ModulationBusHeader.h"
-#include "../../../../Widgets/Button.h"
-#include "../../../Reusable/ModulationBusPanel.h"
-#include "../../../../../Shared/PluginDescriptors.h"
-#include "../../../../../Shared/PluginDimensions.h"
-#include "../../../../../GUI/Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Widgets/SectionHeader.h"
+#include "GUI/Widgets/ModulationBusHeader.h"
+#include "GUI/Widgets/Button.h"
+#include "GUI/Panels/Reusable/ModulationBusPanel.h"
+#include "Shared/PluginDescriptors.h"
+#include "Shared/PluginDimensions.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

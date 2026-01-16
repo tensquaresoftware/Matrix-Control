@@ -119,7 +119,7 @@
 - Code lisible et compréhensible par un humain
 - Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
 - Éviter au maximum les commentaires, ne les utiliser que lorsque c'est absolument nécessaire
-- Toujours préférer la refactorisation d'un bloc de code avec un nom de fonction très explicite, à la place d'un commentaire qui pourrait à la longue mentir... (le code a toujours raison)
+- Toujours préférer la refactorisation d'un bloc de code trop long avec des fonctions intermédiaires plus courtes et aux noms très explicite, à la place de commentaires descriptifs du code qui pourraient s'avérer mentir au fil du temps s'ils sont mal mis à jour
 - Fonctions courtes : 5-15 lignes idéalement
 - Un seul niveau d'abstraction par fonction
 - Une seule responsabilité (Single Responsibility)

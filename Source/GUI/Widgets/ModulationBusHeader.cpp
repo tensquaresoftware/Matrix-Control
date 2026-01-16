@@ -1,7 +1,7 @@
 #include "ModulationBusHeader.h"
 
-#include "../Themes/Theme.h"
-#include "../../Shared/PluginDescriptors.h"
+#include "GUI/Themes/Theme.h"
+#include "Shared/PluginDescriptors.h"
 
 namespace tss
 {

@@ -159,6 +159,12 @@ juce_add_plugin(Matrix-Control
 
 target_sources(Matrix-Control PRIVATE ${PLUGIN_SOURCES})
 
+# Add Source directory as include directory to eliminate relative paths
+target_include_directories(Matrix-Control
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+)
+
 target_link_libraries(Matrix-Control
     PRIVATE
         juce::juce_audio_utils

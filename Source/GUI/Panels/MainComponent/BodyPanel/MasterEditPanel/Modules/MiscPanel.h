@@ -5,6 +5,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Shared/PluginDimensions.h"
+
 namespace tss
 {
     class Theme;
@@ -27,11 +29,10 @@ public:
     void resized() override;
     void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth_; }
+    static int getWidth() { return PluginDimensions::Panels::MasterEditPanel::MiscPanel::kWidth; }
     static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth_ = 160;
     inline constexpr static int kHeight_ = 205;
     
     tss::Theme* theme_;

@@ -2,7 +2,7 @@
 
 #include "SysExParser.h"
 
-#include "../../Loggers/MidiLogger.h"
+#include "Core/Loggers/MidiLogger.h"
 #include "SysExConstants.h"
 
 SysExParser::ValidationResult SysExParser::validateSysEx(const juce::MemoryBlock& sysEx) const

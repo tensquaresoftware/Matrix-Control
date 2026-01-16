@@ -8,8 +8,8 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_core/juce_core.h>
 
-#include "../Exceptions/Exceptions.h"
-#include "../SysEx/SysExConstants.h"
+#include "Core/MIDI/Exceptions/Exceptions.h"
+#include "Core/MIDI/SysEx/SysExConstants.h"
 
 class MidiReceiver : public juce::MidiInputCallback
 {

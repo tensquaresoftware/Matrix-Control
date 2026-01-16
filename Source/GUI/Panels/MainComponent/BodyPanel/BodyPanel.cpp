@@ -1,12 +1,12 @@
 #include "BodyPanel.h"
 
-#include "../../../Themes/Theme.h"
-#include "../../../Widgets/VerticalSeparator.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Widgets/VerticalSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MatrixModulationPanel/MatrixModulationPanel.h"
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "PatchManagerPanel/PatchManagerPanel.h"
-#include "../../../../GUI/Factories/WidgetFactory.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 using tss::VerticalSeparator;

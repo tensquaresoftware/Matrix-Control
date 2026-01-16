@@ -6,7 +6,7 @@
 
 #include <juce_core/juce_core.h>
 
-#include "../MIDI/SysEx/SysExParser.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 
 class MidiLogger
 {

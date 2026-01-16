@@ -1,8 +1,8 @@
 #include "HeaderPanel.h"
 
-#include "../../../Widgets/Button.h"
-#include "../../../Themes/Theme.h"
-#include "../../../../Shared/PluginDimensions.h"
+#include "GUI/Widgets/Button.h"
+#include "GUI/Themes/Theme.h"
+#include "Shared/PluginDimensions.h"
 
 using tss::Theme;
 

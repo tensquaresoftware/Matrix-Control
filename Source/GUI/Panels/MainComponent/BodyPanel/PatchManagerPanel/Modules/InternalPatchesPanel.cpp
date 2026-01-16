@@ -1,13 +1,13 @@
 #include "InternalPatchesPanel.h"
 
-#include "../../../../../Themes/Theme.h"
-#include "../../../../../Widgets/ModuleHeader.h"
-#include "../../../../../Widgets/GroupLabel.h"
-#include "../../../../../Widgets/Button.h"
-#include "../../../../../Widgets/NumberBox.h"
-#include "../../../../../../Shared/PluginDescriptors.h"
-#include "../../../../../../Shared/PluginDimensions.h"
-#include "../../../../../Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Widgets/ModuleHeader.h"
+#include "GUI/Widgets/GroupLabel.h"
+#include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/NumberBox.h"
+#include "Shared/PluginDescriptors.h"
+#include "Shared/PluginDimensions.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

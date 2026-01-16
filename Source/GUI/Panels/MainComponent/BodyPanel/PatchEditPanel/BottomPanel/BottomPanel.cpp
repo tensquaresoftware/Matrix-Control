@@ -6,8 +6,8 @@
 #include "Modules/Lfo1Panel.h"
 #include "Modules/Lfo2Panel.h"
 
-#include "../../../../../Themes/Theme.h"
-#include "../../../../../../GUI/Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

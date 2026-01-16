@@ -6,8 +6,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "../../../../../Shared/PluginDescriptors.h"
-#include "../../../Reusable/ModulationBusPanel.h"
+#include "Shared/PluginDescriptors.h"
+#include "Shared/PluginDimensions.h"
+#include "GUI/Panels/Reusable/ModulationBusPanel.h"
 
 namespace tss
 {
@@ -29,8 +30,8 @@ public:
     void resized() override;
     void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth_; }
-    static int getHeight() { return kHeight_; }
+    static int getWidth() { return PluginDimensions::Panels::MatrixModulationPanel::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::MatrixModulationPanel::kHeight; }
 
 private:
     struct ModulationBusParameterArrays
@@ -40,9 +41,6 @@ private:
         std::array<const char*, PluginDescriptors::kModulationBusCount> amountParameterIds;
         std::array<const char*, PluginDescriptors::kModulationBusCount> destinationParameterIds;
     };
-
-    inline constexpr static int kWidth_ = 275;
-    inline constexpr static int kHeight_ = 325;
 
     std::array<const char*, PluginDescriptors::kModulationBusCount> createBusIds() const;
     std::array<const char*, PluginDescriptors::kModulationBusCount> createSourceParameterIds() const;

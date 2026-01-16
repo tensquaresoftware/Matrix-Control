@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "../../../Widgets/Button.h"
+#include "GUI/Widgets/Button.h"
 
 namespace tss
 {

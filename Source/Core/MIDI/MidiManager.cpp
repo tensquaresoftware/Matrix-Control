@@ -2,7 +2,7 @@
 
 #include "MidiManager.h"
 
-#include "../Loggers/MidiLogger.h"
+#include "Core/Loggers/MidiLogger.h"
 
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef)
     : juce::Thread("MidiManager")

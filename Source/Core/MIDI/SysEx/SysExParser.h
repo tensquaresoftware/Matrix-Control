@@ -2,7 +2,7 @@
 
 #include <juce_core/juce_core.h>
 
-#include "../Exceptions/Exceptions.h"
+#include "Core/MIDI/Exceptions/Exceptions.h"
 #include "SysExConstants.h"
 
 class SysExParser

@@ -1,4 +1,4 @@
-#include "../Core/PluginProcessor.h"
+#include "Core/PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Themes/Theme.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"

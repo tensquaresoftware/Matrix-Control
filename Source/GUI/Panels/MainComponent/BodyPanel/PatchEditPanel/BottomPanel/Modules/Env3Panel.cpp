@@ -1,10 +1,10 @@
 #include "Env3Panel.h"
 
-#include "../../../../../../Themes/Theme.h"
-#include "../../../../../Reusable/ModuleHeaderPanel.h"
-#include "../../../../../Reusable/ParameterPanel.h"
-#include "../../../../../../../Shared/PluginDescriptors.h"
-#include "../../../../../../../GUI/Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
+#include "GUI/Panels/Reusable/ParameterPanel.h"
+#include "Shared/PluginDescriptors.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

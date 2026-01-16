@@ -1,12 +1,12 @@
 #include "ParameterPanel.h"
 
-#include "../../Themes/Theme.h"
-#include "../../Widgets/Label.h"
-#include "../../Widgets/Slider.h"
-#include "../../Widgets/ComboBox.h"
-#include "../../Widgets/HorizontalSeparator.h"
-#include "../../../Shared/PluginDimensions.h"
-#include "../../Factories/WidgetFactory.h"
+#include "GUI/Themes/Theme.h"
+#include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/Slider.h"
+#include "GUI/Widgets/ComboBox.h"
+#include "GUI/Widgets/HorizontalSeparator.h"
+#include "Shared/PluginDimensions.h"
+#include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 

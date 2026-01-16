@@ -42,28 +42,139 @@ namespace PluginDimensions
             inline constexpr int kHeight = 30;
         }
         
-        namespace MasterEditSection
+        namespace MasterEditPanel
         {
             inline constexpr int kWidth = 160;
             inline constexpr int kHeight = 700;
+            
+            namespace MidiPanel
+            {
+                inline constexpr int kWidth = 160;
+            }
+            
+            namespace VibratoPanel
+            {
+                inline constexpr int kWidth = 160;
+            }
+            
+            namespace MiscPanel
+            {
+                inline constexpr int kWidth = 160;
+            }
         }
         
-        namespace PatchEditSection
+        namespace PatchEditPanel
         {
             inline constexpr int kWidth = 810;
             inline constexpr int kHeight = 700;
+            
+            namespace TopPanel
+            {
+                inline constexpr int kWidth = 810;
+                inline constexpr int kHeight = 280;
+                
+                namespace Dco1Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace Dco2Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace VcfVcaPanel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace FmTrackPanel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace RampPortamentoPanel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+            }
+            
+            namespace MiddlePanel
+            {
+                inline constexpr int kWidth = 810;
+                inline constexpr int kHeight = 140;
+            }
+            
+            namespace BottomPanel
+            {
+                inline constexpr int kWidth = 810;
+                inline constexpr int kHeight = 280;
+                
+                namespace Env1Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace Env2Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace Env3Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace Lfo1Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+                
+                namespace Lfo2Panel
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 280;
+                }
+            }
         }
         
-        namespace MatrixModulationSection
+        namespace MatrixModulationPanel
         {
             inline constexpr int kWidth = 275;
             inline constexpr int kHeight = 325;
         }
         
-        namespace PatchManagerSection
+        namespace PatchManagerPanel
         {
             inline constexpr int kWidth = 275;
             inline constexpr int kHeight = 375;
+            
+            namespace BankUtilityPanel
+            {
+                inline constexpr int kWidth = 275;
+                inline constexpr int kHeight = 125;
+            }
+            
+            namespace InternalPatchesPanel
+            {
+                inline constexpr int kWidth = 275;
+                inline constexpr int kHeight = 125;
+            }
+            
+            namespace ComputerPatchesPanel
+            {
+                inline constexpr int kWidth = 275;
+                inline constexpr int kHeight = 125;
+            }
         }
     }
 

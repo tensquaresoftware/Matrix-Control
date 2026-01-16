@@ -1,7 +1,7 @@
 #include "ComboBox.h"
 #include "PopupMenu.h"
 
-#include "../Themes/Theme.h"
+#include "GUI/Themes/Theme.h"
 
 namespace tss
 {

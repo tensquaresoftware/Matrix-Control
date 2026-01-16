@@ -2,7 +2,7 @@
 #include <chrono>
 
 #include "MidiInputPort.h"
-#include "../../Loggers/MidiLogger.h"
+#include "Core/Loggers/MidiLogger.h"
 
 MidiInputPort::MidiInputPort()
     : portIsOpen(false)

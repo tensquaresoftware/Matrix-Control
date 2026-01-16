@@ -1,11 +1,11 @@
 #include "WidgetFactory.h"
 
-#include "../Widgets/Slider.h"
-#include "../Widgets/ComboBox.h"
-#include "../Widgets/Button.h"
-#include "../../Shared/PluginDescriptors.h"
-#include "../../Shared/PluginIDs.h"
-#include "../../Shared/PluginDimensions.h"
+#include "GUI/Widgets/Slider.h"
+#include "GUI/Widgets/ComboBox.h"
+#include "GUI/Widgets/Button.h"
+#include "Shared/PluginDescriptors.h"
+#include "Shared/PluginIDs.h"
+#include "Shared/PluginDimensions.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     : validator(inApvts)

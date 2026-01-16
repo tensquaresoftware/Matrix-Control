@@ -2,8 +2,8 @@
 
 #include "MidiLogger.h"
 
-#include "../MIDI/SysEx/SysExConstants.h"
-#include "../MIDI/SysEx/SysExParser.h"
+#include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 
 MidiLogger& MidiLogger::getInstance()
 {

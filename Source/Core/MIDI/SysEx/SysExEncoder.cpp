@@ -2,7 +2,7 @@
 
 #include "SysExEncoder.h"
 
-#include "../../Loggers/MidiLogger.h"
+#include "Core/Loggers/MidiLogger.h"
 
 juce::MemoryBlock SysExEncoder::encodePatchSysEx(juce::uint8 patchNumber, const juce::uint8* packedData) const
 {
