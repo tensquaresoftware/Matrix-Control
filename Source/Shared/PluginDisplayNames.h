@@ -9,6 +9,12 @@ namespace PluginDescriptors
 {
 
     // ============================================================================
+    // Display Names | Plugin Name
+    // ============================================================================
+
+    constexpr const char* kPluginName                       = "MATRIX-CONTROL";
+    
+    // ============================================================================
     // Display Names | Plugin Modes
     // ============================================================================
 
@@ -324,7 +330,7 @@ namespace PluginDescriptors
         // Patch Manager | Computer Patches Standalone Widget Display Names
         constexpr const char* kLoadPreviousPatchFile        = "<";
         constexpr const char* kLoadNextPatchFile            = ">";
-        constexpr const char* kSelectPatchFile              = "";
+        constexpr const char* kSelectPatchFile              = "SELECT A PATCH!";
         constexpr const char* kOpenPatchFolder              = "OPEN";
         constexpr const char* kSavePatchAsFile              = "SAVE AS";
         constexpr const char* kSavePatch                    = "SAVE";

@@ -56,7 +56,14 @@ namespace tss
         
         if (style_ == Style::ButtonLike)
         {
-            backgroundColour = theme_->getButtonBackgroundColourOn();
+            if (! enabled)
+            {
+                backgroundColour = theme_->getButtonBackgroundColourOff();
+            }
+            else
+            {
+                backgroundColour = theme_->getButtonBackgroundColourOn();
+            }
         }
         else
         {
@@ -80,7 +87,14 @@ namespace tss
         
         if (style_ == Style::ButtonLike)
         {
-            style.colour = theme_->getButtonBorderColourOn();
+            if (! enabled)
+            {
+                style.colour = theme_->getButtonBorderColourOff();
+            }
+            else
+            {
+                style.colour = theme_->getButtonBorderColourOn();
+            }
             style.thickness = kBorderThicknessButtonLike_;
         }
         else
@@ -130,6 +144,10 @@ namespace tss
     {
         if (style_ == Style::ButtonLike)
         {
+            if (! enabled)
+            {
+                return theme_->getButtonTextColourOff();
+            }
             return theme_->getButtonTextColourOn();
         }
         return theme_->getComboBoxTextColour(enabled);

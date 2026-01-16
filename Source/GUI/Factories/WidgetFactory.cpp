@@ -123,10 +123,15 @@ int WidgetFactory::getButtonWidthForWidgetId(const juce::String& widgetId) const
     
     if (widgetId == kLoadPreviousPatch || widgetId == kLoadNextPatch ||
         widgetId == kLoadPreviousPatchFile || widgetId == kLoadNextPatchFile ||
-        widgetId == kOpenPatchFolder || widgetId == kSavePatchAs ||
-        widgetId == kSavePatch || widgetId == kStorePatch)
+        widgetId == kOpenPatchFolder || widgetId == kSavePatch ||
+        widgetId == kStorePatch)
     {
         return PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    }
+    
+    if (widgetId == kSavePatchAs)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kComputerPatchesSaveAs;
     }
     
     if (widgetId == kUnlockBank)

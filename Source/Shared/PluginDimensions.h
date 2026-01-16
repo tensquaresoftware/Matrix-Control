@@ -47,19 +47,24 @@ namespace PluginDimensions
             inline constexpr int kWidth = 160;
             inline constexpr int kHeight = 700;
             
-            namespace MidiPanel
+            namespace ChildPanels
             {
                 inline constexpr int kWidth = 160;
+            }
+            
+            namespace MidiPanel
+            {
+                inline constexpr int kHeight = 245;
             }
             
             namespace VibratoPanel
             {
-                inline constexpr int kWidth = 160;
+                inline constexpr int kHeight = 220;
             }
             
             namespace MiscPanel
             {
-                inline constexpr int kWidth = 160;
+                inline constexpr int kHeight = 205;
             }
         }
         
@@ -73,31 +78,7 @@ namespace PluginDimensions
                 inline constexpr int kWidth = 810;
                 inline constexpr int kHeight = 280;
                 
-                namespace Dco1Panel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace Dco2Panel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace VcfVcaPanel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace FmTrackPanel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace RampPortamentoPanel
+                namespace ChildPanels
                 {
                     inline constexpr int kWidth = 150;
                     inline constexpr int kHeight = 280;
@@ -108,6 +89,12 @@ namespace PluginDimensions
             {
                 inline constexpr int kWidth = 810;
                 inline constexpr int kHeight = 140;
+
+                namespace ChildPanels
+                {
+                    inline constexpr int kWidth = 150;
+                    inline constexpr int kHeight = 80;
+                }
             }
             
             namespace BottomPanel
@@ -115,31 +102,7 @@ namespace PluginDimensions
                 inline constexpr int kWidth = 810;
                 inline constexpr int kHeight = 280;
                 
-                namespace Env1Panel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace Env2Panel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace Env3Panel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace Lfo1Panel
-                {
-                    inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 280;
-                }
-                
-                namespace Lfo2Panel
+                namespace ChildPanels
                 {
                     inline constexpr int kWidth = 150;
                     inline constexpr int kHeight = 280;
@@ -236,6 +199,7 @@ namespace PluginDimensions
                 inline constexpr int kPatchManagerUnlockBank = 75;
                 inline constexpr int kInternalPatchesUtility = 35;
                 inline constexpr int kComputerPatchesUtility = 35;
+                inline constexpr int kComputerPatchesSaveAs = 50;
             }
             
             namespace Slider
