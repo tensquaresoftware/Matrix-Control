@@ -20,29 +20,29 @@ class RampPortamentoPanel;
 class TopPanel : public juce::Component
 {
 public:
-    TopPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    TopPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~TopPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
-    static int getSpacing() { return kSpacing; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
+    static int getSpacing() { return kSpacing_; }
 
 private:
-    inline constexpr static int kWidth = 810;
-    inline constexpr static int kHeight = 280;
-    inline constexpr static int kSpacing = 15;
+    inline constexpr static int kWidth_ = 810;
+    inline constexpr static int kHeight_ = 280;
+    inline constexpr static int kSpacing_ = 15;
 
-    tss::Theme* theme;
+    tss::Theme* theme_;
 
-    std::unique_ptr<Dco1Panel> dco1Panel;
-    std::unique_ptr<Dco2Panel> dco2Panel;
-    std::unique_ptr<VcfVcaPanel> vcfVcaPanel;
-    std::unique_ptr<FmTrackPanel> fmTrackPanel;
-    std::unique_ptr<RampPortamentoPanel> rampPortamentoPanel;
+    std::unique_ptr<Dco1Panel> dco1Panel_;
+    std::unique_ptr<Dco2Panel> dco2Panel_;
+    std::unique_ptr<VcfVcaPanel> vcfVcaPanel_;
+    std::unique_ptr<FmTrackPanel> fmTrackPanel_;
+    std::unique_ptr<RampPortamentoPanel> rampPortamentoPanel_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TopPanel)
 };

@@ -4,32 +4,33 @@
 
 namespace tss
 {
-    Label::Label(Theme& inTheme, LabelWidth inWidth, const juce::String& text)
-        : width(inWidth)
-        , theme(&inTheme)
-        , labelText(text)
+    Label::Label(Theme& theme, int width, int height, const juce::String& text)
+        : theme_(&theme)
+        , width_(width)
+        , height_(height)
+        , labelText_(text)
     {
-        setSize(getWidth(width), kHeight);
+        setSize(width_, height_);
     }
 
-    void Label::setTheme(Theme& inTheme)
+    void Label::setTheme(Theme& theme)
     {
-        theme = &inTheme;
+        theme_ = &theme;
         repaint();
     }
 
-    void Label::setText(const juce::String& newText)
+    void Label::setText(const juce::String& text)
     {
-        if (labelText != newText)
+        if (labelText_ != text)
         {
-            labelText = newText;
+            labelText_ = text;
             repaint();
         }
     }
 
     void Label::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
+        if (theme_ == nullptr)
         {
             return;
         }
@@ -43,15 +44,15 @@ namespace tss
 
     void Label::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto baseColour = theme->getLabelBaseColour();
+        const auto baseColour = theme_->getLabelBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void Label::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = theme->getLabelBackgroundColour();
-        const auto backgroundBounds = bounds.reduced(kBackgroundPadding);
+        const auto backgroundColour = theme_->getLabelBackgroundColour();
+        const auto backgroundBounds = bounds.reduced(kBackgroundPadding_);
         
         g.setColour(backgroundColour);
         g.fillRect(backgroundBounds);
@@ -59,20 +60,20 @@ namespace tss
 
     void Label::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        if (labelText.isEmpty())
+        if (labelText_.isEmpty())
         {
             return;
         }
 
-        const auto textColour = theme->getLabelTextColour();
-        const auto font = theme->getBaseFont();
+        const auto textColour = theme_->getLabelTextColour();
+        const auto font = theme_->getBaseFont();
 
-        auto textBounds = bounds.reduced(kBackgroundPadding);
-        textBounds.removeFromLeft(kTextLeftPadding);
+        auto textBounds = bounds.reduced(kBackgroundPadding_);
+        textBounds.removeFromLeft(kTextLeftPadding_);
 
         g.setColour(textColour);
         g.setFont(font);
-        g.drawText(labelText, textBounds, juce::Justification::centredLeft, false);
+        g.drawText(labelText_, textBounds, juce::Justification::centredLeft, false);
     }
 }
 

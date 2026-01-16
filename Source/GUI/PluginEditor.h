@@ -22,12 +22,12 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 1335;
-    inline constexpr static int kHeight = 790;
+    inline constexpr static int kWidth_ = 1335;
+    inline constexpr static int kHeight_ = 790;
 
     PluginProcessor& pluginProcessor;
     

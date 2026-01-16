@@ -5,6 +5,7 @@
 #include "../Widgets/Button.h"
 #include "../../Shared/PluginDescriptors.h"
 #include "../../Shared/PluginIDs.h"
+#include "../../Shared/PluginDimensions.h"
 
 WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
     : validator(inApvts)
@@ -24,9 +25,11 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     const PluginDescriptors::ChoiceParameterDescriptor* desc,
-    tss::Theme& theme)
+    tss::Theme& theme,
+    int width,
+    int height)
 {
-    auto comboBox = std::make_unique<tss::ComboBox>(theme);
+    auto comboBox = std::make_unique<tss::ComboBox>(theme, width, height);
     
     for (const auto& choice : desc->choices)
         comboBox->addItem(choice, comboBox->getNumItems() + 1);
@@ -48,29 +51,90 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     const juce::String& parameterId,
-    tss::Theme& theme)
+    tss::Theme& theme,
+    int width,
+    int height)
 {
     validator.throwIfParameterIdEmpty(parameterId);
     const auto* desc = findChoiceParameter(parameterId);
     validator.getChoiceParameterDescriptorOrThrow(desc, parameterId);
     validator.validateChoiceParameterValues(desc, parameterId);
-    return createComboBoxFromDescriptor(desc, theme);
+    return createComboBoxFromDescriptor(desc, theme, width, height);
 }
 
 std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     const juce::String& widgetId,
-    tss::Theme& theme)
+    tss::Theme& theme,
+    int height)
 {
     validator.throwIfWidgetIdEmpty(widgetId);
     const auto* desc = findStandaloneWidget(widgetId);
     validator.getStandaloneWidgetDescriptorOrThrow(desc, widgetId);
     validator.validateWidgetType(desc, widgetId);
     
+    const auto buttonWidth = getButtonWidthForWidgetId(widgetId);
+    
     return std::make_unique<tss::Button>(
         theme, 
-        tss::Button::ButtonWidth::InitCopyPaste, 
+        buttonWidth,
+        height,
         desc->displayName
     );
+}
+
+int WidgetFactory::getButtonWidthForWidgetId(const juce::String& widgetId) const
+{
+    using namespace PluginDescriptors::StandaloneWidgetIds;
+    
+    if (widgetId == kDco1Init || widgetId == kDco2Init ||
+        widgetId == kVcfVcaInit || widgetId == kFmTrackInit ||
+        widgetId == kRampPortamentoInit || widgetId == kEnv1Init ||
+        widgetId == kEnv2Init || widgetId == kEnv3Init ||
+        widgetId == kLfo1Init || widgetId == kLfo2Init ||
+        widgetId == kInitPatch)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kInit;
+    }
+    
+    if (widgetId == kDco1Copy || widgetId == kDco2Copy ||
+        widgetId == kEnv1Copy || widgetId == kEnv2Copy ||
+        widgetId == kEnv3Copy || widgetId == kLfo1Copy ||
+        widgetId == kLfo2Copy || widgetId == kCopyPatch)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kCopy;
+    }
+    
+    if (widgetId == kDco1Paste || widgetId == kDco2Paste ||
+        widgetId == kEnv1Paste || widgetId == kEnv2Paste ||
+        widgetId == kEnv3Paste || widgetId == kLfo1Paste ||
+        widgetId == kLfo2Paste || widgetId == kPastePatch)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kPaste;
+    }
+    
+    if (widgetId == kSelectBank0 || widgetId == kSelectBank1 ||
+        widgetId == kSelectBank2 || widgetId == kSelectBank3 ||
+        widgetId == kSelectBank4 || widgetId == kSelectBank5 ||
+        widgetId == kSelectBank6 || widgetId == kSelectBank7 ||
+        widgetId == kSelectBank8 || widgetId == kSelectBank9)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect;
+    }
+    
+    if (widgetId == kLoadPreviousPatch || widgetId == kLoadNextPatch ||
+        widgetId == kLoadPreviousPatchFile || widgetId == kLoadNextPatchFile ||
+        widgetId == kOpenPatchFolder || widgetId == kSavePatchAs ||
+        widgetId == kSavePatch || widgetId == kStorePatch)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    }
+    
+    if (widgetId == kUnlockBank)
+    {
+        return PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank;
+    }
+    
+    return PluginDimensions::Widgets::Widths::Button::kInit;
 }
 
 juce::String WidgetFactory::getParameterDisplayName(const juce::String& parameterId) const

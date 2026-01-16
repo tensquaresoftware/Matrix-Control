@@ -7,33 +7,35 @@
 #include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionHeader.h"
 #include "../../../../Shared/PluginDescriptors.h"
+#include "../../../../Shared/PluginDimensions.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
 PatchEditPanel::~PatchEditPanel() = default;
 
-PatchEditPanel::PatchEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme(&inTheme)
-    , sectionHeader(std::make_unique<tss::SectionHeader>(
-        inTheme, 
-        tss::SectionHeader::SectionWidth::PatchEdit, 
+PatchEditPanel::PatchEditPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme_(&theme)
+    , sectionHeader_(std::make_unique<tss::SectionHeader>(
+        theme, 
+        PluginDimensions::Widgets::Widths::SectionHeader::kPatchEdit,
+        PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchEdit)))
-    , topPanel(std::make_unique<TopPanel>(inTheme, widgetFactory, apvts))
-    , middlePanel(std::make_unique<MiddlePanel>(inTheme))
-    , bottomPanel(std::make_unique<BottomPanel>(inTheme, widgetFactory, apvts))
+    , topPanel_(std::make_unique<TopPanel>(theme, widgetFactory, apvts))
+    , middlePanel_(std::make_unique<MiddlePanel>(theme))
+    , bottomPanel_(std::make_unique<BottomPanel>(theme, widgetFactory, apvts))
 {
-    addAndMakeVisible(*sectionHeader);
-    addAndMakeVisible(*topPanel);
-    addAndMakeVisible(*middlePanel);
-    addAndMakeVisible(*bottomPanel);
+    addAndMakeVisible(*sectionHeader_);
+    addAndMakeVisible(*topPanel_);
+    addAndMakeVisible(*middlePanel_);
+    addAndMakeVisible(*bottomPanel_);
 
     setSize(getWidth(), getHeight());
 }
 
 void PatchEditPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme)
+    if (auto* currentTheme = theme_)
         g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
 }
 
@@ -42,15 +44,15 @@ void PatchEditPanel::resized()
     const auto bounds = getLocalBounds();
     
     const auto sectionHeaderY = 0;
-    sectionHeader->setBounds(
+    sectionHeader_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + sectionHeaderY,
         bounds.getWidth(),
-        tss::SectionHeader::getHeight()
+        PluginDimensions::Widgets::Heights::kSectionHeader
     );
     
-    const auto topPanelY = sectionHeaderY + tss::SectionHeader::getHeight();
-    topPanel->setBounds(
+    const auto topPanelY = sectionHeaderY + PluginDimensions::Widgets::Heights::kSectionHeader;
+    topPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + topPanelY,
         bounds.getWidth(),
@@ -58,7 +60,7 @@ void PatchEditPanel::resized()
     );
     
     const auto middlePanelY = topPanelY + TopPanel::getHeight();
-    middlePanel->setBounds(
+    middlePanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + middlePanelY,
         bounds.getWidth(),
@@ -66,7 +68,7 @@ void PatchEditPanel::resized()
     );
     
     const auto bottomPanelY = middlePanelY + MiddlePanel::getHeight();
-    bottomPanel->setBounds(
+    bottomPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + bottomPanelY,
         bounds.getWidth(),
@@ -74,21 +76,21 @@ void PatchEditPanel::resized()
     );
 }
 
-void PatchEditPanel::setTheme(Theme& inTheme)
+void PatchEditPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* header = sectionHeader.get())
-        header->setTheme(inTheme);
+    if (auto* header = sectionHeader_.get())
+        header->setTheme(theme);
 
-    if (auto* panel = topPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = topPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = middlePanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = middlePanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = bottomPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = bottomPanel_.get())
+        panel->setTheme(theme);
 
     repaint();
 }

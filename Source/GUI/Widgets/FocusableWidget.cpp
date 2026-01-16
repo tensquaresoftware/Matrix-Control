@@ -12,21 +12,21 @@ namespace tss
     {
         if (component != nullptr && component->isEnabled())
         {
-            hasFocusFlag = true;
+            hasFocusFlag_ = true;
             component->repaint();
         }
     }
 
     void FocusableWidget::handleFocusLost(juce::Component* component)
     {
-        hasFocusFlag = false;
+        hasFocusFlag_ = false;
         if (auto* widget = component)
             widget->repaint();
     }
 
     void FocusableWidget::drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Theme& theme) const
     {
-        if (hasFocusFlag)
+        if (hasFocusFlag_)
         {
             g.setColour(theme.getSliderFocusBorderColour());
         }
@@ -34,7 +34,7 @@ namespace tss
         {
             g.setColour(juce::Colours::transparentBlack);
         }
-        g.drawRect(bounds, kBorderThickness);
+        g.drawRect(bounds, kBorderThickness_);
     }
 }
 

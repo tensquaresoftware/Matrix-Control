@@ -20,8 +20,10 @@ endif()
 
 project(Matrix-Control VERSION 0.0.18)
 
+# C++ Standard configuration
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Generate compile_commands.json for IDE support (clangd, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -91,6 +93,11 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
     Source/GUI/Panels/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
     
+    # GUI - Panels - Reusable
+    Source/GUI/Panels/Reusable/ModuleHeaderPanel.cpp
+    Source/GUI/Panels/Reusable/ParameterPanel.cpp
+    Source/GUI/Panels/Reusable/ModulationBusPanel.cpp
+    
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp
     Source/GUI/Widgets/ComboBox.cpp
@@ -98,6 +105,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/GroupLabel.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp
+    Source/GUI/Widgets/NumberBox.cpp
     Source/GUI/Widgets/VerticalSeparator.cpp
     Source/GUI/Widgets/Label.cpp
     Source/GUI/Widgets/HorizontalSeparator.cpp

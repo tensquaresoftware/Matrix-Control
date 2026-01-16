@@ -7,43 +7,44 @@
 #include "../../../../Widgets/ComboBox.h"
 #include "../../../../Widgets/HorizontalSeparator.h"
 #include "../../../../../Shared/PluginDescriptors.h"
+#include "../../../../../Shared/PluginDimensions.h"
 #include "../../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
 
-VibratoPanel::VibratoPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts)
-    : theme(&inTheme)
-    , apvts(inApvts)
+VibratoPanel::VibratoPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme_(&theme)
+    , apvts_(apvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kVibrato);
+    setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kVibrato);
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kVibratoSpeed,
-                                vibratoSpeedLabel, vibratoSpeedSlider, vibratoSpeedAttachment, horizontalSeparator1);
+                                vibratoSpeedLabel_, vibratoSpeedSlider_, vibratoSpeedAttachment_, horizontalSeparator1_);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kVibratoWaveform,
-                                     vibratoWaveformLabel, vibratoWaveformComboBox, vibratoWaveformAttachment, horizontalSeparator2);
+                                     vibratoWaveformLabel_, vibratoWaveformComboBox_, vibratoWaveformAttachment_, horizontalSeparator2_);
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kVibratoAmplitude,
-                                vibratoAmplitudeLabel, vibratoAmplitudeSlider, vibratoAmplitudeAttachment, horizontalSeparator3);
+                                vibratoAmplitudeLabel_, vibratoAmplitudeSlider_, vibratoAmplitudeAttachment_, horizontalSeparator3_);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kVibratoSpeedModSource,
-                                     vibratoSpeedModSourceLabel, vibratoSpeedModSourceComboBox, vibratoSpeedModSourceAttachment, horizontalSeparator4);
+                                     vibratoSpeedModSourceLabel_, vibratoSpeedModSourceComboBox_, vibratoSpeedModSourceAttachment_, horizontalSeparator4_);
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kVibratoSpeedModAmount,
-                                vibratoSpeedModAmountLabel, vibratoSpeedModAmountSlider, vibratoSpeedModAmountAttachment, horizontalSeparator5);
+                                vibratoSpeedModAmountLabel_, vibratoSpeedModAmountSlider_, vibratoSpeedModAmountAttachment_, horizontalSeparator5_);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kVibratoAmpModSource,
-                                     vibratoAmpModSourceLabel, vibratoAmpModSourceComboBox, vibratoAmpModSourceAttachment, horizontalSeparator6);
+                                     vibratoAmpModSourceLabel_, vibratoAmpModSourceComboBox_, vibratoAmpModSourceAttachment_, horizontalSeparator6_);
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kVibratoAmpModAmount,
-                                vibratoAmpModAmountLabel, vibratoAmpModAmountSlider, vibratoAmpModAmountAttachment, horizontalSeparator7);
+                                vibratoAmpModAmountLabel_, vibratoAmpModAmountSlider_, vibratoAmpModAmountAttachment_, horizontalSeparator7_);
 
     setSize(getWidth(), getHeight());
 }
@@ -52,203 +53,204 @@ VibratoPanel::~VibratoPanel() = default;
 
 void VibratoPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(theme->getMasterEditPanelBackgroundColour());
+    g.fillAll(theme_->getMasterEditPanelBackgroundColour());
 }
 
 void VibratoPanel::resized()
 {
-    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::MasterEdit);
-    const auto labelWidth = tss::Label::getWidth(tss::Label::LabelWidth::MasterEditModule);
-    const auto labelHeight = tss::Label::getHeight();
-    const auto sliderWidth = tss::Slider::getWidth();
+    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
+    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule;
+    const auto labelWidth = PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
+    const auto labelHeight = PluginDimensions::Widgets::Heights::kLabel;
+    const auto sliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::MasterEditModule);
-    const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::MasterEditModule);
-    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
+    const auto comboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule;
+    const auto comboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+    const auto separatorWidth = PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule;
+    const auto separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
 
     int y = 0;
 
-    if (auto* header = vibratoModuleHeader.get())
+    if (auto* header = vibratoModuleHeader_.get())
         header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
     y += moduleHeaderHeight;
 
-    if (auto* label = vibratoSpeedLabel.get())
+    if (auto* label = vibratoSpeedLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = vibratoSpeedSlider.get())
+    if (auto* slider = vibratoSpeedSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator1.get())
+    if (auto* separator = horizontalSeparator1_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = vibratoWaveformLabel.get())
+    if (auto* label = vibratoWaveformLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = vibratoWaveformComboBox.get())
+    if (auto* comboBox = vibratoWaveformComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator2.get())
+    if (auto* separator = horizontalSeparator2_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = vibratoAmplitudeLabel.get())
+    if (auto* label = vibratoAmplitudeLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = vibratoAmplitudeSlider.get())
+    if (auto* slider = vibratoAmplitudeSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator3.get())
+    if (auto* separator = horizontalSeparator3_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = vibratoSpeedModSourceLabel.get())
+    if (auto* label = vibratoSpeedModSourceLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = vibratoSpeedModSourceComboBox.get())
+    if (auto* comboBox = vibratoSpeedModSourceComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator4.get())
+    if (auto* separator = horizontalSeparator4_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = vibratoSpeedModAmountLabel.get())
+    if (auto* label = vibratoSpeedModAmountLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = vibratoSpeedModAmountSlider.get())
+    if (auto* slider = vibratoSpeedModAmountSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator5.get())
+    if (auto* separator = horizontalSeparator5_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = vibratoAmpModSourceLabel.get())
+    if (auto* label = vibratoAmpModSourceLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = vibratoAmpModSourceComboBox.get())
+    if (auto* comboBox = vibratoAmpModSourceComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator6.get())
+    if (auto* separator = horizontalSeparator6_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = vibratoAmpModAmountLabel.get())
+    if (auto* label = vibratoAmpModAmountLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = vibratoAmpModAmountSlider.get())
+    if (auto* slider = vibratoAmpModAmountSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator7.get())
+    if (auto* separator = horizontalSeparator7_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
-void VibratoPanel::setTheme(Theme& inTheme)
+void VibratoPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* header = vibratoModuleHeader.get())
-        header->setTheme(inTheme);
+    if (auto* header = vibratoModuleHeader_.get())
+        header->setTheme(theme);
 
-    if (auto* label = vibratoSpeedLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoSpeedLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = vibratoSpeedSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = vibratoSpeedSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator1.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator1_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = vibratoWaveformLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoWaveformLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = vibratoWaveformComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = vibratoWaveformComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator2.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator2_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = vibratoAmplitudeLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoAmplitudeLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = vibratoAmplitudeSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = vibratoAmplitudeSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator3.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator3_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = vibratoSpeedModSourceLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoSpeedModSourceLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = vibratoSpeedModSourceComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = vibratoSpeedModSourceComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator4.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator4_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = vibratoSpeedModAmountLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoSpeedModAmountLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = vibratoSpeedModAmountSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = vibratoSpeedModAmountSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator5.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator5_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = vibratoAmpModSourceLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoAmpModSourceLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = vibratoAmpModSourceComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = vibratoAmpModSourceComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator6.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator6_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = vibratoAmpModAmountLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = vibratoAmpModAmountLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = vibratoAmpModAmountSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = vibratoAmpModAmountSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator7.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator7_.get())
+        separator->setTheme(theme);
 
     repaint();
 }
 
-void VibratoPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void VibratoPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
-    vibratoModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
+    vibratoModuleHeader_ = std::make_unique<tss::ModuleHeader>(
+        theme, 
         widgetFactory.getGroupDisplayName(moduleId),
-        tss::ModuleHeader::ModuleWidth::MasterEdit,
+        PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kModuleHeader,
         tss::ModuleHeader::ColourVariant::Orange);
-    addAndMakeVisible(*vibratoModuleHeader);
+    addAndMakeVisible(*vibratoModuleHeader_);
 }
 
-void VibratoPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+void VibratoPanel::setupIntParameterWithSlider(Theme& theme, WidgetFactory& widgetFactory,
                                               const juce::String& parameterId,
                                               std::unique_ptr<tss::Label>& label,
                                               std::unique_ptr<tss::Slider>& slider,
@@ -256,22 +258,27 @@ void VibratoPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& wi
                                               std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::MasterEditModule, 
+        theme, 
+        PluginDimensions::Widgets::Widths::Label::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kLabel,
         widgetFactory.getParameterDisplayName(parameterId));
     addAndMakeVisible(*label);
 
-    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    slider = widgetFactory.createIntParameterSlider(parameterId, theme);
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
+        apvts_,
         parameterId,
         *slider);
     addAndMakeVisible(*slider);
 
-    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::MasterEditModule);
+    separator = std::make_unique<tss::HorizontalSeparator>(
+        theme, 
+        PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kHorizontalSeparator);
     addAndMakeVisible(*separator);
 }
 
-void VibratoPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+void VibratoPanel::setupChoiceParameterWithComboBox(Theme& theme, WidgetFactory& widgetFactory,
                                                     const juce::String& parameterId,
                                                     std::unique_ptr<tss::Label>& label,
                                                     std::unique_ptr<tss::ComboBox>& comboBox,
@@ -279,17 +286,26 @@ void VibratoPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactor
                                                     std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::MasterEditModule, 
+        theme, 
+        PluginDimensions::Widgets::Widths::Label::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kLabel,
         widgetFactory.getParameterDisplayName(parameterId));
     addAndMakeVisible(*label);
 
-    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    comboBox = widgetFactory.createChoiceParameterComboBox(
+        parameterId, 
+        theme,
+        PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kComboBox);
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
+        apvts_,
         parameterId,
         *comboBox);
     addAndMakeVisible(*comboBox);
 
-    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::MasterEditModule);
+    separator = std::make_unique<tss::HorizontalSeparator>(
+        theme, 
+        PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kHorizontalSeparator);
     addAndMakeVisible(*separator);
 }

@@ -11,33 +11,33 @@
 using tss::Theme;
 using tss::VerticalSeparator;
 
-BodyPanel::BodyPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme(&inTheme)
+BodyPanel::BodyPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme_(&theme)
 {
-    patchEditPanel = std::make_unique<PatchEditPanel>(inTheme, widgetFactory, apvts);
-    addAndMakeVisible(*patchEditPanel);
+    patchEditPanel_ = std::make_unique<PatchEditPanel>(theme, widgetFactory, apvts);
+    addAndMakeVisible(*patchEditPanel_);
 
-    verticalSeparator1 = std::make_unique<VerticalSeparator>(inTheme);
-    addAndMakeVisible(*verticalSeparator1);
+    verticalSeparator1_ = std::make_unique<VerticalSeparator>(theme);
+    addAndMakeVisible(*verticalSeparator1_);
 
-    matrixModulationPanel = std::make_unique<MatrixModulationPanel>(inTheme, widgetFactory, apvts);
-    addAndMakeVisible(*matrixModulationPanel);
+    matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(theme, widgetFactory, apvts);
+    addAndMakeVisible(*matrixModulationPanel_);
 
-    patchManagerPanel = std::make_unique<PatchManagerPanel>(inTheme, widgetFactory);
-    addAndMakeVisible(*patchManagerPanel);
+    patchManagerPanel_ = std::make_unique<PatchManagerPanel>(theme, widgetFactory);
+    addAndMakeVisible(*patchManagerPanel_);
 
-    verticalSeparator2 = std::make_unique<VerticalSeparator>(inTheme);
-    addAndMakeVisible(*verticalSeparator2);
+    verticalSeparator2_ = std::make_unique<VerticalSeparator>(theme);
+    addAndMakeVisible(*verticalSeparator2_);
 
-    masterEditPanel = std::make_unique<MasterEditPanel>(inTheme, widgetFactory, apvts);
-    addAndMakeVisible(*masterEditPanel);
+    masterEditPanel_ = std::make_unique<MasterEditPanel>(theme, widgetFactory, apvts);
+    addAndMakeVisible(*masterEditPanel_);
 }
 
 BodyPanel::~BodyPanel() = default;
 
 void BodyPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme)
+    if (auto* currentTheme = theme_)
         g.fillAll(currentTheme->getBodyPanelBackgroundColour());
 }
 
@@ -48,7 +48,7 @@ void BodyPanel::resized()
     
     const auto patchEditPanelX = padding;
     const auto patchEditPanelY = padding;
-    patchEditPanel->setBounds(
+    patchEditPanel_->setBounds(
         bounds.getX() + patchEditPanelX,
         bounds.getY() + patchEditPanelY,
         PatchEditPanel::getWidth(),
@@ -57,14 +57,14 @@ void BodyPanel::resized()
     
     const auto verticalSeparator1X = patchEditPanelX + PatchEditPanel::getWidth();
     const auto verticalSeparator1Y = padding;
-    verticalSeparator1->setTopLeftPosition(
+    verticalSeparator1_->setTopLeftPosition(
         bounds.getX() + verticalSeparator1X,
         bounds.getY() + verticalSeparator1Y
     );
     
     const auto matrixModulationPanelX = verticalSeparator1X + VerticalSeparator::getWidth();
     const auto matrixModulationPanelY = padding;
-    matrixModulationPanel->setBounds(
+    matrixModulationPanel_->setBounds(
         bounds.getX() + matrixModulationPanelX,
         bounds.getY() + matrixModulationPanelY,
         MatrixModulationPanel::getWidth(),
@@ -73,7 +73,7 @@ void BodyPanel::resized()
     
     const auto patchManagerPanelX = matrixModulationPanelX;
     const auto patchManagerPanelY = matrixModulationPanelY + MatrixModulationPanel::getHeight();
-    patchManagerPanel->setBounds(
+    patchManagerPanel_->setBounds(
         bounds.getX() + patchManagerPanelX,
         bounds.getY() + patchManagerPanelY,
         PatchManagerPanel::getWidth(),
@@ -82,14 +82,14 @@ void BodyPanel::resized()
     
     const auto verticalSeparator2X = matrixModulationPanelX + MatrixModulationPanel::getWidth();
     const auto verticalSeparator2Y = padding;
-    verticalSeparator2->setTopLeftPosition(
+    verticalSeparator2_->setTopLeftPosition(
         bounds.getX() + verticalSeparator2X,
         bounds.getY() + verticalSeparator2Y
     );
     
     const auto masterEditPanelX = verticalSeparator2X + VerticalSeparator::getWidth();
     const auto masterEditPanelY = padding;
-    masterEditPanel->setBounds(
+    masterEditPanel_->setBounds(
         bounds.getX() + masterEditPanelX,
         bounds.getY() + masterEditPanelY,
         MasterEditPanel::getWidth(),
@@ -97,27 +97,27 @@ void BodyPanel::resized()
     );
 }
 
-void BodyPanel::setTheme(Theme& inTheme)
+void BodyPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* panel = patchEditPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = patchEditPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* separator = verticalSeparator1.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = verticalSeparator1_.get())
+        separator->setTheme(theme);
 
-    if (auto* panel = matrixModulationPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = matrixModulationPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* separator = verticalSeparator2.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = verticalSeparator2_.get())
+        separator->setTheme(theme);
 
-    if (auto* panel = masterEditPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = masterEditPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = patchManagerPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = patchManagerPanel_.get())
+        panel->setTheme(theme);
 
     repaint();
 }

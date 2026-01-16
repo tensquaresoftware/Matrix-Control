@@ -20,29 +20,29 @@ class Lfo2Panel;
 class BottomPanel : public juce::Component
 {
 public:
-    BottomPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BottomPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BottomPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
-    static int getSpacing() { return kSpacing; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
+    static int getSpacing() { return kSpacing_; }
 
 private:
-    inline constexpr static int kWidth = 810;
-    inline constexpr static int kHeight = 280;
-    inline constexpr static int kSpacing = 15;
+    inline constexpr static int kWidth_ = 810;
+    inline constexpr static int kHeight_ = 280;
+    inline constexpr static int kSpacing_ = 15;
 
-    tss::Theme* theme;
+    tss::Theme* theme_;
 
-    std::unique_ptr<Env1Panel> env1Panel;
-    std::unique_ptr<Env2Panel> env2Panel;
-    std::unique_ptr<Env3Panel> env3Panel;
-    std::unique_ptr<Lfo1Panel> lfo1Panel;
-    std::unique_ptr<Lfo2Panel> lfo2Panel;
+    std::unique_ptr<Env1Panel> env1Panel_;
+    std::unique_ptr<Env2Panel> env2Panel_;
+    std::unique_ptr<Env3Panel> env3Panel_;
+    std::unique_ptr<Lfo1Panel> lfo1Panel_;
+    std::unique_ptr<Lfo2Panel> lfo2Panel_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BottomPanel)
 };

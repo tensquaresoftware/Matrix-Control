@@ -18,26 +18,26 @@ class ComputerPatchesPanel;
 class PatchManagerPanel : public juce::Component
 {
 public:
-    PatchManagerPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory);
+    PatchManagerPanel(tss::Theme& theme, WidgetFactory& widgetFactory);
     ~PatchManagerPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 275;
-    inline constexpr static int kHeight = 375;
+    inline constexpr static int kWidth_ = 275;
+    inline constexpr static int kHeight_ = 375;
 
-    tss::Theme* theme;
+    tss::Theme* theme_;
 
-    std::unique_ptr<tss::SectionHeader> sectionHeader;
-    std::unique_ptr<BankUtilityPanel> bankUtilityPanel;
-    std::unique_ptr<InternalPatchesPanel> internalPatchesPanel;
-    std::unique_ptr<ComputerPatchesPanel> computerPatchesPanel;
+    std::unique_ptr<tss::SectionHeader> sectionHeader_;
+    std::unique_ptr<BankUtilityPanel> bankUtilityPanel_;
+    std::unique_ptr<InternalPatchesPanel> internalPatchesPanel_;
+    std::unique_ptr<ComputerPatchesPanel> computerPatchesPanel_;
 
     void layoutSectionHeader(const juce::Rectangle<int>& bounds, int y);
     void layoutBankUtilityPanel(const juce::Rectangle<int>& bounds, int y);

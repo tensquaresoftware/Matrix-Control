@@ -5,32 +5,33 @@
 
 namespace tss
 {
-    ComboBox::ComboBox(Theme& inTheme, ComboBoxWidth width)
+    ComboBox::ComboBox(Theme& theme, int width, int height)
         : juce::ComboBox()
-        , theme(&inTheme)
-        , comboWidth(width)
+        , theme_(&theme)
+        , width_(width)
+        , height_(height)
     {
-        setSize(getWidth(width), kHeight);
+        setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 
-    void ComboBox::setTheme(Theme& inTheme)
+    void ComboBox::setTheme(Theme& theme)
     {
-        theme = &inTheme;
+        theme_ = &theme;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
     }
 
     void ComboBox::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
+        if (theme_ == nullptr)
         {
             return;
         }
 
         const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
-        const auto hasFocus = focusableWidget.hasFocus() || isPopupOpen;
+        const auto hasFocus = focusableWidget_.hasFocus() || isPopupOpen_;
 
         const auto backgroundBounds = calculateBackgroundBounds(bounds);
 
@@ -43,28 +44,28 @@ namespace tss
 
     void ComboBox::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto baseColour = theme->getComboBoxBaseColour();
+        const auto baseColour = theme_->getComboBoxBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        const auto backgroundColour = theme->getComboBoxBackgroundColour(enabled);
+        const auto backgroundColour = theme_->getComboBoxBackgroundColour(enabled);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void ComboBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        const auto borderColour = theme->getComboBoxBorderColour(enabled, false);
+        const auto borderColour = theme_->getComboBoxBorderColour(enabled, false);
         g.setColour(borderColour);
-        const auto borderThickness = kBorderThickness;
+        const auto borderThickness = kBorderThickness_;
         g.drawRect(bounds, borderThickness);
 
         if (hasFocus)
         {
-            const auto focusBorderColour = theme->getComboBoxBorderColour(enabled, true);
+            const auto focusBorderColour = theme_->getComboBoxBorderColour(enabled, true);
             g.setColour(focusBorderColour);
             g.drawRect(backgroundBounds, borderThickness);
         }
@@ -80,12 +81,12 @@ namespace tss
             text = getItemText(selectedIndex);
         }
 
-        const auto textColour = theme->getComboBoxTextColour(enabled);
-        const auto font = theme->getBaseFont();
+        const auto textColour = theme_->getComboBoxTextColour(enabled);
+        const auto font = theme_->getBaseFont();
 
-        const auto leftPadding = kLeftPadding;
-        const auto rightPadding = kRightPadding;
-        const auto triangleBaseSize = kTriangleBaseSize;
+        const auto leftPadding = kLeftPadding_;
+        const auto rightPadding = kRightPadding_;
+        const auto triangleBaseSize = kTriangleBaseSize_;
         auto textBounds = bounds;
         textBounds.removeFromLeft(leftPadding);
         textBounds.removeFromRight(triangleBaseSize + rightPadding);
@@ -97,12 +98,12 @@ namespace tss
 
     void ComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        const auto triangleColour = theme->getComboBoxTriangleColour(enabled);
+        const auto triangleColour = theme_->getComboBoxTriangleColour(enabled);
         g.setColour(triangleColour);
 
-        const auto triangleBaseSize = kTriangleBaseSize;
-        const auto triangleHeight = triangleBaseSize * kTriangleHeightFactor;
-        const auto triangleX = bounds.getRight() - triangleBaseSize - kRightPadding;
+        const auto triangleBaseSize = kTriangleBaseSize_;
+        const auto triangleHeight = triangleBaseSize * kTriangleHeightFactor_;
+        const auto triangleX = bounds.getRight() - triangleBaseSize - kRightPadding_;
         const auto triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
 
         const auto trianglePath = createTrianglePath(triangleX, triangleY, triangleBaseSize);
@@ -113,7 +114,7 @@ namespace tss
     {
         juce::Path path;
         
-        const auto height = baseSize * kTriangleHeightFactor;
+        const auto height = baseSize * kTriangleHeightFactor_;
         
         path.startNewSubPath(x, y);
         path.lineTo(x + baseSize, y);
@@ -125,10 +126,8 @@ namespace tss
 
     juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
-        const auto backgroundWidth = static_cast<float>((comboWidth == ComboBoxWidth::MatrixModulationDestination) 
-            ? kLargeBackgroundWidth 
-            : kNormalBackgroundWidth);
-        const auto backgroundHeight = static_cast<float>(kBackgroundHeight);
+        const auto backgroundWidth = static_cast<float>(width_ - static_cast<int>(kLeftPadding_ + kRightPadding_));
+        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_);
         const auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
         const auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
         return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);
@@ -147,7 +146,7 @@ namespace tss
         {
             if (safePointer != nullptr && safePointer->isEnabled() && safePointer->getNumItems() > 0)
             {
-                safePointer->isPopupOpen = true;
+                safePointer->isPopupOpen_ = true;
                 PopupMenu::show(*safePointer);
             }
         });
@@ -168,15 +167,15 @@ namespace tss
 
     void ComboBox::focusGained(juce::Component::FocusChangeType)
     {
-        if (! focusableWidget.hasFocus())
+        if (! focusableWidget_.hasFocus())
         {
-            focusableWidget.handleFocusGained(this);
+            focusableWidget_.handleFocusGained(this);
         }
     }
 
     void ComboBox::focusLost(juce::Component::FocusChangeType)
     {
-        focusableWidget.handleFocusLost(this);
+        focusableWidget_.handleFocusLost(this);
     }
 }
 

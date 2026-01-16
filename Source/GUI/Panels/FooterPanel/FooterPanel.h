@@ -19,7 +19,7 @@ public:
     void resized() override;
     void setTheme(tss::Theme& inTheme);
 
-    static int getHeight() { return kHeight; }
+    static int getHeight() { return kHeight_; }
 
     // ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& tree,
@@ -35,9 +35,9 @@ private:
         Error
     };
     
-    inline constexpr static int kHeight = 30;
-    inline constexpr static int kPadding = 8;
-    inline constexpr static int kIconSize = 14;
+    inline constexpr static int kHeight_ = 30;
+    inline constexpr static int kPadding_ = 8;
+    inline constexpr static int kIconSize_ = 14;
     
     tss::Theme* theme;
     juce::AudioProcessorValueTreeState& apvts;

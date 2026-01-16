@@ -9,7 +9,7 @@ namespace tss
         , theme(&inTheme)
         , defaultValue(initValue)
     {
-        setSize(kWidth, kHeight);
+        setSize(kWidth_, kHeight_);
         setWantsKeyboardFocus(true);
         setInterceptsMouseClicks(true, false);
     }
@@ -54,8 +54,8 @@ namespace tss
 
     juce::Rectangle<float> Slider::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
-        const auto backgroundWidth = static_cast<float>(kBackgroundWidth);
-        const auto backgroundHeight = static_cast<float>(kBackgroundHeight);
+        const auto backgroundWidth = static_cast<float>(kBackgroundWidth_);
+        const auto backgroundHeight = static_cast<float>(kBackgroundHeight_);
         const auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
         const auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;
         return juce::Rectangle<float>(bounds.getX() + backgroundX, bounds.getY() + backgroundY, backgroundWidth, backgroundHeight);
@@ -162,7 +162,7 @@ namespace tss
         }
         
         const auto dragDistance = dragStartPosition.y - e.getPosition().y;
-        const auto valueDelta = dragDistance * kDragSensitivity;
+        const auto valueDelta = dragDistance * kDragSensitivity_;
         
         const auto range = getRange();
         auto newValue = dragStartValue + valueDelta;
@@ -239,7 +239,7 @@ namespace tss
     {
         if (isShiftPressed)
         {
-            return kShiftKeyStep;
+            return kShiftKeyStep_;
         }
         
         if (rangeLength <= 100.0)

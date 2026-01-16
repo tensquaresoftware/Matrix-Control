@@ -20,72 +20,71 @@ class WidgetFactory;
 class VibratoPanel : public juce::Component
 {
 public:
-    VibratoPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
+    VibratoPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~VibratoPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 160;
-    inline constexpr static int kHeight = 220;
+    inline constexpr static int kWidth_ = 160;
+    inline constexpr static int kHeight_ = 220;
     
-    tss::Theme* theme;
-    juce::AudioProcessorValueTreeState& apvts;
+    tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
     // Module Name
-    std::unique_ptr<tss::ModuleHeader> vibratoModuleHeader;
+    std::unique_ptr<tss::ModuleHeader> vibratoModuleHeader_;
 
     // Labels
-    std::unique_ptr<tss::Label> vibratoSpeedLabel;
-    std::unique_ptr<tss::Label> vibratoSpeedModSourceLabel;
-    std::unique_ptr<tss::Label> vibratoSpeedModAmountLabel;
-    std::unique_ptr<tss::Label> vibratoWaveformLabel;
-    std::unique_ptr<tss::Label> vibratoAmplitudeLabel;
-    std::unique_ptr<tss::Label> vibratoAmpModSourceLabel;
-    std::unique_ptr<tss::Label> vibratoAmpModAmountLabel;
+    std::unique_ptr<tss::Label> vibratoSpeedLabel_;
+    std::unique_ptr<tss::Label> vibratoSpeedModSourceLabel_;
+    std::unique_ptr<tss::Label> vibratoSpeedModAmountLabel_;
+    std::unique_ptr<tss::Label> vibratoWaveformLabel_;
+    std::unique_ptr<tss::Label> vibratoAmplitudeLabel_;
+    std::unique_ptr<tss::Label> vibratoAmpModSourceLabel_;
+    std::unique_ptr<tss::Label> vibratoAmpModAmountLabel_;
 
     // Sliders
-    std::unique_ptr<tss::Slider> vibratoSpeedSlider;
-    std::unique_ptr<tss::Slider> vibratoSpeedModAmountSlider;
-    std::unique_ptr<tss::Slider> vibratoAmplitudeSlider;
-    std::unique_ptr<tss::Slider> vibratoAmpModAmountSlider;
+    std::unique_ptr<tss::Slider> vibratoSpeedSlider_;
+    std::unique_ptr<tss::Slider> vibratoSpeedModAmountSlider_;
+    std::unique_ptr<tss::Slider> vibratoAmplitudeSlider_;
+    std::unique_ptr<tss::Slider> vibratoAmpModAmountSlider_;
 
     // Combo Boxes
-    std::unique_ptr<tss::ComboBox> vibratoSpeedModSourceComboBox;
-    std::unique_ptr<tss::ComboBox> vibratoWaveformComboBox;
-    std::unique_ptr<tss::ComboBox> vibratoAmpModSourceComboBox;
+    std::unique_ptr<tss::ComboBox> vibratoSpeedModSourceComboBox_;
+    std::unique_ptr<tss::ComboBox> vibratoWaveformComboBox_;
+    std::unique_ptr<tss::ComboBox> vibratoAmpModSourceComboBox_;
 
     // Separators
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7_;
 
-    // Attachments
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoSpeedAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoSpeedModSourceAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoSpeedModAmountAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoWaveformAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoAmplitudeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoAmpModSourceAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoAmpModAmountAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoSpeedAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoSpeedModSourceAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoSpeedModAmountAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoWaveformAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoAmplitudeAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vibratoAmpModSourceAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vibratoAmpModAmountAttachment_;
 
-    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+    void setupModuleHeader(tss::Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupIntParameterWithSlider(tss::Theme& theme, WidgetFactory& widgetFactory,
                                      const juce::String& parameterId,
                                      std::unique_ptr<tss::Label>& label,
                                      std::unique_ptr<tss::Slider>& slider,
                                      std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
                                      std::unique_ptr<tss::HorizontalSeparator>& separator);
-    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+    void setupChoiceParameterWithComboBox(tss::Theme& theme, WidgetFactory& widgetFactory,
                                           const juce::String& parameterId,
                                           std::unique_ptr<tss::Label>& label,
                                           std::unique_ptr<tss::ComboBox>& comboBox,

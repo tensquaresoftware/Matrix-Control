@@ -26,11 +26,11 @@ namespace tss
         static void show(ComboBox& comboBox);
 
     private:
-        inline constexpr static int kItemHeight = 20;
-        inline constexpr static float kBorderThickness = 1.0f;
-        inline constexpr static int kSeparatorWidth = 1;
-        inline constexpr static int kTextLeftPadding = 3;
-        inline constexpr static int kColumnThreshold = 10;
+        inline constexpr static int kItemHeight_ = 20;
+        inline constexpr static float kBorderThickness_ = 1.0f;
+        inline constexpr static int kSeparatorWidth_ = 1;
+        inline constexpr static int kTextLeftPadding_ = 3;
+        inline constexpr static int kColumnThreshold_ = 10;
 
         ComboBox& comboBox;
         Theme* theme = nullptr;

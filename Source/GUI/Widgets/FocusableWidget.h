@@ -17,11 +17,11 @@ namespace tss
         
         void drawFocusBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, Theme& theme) const;
         
-        bool hasFocus() const { return hasFocusFlag; }
+        bool hasFocus() const { return hasFocusFlag_; }
 
     private:
-        inline constexpr static float kBorderThickness = 1.0f;
-        bool hasFocusFlag = false;
+        inline constexpr static int kBorderThickness_ = 1;
+        bool hasFocusFlag_ = false;
     };
 }
 

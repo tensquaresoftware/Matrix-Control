@@ -4,57 +4,29 @@
 #include "../../../../Widgets/ModuleHeader.h"
 #include "../../../../Widgets/GroupLabel.h"
 #include "../../../../Widgets/Button.h"
+#include "../../../../Widgets/NumberBox.h"
 #include "../../../../../Shared/PluginDescriptors.h"
+#include "../../../../../Shared/PluginDimensions.h"
 #include "../../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
 
-InternalPatchesPanel::InternalPatchesPanel(Theme& inTheme, WidgetFactory& widgetFactory)
-    : theme(&inTheme)
+InternalPatchesPanel::InternalPatchesPanel(Theme& theme, WidgetFactory& widgetFactory)
+    : theme_(&theme)
 {
-    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
+    setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
 
-    browserGroupLabel = std::make_unique<tss::GroupLabel>(
-        inTheme,
-        tss::GroupLabel::GroupWidth::InternalPatchesBrowser,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesBrowser);
-    addAndMakeVisible(*browserGroupLabel);
+    setupBrowserGroupLabel(theme);
+    setupLoadPreviousPatchButton(theme, widgetFactory);
+    setupLoadNextPatchButton(theme, widgetFactory);
+    setupCurrentBankNumberBox(theme);
+    setupCurrentPatchNumberBox(theme);
 
-    utilityGroupLabel = std::make_unique<tss::GroupLabel>(
-        inTheme,
-        tss::GroupLabel::GroupWidth::InternalPatchesUtility,
-        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesUtility);
-    addAndMakeVisible(*utilityGroupLabel);
-
-    loadPreviousInternalPatchButton = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
-        inTheme);
-    addAndMakeVisible(*loadPreviousInternalPatchButton);
-
-    loadNextInternalPatchButton = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
-        inTheme);
-    addAndMakeVisible(*loadNextInternalPatchButton);
-
-    initInternalPatchButton = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kInitPatch,
-        inTheme);
-    addAndMakeVisible(*initInternalPatchButton);
-
-    copyInternalPatchButton = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
-        inTheme);
-    addAndMakeVisible(*copyInternalPatchButton);
-
-    pasteInternalPatchButton = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kPastePatch,
-        inTheme);
-    addAndMakeVisible(*pasteInternalPatchButton);
-
-    storeInternalPatchButton = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kStorePatch,
-        inTheme);
-    addAndMakeVisible(*storeInternalPatchButton);
+    setupUtilityGroupLabel(theme);
+    setupInitPatchButton(theme, widgetFactory);
+    setupCopyPatchButton(theme, widgetFactory);
+    setupPastePatchButton(theme, widgetFactory);
+    setupStorePatchButton(theme, widgetFactory);
 
     setSize(getWidth(), getHeight());
 }
@@ -63,90 +35,277 @@ InternalPatchesPanel::~InternalPatchesPanel() = default;
 
 void InternalPatchesPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme)
+    if (auto* currentTheme = theme_)
         g.fillAll(currentTheme->getPatchManagerPanelBackgroundColour());
 }
 
 void InternalPatchesPanel::resized()
 {
-    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::PatchManager);
+    int x = 0;
+    int y = kTopPadding_;
 
-    int y = kTopPadding;
+    layoutModuleHeader(x, y);
+    y += PluginDimensions::Widgets::Heights::kModuleHeader;
 
-    if (auto* header = internalPatchesModuleHeader.get())
-        header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
+    const auto browserGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser;
+    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
 
-    y += moduleHeaderHeight;
+    layoutBrowserGroupLabel(x, y);
+    x = browserGroupWidth + kGroupLabelSpacing_;
 
-    const auto browserGroupWidth = tss::GroupLabel::getWidth(tss::GroupLabel::GroupWidth::InternalPatchesBrowser);
-    constexpr int browserGroupHeight = 40;
-    const auto utilityGroupWidth = tss::GroupLabel::getWidth(tss::GroupLabel::GroupWidth::InternalPatchesUtility);
-    constexpr int utilityGroupHeight = 40;
+    layoutUtilityGroupLabel(x, y);
+    y += groupLabelHeight + kTopPadding_;
 
-    if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setBounds(0, y, browserGroupWidth, browserGroupHeight);
+    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
+    x = 0;
 
-    if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setBounds(browserGroupWidth + kSpacing, y, utilityGroupWidth, utilityGroupHeight);
+    layoutLoadPreviousPatchButton(x, y);
+    x += navigationButtonWidth + kSpacing_;
 
-    y += browserGroupHeight + kTopPadding;
+    layoutLoadNextPatchButton(x, y);
+    x += navigationButtonWidth + kSpacing_;
 
-    const auto buttonHeight = tss::Button::getHeight();
-    const auto navigationButtonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InitCopyPaste);
-    const auto utilityButtonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::InternalPatchesUtility);
+    layoutCurrentBankNumberBox(x, y);
+    x += PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber + kSpacing_;
 
-    if (auto* prevButton = loadPreviousInternalPatchButton.get())
-        prevButton->setBounds(0, y, navigationButtonWidth, buttonHeight);
+    layoutCurrentPatchNumberBox(x, y);
 
-    if (auto* nextButton = loadNextInternalPatchButton.get())
-        nextButton->setBounds(navigationButtonWidth + kSpacing, y, navigationButtonWidth, buttonHeight);
+    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+    x = browserGroupWidth + kGroupLabelSpacing_;
 
-    int utilityX = browserGroupWidth + kSpacing;
-    if (auto* initButton = initInternalPatchButton.get())
-    {
-        initButton->setBounds(utilityX, y, utilityButtonWidth, buttonHeight);
-        utilityX += utilityButtonWidth + kSpacing;
-    }
+    layoutInitPatchButton(x, y);
+    x += utilityButtonWidth + kSpacing_;
 
-    if (auto* copyButton = copyInternalPatchButton.get())
-    {
-        copyButton->setBounds(utilityX, y, utilityButtonWidth, buttonHeight);
-        utilityX += utilityButtonWidth + kSpacing;
-    }
+    layoutCopyPatchButton(x, y);
+    x += utilityButtonWidth + kSpacing_;
 
-    if (auto* pasteButton = pasteInternalPatchButton.get())
-    {
-        pasteButton->setBounds(utilityX, y, utilityButtonWidth, buttonHeight);
-        utilityX += utilityButtonWidth + kSpacing;
-    }
+    layoutPastePatchButton(x, y);
+    x += utilityButtonWidth + kSpacing_;
 
-    if (auto* storeButton = storeInternalPatchButton.get())
-        storeButton->setBounds(utilityX, y, utilityButtonWidth, buttonHeight);
+    layoutStorePatchButton(x, y);
 }
 
-void InternalPatchesPanel::setTheme(Theme& inTheme)
+void InternalPatchesPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* header = internalPatchesModuleHeader.get())
-        header->setTheme(inTheme);
+    if (auto* header = moduleHeader.get())
+        header->setTheme(theme);
 
     if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setTheme(inTheme);
+        browserLabel->setTheme(theme);
 
     if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setTheme(inTheme);
+        utilityLabel->setTheme(theme);
+
+    if (auto* bankNumber = currentBankNumber.get())
+        bankNumber->setTheme(theme);
+
+    if (auto* patchNumber = currentPatchNumber.get())
+        patchNumber->setTheme(theme);
 
     repaint();
 }
 
-void InternalPatchesPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void InternalPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
-    internalPatchesModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme,
+    moduleHeader = std::make_unique<tss::ModuleHeader>(
+        theme, 
         widgetFactory.getGroupDisplayName(moduleId),
-        tss::ModuleHeader::ModuleWidth::PatchManager,
+        PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
+        PluginDimensions::Widgets::Heights::kModuleHeader,
         tss::ModuleHeader::ColourVariant::Blue);
-    addAndMakeVisible(*internalPatchesModuleHeader);
+    addAndMakeVisible(*moduleHeader);
+}
+
+void InternalPatchesPanel::setupBrowserGroupLabel(Theme& theme)
+{
+    browserGroupLabel = std::make_unique<tss::GroupLabel>(
+        theme,
+        PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser,
+        PluginDimensions::Widgets::Heights::kGroupLabel,
+        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesBrowser);
+    addAndMakeVisible(*browserGroupLabel);
+}
+
+void InternalPatchesPanel::setupLoadPreviousPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+{
+    loadPreviousPatchButton_ = widgetFactory.createStandaloneButton(
+        PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
+        theme,
+        PluginDimensions::Widgets::Heights::kButton);
+    addAndMakeVisible(*loadPreviousPatchButton_);
+}
+
+void InternalPatchesPanel::setupLoadNextPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+{
+    loadNextPatchButton_ = widgetFactory.createStandaloneButton(
+        PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
+        theme,
+        PluginDimensions::Widgets::Heights::kButton);
+    addAndMakeVisible(*loadNextPatchButton_);
+}
+
+void InternalPatchesPanel::setupCurrentBankNumberBox(Theme& theme)
+{
+    currentBankNumber = std::make_unique<tss::NumberBox>(
+        theme, 
+        PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber, 
+        false);
+    currentBankNumber->setShowDot(true);
+    addAndMakeVisible(*currentBankNumber);
+}
+
+void InternalPatchesPanel::setupCurrentPatchNumberBox(Theme& theme)
+{
+    currentPatchNumber = std::make_unique<tss::NumberBox>(
+        theme, 
+        PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber, 
+        true);
+    addAndMakeVisible(*currentPatchNumber);
+}
+
+void InternalPatchesPanel::setupUtilityGroupLabel(Theme& theme)
+{
+    utilityGroupLabel = std::make_unique<tss::GroupLabel>(
+        theme,
+        PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesUtility,
+        PluginDimensions::Widgets::Heights::kGroupLabel,
+        PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesUtility);
+    addAndMakeVisible(*utilityGroupLabel);
+}
+
+void InternalPatchesPanel::setupInitPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+{
+    initPatchButton_ = widgetFactory.createStandaloneButton(
+        PluginDescriptors::StandaloneWidgetIds::kInitPatch,
+        theme,
+        PluginDimensions::Widgets::Heights::kButton);
+    addAndMakeVisible(*initPatchButton_);
+}
+
+void InternalPatchesPanel::setupCopyPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+{
+    copyPatchButton_ = widgetFactory.createStandaloneButton(
+        PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
+        theme,
+        PluginDimensions::Widgets::Heights::kButton);
+    addAndMakeVisible(*copyPatchButton_);
+}
+
+void InternalPatchesPanel::setupPastePatchButton(Theme& theme, WidgetFactory& widgetFactory)
+{
+    pastePatchButton_ = widgetFactory.createStandaloneButton(
+        PluginDescriptors::StandaloneWidgetIds::kPastePatch,
+        theme,
+        PluginDimensions::Widgets::Heights::kButton);
+    addAndMakeVisible(*pastePatchButton_);
+}
+
+void InternalPatchesPanel::setupStorePatchButton(Theme& theme, WidgetFactory& widgetFactory)
+{
+    storePatchButton_ = widgetFactory.createStandaloneButton(
+        PluginDescriptors::StandaloneWidgetIds::kStorePatch,
+        theme,
+        PluginDimensions::Widgets::Heights::kButton);
+    addAndMakeVisible(*storePatchButton_);
+}
+
+void InternalPatchesPanel::layoutModuleHeader(int x, int y)
+{
+    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
+    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule;
+
+    if (auto* header = moduleHeader.get())
+        header->setBounds(x, y, moduleHeaderWidth, moduleHeaderHeight);
+}
+
+void InternalPatchesPanel::layoutBrowserGroupLabel(int x, int y)
+{
+    const auto browserGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser;
+    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
+
+    if (auto* browserLabel = browserGroupLabel.get())
+        browserLabel->setBounds(x, y, browserGroupWidth, groupLabelHeight);
+}
+
+void InternalPatchesPanel::layoutLoadPreviousPatchButton(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
+
+    if (auto* prevButton = loadPreviousPatchButton_.get())
+        prevButton->setBounds(x, y, navigationButtonWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutLoadNextPatchButton(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto navigationButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
+
+    if (auto* nextButton = loadNextPatchButton_.get())
+        nextButton->setBounds(x, y, navigationButtonWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutCurrentBankNumberBox(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto bankNumberWidth = PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber;
+
+    if (auto* bankNumber = currentBankNumber.get())
+        bankNumber->setBounds(x, y, bankNumberWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutCurrentPatchNumberBox(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto patchNumberWidth = PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber;
+
+    if (auto* patchNumber = currentPatchNumber.get())
+        patchNumber->setBounds(x, y, patchNumberWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutUtilityGroupLabel(int x, int y)
+{
+    const auto utilityGroupWidth = PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesUtility;
+    const auto groupLabelHeight = PluginDimensions::Widgets::Heights::kGroupLabel;
+
+    if (auto* utilityLabel = utilityGroupLabel.get())
+        utilityLabel->setBounds(x, y, utilityGroupWidth, groupLabelHeight);
+}
+
+void InternalPatchesPanel::layoutInitPatchButton(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+
+    if (auto* initButton = initPatchButton_.get())
+        initButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutCopyPatchButton(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+
+    if (auto* copyButton = copyPatchButton_.get())
+        copyButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutPastePatchButton(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+
+    if (auto* pasteButton = pastePatchButton_.get())
+        pasteButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
+}
+
+void InternalPatchesPanel::layoutStorePatchButton(int x, int y)
+{
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const auto utilityButtonWidth = PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;
+
+    if (auto* storeButton = storePatchButton_.get())
+        storeButton->setBounds(x, y, utilityButtonWidth, buttonHeight);
 }

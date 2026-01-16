@@ -7,7 +7,7 @@ namespace tss
     VerticalSeparator::VerticalSeparator(Theme& inTheme)
         : theme(&inTheme)
     {
-        setSize(kWidth, kHeight);
+        setSize(kWidth_, kHeight_);
     }
 
     void VerticalSeparator::setTheme(Theme& inTheme)
@@ -39,7 +39,7 @@ namespace tss
     void VerticalSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto lineColour = theme->getVerticalSeparatorLineColour();
-        const auto lineWidth = kLineWidth;
+        const auto lineWidth = kLineWidth_;
         const auto lineX = bounds.getCentreX() - lineWidth / 2.0f;
         
         auto line = bounds;

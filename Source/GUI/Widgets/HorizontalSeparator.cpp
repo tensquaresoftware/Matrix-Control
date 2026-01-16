@@ -4,22 +4,23 @@
 
 namespace tss
 {
-    HorizontalSeparator::HorizontalSeparator(Theme& inTheme, SeparatorWidth width)
-        : separatorWidth(width)
-        , theme(&inTheme)
+    HorizontalSeparator::HorizontalSeparator(Theme& theme, int width, int height)
+        : theme_(&theme)
+        ,width_(width)
+        , height_(height)
     {
-        setSize(getWidth(width), kHeight);
+        setSize(width_, height_);
     }
 
-    void HorizontalSeparator::setTheme(Theme& inTheme)
+    void HorizontalSeparator::setTheme(Theme& theme)
     {
-        theme = &inTheme;
+        theme_ = &theme;
         repaint();
     }
 
     void HorizontalSeparator::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
+        if (theme_ == nullptr)
         {
             return;
         }
@@ -32,23 +33,18 @@ namespace tss
 
     void HorizontalSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto baseColour = theme->getHorizontalSeparatorBaseColour();
+        const auto baseColour = theme_->getHorizontalSeparatorBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void HorizontalSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto lineColour = theme->getHorizontalSeparatorLineColour();
+        const auto lineColour = theme_->getHorizontalSeparatorLineColour();
         const auto lineY = bounds.getCentreY();
         
         g.setColour(lineColour);
-        g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, kLineThickness);
-    }
-
-    int HorizontalSeparator::getWidth() const
-    {
-        return getWidth(separatorWidth);
+        g.drawLine(bounds.getX(), lineY, bounds.getRight(), lineY, kLineThickness_);
     }
 }
 

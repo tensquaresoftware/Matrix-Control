@@ -9,48 +9,23 @@ namespace tss
     class HorizontalSeparator : public juce::Component
     {
     public:
-        enum class SeparatorWidth
-        {
-            PatchEditModule,
-            MasterEditModule,
-            MatrixModulationBus
-        };
-
-        HorizontalSeparator(Theme& inTheme, SeparatorWidth width);
+        HorizontalSeparator(Theme& theme, int width, int height);
         ~HorizontalSeparator() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
 
-        int getWidth() const;
-        static constexpr int getHeight() { return kHeight; }
-
-        static constexpr int getWidth(SeparatorWidth width)
-        {
-            switch (width)
-            {
-                case SeparatorWidth::PatchEditModule:
-                    return kPatchEditModuleWidth;
-                case SeparatorWidth::MasterEditModule:
-                    return kMasterEditModuleWidth;
-                case SeparatorWidth::MatrixModulationBus:
-                    return kMatrixModulationBusWidth;
-                default:
-                    return kPatchEditModuleWidth;
-            }
-        }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kPatchEditModuleWidth = 150;
-        inline constexpr static int kMasterEditModuleWidth = 160;
-        inline constexpr static int kMatrixModulationBusWidth = 275;
-        inline constexpr static int kHeight = 5;
-        inline constexpr static float kLineThickness = 1.0f;
+        inline constexpr static int kLineThickness_ = 1;
 
-        SeparatorWidth separatorWidth;
-        Theme* theme = nullptr;
-
+        Theme* theme_ = nullptr;
+        int width_;
+        int height_;
+        
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
 

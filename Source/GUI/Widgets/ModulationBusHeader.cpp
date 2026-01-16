@@ -5,7 +5,7 @@
 
 namespace tss
 {
-    ModulationBusHeader::ModulationBusHeader(Theme& inTheme, ColourVariant variant)
+    ModulationBusHeader::ModulationBusHeader(Theme& inTheme, int width, int height, ColourVariant variant)
         : theme(&inTheme)
         , busNumberText(PluginDescriptors::ParameterDisplayNames::kModulationBusNumber)
         , busSourceText(PluginDescriptors::ParameterDisplayNames::kModulationBusSource)
@@ -13,7 +13,7 @@ namespace tss
         , busDestinationText(PluginDescriptors::ParameterDisplayNames::kModulationBusDestination)
         , colourVariant(variant)
     {
-        setSize(kWidth, kHeight);
+        setSize(width, height);
     }
 
     void ModulationBusHeader::setTheme(Theme& inTheme)
@@ -49,8 +49,8 @@ namespace tss
         auto font = theme->getBaseFont().withHeight(16.0f).boldened();
 
         auto textArea = bounds;
-        textArea.setHeight(kTextAreaHeight);
-        textArea.removeFromLeft(kTextLeftPadding);
+        textArea.setHeight(kTextAreaHeight_);
+        textArea.removeFromLeft(kTextLeftPadding_);
 
         auto x = textArea.getX();
         auto y = textArea.getY();
@@ -59,38 +59,38 @@ namespace tss
         g.setFont(font);
 
         drawBusNumberText(g, x, y);
-        x += kBusNumberTextWidth;
+        x += kBusNumberTextWidth_;
 
         drawBusSourceText(g, x, y);
-        x += kBusSourceTextWidth;
+        x += kBusSourceTextWidth_;
 
         drawBusAmountText(g, x, y);
-        x += kBusAmountTextWidth;
+        x += kBusAmountTextWidth_;
 
         drawBusDestinationText(g, x, y);
     }
 
     void ModulationBusHeader::drawBusNumberText(juce::Graphics& g, float x, float y)
     {
-        auto busNumberBounds = juce::Rectangle<float>(x, y, kBusNumberTextWidth, kTextAreaHeight);
+        auto busNumberBounds = juce::Rectangle<float>(x, y, kBusNumberTextWidth_, kTextAreaHeight_);
         g.drawText(busNumberText, busNumberBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusSourceText(juce::Graphics& g, float x, float y)
     {
-        auto busSourceBounds = juce::Rectangle<float>(x, y, kBusSourceTextWidth, kTextAreaHeight);
+        auto busSourceBounds = juce::Rectangle<float>(x, y, kBusSourceTextWidth_, kTextAreaHeight_);
         g.drawText(busSourceText, busSourceBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusAmountText(juce::Graphics& g, float x, float y)
     {
-        auto busAmountBounds = juce::Rectangle<float>(x, y, kBusAmountTextWidth, kTextAreaHeight);
+        auto busAmountBounds = juce::Rectangle<float>(x, y, kBusAmountTextWidth_, kTextAreaHeight_);
         g.drawText(busAmountText, busAmountBounds, juce::Justification::centredLeft, false);
     }
 
     void ModulationBusHeader::drawBusDestinationText(juce::Graphics& g, float x, float y)
     {
-        auto busDestinationBounds = juce::Rectangle<float>(x, y, kBusDestinationTextWidth, kTextAreaHeight);
+        auto busDestinationBounds = juce::Rectangle<float>(x, y, kBusDestinationTextWidth_, kTextAreaHeight_);
         g.drawText(busDestinationText, busDestinationBounds, juce::Justification::centredLeft, false);
     }
 
@@ -98,9 +98,9 @@ namespace tss
     {
         auto lineColour = getLineColour();
         
-        auto lineThickness = kLineThickness;
-        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight;
-        auto verticalOffset = kTextAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
+        auto lineThickness = kLineThickness_;
+        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
+        auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - lineThickness) / 2.0f;
         
         auto lineBounds = bounds;
         lineBounds.setHeight(lineThickness);

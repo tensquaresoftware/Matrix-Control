@@ -32,11 +32,14 @@ public:
     
     std::unique_ptr<tss::ComboBox> createChoiceParameterComboBox(
         const juce::String& parameterId,
-        tss::Theme& theme);
+        tss::Theme& theme,
+        int width,
+        int height);
     
     std::unique_ptr<tss::Button> createStandaloneButton(
         const juce::String& widgetId,
-        tss::Theme& theme);
+        tss::Theme& theme,
+        int height);
 
     // ============================================================================
     // Display Name Helper Methods
@@ -79,6 +82,8 @@ private:
     void addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets);
     
     std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::Theme& theme);
-    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::Theme& theme);
+    std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::Theme& theme, int width, int height);
+    
+    int getButtonWidthForWidgetId(const juce::String& widgetId) const;
 };
 

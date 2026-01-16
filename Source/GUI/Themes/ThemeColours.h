@@ -513,6 +513,23 @@ namespace tss
                 ColourChart::kTransparent
             };
         }
+
+        namespace NumberBox
+        {
+            inline constexpr ColourElement kText = {
+                "NumberBoxText",
+                ColourChart::kRed,
+                ColourChart::kRed,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kDot = {
+                "NumberBoxDot",
+                ColourChart::kRed,
+                ColourChart::kRed,
+                ColourChart::kTransparent
+            };
+        }
     }
 }
 

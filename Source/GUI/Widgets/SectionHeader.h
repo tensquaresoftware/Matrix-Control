@@ -9,58 +9,33 @@ namespace tss
     class SectionHeader : public juce::Component
     {
     public:
-        enum class SectionWidth
-        {
-            PatchEdit,
-            MatrixModulation,
-            PatchManager,
-            MasterEdit
-        };
-
         enum class ColourVariant
         {
             Blue,
             Orange
         };
 
-        explicit SectionHeader(Theme& inTheme, SectionWidth width, const juce::String& inText = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(Theme& theme, int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth(SectionWidth width)
-        {
-            switch (width)
-            {
-                case SectionWidth::PatchEdit:
-                    return kPatchEditWidth;
-                case SectionWidth::MatrixModulation:
-                case SectionWidth::PatchManager:
-                    return kMatrixModulationWidth;
-                case SectionWidth::MasterEdit:
-                    return kMasterEditWidth;
-                default:
-                    return kPatchEditWidth;
-            }
-        }
-
-        static constexpr int getHeight() { return kHeight; }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kPatchEditWidth = 810;
-        inline constexpr static int kMatrixModulationWidth = 275;
-        inline constexpr static int kMasterEditWidth = 160;
-        inline constexpr static int kHeight = 30;
-        inline constexpr static float kContentHeight = 20.0f;
-        inline constexpr static float kLineHeight = 12.0f;
-        inline constexpr static float kLeftLineWidth = 20.0f;
-        inline constexpr static float kTextSpacing = 8.0f;
+        inline constexpr static float kContentHeight_ = 20.0f;
+        inline constexpr static float kLineHeight_ = 12.0f;
+        inline constexpr static float kLeftLineWidth_ = 20.0f;
+        inline constexpr static float kTextSpacing_ = 8.0f;
 
-        Theme* theme = nullptr;
-        juce::String text;
-        ColourVariant colourVariant;
+        int width_;
+        int height_;
+        Theme* theme_ = nullptr;
+        juce::String text_;
+        ColourVariant colourVariant_;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawContentArea(juce::Graphics& g, const juce::Rectangle<float>& bounds);

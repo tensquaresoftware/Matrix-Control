@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -8,106 +9,34 @@
 namespace tss
 {
     class Theme;
-    class ModuleHeader;
-    class Label;
-    class Slider;
-    class ComboBox;
-    class Button;
-    class HorizontalSeparator;
 }
 
 class WidgetFactory;
+class ModuleHeaderPanel;
+class ParameterPanel;
 
 class Lfo2Panel : public juce::Component
 {
 public:
-    Lfo2Panel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
+    Lfo2Panel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Lfo2Panel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 150;
-    inline constexpr static int kHeight = 280;
+    inline constexpr static int kWidth_ = 150;
+    inline constexpr static int kHeight_ = 280;
     
-    tss::Theme* theme;
-    juce::AudioProcessorValueTreeState& apvts;
+    tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
-    // Module Name
-    std::unique_ptr<tss::ModuleHeader> lfo2ModuleHeader;
-
-    // Buttons
-    std::unique_ptr<tss::Button> lfo2InitButton;
-    std::unique_ptr<tss::Button> lfo2CopyButton;
-    std::unique_ptr<tss::Button> lfo2PasteButton;
-
-    // Labels
-    std::unique_ptr<tss::Label> lfo2SpeedLabel;
-    std::unique_ptr<tss::Label> lfo2SpeedModByKeyboardLabel;
-    std::unique_ptr<tss::Label> lfo2RetriggerPointLabel;
-    std::unique_ptr<tss::Label> lfo2AmplitudeLabel;
-    std::unique_ptr<tss::Label> lfo2AmplitudeModByRamp2Label;
-    std::unique_ptr<tss::Label> lfo2WaveformLabel;
-    std::unique_ptr<tss::Label> lfo2TriggerModeLabel;
-    std::unique_ptr<tss::Label> lfo2LagLabel;
-    std::unique_ptr<tss::Label> lfo2SampleInputLabel;
-
-    // Sliders
-    std::unique_ptr<tss::Slider> lfo2SpeedSlider;
-    std::unique_ptr<tss::Slider> lfo2SpeedModByKeyboardSlider;
-    std::unique_ptr<tss::Slider> lfo2RetriggerPointSlider;
-    std::unique_ptr<tss::Slider> lfo2AmplitudeSlider;
-    std::unique_ptr<tss::Slider> lfo2AmplitudeModByRamp2Slider;
-
-    // Combo Boxes
-    std::unique_ptr<tss::ComboBox> lfo2WaveformComboBox;
-    std::unique_ptr<tss::ComboBox> lfo2TriggerModeComboBox;
-    std::unique_ptr<tss::ComboBox> lfo2LagComboBox;
-    std::unique_ptr<tss::ComboBox> lfo2SampleInputComboBox;
-
-    // Separators
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator8;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator9;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator10;
-
-    // Attachments
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfo2SpeedAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfo2SpeedModByKeyboardAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfo2RetriggerPointAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfo2AmplitudeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lfo2AmplitudeModByRamp2Attachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> lfo2WaveformAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> lfo2TriggerModeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> lfo2LagAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> lfo2SampleInputAttachment;
-
-    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupInitCopyPasteButtons(tss::Theme& inTheme, WidgetFactory& widgetFactory, 
-                                   const juce::String& initWidgetId, const juce::String& copyWidgetId, const juce::String& pasteWidgetId);
-    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
-                                     const juce::String& parameterId,
-                                     std::unique_ptr<tss::Label>& label,
-                                     std::unique_ptr<tss::Slider>& slider,
-                                     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
-                                     std::unique_ptr<tss::HorizontalSeparator>& separator);
-    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
-                                          const juce::String& parameterId,
-                                          std::unique_ptr<tss::Label>& label,
-                                          std::unique_ptr<tss::ComboBox>& comboBox,
-                                          std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
-                                          std::unique_ptr<tss::HorizontalSeparator>& separator);
+    std::unique_ptr<ModuleHeaderPanel> moduleHeaderPanel_;
+    std::vector<std::unique_ptr<ParameterPanel>> parameterPanels_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Lfo2Panel)
 };

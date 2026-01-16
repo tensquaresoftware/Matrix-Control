@@ -7,45 +7,46 @@
 #include "../../../../Widgets/ComboBox.h"
 #include "../../../../Widgets/HorizontalSeparator.h"
 #include "../../../../../Shared/PluginDescriptors.h"
+#include "../../../../../Shared/PluginDimensions.h"
 #include "../../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
 
-MiscPanel::MiscPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts)
-    : theme(&inTheme)
-    , apvts(inApvts)
+MiscPanel::MiscPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme_(&theme)
+    , apvts_(apvts)
 {
-    setupModuleHeader(inTheme, widgetFactory, PluginDescriptors::ModuleIds::kMisc);
+    setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kMisc);
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kMasterTune,
-                                masterTuneLabel, masterTuneSlider, masterTuneAttachment, horizontalSeparator1);
+                                masterTuneLabel_, masterTuneSlider_, masterTuneAttachment_, horizontalSeparator1_);
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kMasterTranspose,
-                                masterTransposeLabel, masterTransposeSlider, masterTransposeAttachment, horizontalSeparator2);
-    masterTransposeSlider->setUnit("st");
+                                masterTransposeLabel_, masterTransposeSlider_, masterTransposeAttachment_, horizontalSeparator2_);
+    masterTransposeSlider_->setUnit("st");
 
-    setupIntParameterWithSlider(inTheme, widgetFactory,
+    setupIntParameterWithSlider(theme, widgetFactory,
                                 PluginDescriptors::ParameterIds::kBendRange,
-                                bendRangeLabel, bendRangeSlider, bendRangeAttachment, horizontalSeparator3);
-    bendRangeSlider->setUnit("st");
+                                bendRangeLabel_, bendRangeSlider_, bendRangeAttachment_, horizontalSeparator3_);
+    bendRangeSlider_->setUnit("st");
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kUnisonEnable,
-                                     unisonEnableLabel, unisonEnableComboBox, unisonEnableAttachment, horizontalSeparator4);
+                                     unisonEnableLabel_, unisonEnableComboBox_, unisonEnableAttachment_, horizontalSeparator4_);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kVolumeInvertEnable,
-                                     volumeInvertEnableLabel, volumeInvertEnableComboBox, volumeInvertEnableAttachment, horizontalSeparator5);
+                                     volumeInvertEnableLabel_, volumeInvertEnableComboBox_, volumeInvertEnableAttachment_, horizontalSeparator5_);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kBankLockEnable,
-                                     bankLockEnableLabel, bankLockEnableComboBox, bankLockEnableAttachment, horizontalSeparator6);
+                                     bankLockEnableLabel_, bankLockEnableComboBox_, bankLockEnableAttachment_, horizontalSeparator6_);
 
-    setupChoiceParameterWithComboBox(inTheme, widgetFactory,
+    setupChoiceParameterWithComboBox(theme, widgetFactory,
                                      PluginDescriptors::ParameterIds::kMemoryProtectEnable,
-                                     memoryProtectEnableLabel, memoryProtectEnableComboBox, memoryProtectEnableAttachment, horizontalSeparator7);
+                                     memoryProtectEnableLabel_, memoryProtectEnableComboBox_, memoryProtectEnableAttachment_, horizontalSeparator7_);
 
     setSize(getWidth(), getHeight());
 }
@@ -54,203 +55,204 @@ MiscPanel::~MiscPanel() = default;
 
 void MiscPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(theme->getMasterEditPanelBackgroundColour());
+    g.fillAll(theme_->getMasterEditPanelBackgroundColour());
 }
 
 void MiscPanel::resized()
 {
-    const auto moduleHeaderHeight = tss::ModuleHeader::getHeight();
-    const auto moduleHeaderWidth = tss::ModuleHeader::getWidth(tss::ModuleHeader::ModuleWidth::MasterEdit);
-    const auto labelWidth = tss::Label::getWidth(tss::Label::LabelWidth::MasterEditModule);
-    const auto labelHeight = tss::Label::getHeight();
-    const auto sliderWidth = tss::Slider::getWidth();
+    const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
+    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule;
+    const auto labelWidth = PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
+    const auto labelHeight = PluginDimensions::Widgets::Heights::kLabel;
+    const auto sliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = tss::ComboBox::getWidth(tss::ComboBox::ComboBoxWidth::MasterEditModule);
-    const auto comboBoxHeight = tss::ComboBox::getHeight();
-    const auto separatorWidth = tss::HorizontalSeparator::getWidth(tss::HorizontalSeparator::SeparatorWidth::MasterEditModule);
-    const auto separatorHeight = tss::HorizontalSeparator::getHeight();
+    const auto comboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule;
+    const auto comboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+    const auto separatorWidth = PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule;
+    const auto separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
 
     int y = 0;
 
-    if (auto* header = miscModuleHeader.get())
+    if (auto* header = miscModuleHeader_.get())
         header->setBounds(0, y, moduleHeaderWidth, moduleHeaderHeight);
 
     y += moduleHeaderHeight;
 
-    if (auto* label = masterTuneLabel.get())
+    if (auto* label = masterTuneLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = masterTuneSlider.get())
+    if (auto* slider = masterTuneSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator1.get())
+    if (auto* separator = horizontalSeparator1_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = masterTransposeLabel.get())
+    if (auto* label = masterTransposeLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = masterTransposeSlider.get())
+    if (auto* slider = masterTransposeSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator2.get())
+    if (auto* separator = horizontalSeparator2_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = bendRangeLabel.get())
+    if (auto* label = bendRangeLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* slider = bendRangeSlider.get())
+    if (auto* slider = bendRangeSlider_.get())
         slider->setBounds(labelWidth, y, sliderWidth, sliderHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator3.get())
+    if (auto* separator = horizontalSeparator3_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = unisonEnableLabel.get())
+    if (auto* label = unisonEnableLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = unisonEnableComboBox.get())
+    if (auto* comboBox = unisonEnableComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator4.get())
+    if (auto* separator = horizontalSeparator4_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = volumeInvertEnableLabel.get())
+    if (auto* label = volumeInvertEnableLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = volumeInvertEnableComboBox.get())
+    if (auto* comboBox = volumeInvertEnableComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator5.get())
+    if (auto* separator = horizontalSeparator5_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = bankLockEnableLabel.get())
+    if (auto* label = bankLockEnableLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = bankLockEnableComboBox.get())
+    if (auto* comboBox = bankLockEnableComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator6.get())
+    if (auto* separator = horizontalSeparator6_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 
     y += separatorHeight;
 
-    if (auto* label = memoryProtectEnableLabel.get())
+    if (auto* label = memoryProtectEnableLabel_.get())
         label->setBounds(0, y, labelWidth, labelHeight);
 
-    if (auto* comboBox = memoryProtectEnableComboBox.get())
+    if (auto* comboBox = memoryProtectEnableComboBox_.get())
         comboBox->setBounds(labelWidth, y, comboBoxWidth, comboBoxHeight);
 
     y += labelHeight;
 
-    if (auto* separator = horizontalSeparator7.get())
+    if (auto* separator = horizontalSeparator7_.get())
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
-void MiscPanel::setTheme(Theme& inTheme)
+void MiscPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* header = miscModuleHeader.get())
-        header->setTheme(inTheme);
+    if (auto* header = miscModuleHeader_.get())
+        header->setTheme(theme);
 
-    if (auto* label = masterTuneLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = masterTuneLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = masterTuneSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = masterTuneSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator1.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator1_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = masterTransposeLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = masterTransposeLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = masterTransposeSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = masterTransposeSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator2.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator2_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = bendRangeLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = bendRangeLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* slider = bendRangeSlider.get())
-        slider->setTheme(inTheme);
+    if (auto* slider = bendRangeSlider_.get())
+        slider->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator3.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator3_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = unisonEnableLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = unisonEnableLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = unisonEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = unisonEnableComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator4.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator4_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = volumeInvertEnableLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = volumeInvertEnableLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = volumeInvertEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = volumeInvertEnableComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator5.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator5_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = bankLockEnableLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = bankLockEnableLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = bankLockEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = bankLockEnableComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator6.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator6_.get())
+        separator->setTheme(theme);
 
-    if (auto* label = memoryProtectEnableLabel.get())
-        label->setTheme(inTheme);
+    if (auto* label = memoryProtectEnableLabel_.get())
+        label->setTheme(theme);
 
-    if (auto* comboBox = memoryProtectEnableComboBox.get())
-        comboBox->setTheme(inTheme);
+    if (auto* comboBox = memoryProtectEnableComboBox_.get())
+        comboBox->setTheme(theme);
 
-    if (auto* separator = horizontalSeparator7.get())
-        separator->setTheme(inTheme);
+    if (auto* separator = horizontalSeparator7_.get())
+        separator->setTheme(theme);
 
     repaint();
 }
 
-void MiscPanel::setupModuleHeader(Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void MiscPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
-    miscModuleHeader = std::make_unique<tss::ModuleHeader>(
-        inTheme, 
+    miscModuleHeader_ = std::make_unique<tss::ModuleHeader>(
+        theme, 
         widgetFactory.getGroupDisplayName(moduleId),
-        tss::ModuleHeader::ModuleWidth::MasterEdit,
+        PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kModuleHeader,
         tss::ModuleHeader::ColourVariant::Orange);
-    addAndMakeVisible(*miscModuleHeader);
+    addAndMakeVisible(*miscModuleHeader_);
 }
 
-void MiscPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widgetFactory,
+void MiscPanel::setupIntParameterWithSlider(Theme& theme, WidgetFactory& widgetFactory,
                                            const juce::String& parameterId,
                                            std::unique_ptr<tss::Label>& label,
                                            std::unique_ptr<tss::Slider>& slider,
@@ -258,22 +260,27 @@ void MiscPanel::setupIntParameterWithSlider(Theme& inTheme, WidgetFactory& widge
                                            std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::MasterEditModule, 
+        theme, 
+        PluginDimensions::Widgets::Widths::Label::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kLabel,
         widgetFactory.getParameterDisplayName(parameterId));
     addAndMakeVisible(*label);
 
-    slider = widgetFactory.createIntParameterSlider(parameterId, inTheme);
+    slider = widgetFactory.createIntParameterSlider(parameterId, theme);
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
+        apvts_,
         parameterId,
         *slider);
     addAndMakeVisible(*slider);
 
-    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::MasterEditModule);
+    separator = std::make_unique<tss::HorizontalSeparator>(
+        theme, 
+        PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kHorizontalSeparator);
     addAndMakeVisible(*separator);
 }
 
-void MiscPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& widgetFactory,
+void MiscPanel::setupChoiceParameterWithComboBox(Theme& theme, WidgetFactory& widgetFactory,
                                                  const juce::String& parameterId,
                                                  std::unique_ptr<tss::Label>& label,
                                                  std::unique_ptr<tss::ComboBox>& comboBox,
@@ -281,17 +288,26 @@ void MiscPanel::setupChoiceParameterWithComboBox(Theme& inTheme, WidgetFactory& 
                                                  std::unique_ptr<tss::HorizontalSeparator>& separator)
 {
     label = std::make_unique<tss::Label>(
-        inTheme, tss::Label::LabelWidth::MasterEditModule, 
+        theme, 
+        PluginDimensions::Widgets::Widths::Label::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kLabel,
         widgetFactory.getParameterDisplayName(parameterId));
     addAndMakeVisible(*label);
 
-    comboBox = widgetFactory.createChoiceParameterComboBox(parameterId, inTheme);
+    comboBox = widgetFactory.createChoiceParameterComboBox(
+        parameterId, 
+        theme,
+        PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kComboBox);
     attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
+        apvts_,
         parameterId,
         *comboBox);
     addAndMakeVisible(*comboBox);
 
-    separator = std::make_unique<tss::HorizontalSeparator>(inTheme, tss::HorizontalSeparator::SeparatorWidth::MasterEditModule);
+    separator = std::make_unique<tss::HorizontalSeparator>(
+        theme, 
+        PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule,
+        PluginDimensions::Widgets::Heights::kHorizontalSeparator);
     addAndMakeVisible(*separator);
 }

@@ -10,6 +10,7 @@ namespace tss
     class ModuleHeader;
     class GroupLabel;
     class Button;
+    class NumberBox;
 }
 
 class WidgetFactory;
@@ -17,38 +18,64 @@ class WidgetFactory;
 class InternalPatchesPanel : public juce::Component
 {
 public:
-    InternalPatchesPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory);
+    InternalPatchesPanel(tss::Theme& theme, WidgetFactory& widgetFactory);
     ~InternalPatchesPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 275;
-    inline constexpr static int kHeight = 115;
-    inline constexpr static int kTopPadding = 10;
-    inline constexpr static int kSpacing = 5;
+    inline constexpr static int kWidth_ = 275;
+    inline constexpr static int kHeight_ = 115;
+    inline constexpr static int kTopPadding_ = 5;
+    inline constexpr static int kGroupLabelSpacing_ = 10;
+    inline constexpr static int kSpacing_ = 5;
 
-    tss::Theme* theme;
+    tss::Theme* theme_;
 
-    std::unique_ptr<tss::ModuleHeader> internalPatchesModuleHeader;
+    std::unique_ptr<tss::ModuleHeader> moduleHeader;
 
     std::unique_ptr<tss::GroupLabel> browserGroupLabel;
     std::unique_ptr<tss::GroupLabel> utilityGroupLabel;
 
-    std::unique_ptr<tss::Button> loadPreviousInternalPatchButton;
-    std::unique_ptr<tss::Button> loadNextInternalPatchButton;
+    std::unique_ptr<tss::Button> loadPreviousPatchButton_;
+    std::unique_ptr<tss::Button> loadNextPatchButton_;
 
-    std::unique_ptr<tss::Button> initInternalPatchButton;
-    std::unique_ptr<tss::Button> copyInternalPatchButton;
-    std::unique_ptr<tss::Button> pasteInternalPatchButton;
-    std::unique_ptr<tss::Button> storeInternalPatchButton;
+    std::unique_ptr<tss::NumberBox> currentBankNumber;
+    std::unique_ptr<tss::NumberBox> currentPatchNumber;
 
-    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    std::unique_ptr<tss::Button> initPatchButton_;
+    std::unique_ptr<tss::Button> copyPatchButton_;
+    std::unique_ptr<tss::Button> pastePatchButton_;
+    std::unique_ptr<tss::Button> storePatchButton_;
+
+    void setupModuleHeader(tss::Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupBrowserGroupLabel(tss::Theme& theme);
+    void setupLoadPreviousPatchButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+    void setupLoadNextPatchButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+    void setupCurrentBankNumberBox(tss::Theme& theme);
+    void setupCurrentPatchNumberBox(tss::Theme& theme);
+    void setupUtilityGroupLabel(tss::Theme& theme);
+    void setupInitPatchButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+    void setupCopyPatchButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+    void setupPastePatchButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+    void setupStorePatchButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+
+    void layoutModuleHeader(int x, int y);
+    void layoutBrowserGroupLabel(int x, int y);
+    void layoutLoadPreviousPatchButton(int x, int y);
+    void layoutLoadNextPatchButton(int x, int y);
+    void layoutCurrentBankNumberBox(int x, int y);
+    void layoutCurrentPatchNumberBox(int x, int y);
+    void layoutUtilityGroupLabel(int x, int y);
+    void layoutInitPatchButton(int x, int y);
+    void layoutCopyPatchButton(int x, int y);
+    void layoutPastePatchButton(int x, int y);
+    void layoutStorePatchButton(int x, int y);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InternalPatchesPanel)
 };

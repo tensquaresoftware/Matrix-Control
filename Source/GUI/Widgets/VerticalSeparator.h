@@ -16,13 +16,13 @@ namespace tss
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth() { return kWidth; }
-        static constexpr int getHeight() { return kHeight; }
+        static constexpr int getWidth() { return kWidth_; }
+        static constexpr int getHeight() { return kHeight_; }
 
     private:
-        inline constexpr static int kWidth = 30;
-        inline constexpr static int kHeight = 730;
-        inline constexpr static float kLineWidth = 4.0f;
+        inline constexpr static int kWidth_ = 30;
+        inline constexpr static int kHeight_ = 730;
+        inline constexpr static float kLineWidth_ = 4.0f;
 
         Theme* theme = nullptr;
 

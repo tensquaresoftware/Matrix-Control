@@ -5,18 +5,23 @@
             "name": "Debug: Standalone",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build-macos/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
+            "program": "${workspaceFolder}/Builds/macOS/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control",
             "args": [],
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build: Standalone",
             "osx": {
                 "type": "lldb",
-                "program": "${workspaceFolder}/build-macos/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control"
+                "program": "${workspaceFolder}/Builds/macOS/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.app/Contents/MacOS/Matrix-Control"
             },
             "windows": {
                 "type": "cppvsdbg",
-                "program": "${workspaceFolder}/build-windows/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.exe",
+                "program": "${workspaceFolder}/Builds/Windows/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control.exe",
                 "MIMode": "windows"
+            },
+            "linux": {
+                "type": "cppdbg",
+                "program": "${workspaceFolder}/Builds/Linux/Matrix-Control_artefacts/Debug/Standalone/Matrix-Control",
+                "MIMode": "gdb"
             }
         },
         {

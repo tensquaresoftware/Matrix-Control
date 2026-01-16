@@ -12,18 +12,10 @@ namespace tss
     class ComboBox : public juce::ComboBox
     {
     public:
-        enum class ComboBoxWidth
-        {
-            PatchEditModule,
-            MasterEditModule,
-            MatrixModulationAmount,
-            MatrixModulationDestination
-        };
-
-        explicit ComboBox(Theme& inTheme, ComboBoxWidth width = ComboBoxWidth::PatchEditModule);
+        explicit ComboBox(Theme& theme, int width, int height);
         ~ComboBox() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
         void showPopup() override;
@@ -33,44 +25,24 @@ namespace tss
         void focusGained(juce::Component::FocusChangeType cause) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
-        static constexpr int getWidth(ComboBoxWidth width)
-        {
-            switch (width)
-            {
-                case ComboBoxWidth::PatchEditModule:
-                case ComboBoxWidth::MasterEditModule:
-                case ComboBoxWidth::MatrixModulationAmount:
-                    return kNormalWidth;
-                case ComboBoxWidth::MatrixModulationDestination:
-                    return kLargeWidth;
-                default:
-                    return kNormalWidth;
-            }
-        }
-
-        static constexpr int getHeight() { return kHeight; }
-        static constexpr int getVerticalMargin() { return kVerticalMargin; }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
+        static constexpr int getVerticalMargin() { return kVerticalMargin_; }
 
     private:
-        inline constexpr static int kNormalWidth = 60;
-        inline constexpr static int kLargeWidth = 105;
-        inline constexpr static int kHeight = 20;
+        inline constexpr static int kVerticalMargin_ = 4;
+        inline constexpr static int kBackgroundHeight_ = 16;
+        inline constexpr static int kLeftPadding_ = 3;
+        inline constexpr static int kRightPadding_ = 3;
+        inline constexpr static int kBorderThickness_ = 1;
+        inline constexpr static int kTriangleBaseSize_ = 7;
+        inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
 
-        inline constexpr static int kNormalBackgroundWidth = 60;
-        inline constexpr static int kLargeBackgroundWidth = 105;
-        inline constexpr static int kBackgroundHeight = 16;
-        
-        inline constexpr static float kLeftPadding = 3.0f;
-        inline constexpr static float kRightPadding = 3.0f;
-        inline constexpr static float kBorderThickness = 1.0f;
-        inline constexpr static int kVerticalMargin = 4;
-        inline constexpr static float kTriangleBaseSize = 7.0f;
-        inline constexpr static float kTriangleHeightFactor = 0.8660254f; // √3 / 2
-
-        Theme* theme = nullptr;
-        FocusableWidget focusableWidget;
-        ComboBoxWidth comboWidth;
-        bool isPopupOpen = false;
+        Theme* theme_ = nullptr;
+        FocusableWidget focusableWidget_;
+        int width_;
+        int height_;
+        bool isPopupOpen_ = false;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

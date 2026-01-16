@@ -26,10 +26,12 @@ def ensureSettingsFileExists(settingsFile):
 def detectCurrentPlatform():
     system = platform.system()
     if system == "Darwin":
-        return "build-macos", "default-macos", "macOS"
+        return "Builds/macOS", "default-macos", "macOS"
     elif system == "Windows":
-        return "build-windows", "default-windows", "Windows"
-    return "build", "default", system
+        return "Builds/Windows", "default-windows", "Windows"
+    elif system == "Linux":
+        return "Builds/Linux", "default-linux", "Linux"
+    return "Builds", "default", system
 
 def loadSettingsFromFile(settingsFile):
     try:

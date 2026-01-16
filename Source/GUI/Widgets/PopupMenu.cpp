@@ -15,7 +15,7 @@ namespace tss
         
         if (auto* parent [[maybe_unused]] = comboBox.getParentComponent())
         {
-            theme = comboBox.theme;
+            theme = comboBox.theme_;
             if (auto* currentTheme = theme)
                 cachedFont = currentTheme->getBaseFont();
         }
@@ -41,7 +41,7 @@ namespace tss
         }
 
         auto bounds = getLocalBounds();
-        auto borderThickness = kBorderThickness;
+        auto borderThickness = kBorderThickness_;
         auto borderThicknessInt = static_cast<int>(borderThickness);
         
         drawBase(g, bounds);
@@ -86,7 +86,7 @@ namespace tss
     {
         exitModalState(0);
         
-        comboBox.isPopupOpen = false;
+        comboBox.isPopupOpen_ = false;
         comboBox.repaint();
         
         comboBox.grabKeyboardFocus();
@@ -104,7 +104,7 @@ namespace tss
         {
             exitModalState(0);
             
-            comboBox.isPopupOpen = false;
+            comboBox.isPopupOpen_ = false;
             comboBox.repaint();
             
             comboBox.grabKeyboardFocus();
@@ -149,7 +149,7 @@ namespace tss
 
     int PopupMenu::calculateColumnCount(int totalItems) const
     {
-        auto columnThreshold = kColumnThreshold;
+        auto columnThreshold = kColumnThreshold_;
         if (totalItems <= columnThreshold)
         {
             return 1;
@@ -227,9 +227,9 @@ namespace tss
             return juce::Rectangle<int>();
         }
         
-        auto borderThickness = kBorderThickness;
-        auto itemHeight = kItemHeight;
-        auto separatorWidth = kSeparatorWidth;
+        auto borderThickness = kBorderThickness_;
+        auto itemHeight = kItemHeight_;
+        auto separatorWidth = kSeparatorWidth_;
         auto contentBounds = getLocalBounds().reduced(static_cast<int>(borderThickness));
         
         if (columnCount == 1)
@@ -251,7 +251,7 @@ namespace tss
 
     int PopupMenu::getItemIndexAt(int x, int y) const
     {
-        auto contentBounds = getLocalBounds().reduced(static_cast<int>(kBorderThickness));
+        auto contentBounds = getLocalBounds().reduced(static_cast<int>(kBorderThickness_));
         
         if (! contentBounds.contains(x, y))
         {
@@ -295,7 +295,7 @@ namespace tss
         
         relativeX -= columnWidth;
         
-        auto separatorWidth = kSeparatorWidth;
+        auto separatorWidth = kSeparatorWidth_;
         for (int column = 1; column < columnCount; ++column)
         {
             if (relativeX < separatorWidth)
@@ -318,7 +318,7 @@ namespace tss
 
     int PopupMenu::getRowFromY(int y) const
     {
-        return y / kItemHeight;
+        return y / kItemHeight_;
     }
 
     int PopupMenu::getItemIndexFromColumnAndRow(int column, int row) const
@@ -344,7 +344,7 @@ namespace tss
     {
         exitModalState(0);
         
-        comboBox.isPopupOpen = false;
+            comboBox.isPopupOpen_ = false;
         comboBox.repaint();
         
         if (isValidItemIndex(itemIndex))
@@ -396,7 +396,7 @@ namespace tss
         
         auto borderColour = theme->getPopupMenuBorderColour();
         g.setColour(borderColour);
-        g.drawRect(bounds.toFloat(), kBorderThickness);
+        g.drawRect(bounds.toFloat(), kBorderThickness_);
     }
 
     void PopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<int>&)
@@ -437,7 +437,7 @@ namespace tss
             g.setFont(cachedFont);
             
             auto textBounds = itemBounds;
-            textBounds.removeFromLeft(kTextLeftPadding);
+            textBounds.removeFromLeft(kTextLeftPadding_);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
         else
@@ -452,7 +452,7 @@ namespace tss
             g.setFont(cachedFont);
             
             auto textBounds = itemBounds;
-            textBounds.removeFromLeft(kTextLeftPadding);
+            textBounds.removeFromLeft(kTextLeftPadding_);
             g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
     }
@@ -467,7 +467,7 @@ namespace tss
         auto separatorColour = theme->getPopupMenuSeparatorColour();
         g.setColour(separatorColour);
         
-        auto separatorWidth = kSeparatorWidth;
+        auto separatorWidth = kSeparatorWidth_;
         for (int i = 1; i < columnCount; ++i)
         {
             auto separatorX = contentBounds.getX() + i * columnWidth + (i - 1) * separatorWidth;
@@ -621,7 +621,7 @@ namespace tss
             return;
         }
 
-        auto* themePtr = comboBoxRef.theme;
+        auto* themePtr = comboBoxRef.theme_;
         if (themePtr == nullptr)
         {
             return;
@@ -646,9 +646,9 @@ namespace tss
         auto columnCount = rawPtr->columnCount;
         auto itemsPerColumn = rawPtr->itemsPerColumn;
         auto columnWidth = rawPtr->columnWidth;
-        auto separatorWidth = kSeparatorWidth;
-        auto itemHeight = kItemHeight;
-        auto borderThickness = kBorderThickness;
+        auto separatorWidth = kSeparatorWidth_;
+        auto itemHeight = kItemHeight_;
+        auto borderThickness = kBorderThickness_;
         auto totalWidth = columnCount * columnWidth + (columnCount - 1) * separatorWidth;
         auto totalHeight = itemsPerColumn * itemHeight;
         auto popupSize = juce::Point<int>(totalWidth + static_cast<int>(borderThickness * 2.0f),

@@ -1,7 +1,6 @@
 # Build artifacts
 build/
-build-macos/
-build-windows/
+Builds/
 *.o
 *.obj
 

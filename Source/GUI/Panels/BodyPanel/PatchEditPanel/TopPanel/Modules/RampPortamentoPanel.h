@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -8,103 +9,34 @@
 namespace tss
 {
     class Theme;
-    class ModuleHeader;
-    class Label;
-    class Slider;
-    class ComboBox;
-    class Button;
-    class HorizontalSeparator;
 }
 
 class WidgetFactory;
+class ModuleHeaderPanel;
+class ParameterPanel;
 
 class RampPortamentoPanel : public juce::Component
 {
 public:
-    RampPortamentoPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
+    RampPortamentoPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~RampPortamentoPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 150;
-    inline constexpr static int kHeight = 280;
+    inline constexpr static int kWidth_ = 150;
+    inline constexpr static int kHeight_ = 280;
     
-    tss::Theme* theme;
-    juce::AudioProcessorValueTreeState& apvts;
+    tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
-    // Module Name
-    std::unique_ptr<tss::ModuleHeader> rampPortamentoModuleHeader;
-
-    // Buttons
-    std::unique_ptr<tss::Button> rampPortamentoInitButton;
-
-    // Labels
-    std::unique_ptr<tss::Label> ramp1RateLabel;
-    std::unique_ptr<tss::Label> ramp1TriggerLabel;
-    std::unique_ptr<tss::Label> ramp2RateLabel;
-    std::unique_ptr<tss::Label> ramp2TriggerLabel;
-    std::unique_ptr<tss::Label> portamentoRateLabel;
-    std::unique_ptr<tss::Label> portamentoModByVelocityLabel;
-    std::unique_ptr<tss::Label> portamentoModeLabel;
-    std::unique_ptr<tss::Label> portamentoLegatoLabel;
-    std::unique_ptr<tss::Label> portamentoKeyboardModeLabel;
-
-    // Sliders
-    std::unique_ptr<tss::Slider> ramp1RateSlider;
-    std::unique_ptr<tss::Slider> ramp2RateSlider;
-    std::unique_ptr<tss::Slider> portamentoRateSlider;
-    std::unique_ptr<tss::Slider> portamentoModByVelocitySlider;
-
-    // Combo Boxes
-    std::unique_ptr<tss::ComboBox> ramp1TriggerComboBox;
-    std::unique_ptr<tss::ComboBox> ramp2TriggerComboBox;
-    std::unique_ptr<tss::ComboBox> portamentoModeComboBox;
-    std::unique_ptr<tss::ComboBox> portamentoLegatoComboBox;
-    std::unique_ptr<tss::ComboBox> portamentoKeyboardModeComboBox;
-
-    // Separators
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator8;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator9;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator10;
-
-    // Attachments
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> ramp1RateAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ramp1TriggerAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> ramp2RateAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ramp2TriggerAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> portamentoRateAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> portamentoModByVelocityAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> portamentoModeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> portamentoLegatoAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> portamentoKeyboardModeAttachment;
-
-    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupInitButton(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& initWidgetId);
-    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
-                                     const juce::String& parameterId,
-                                     std::unique_ptr<tss::Label>& label,
-                                     std::unique_ptr<tss::Slider>& slider,
-                                     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
-                                     std::unique_ptr<tss::HorizontalSeparator>& separator);
-    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
-                                          const juce::String& parameterId,
-                                          std::unique_ptr<tss::Label>& label,
-                                          std::unique_ptr<tss::ComboBox>& comboBox,
-                                          std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
-                                          std::unique_ptr<tss::HorizontalSeparator>& separator);
+    std::unique_ptr<ModuleHeaderPanel> moduleHeaderPanel_;
+    std::vector<std::unique_ptr<ParameterPanel>> parameterPanels_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RampPortamentoPanel)
 };

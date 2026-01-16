@@ -79,17 +79,14 @@
 
 [Conventions de nommage]
 - Variables & Méthodes : lowerCamelCase
-  * Exemple : audioBuffer, processMidiEvents(), getSampleRate()
-- Variables privées : pas de préfixe ni suffixe (underscore ou autre)
-  * Exemple : apvts
-- Constantes : kConstantName (private par défaut)
-  * Exemple : kMaxBufferSize, kDefaultChannels
+  * Exemples : audioBuffer, processMidiEvents(), getSampleRate()
+- Variables et constantes publiques : pas de préfixe ni suffixe
+  * Exemples : pluginFactory, kMaxBufferSize
+- Variables et constantes privées : suffixe underscore (Google Style)
+  * Exemples : apvts_, kWidth_
 - Classes : PascalCase
-  * Exemple : PluginProcessor, PluginEditor, AudioAnalyzer
+  * Exemples : PluginProcessor, PluginEditor, AudioAnalyzer
 - Éviter les underscore_case, sauf cas très particulier
-- Paramètres de constructeur : préfixe "in" pour éviter le shadowing
-  * Exemple : inParameterId, inReason, inWidgetId
-  * Permet d'initialiser clairement les membres : parameterId(inParameterId)
 
 [Magic Numbers - INTERDITS]
 - Ne JAMAIS utiliser de magic numbers dans le code !

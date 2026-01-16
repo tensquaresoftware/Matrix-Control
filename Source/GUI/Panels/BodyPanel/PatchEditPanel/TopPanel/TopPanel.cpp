@@ -13,26 +13,26 @@ using tss::Theme;
 
 TopPanel::~TopPanel() = default;
 
-TopPanel::TopPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme(&inTheme)
-    , dco1Panel(std::make_unique<Dco1Panel>(inTheme, widgetFactory, apvts))
-    , dco2Panel(std::make_unique<Dco2Panel>(inTheme, widgetFactory, apvts))
-    , vcfVcaPanel(std::make_unique<VcfVcaPanel>(inTheme, widgetFactory, apvts))
-    , fmTrackPanel(std::make_unique<FmTrackPanel>(inTheme, widgetFactory, apvts))
-    , rampPortamentoPanel(std::make_unique<RampPortamentoPanel>(inTheme, widgetFactory, apvts))
+TopPanel::TopPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme_(&theme)
+    , dco1Panel_(std::make_unique<Dco1Panel>(theme, widgetFactory, apvts))
+    , dco2Panel_(std::make_unique<Dco2Panel>(theme, widgetFactory, apvts))
+    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(theme, widgetFactory, apvts))
+    , fmTrackPanel_(std::make_unique<FmTrackPanel>(theme, widgetFactory, apvts))
+    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(theme, widgetFactory, apvts))
 {
-    addAndMakeVisible(*dco1Panel);
-    addAndMakeVisible(*dco2Panel);
-    addAndMakeVisible(*vcfVcaPanel);
-    addAndMakeVisible(*fmTrackPanel);
-    addAndMakeVisible(*rampPortamentoPanel);
+    addAndMakeVisible(*dco1Panel_);
+    addAndMakeVisible(*dco2Panel_);
+    addAndMakeVisible(*vcfVcaPanel_);
+    addAndMakeVisible(*fmTrackPanel_);
+    addAndMakeVisible(*rampPortamentoPanel_);
 
     setSize(getWidth(), getHeight());
 }
 
 void TopPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme)
+    if (auto* currentTheme = theme_)
         g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
 }
 
@@ -43,7 +43,7 @@ void TopPanel::resized()
     
     const auto dco1PanelX = 0;
     const auto dco1PanelY = 0;
-    dco1Panel->setBounds(
+    dco1Panel_->setBounds(
         bounds.getX() + dco1PanelX,
         bounds.getY() + dco1PanelY,
         Dco1Panel::getWidth(),
@@ -52,7 +52,7 @@ void TopPanel::resized()
     
     const auto dco2PanelX = dco1PanelX + Dco1Panel::getWidth() + spacing;
     const auto dco2PanelY = 0;
-    dco2Panel->setBounds(
+    dco2Panel_->setBounds(
         bounds.getX() + dco2PanelX,
         bounds.getY() + dco2PanelY,
         Dco2Panel::getWidth(),
@@ -61,7 +61,7 @@ void TopPanel::resized()
     
     const auto vcfVcaPanelX = dco2PanelX + Dco2Panel::getWidth() + spacing;
     const auto vcfVcaPanelY = 0;
-    vcfVcaPanel->setBounds(
+    vcfVcaPanel_->setBounds(
         bounds.getX() + vcfVcaPanelX,
         bounds.getY() + vcfVcaPanelY,
         VcfVcaPanel::getWidth(),
@@ -70,7 +70,7 @@ void TopPanel::resized()
     
     const auto fmTrackPanelX = vcfVcaPanelX + VcfVcaPanel::getWidth() + spacing;
     const auto fmTrackPanelY = 0;
-    fmTrackPanel->setBounds(
+    fmTrackPanel_->setBounds(
         bounds.getX() + fmTrackPanelX,
         bounds.getY() + fmTrackPanelY,
         FmTrackPanel::getWidth(),
@@ -79,7 +79,7 @@ void TopPanel::resized()
     
     const auto rampPortamentoPanelX = fmTrackPanelX + FmTrackPanel::getWidth() + spacing;
     const auto rampPortamentoPanelY = 0;
-    rampPortamentoPanel->setBounds(
+    rampPortamentoPanel_->setBounds(
         bounds.getX() + rampPortamentoPanelX,
         bounds.getY() + rampPortamentoPanelY,
         RampPortamentoPanel::getWidth(),
@@ -87,24 +87,24 @@ void TopPanel::resized()
     );
 }
 
-void TopPanel::setTheme(Theme& inTheme)
+void TopPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* panel = dco1Panel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = dco1Panel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = dco2Panel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = dco2Panel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = vcfVcaPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = vcfVcaPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = fmTrackPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = fmTrackPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = rampPortamentoPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = rampPortamentoPanel_.get())
+        panel->setTheme(theme);
 
     repaint();
 }

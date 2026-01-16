@@ -4,32 +4,34 @@
 
 namespace tss
 {
-    ModuleHeader::ModuleHeader(Theme& inTheme, const juce::String& inText, ModuleWidth width, ColourVariant variant)
-        : theme(&inTheme)
-        , text(inText)
-        , colourVariant(variant)
+    ModuleHeader::ModuleHeader(Theme& theme, const juce::String& text, int width, int height, ColourVariant variant)
+        : width_(width)
+        , height_(height)
+        , theme_(&theme)
+        , text_(text)
+        , colourVariant_(variant)
     {
-        setSize(getWidth(width), kHeight);
+        setSize(width_, height_);
     }
 
-    void ModuleHeader::setTheme(Theme& inTheme)
+    void ModuleHeader::setTheme(Theme& theme)
     {
-        theme = &inTheme;
+        theme_ = &theme;
         repaint();
     }
 
-    void ModuleHeader::setText(const juce::String& newText)
+    void ModuleHeader::setText(const juce::String& text)
     {
-        if (text != newText)
+        if (text_ != text)
         {
-            text = newText;
+            text_ = text;
             repaint();
         }
     }
 
     void ModuleHeader::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
+        if (theme_ == nullptr)
         {
             return;
         }
@@ -43,37 +45,37 @@ namespace tss
 
     void ModuleHeader::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto baseColour = theme->getModuleHeaderBaseColour();
+        auto baseColour = theme_->getModuleHeaderBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
 
     void ModuleHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        if (text.isEmpty())
+        if (text_.isEmpty())
         {
             return;
         }
 
-        auto textColour = theme->getModuleHeaderTextColour();
-        auto font = theme->getBaseFont().withHeight(16.0f).boldened();
+        auto textColour = theme_->getModuleHeaderTextColour();
+        auto font = theme_->getBaseFont().withHeight(16.0f).boldened();
 
         auto textBounds = bounds;
-        textBounds.setHeight(kTextAreaHeight);
-        textBounds.removeFromLeft(kTextLeftPadding);
+        textBounds.setHeight(kTextAreaHeight_);
+        textBounds.removeFromLeft(kTextLeftPadding_);
 
         g.setColour(textColour);
         g.setFont(font);
-        g.drawText(text, textBounds, juce::Justification::centredLeft, false);
+        g.drawText(text_, textBounds, juce::Justification::centredLeft, false);
     }
 
     void ModuleHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto lineColour = getLineColour();
         
-        auto lineThickness = kLineThickness;
-        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight;
-        auto verticalOffset = kTextAreaHeight + (lineAreaHeight - lineThickness) / 2.0f;
+        auto lineThickness = kLineThickness_;
+        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
+        auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - lineThickness) / 2.0f;
         
         auto lineBounds = bounds;
         lineBounds.setHeight(lineThickness);
@@ -85,9 +87,9 @@ namespace tss
 
     juce::Colour ModuleHeader::getLineColour() const
     {
-        return (colourVariant == ColourVariant::Blue) 
-            ? theme->getModuleHeaderLineColourBlue() 
-            : theme->getModuleHeaderLineColourOrange();
+        return (colourVariant_ == ColourVariant::Blue) 
+            ? theme_->getModuleHeaderLineColourBlue() 
+            : theme_->getModuleHeaderLineColourOrange();
     }
 }
 

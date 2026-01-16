@@ -40,7 +40,7 @@ void FooterPanel::paint(juce::Graphics& g)
     if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
         return;
     
-    auto bounds = getLocalBounds().reduced(kPadding);
+    auto bounds = getLocalBounds().reduced(kPadding_);
     
     // Couleur du texte selon la sévérité
     g.setColour(getSeverityColour(currentSeverity));
@@ -50,7 +50,7 @@ void FooterPanel::paint(juce::Graphics& g)
     const juce::String icon = getSeverityIcon(currentSeverity);
     if (icon.isNotEmpty())
     {
-        const auto iconBounds = bounds.removeFromLeft(kIconSize + kPadding);
+        const auto iconBounds = bounds.removeFromLeft(kIconSize_ + kPadding_);
         g.drawText(icon, iconBounds, juce::Justification::centredLeft);
     }
     

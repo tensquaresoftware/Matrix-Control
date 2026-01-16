@@ -6,29 +6,29 @@ using tss::Theme;
 
 MiddlePanel::~MiddlePanel() = default;
 
-MiddlePanel::MiddlePanel(Theme& inTheme)
-    : theme(&inTheme)
+MiddlePanel::MiddlePanel(Theme& theme)
+    : theme_(&theme)
 {
     setSize(getWidth(), getHeight());
 }
 
 void MiddlePanel::paint(juce::Graphics& g)
 {
-    if (theme == nullptr)
+    if (theme_ == nullptr)
     {
         return;
     }
 
-    g.fillAll(theme->getPatchEditPanelBackgroundColour());
+    g.fillAll(theme_->getPatchEditPanelBackgroundColour());
 }
 
 void MiddlePanel::resized()
 {
 }
 
-void MiddlePanel::setTheme(Theme& inTheme)
+void MiddlePanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
     repaint();
 }
 

@@ -2,38 +2,39 @@
 
 #include "../../Widgets/Button.h"
 #include "../../Themes/Theme.h"
+#include "../../../Shared/PluginDimensions.h"
 
 using tss::Theme;
 
-HeaderPanel::HeaderPanel(Theme& inTheme)
-    : theme(&inTheme)
-    , blackThemeButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "BLACK")
-    , creamThemeButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "CREAM")
-    , debugThemeButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "DEBUG")
-    , someDisabledButton(inTheme, tss::Button::ButtonWidth::HeaderPanelTheme, "DISABLED")
+HeaderPanel::HeaderPanel(Theme& theme)
+    : theme_(&theme)
+    , blackThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "BLACK")
+    , creamThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "CREAM")
+    , debugThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "DEBUG")
+    , someDisabledButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "DISABLED")
 {
-    addAndMakeVisible(blackThemeButton);
-    addAndMakeVisible(creamThemeButton);
-    addAndMakeVisible(debugThemeButton);
-    someDisabledButton.setEnabled(false);
-    addAndMakeVisible(someDisabledButton);
+    addAndMakeVisible(blackThemeButton_);
+    addAndMakeVisible(creamThemeButton_);
+    addAndMakeVisible(debugThemeButton_);
+    someDisabledButton_.setEnabled(false);
+    addAndMakeVisible(someDisabledButton_);
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(theme->getHeaderPanelBackgroundColour());
+    g.fillAll(theme_->getHeaderPanelBackgroundColour());
 }
 
 void HeaderPanel::resized()
 {
     const auto bounds = getLocalBounds();
     const auto buttonSpacing = getButtonSpacing();
-    const auto buttonWidth = tss::Button::getWidth(tss::Button::ButtonWidth::HeaderPanelTheme);
-    const auto buttonHeight = tss::Button::getHeight();
+    const auto buttonWidth = PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme;
+    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
     const auto buttonY = (getHeight() - buttonHeight) / 2;
     
     const auto blackThemeButtonX = buttonSpacing;
-    blackThemeButton.setBounds(
+    blackThemeButton_.setBounds(
         bounds.getX() + blackThemeButtonX,
         bounds.getY() + buttonY,
         buttonWidth,
@@ -41,7 +42,7 @@ void HeaderPanel::resized()
     );
     
     const auto creamThemeButtonX = blackThemeButtonX + buttonWidth + buttonSpacing;
-    creamThemeButton.setBounds(
+    creamThemeButton_.setBounds(
         bounds.getX() + creamThemeButtonX,
         bounds.getY() + buttonY,
         buttonWidth,
@@ -49,7 +50,7 @@ void HeaderPanel::resized()
     );
     
     const auto debugThemeButtonX = creamThemeButtonX + buttonWidth + buttonSpacing;
-    debugThemeButton.setBounds(
+    debugThemeButton_.setBounds(
         bounds.getX() + debugThemeButtonX,
         bounds.getY() + buttonY,
         buttonWidth,
@@ -57,7 +58,7 @@ void HeaderPanel::resized()
     );
     
     const auto someDisabledButtonX = debugThemeButtonX + buttonWidth + buttonSpacing;
-    someDisabledButton.setBounds(
+    someDisabledButton_.setBounds(
         bounds.getX() + someDisabledButtonX,
         bounds.getY() + buttonY,
         buttonWidth,
@@ -65,13 +66,13 @@ void HeaderPanel::resized()
     );
 }
 
-void HeaderPanel::setTheme(Theme& inTheme)
+void HeaderPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
-    blackThemeButton.setTheme(inTheme);
-    creamThemeButton.setTheme(inTheme);
-    debugThemeButton.setTheme(inTheme);
-    someDisabledButton.setTheme(inTheme);
+    theme_ = &theme;
+    blackThemeButton_.setTheme(theme);
+    creamThemeButton_.setTheme(theme);
+    debugThemeButton_.setTheme(theme);
+    someDisabledButton_.setTheme(theme);
     repaint();
 }
 

@@ -336,6 +336,17 @@ namespace tss
         return getColour(ThemeColours::PopupMenu::kTextHoover);
     }
 
+    // NumberBox colours -------------------------------------------------------
+    juce::Colour Theme::getNumberBoxTextColour() const
+    {
+        return getColour(ThemeColours::NumberBox::kText);
+    }
+
+    juce::Colour Theme::getNumberBoxDotColour() const
+    {
+        return getColour(ThemeColours::NumberBox::kDot);
+    }
+
     
     //=========================================================================
     // FONTS

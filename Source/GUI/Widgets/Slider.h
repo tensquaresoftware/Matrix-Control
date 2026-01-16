@@ -31,16 +31,16 @@ namespace tss
 
         bool keyPressed(const juce::KeyPress& key) override;
 
-        static constexpr int getWidth() { return kWidth; }
-        static constexpr int getHeight() { return kHeight; }
+        static constexpr int getWidth() { return kWidth_; }
+        static constexpr int getHeight() { return kHeight_; }
 
     private:
-        inline constexpr static int kWidth = 60;
-        inline constexpr static int kHeight = 20;
-        inline constexpr static int kBackgroundWidth = 60;
-        inline constexpr static int kBackgroundHeight = 16;
-        inline constexpr static double kDragSensitivity = 0.5;
-        inline constexpr static double kShiftKeyStep = 10.0;
+        inline constexpr static int kWidth_ = 60;
+        inline constexpr static int kHeight_ = 20;
+        inline constexpr static int kBackgroundWidth_ = 60;
+        inline constexpr static int kBackgroundHeight_ = 16;
+        inline constexpr static double kDragSensitivity_ = 0.5;
+        inline constexpr static double kShiftKeyStep_ = 10.0;
 
         Theme* theme = nullptr;
         FocusableWidget focusableWidget;

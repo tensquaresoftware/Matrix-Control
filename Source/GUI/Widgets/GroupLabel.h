@@ -9,59 +9,35 @@ namespace tss
     class GroupLabel : public juce::Component
     {
     public:
-        enum class GroupWidth
-        {
-            InternalPatchesBrowser,
-            InternalPatchesUtility,
-            ComputerPatchesBrowser,
-            ComputerPatchesFolderAndFiles
-        };
-
-        explicit GroupLabel(Theme& inTheme, GroupWidth width, const juce::String& text = juce::String());
+        explicit GroupLabel(Theme& theme, int width, int height, const juce::String& text = juce::String());
         ~GroupLabel() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
 
-        void setText(const juce::String& newText);
-        juce::String getText() const { return labelText; }
+        void setText(const juce::String& text);
+        juce::String getText() const { return labelText_; }
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth(GroupWidth width)
-        {
-            switch (width)
-            {
-                case GroupWidth::InternalPatchesBrowser:
-                    return kInternalPatchesBrowserWidth;
-                case GroupWidth::InternalPatchesUtility:
-                    return kInternalPatchesUtilityWidth;
-                case GroupWidth::ComputerPatchesBrowser:
-                    return kComputerPatchesBrowserWidth;
-                case GroupWidth::ComputerPatchesFolderAndFiles:
-                    return kComputerPatchesFolderAndFilesWidth;
-                default:
-                    return kInternalPatchesBrowserWidth;
-            }
-        }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kInternalPatchesBrowserWidth = 115;
-        inline constexpr static int kInternalPatchesUtilityWidth = 155;
-        inline constexpr static int kComputerPatchesBrowserWidth = 140;
-        inline constexpr static int kComputerPatchesFolderAndFilesWidth = 130;
-        inline constexpr static int kHeight = 40;
-        inline constexpr static float kTopAreaHeight = 15.0f;
-        inline constexpr static float kContentHeight = 20.0f;
-        inline constexpr static float kTextSpacing = 8.0f;
-        inline constexpr static float kLineThickness = 1.0f;
-
-        Theme* theme = nullptr;
-        juce::String labelText;
+        inline constexpr static int kTopAreaHeight_ = 10;
+        inline constexpr static int kContentHeight_ = 20;
+        inline constexpr static int kTextSpacing_ = 8;
+        inline constexpr static int kLineThickness_ = 1;
+        
+        Theme* theme_ = nullptr;
+        int width_;
+        int height_;
+        juce::String labelText_;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
+        void drawLines(juce::Graphics& g, const juce::Rectangle<float>& bounds);
+        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY);
+        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY);
         juce::Rectangle<float> getContentArea(const juce::Rectangle<float>& bounds) const;
         float calculateTextWidth() const;
 

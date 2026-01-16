@@ -9,55 +9,27 @@ namespace tss
     class Label : public juce::Component
     {
     public:
-        enum class LabelWidth
-        {
-            PatchEditModule,
-            MasterEditModule,
-            ModulationBusNumber,
-            PatchManagerBankSelector
-        };
-
-        explicit Label(Theme& inTheme, LabelWidth inWidth, const juce::String& text = juce::String());
+        explicit Label(Theme& theme, int width, int height, const juce::String& text = juce::String());
         ~Label() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
         
-        void setText(const juce::String& newText);
-        juce::String getText() const { return labelText; }
+        void setText(const juce::String& text);
+        juce::String getText() const { return labelText_; }
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth(LabelWidth width)
-        {
-            switch (width)
-            {
-                case LabelWidth::ModulationBusNumber:
-                    return kBusNumberWidth;
-                case LabelWidth::PatchManagerBankSelector:
-                    return kPatchManagerBankSelectWidth;
-                case LabelWidth::PatchEditModule:
-                    return kPatchEditModuleWidth;
-                case LabelWidth::MasterEditModule:
-                    return kMasterEditModuleWidth;
-                default:
-                    return kPatchEditModuleWidth;
-            }
-        }
-
-        static constexpr int getHeight() { return kHeight; }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kBusNumberWidth = 15;
-        inline constexpr static int kPatchManagerBankSelectWidth = 75;
-        inline constexpr static int kPatchEditModuleWidth = 90;
-        inline constexpr static int kMasterEditModuleWidth = 100;
-        inline constexpr static int kHeight = 20;
-        inline constexpr static float kBackgroundPadding = 1.0f;
-        inline constexpr static float kTextLeftPadding = 2.0f;
+        inline constexpr static int kBackgroundPadding_ = 1;
+        inline constexpr static int kTextLeftPadding_ = 2;
 
-        LabelWidth width;
-        Theme* theme = nullptr;
-        juce::String labelText;
+        Theme* theme_ = nullptr;
+        int width_;
+        int height_;
+        juce::String labelText_;
 
         void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);

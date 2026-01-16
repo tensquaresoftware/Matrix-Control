@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -8,106 +9,34 @@
 namespace tss
 {
     class Theme;
-    class ModuleHeader;
-    class Label;
-    class Slider;
-    class ComboBox;
-    class Button;
-    class HorizontalSeparator;
 }
 
 class WidgetFactory;
+class ModuleHeaderPanel;
+class ParameterPanel;
 
 class VcfVcaPanel : public juce::Component
 {
 public:
-    VcfVcaPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
+    VcfVcaPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~VcfVcaPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 150;
-    inline constexpr static int kHeight = 280;
+    inline constexpr static int kWidth_ = 150;
+    inline constexpr static int kHeight_ = 280;
     
-    tss::Theme* theme;
-    juce::AudioProcessorValueTreeState& apvts;
+    tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
-    // Module Name
-    std::unique_ptr<tss::ModuleHeader> vcfVcaModuleHeader;
-
-    // Buttons
-    std::unique_ptr<tss::Button> vcfVcaInitButton;
-
-    // Labels
-    std::unique_ptr<tss::Label> vcfBalanceLabel;
-    std::unique_ptr<tss::Label> vcfFrequencyLabel;
-    std::unique_ptr<tss::Label> vcfFrequencyModByEnv1Label;
-    std::unique_ptr<tss::Label> vcfFrequencyModByPressureLabel;
-    std::unique_ptr<tss::Label> vcfResonanceLabel;
-    std::unique_ptr<tss::Label> vca1VolumeLabel;
-    std::unique_ptr<tss::Label> vca1ModByVelocityLabel;
-    std::unique_ptr<tss::Label> vca2ModByEnv2Label;
-    std::unique_ptr<tss::Label> vcfLeversLabel;
-    std::unique_ptr<tss::Label> vcfKeyboardPortamentoLabel;
-
-    // Sliders
-    std::unique_ptr<tss::Slider> vcfBalanceSlider;
-    std::unique_ptr<tss::Slider> vcfFrequencySlider;
-    std::unique_ptr<tss::Slider> vcfFrequencyModByEnv1Slider;
-    std::unique_ptr<tss::Slider> vcfFrequencyModByPressureSlider;
-    std::unique_ptr<tss::Slider> vcfResonanceSlider;
-    std::unique_ptr<tss::Slider> vca1VolumeSlider;
-    std::unique_ptr<tss::Slider> vca1ModByVelocitySlider;
-    std::unique_ptr<tss::Slider> vca2ModByEnv2Slider;
-
-    // Combo Boxes
-    std::unique_ptr<tss::ComboBox> vcfLeversComboBox;
-    std::unique_ptr<tss::ComboBox> vcfKeyboardPortamentoComboBox;
-
-    // Separators
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator8;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator9;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator10;
-
-    // Attachments
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vcfBalanceAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vcfFrequencyAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vcfFrequencyModByEnv1Attachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vcfFrequencyModByPressureAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vcfResonanceAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vca1VolumeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vca1ModByVelocityAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> vca2ModByEnv2Attachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vcfLeversAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> vcfKeyboardPortamentoAttachment;
-
-    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupInitButton(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& initWidgetId);
-    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
-                                     const juce::String& parameterId,
-                                     std::unique_ptr<tss::Label>& label,
-                                     std::unique_ptr<tss::Slider>& slider,
-                                     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
-                                     std::unique_ptr<tss::HorizontalSeparator>& separator);
-    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
-                                          const juce::String& parameterId,
-                                          std::unique_ptr<tss::Label>& label,
-                                          std::unique_ptr<tss::ComboBox>& comboBox,
-                                          std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>& attachment,
-                                          std::unique_ptr<tss::HorizontalSeparator>& separator);
+    std::unique_ptr<ModuleHeaderPanel> moduleHeaderPanel_;
+    std::vector<std::unique_ptr<ParameterPanel>> parameterPanels_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VcfVcaPanel)
 };

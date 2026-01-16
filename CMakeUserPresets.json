@@ -6,7 +6,7 @@
       "displayName": "Default (Auto-detect platform)",
       "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build-macos",
+      "binaryDir": "${sourceDir}/Builds/macOS",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_OSX_ARCHITECTURES": "arm64",
@@ -17,7 +17,7 @@
       "name": "default-macos",
       "displayName": "macOS (Ninja)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build-macos",
+      "binaryDir": "${sourceDir}/Builds/macOS",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -33,7 +33,7 @@
       "name": "default-windows",
       "displayName": "Windows (Visual Studio 2022)",
       "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/build-windows",
+      "binaryDir": "${sourceDir}/Builds/Windows",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -42,6 +42,21 @@
       "architecture": {
         "value": "x64",
         "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "JUCE_DIR": "${env:JUCE_DIR}"
+      }
+    },
+    {
+      "name": "default-linux",
+      "displayName": "Linux (Ninja)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Builds/Linux",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
@@ -63,6 +78,11 @@
     {
       "name": "default-windows",
       "configurePreset": "default-windows",
+      "configuration": "Debug"
+    },
+    {
+      "name": "default-linux",
+      "configurePreset": "default-linux",
       "configuration": "Debug"
     }
   ]

@@ -4,22 +4,24 @@
 
 namespace tss
 {
-    Button::Button(Theme& inTheme, ButtonWidth width, const juce::String& text)
+    Button::Button(Theme& theme, int width, int height, const juce::String& text)
         : juce::Button(text)
-        , theme(&inTheme)
+        , theme_(&theme)
+        , width_(width)
+        , height_(height)
     {
-        setSize(getWidth(width), kHeight);
+        setSize(width_, height_);
     }
 
-    void Button::setTheme(Theme& inTheme)
+    void Button::setTheme(Theme& theme)
     {
-        theme = &inTheme;
+        theme_ = &theme;
         repaint();
     }
 
     void Button::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
     {
-        if (theme == nullptr)
+        if (theme_ == nullptr)
         {
             return;
         }
@@ -35,7 +37,7 @@ namespace tss
 
     void Button::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto baseColour = theme->getButtonBaseColour();
+        const auto baseColour = theme_->getButtonBaseColour();
         g.setColour(baseColour);
         g.fillRect(bounds);
     }
@@ -46,19 +48,19 @@ namespace tss
         
         if (!enabled)
         {
-            backgroundColour = theme->getButtonBackgroundColourOff();
+            backgroundColour = theme_->getButtonBackgroundColourOff();
         }
         else if (isDown)
         {
-            backgroundColour = theme->getButtonBackgroundColourClicked();
+            backgroundColour = theme_->getButtonBackgroundColourClicked();
         }
         else if (isHighlighted)
         {
-            backgroundColour = theme->getButtonBackgroundColourHoover();
+            backgroundColour = theme_->getButtonBackgroundColourHoover();
         }
         else
         {
-            backgroundColour = theme->getButtonBackgroundColourOn();
+            backgroundColour = theme_->getButtonBackgroundColourOn();
         }
         
         g.setColour(backgroundColour);
@@ -71,26 +73,15 @@ namespace tss
         
         if (!enabled)
         {
-            borderColour = theme->getButtonBorderColourOff();
+            borderColour = theme_->getButtonBorderColourOff();
         }
         else
         {
-            borderColour = theme->getButtonBorderColourOn();
+            borderColour = theme_->getButtonBorderColourOn();
         }
         
         g.setColour(borderColour);
-        
-        const auto borderThickness = kBorderThickness;
-        
-        const auto topBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY(), bounds.getWidth(), borderThickness);
-        const auto bottomBorder = juce::Rectangle<float>(bounds.getX(), bounds.getBottom() - borderThickness, bounds.getWidth(), borderThickness);
-        const auto leftBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
-        const auto rightBorder = juce::Rectangle<float>(bounds.getRight() - borderThickness, bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
-        
-        g.fillRect(topBorder);
-        g.fillRect(bottomBorder);
-        g.fillRect(leftBorder);
-        g.fillRect(rightBorder);
+        g.drawRect(bounds, kBorderThickness_);
     }
 
     void Button::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown)
@@ -105,22 +96,22 @@ namespace tss
         
         if (!enabled)
         {
-            textColour = theme->getButtonTextColourOff();
+            textColour = theme_->getButtonTextColourOff();
         }
         else if (isDown)
         {
-            textColour = theme->getButtonTextColourClicked();
+            textColour = theme_->getButtonTextColourClicked();
         }
         else if (isHighlighted)
         {
-            textColour = theme->getButtonTextColourHoover();
+            textColour = theme_->getButtonTextColourHoover();
         }
         else
         {
-            textColour = theme->getButtonTextColourOn();
+            textColour = theme_->getButtonTextColourOn();
         }
 
-        const auto font = theme->getBaseFont();
+        const auto font = theme_->getBaseFont();
 
         g.setColour(textColour);
         g.setFont(font);

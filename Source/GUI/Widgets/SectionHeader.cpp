@@ -4,23 +4,25 @@
 
 namespace tss
 {
-    SectionHeader::SectionHeader(Theme& inTheme, SectionWidth width, const juce::String& inText, ColourVariant variant)
-        : theme(&inTheme)
-        , text(inText)
-        , colourVariant(variant)
+    SectionHeader::SectionHeader(Theme& theme, int width, int height, const juce::String& text, ColourVariant variant)
+        : width_(width)
+        , height_(height)
+        , theme_(&theme)
+        , text_(text)
+        , colourVariant_(variant)
     {
-        setSize(getWidth(width), kHeight);
+        setSize(width_, height_);
     }
 
-    void SectionHeader::setTheme(Theme& inTheme)
+    void SectionHeader::setTheme(Theme& theme)
     {
-        theme = &inTheme;
+        theme_ = &theme;
         repaint();
     }
 
     void SectionHeader::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
+        if (theme_ == nullptr)
         {
             return;
         }
@@ -36,42 +38,42 @@ namespace tss
 
     void SectionHeader::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        g.setColour(theme->getSectionHeaderBaseColour());
+        g.setColour(theme_->getSectionHeaderBaseColour());
         g.fillRect(bounds);
     }
 
     void SectionHeader::drawContentArea(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto contentArea = getContentArea(bounds);
-        g.setColour(theme->getSectionHeaderContentAreaColour());
+        g.setColour(theme_->getSectionHeaderContentAreaColour());
         g.fillRect(contentArea);
     }
 
     void SectionHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        if (text.isEmpty())
+        if (text_.isEmpty())
         {
             return;
         }
 
-        auto leftLineWidth = kLeftLineWidth;
-        auto textSpacing = kTextSpacing;
+        auto leftLineWidth = kLeftLineWidth_;
+        auto textSpacing = kTextSpacing_;
         auto contentArea = getContentArea(bounds);
         auto textBounds = contentArea;
         textBounds.removeFromLeft(leftLineWidth + textSpacing);
         textBounds.setWidth(calculateTextWidth());
 
-        g.setColour(theme->getSectionHeaderTextColour());
-        g.setFont(theme->getBaseFont().withHeight(20.0f));
-        g.drawText(text, textBounds, juce::Justification::topLeft, false);
+        g.setColour(theme_->getSectionHeaderTextColour());
+        g.setFont(theme_->getBaseFont().withHeight(20.0f));
+        g.drawText(text_, textBounds, juce::Justification::topLeft, false);
     }
 
     void SectionHeader::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         g.setColour(getLineColour());
 
-        auto leftLineWidth = kLeftLineWidth;
-        auto lineHeight = kLineHeight;
+        auto leftLineWidth = kLeftLineWidth_;
+        auto lineHeight = kLineHeight_;
         auto contentArea = getContentArea(bounds);
         auto verticalOffset = (contentArea.getHeight() - lineHeight) / 2.0f;
         
@@ -86,8 +88,8 @@ namespace tss
     void SectionHeader::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         auto textWidth = calculateTextWidth();
-        auto leftLineWidth = kLeftLineWidth;
-        auto textSpacing = kTextSpacing;
+        auto leftLineWidth = kLeftLineWidth_;
+        auto textSpacing = kTextSpacing_;
         auto lineStartX = leftLineWidth + textSpacing + textWidth + textSpacing;
         auto remainingWidth = bounds.getWidth() - lineStartX;
 
@@ -96,11 +98,11 @@ namespace tss
             g.setColour(getLineColour());
 
             auto contentArea = getContentArea(bounds);
-            auto verticalOffset = (contentArea.getHeight() - kLineHeight) / 2.0f;
+            auto verticalOffset = (contentArea.getHeight() - kLineHeight_) / 2.0f;
             
             auto line = contentArea;
             line.removeFromLeft(lineStartX);
-            line.setHeight(kLineHeight);
+            line.setHeight(kLineHeight_);
             line.translate(0.0f, verticalOffset);
             
             g.fillRect(line);
@@ -109,28 +111,28 @@ namespace tss
 
     juce::Colour SectionHeader::getLineColour() const
     {
-        return (colourVariant == ColourVariant::Blue) 
-            ? theme->getSectionHeaderLineColourBlue() 
-            : theme->getSectionHeaderLineColourOrange();
+        return (colourVariant_ == ColourVariant::Blue) 
+            ? theme_->getSectionHeaderLineColourBlue() 
+            : theme_->getSectionHeaderLineColourOrange();
     }
 
     juce::Rectangle<float> SectionHeader::getContentArea(const juce::Rectangle<float>& bounds) const
     {
         auto contentArea = bounds;
-        contentArea.setHeight(kContentHeight);
+        contentArea.setHeight(kContentHeight_);
         return contentArea;
     }
 
     float SectionHeader::calculateTextWidth() const
     {
-        if (text.isEmpty() || theme == nullptr)
+        if (text_.isEmpty() || theme_ == nullptr)
         {
             return 0.0f;
         }
 
-        auto font = theme->getBaseFont().withHeight(20.0f);
+        auto font = theme_->getBaseFont().withHeight(20.0f);
         juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(font, text, 0.0f, 0.0f);
+        glyphArrangement.addLineOfText(font, text_, 0.0f, 0.0f);
         auto bounds = glyphArrangement.getBoundingBox(0, -1, true);
         return bounds.getWidth();
     }

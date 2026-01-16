@@ -7,25 +7,27 @@
 #include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionHeader.h"
 #include "../../../../Shared/PluginDescriptors.h"
+#include "../../../../Shared/PluginDimensions.h"
 #include "../../../Factories/WidgetFactory.h"
 
 using tss::Theme;
 
-PatchManagerPanel::PatchManagerPanel(Theme& inTheme, WidgetFactory& widgetFactory)
-    : theme(&inTheme)
-    , sectionHeader(std::make_unique<tss::SectionHeader>(
-        inTheme,
-        tss::SectionHeader::SectionWidth::PatchManager,
+PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory)
+    : theme_(&theme)
+    , sectionHeader_(std::make_unique<tss::SectionHeader>(
+        theme,
+        PluginDimensions::Widgets::Widths::SectionHeader::kPatchManager,
+        PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchManager),
         tss::SectionHeader::ColourVariant::Blue))
-    , bankUtilityPanel(std::make_unique<BankUtilityPanel>(inTheme, widgetFactory))
-    , internalPatchesPanel(std::make_unique<InternalPatchesPanel>(inTheme, widgetFactory))
-    , computerPatchesPanel(std::make_unique<ComputerPatchesPanel>(inTheme, widgetFactory))
+    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(theme, widgetFactory))
+    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(theme, widgetFactory))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(theme, widgetFactory))
 {
-    addAndMakeVisible(*sectionHeader);
-    addAndMakeVisible(*bankUtilityPanel);
-    addAndMakeVisible(*internalPatchesPanel);
-    addAndMakeVisible(*computerPatchesPanel);
+    addAndMakeVisible(*sectionHeader_);
+    addAndMakeVisible(*bankUtilityPanel_);
+    addAndMakeVisible(*internalPatchesPanel_);
+    addAndMakeVisible(*computerPatchesPanel_);
 
     setSize(getWidth(), getHeight());
 }
@@ -34,7 +36,7 @@ PatchManagerPanel::~PatchManagerPanel() = default;
 
 void PatchManagerPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme)
+    if (auto* currentTheme = theme_)
         g.fillAll(currentTheme->getPatchManagerPanelBackgroundColour());
 }
 
@@ -44,7 +46,7 @@ void PatchManagerPanel::resized()
     int y = 0;
 
     layoutSectionHeader(bounds, y);
-    y += tss::SectionHeader::getHeight();
+    y += PluginDimensions::Widgets::Heights::kSectionHeader;
 
     layoutBankUtilityPanel(bounds, y);
     y += BankUtilityPanel::getHeight();
@@ -57,20 +59,20 @@ void PatchManagerPanel::resized()
 
 void PatchManagerPanel::layoutSectionHeader(const juce::Rectangle<int>& bounds, int y)
 {
-    if (auto* header = sectionHeader.get())
+    if (auto* header = sectionHeader_.get())
     {
         header->setBounds(
             bounds.getX(),
             bounds.getY() + y,
             bounds.getWidth(),
-            tss::SectionHeader::getHeight()
+            PluginDimensions::Widgets::Heights::kSectionHeader
         );
     }
 }
 
 void PatchManagerPanel::layoutBankUtilityPanel(const juce::Rectangle<int>& bounds, int y)
 {
-    if (auto* panel = bankUtilityPanel.get())
+    if (auto* panel = bankUtilityPanel_.get())
     {
         panel->setBounds(
             bounds.getX(),
@@ -83,7 +85,7 @@ void PatchManagerPanel::layoutBankUtilityPanel(const juce::Rectangle<int>& bound
 
 void PatchManagerPanel::layoutInternalPatchesPanel(const juce::Rectangle<int>& bounds, int y)
 {
-    if (auto* panel = internalPatchesPanel.get())
+    if (auto* panel = internalPatchesPanel_.get())
     {
         panel->setBounds(
             bounds.getX(),
@@ -96,7 +98,7 @@ void PatchManagerPanel::layoutInternalPatchesPanel(const juce::Rectangle<int>& b
 
 void PatchManagerPanel::layoutComputerPatchesPanel(const juce::Rectangle<int>& bounds, int y)
 {
-    if (auto* panel = computerPatchesPanel.get())
+    if (auto* panel = computerPatchesPanel_.get())
     {
         panel->setBounds(
             bounds.getX(),
@@ -107,21 +109,21 @@ void PatchManagerPanel::layoutComputerPatchesPanel(const juce::Rectangle<int>& b
     }
 }
 
-void PatchManagerPanel::setTheme(Theme& inTheme)
+void PatchManagerPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* header = sectionHeader.get())
-        header->setTheme(inTheme);
+    if (auto* header = sectionHeader_.get())
+        header->setTheme(theme);
 
-    if (auto* panel = bankUtilityPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = bankUtilityPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = internalPatchesPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = internalPatchesPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = computerPatchesPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = computerPatchesPanel_.get())
+        panel->setTheme(theme);
 
     repaint();
 }

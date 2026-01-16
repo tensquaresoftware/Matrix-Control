@@ -7,26 +7,28 @@
 #include "../../../Themes/Theme.h"
 #include "../../../Widgets/SectionHeader.h"
 #include "../../../../Shared/PluginDescriptors.h"
+#include "../../../../Shared/PluginDimensions.h"
 #include "../../../../Shared/PluginIDs.h"
 #include "../../../../GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
-MasterEditPanel::MasterEditPanel(Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme(&inTheme)
-    , sectionHeader(std::make_unique<tss::SectionHeader>(
-        inTheme, 
-        tss::SectionHeader::SectionWidth::MasterEdit, 
+MasterEditPanel::MasterEditPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : theme_(&theme)
+    , sectionHeader_(std::make_unique<tss::SectionHeader>(
+        theme, 
+        PluginDimensions::Widgets::Widths::SectionHeader::kMasterEdit,
+        PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMasterEdit),
         tss::SectionHeader::ColourVariant::Orange))
-    , midiPanel(std::make_unique<MidiPanel>(inTheme, widgetFactory, apvts))
-    , vibratoPanel(std::make_unique<VibratoPanel>(inTheme, widgetFactory, apvts))
-    , miscPanel(std::make_unique<MiscPanel>(inTheme, widgetFactory, apvts))
+    , midiPanel_(std::make_unique<MidiPanel>(theme, widgetFactory, apvts))
+    , vibratoPanel_(std::make_unique<VibratoPanel>(theme, widgetFactory, apvts))
+    , miscPanel_(std::make_unique<MiscPanel>(theme, widgetFactory, apvts))
 {
-    addAndMakeVisible(*sectionHeader);
-    addAndMakeVisible(*midiPanel);
-    addAndMakeVisible(*vibratoPanel);
-    addAndMakeVisible(*miscPanel);
+    addAndMakeVisible(*sectionHeader_);
+    addAndMakeVisible(*midiPanel_);
+    addAndMakeVisible(*vibratoPanel_);
+    addAndMakeVisible(*miscPanel_);
 
     setSize(getWidth(), getHeight());
 }
@@ -35,7 +37,7 @@ MasterEditPanel::~MasterEditPanel() = default;
 
 void MasterEditPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme)
+    if (auto* currentTheme = theme_)
         g.fillAll(currentTheme->getMasterEditPanelBackgroundColour());
 }
 
@@ -44,15 +46,15 @@ void MasterEditPanel::resized()
     const auto bounds = getLocalBounds();
     
     const auto sectionHeaderY = 0;
-    sectionHeader->setBounds(
+    sectionHeader_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + sectionHeaderY,
         bounds.getWidth(),
-        tss::SectionHeader::getHeight()
+        PluginDimensions::Widgets::Heights::kSectionHeader
     );
     
-    const auto midiPanelY = sectionHeaderY + tss::SectionHeader::getHeight();
-    midiPanel->setBounds(
+    const auto midiPanelY = sectionHeaderY + PluginDimensions::Widgets::Heights::kSectionHeader;
+    midiPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + midiPanelY,
         MidiPanel::getWidth(),
@@ -60,7 +62,7 @@ void MasterEditPanel::resized()
     );
     
     const auto vibratoPanelY = midiPanelY + MidiPanel::getHeight();
-    vibratoPanel->setBounds(
+    vibratoPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + vibratoPanelY,
         VibratoPanel::getWidth(),
@@ -68,7 +70,7 @@ void MasterEditPanel::resized()
     );
     
     const auto miscPanelY = vibratoPanelY + VibratoPanel::getHeight();
-    miscPanel->setBounds(
+    miscPanel_->setBounds(
         bounds.getX() + 0,
         bounds.getY() + miscPanelY,
         MiscPanel::getWidth(),
@@ -76,21 +78,21 @@ void MasterEditPanel::resized()
     );
 }
 
-void MasterEditPanel::setTheme(Theme& inTheme)
+void MasterEditPanel::setTheme(Theme& theme)
 {
-    theme = &inTheme;
+    theme_ = &theme;
 
-    if (auto* header = sectionHeader.get())
-        header->setTheme(inTheme);
+    if (auto* header = sectionHeader_.get())
+        header->setTheme(theme);
 
-    if (auto* panel = midiPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = midiPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = vibratoPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = vibratoPanel_.get())
+        panel->setTheme(theme);
 
-    if (auto* panel = miscPanel.get())
-        panel->setTheme(inTheme);
+    if (auto* panel = miscPanel_.get())
+        panel->setTheme(theme);
 
     repaint();
 }

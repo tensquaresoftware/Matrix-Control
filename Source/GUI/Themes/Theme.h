@@ -109,6 +109,10 @@ namespace tss
         juce::Colour getPopupMenuTextColour() const;
         juce::Colour getPopupMenuBackgroundHooverColour() const;
         juce::Colour getPopupMenuTextHooverColour() const;
+
+        // NumberBox colours ---------------------------------------------------
+        juce::Colour getNumberBoxTextColour() const;
+        juce::Colour getNumberBoxDotColour() const;
         
         
         //---------------------------------------------------------------------

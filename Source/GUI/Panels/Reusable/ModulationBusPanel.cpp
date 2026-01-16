@@ -1,0 +1,198 @@
+#include "ModulationBusPanel.h"
+
+#include "../../Themes/Theme.h"
+#include "../../Widgets/Label.h"
+#include "../../Widgets/ComboBox.h"
+#include "../../Widgets/Slider.h"
+#include "../../Widgets/Button.h"
+#include "../../Widgets/HorizontalSeparator.h"
+#include "../../../Shared/PluginDescriptors.h"
+#include "../../Factories/WidgetFactory.h"
+
+using tss::Theme;
+
+ModulationBusPanel::~ModulationBusPanel() = default;
+
+ModulationBusPanel::ModulationBusPanel(int busNumber,
+                                      WidgetFactory& factory,
+                                      Theme& theme,
+                                      juce::AudioProcessorValueTreeState& apvts,
+                                      const juce::String& sourceParamId,
+                                      const juce::String& amountParamId,
+                                      const juce::String& destinationParamId,
+                                      const juce::String& busId)
+    : apvts_(apvts)
+    , busId_(busId)
+{
+    createBusNumberLabel(busNumber, theme);
+    createSourceComboBox(factory, theme, sourceParamId, apvts);
+    createAmountSlider(factory, theme, amountParamId, apvts);
+    createDestinationComboBox(busNumber, theme, destinationParamId, apvts);
+    createInitButton(theme);
+    createSeparator(theme);
+}
+
+void ModulationBusPanel::createBusNumberLabel(int busNumber, Theme& theme)
+{
+    busNumberLabel_ = std::make_unique<tss::Label>(
+        theme,
+        PluginDimensions::Widgets::Widths::Label::kModulationBusNumber,
+        PluginDimensions::Widgets::Heights::kLabel,
+        juce::String(busNumber));
+    addAndMakeVisible(*busNumberLabel_);
+}
+
+void ModulationBusPanel::createSourceComboBox(WidgetFactory& factory, Theme& theme, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts)
+{
+    sourceComboBox_ = factory.createChoiceParameterComboBox(
+        sourceParamId,
+        theme,
+        PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationSource,
+        PluginDimensions::Widgets::Heights::kComboBox);
+    sourceAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        sourceParamId,
+        *sourceComboBox_);
+    addAndMakeVisible(*sourceComboBox_);
+}
+
+void ModulationBusPanel::createAmountSlider(WidgetFactory& factory, Theme& theme, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
+{
+    amountSlider_ = factory.createIntParameterSlider(amountParamId, theme);
+    amountAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        apvts,
+        amountParamId,
+        *amountSlider_);
+    addAndMakeVisible(*amountSlider_);
+}
+
+void ModulationBusPanel::createDestinationComboBox(int busNumber, Theme& theme, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
+{
+    const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
+    const auto& destinationDesc = PluginDescriptors::kModulationBusChoiceParameters[busNumberAsSizeT][1];
+
+    destinationComboBox_ = std::make_unique<tss::ComboBox>(
+        theme,
+        PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationDestination,
+        PluginDimensions::Widgets::Heights::kComboBox);
+    for (const auto& choice : destinationDesc.choices)
+    {
+        destinationComboBox_->addItem(choice, destinationComboBox_->getNumItems() + 1);
+    }
+    destinationComboBox_->setSelectedItemIndex(destinationDesc.defaultIndex);
+    destinationAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+        apvts,
+        destinationParamId,
+        *destinationComboBox_);
+    addAndMakeVisible(*destinationComboBox_);
+}
+
+void ModulationBusPanel::createInitButton(Theme& theme)
+{
+    initButton_ = std::make_unique<tss::Button>(
+        theme,
+        PluginDimensions::Widgets::Widths::Button::kInit,
+        PluginDimensions::Widgets::Heights::kButton,
+        PluginDescriptors::StandaloneWidgetDisplayNames::kShortInitLabel);
+    initButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(busId_, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+    };
+    addAndMakeVisible(*initButton_);
+}
+
+void ModulationBusPanel::createSeparator(Theme& theme)
+{
+    separator_ = std::make_unique<tss::HorizontalSeparator>(
+        theme,
+        PluginDimensions::Widgets::Widths::HorizontalSeparator::kMatrixModulationBus,
+        PluginDimensions::Widgets::Heights::kHorizontalSeparator);
+    addAndMakeVisible(*separator_);
+}
+
+void ModulationBusPanel::paint(juce::Graphics&)
+{
+}
+
+void ModulationBusPanel::resized()
+{
+    const auto widgetRowHeight = PluginDimensions::Widgets::Heights::kLabel;
+    int y = 0;
+
+    layoutWidgetRow();
+    y += widgetRowHeight;
+    layoutSeparator(y);
+}
+
+void ModulationBusPanel::layoutWidgetRow()
+{
+    const auto busNumberLabelWidth = PluginDimensions::Widgets::Widths::Label::kModulationBusNumber;
+    const auto busNumberLabelHeight = PluginDimensions::Widgets::Heights::kLabel;
+    const auto sourceComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationSource;
+    const auto sourceComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+    const auto amountSliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
+    const auto amountSliderHeight = tss::Slider::getHeight();
+    const auto destinationComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationDestination;
+    const auto destinationComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
+    const auto initButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;
+    const auto initButtonHeight = PluginDimensions::Widgets::Heights::kButton;
+    const int y = 0;
+
+    int x = 0;
+
+    if (auto* label = busNumberLabel_.get())
+        label->setBounds(x, y, busNumberLabelWidth, busNumberLabelHeight);
+    x += busNumberLabelWidth;
+
+    if (auto* comboBox = sourceComboBox_.get())
+        comboBox->setBounds(x, y, sourceComboBoxWidth, sourceComboBoxHeight);
+    x += sourceComboBoxWidth + kSpacing_;
+
+    if (auto* slider = amountSlider_.get())
+        slider->setBounds(x, y, amountSliderWidth, amountSliderHeight);
+    x += amountSliderWidth + kSpacing_;
+
+    if (auto* comboBox = destinationComboBox_.get())
+        comboBox->setBounds(x, y, destinationComboBoxWidth, destinationComboBoxHeight);
+    x += destinationComboBoxWidth + kSpacing_;
+
+    if (auto* button = initButton_.get())
+        button->setBounds(x, y, initButtonWidth, initButtonHeight);
+}
+
+void ModulationBusPanel::layoutSeparator(int y)
+{
+    const auto separatorWidth = PluginDimensions::Widgets::Widths::HorizontalSeparator::kMatrixModulationBus;
+    const auto separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+
+    if (auto* separator = separator_.get())
+        separator->setBounds(0, y, separatorWidth, separatorHeight);
+}
+
+void ModulationBusPanel::setTheme(Theme& theme)
+{
+    if (auto* label = busNumberLabel_.get())
+        label->setTheme(theme);
+
+    if (auto* comboBox = sourceComboBox_.get())
+        comboBox->setTheme(theme);
+
+    if (auto* slider = amountSlider_.get())
+        slider->setTheme(theme);
+
+    if (auto* comboBox = destinationComboBox_.get())
+        comboBox->setTheme(theme);
+
+    if (auto* button = initButton_.get())
+        button->setTheme(theme);
+
+    if (auto* separator = separator_.get())
+        separator->setTheme(theme);
+
+    repaint();
+}
+
+int ModulationBusPanel::getHeight()
+{
+    return PluginDimensions::Widgets::Heights::kLabel + PluginDimensions::Widgets::Heights::kHorizontalSeparator;
+}

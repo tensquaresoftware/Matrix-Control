@@ -20,72 +20,71 @@ class WidgetFactory;
 class MiscPanel : public juce::Component
 {
 public:
-    MiscPanel(tss::Theme& inTheme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& inApvts);
+    MiscPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MiscPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return kWidth; }
-    static int getHeight() { return kHeight; }
+    static int getWidth() { return kWidth_; }
+    static int getHeight() { return kHeight_; }
 
 private:
-    inline constexpr static int kWidth = 160;
-    inline constexpr static int kHeight = 205;
+    inline constexpr static int kWidth_ = 160;
+    inline constexpr static int kHeight_ = 205;
     
-    tss::Theme* theme;
-    juce::AudioProcessorValueTreeState& apvts;
+    tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
     // Module Name
-    std::unique_ptr<tss::ModuleHeader> miscModuleHeader;
+    std::unique_ptr<tss::ModuleHeader> miscModuleHeader_;
 
     // Labels
-    std::unique_ptr<tss::Label> masterTuneLabel;
-    std::unique_ptr<tss::Label> masterTransposeLabel;
-    std::unique_ptr<tss::Label> bendRangeLabel;
-    std::unique_ptr<tss::Label> unisonEnableLabel;
-    std::unique_ptr<tss::Label> volumeInvertEnableLabel;
-    std::unique_ptr<tss::Label> bankLockEnableLabel;
-    std::unique_ptr<tss::Label> memoryProtectEnableLabel;
+    std::unique_ptr<tss::Label> masterTuneLabel_;
+    std::unique_ptr<tss::Label> masterTransposeLabel_;
+    std::unique_ptr<tss::Label> bendRangeLabel_;
+    std::unique_ptr<tss::Label> unisonEnableLabel_;
+    std::unique_ptr<tss::Label> volumeInvertEnableLabel_;
+    std::unique_ptr<tss::Label> bankLockEnableLabel_;
+    std::unique_ptr<tss::Label> memoryProtectEnableLabel_;
 
     // Sliders
-    std::unique_ptr<tss::Slider> masterTuneSlider;
-    std::unique_ptr<tss::Slider> masterTransposeSlider;
-    std::unique_ptr<tss::Slider> bendRangeSlider;
+    std::unique_ptr<tss::Slider> masterTuneSlider_;
+    std::unique_ptr<tss::Slider> masterTransposeSlider_;
+    std::unique_ptr<tss::Slider> bendRangeSlider_;
 
     // Combo Boxes
-    std::unique_ptr<tss::ComboBox> unisonEnableComboBox;
-    std::unique_ptr<tss::ComboBox> volumeInvertEnableComboBox;
-    std::unique_ptr<tss::ComboBox> bankLockEnableComboBox;
-    std::unique_ptr<tss::ComboBox> memoryProtectEnableComboBox;
+    std::unique_ptr<tss::ComboBox> unisonEnableComboBox_;
+    std::unique_ptr<tss::ComboBox> volumeInvertEnableComboBox_;
+    std::unique_ptr<tss::ComboBox> bankLockEnableComboBox_;
+    std::unique_ptr<tss::ComboBox> memoryProtectEnableComboBox_;
 
     // Separators
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6;
-    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator1_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator2_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator3_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator4_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator5_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator6_;
+    std::unique_ptr<tss::HorizontalSeparator> horizontalSeparator7_;
 
-    // Attachments
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterTuneAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterTransposeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bendRangeAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> unisonEnableAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> volumeInvertEnableAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> bankLockEnableAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> memoryProtectEnableAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterTuneAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterTransposeAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bendRangeAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> unisonEnableAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> volumeInvertEnableAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> bankLockEnableAttachment_;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> memoryProtectEnableAttachment_;
 
-    void setupModuleHeader(tss::Theme& inTheme, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupIntParameterWithSlider(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+    void setupModuleHeader(tss::Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupIntParameterWithSlider(tss::Theme& theme, WidgetFactory& widgetFactory,
                                      const juce::String& parameterId,
                                      std::unique_ptr<tss::Label>& label,
                                      std::unique_ptr<tss::Slider>& slider,
                                      std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>& attachment,
                                      std::unique_ptr<tss::HorizontalSeparator>& separator);
-    void setupChoiceParameterWithComboBox(tss::Theme& inTheme, WidgetFactory& widgetFactory,
+    void setupChoiceParameterWithComboBox(tss::Theme& theme, WidgetFactory& widgetFactory,
                                           const juce::String& parameterId,
                                           std::unique_ptr<tss::Label>& label,
                                           std::unique_ptr<tss::ComboBox>& comboBox,

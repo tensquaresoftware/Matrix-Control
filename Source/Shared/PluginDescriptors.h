@@ -1,5 +1,10 @@
 #pragma once
 
+// PluginDescriptors.h
+// Central file for plugin descriptor structures and declarations
+// Contains ONLY data structures and declarations - no code/logic
+// Single source of truth for plugin structure description
+
 #include <array>
 #include <vector>
 
@@ -8,10 +13,6 @@
 #include "PluginIDs.h"
 #include "PluginDisplayNames.h"
 
-// PluginDescriptors.h
-// Central file for plugin descriptor structures and declarations
-// Contains ONLY data structures and declarations - no code/logic
-// Single source of truth for plugin structure description
 
 namespace PluginDescriptors
 {
@@ -20,11 +21,11 @@ namespace PluginDescriptors
 // Constants
 // ============================================================================
 
+// Used for root groups (= Plugin Master & Patch Modes) that have no parent
+constexpr const char* kNoParentId = "";
+
 // Used for modulation bus parameters that don't have a SysEx ID
 constexpr int kNoSysExId = -1;
-
-// Used for root groups (= Plugin Modes) that have no parent
-constexpr const char* kNoParentId = "";
 
 // ============================================================================
 // APVTS Group Descriptors
