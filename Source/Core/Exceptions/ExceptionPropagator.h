@@ -2,7 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-#include "WidgetFactoryExceptions.h"
+#include "../../GUI/Exceptions/WidgetFactoryExceptions.h"
 
 class ExceptionPropagator
 {
