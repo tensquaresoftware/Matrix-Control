@@ -113,6 +113,24 @@ namespace tss
         // NumberBox colours ---------------------------------------------------
         juce::Colour getNumberBoxTextColour() const;
         juce::Colour getNumberBoxDotColour() const;
+
+        // EnvelopeDisplay colours ----------------------------------------------
+        juce::Colour getEnvelopeDisplayBaseColour() const;
+        juce::Colour getEnvelopeDisplayBackgroundColour() const;
+        juce::Colour getEnvelopeDisplayBorderColour() const;
+        juce::Colour getEnvelopeDisplayEnvelopeColour() const;
+
+        // PatchNameDisplay colours ---------------------------------------------
+        juce::Colour getPatchNameDisplayBaseColour() const;
+        juce::Colour getPatchNameDisplayBackgroundColour() const;
+        juce::Colour getPatchNameDisplayBorderColour() const;
+        juce::Colour getPatchNameDisplayTextColour() const;
+
+        // TrackGeneratorDisplay colours ----------------------------------------
+        juce::Colour getTrackGeneratorDisplayBaseColour() const;
+        juce::Colour getTrackGeneratorDisplayBackgroundColour() const;
+        juce::Colour getTrackGeneratorDisplayBorderColour() const;
+        juce::Colour getTrackGeneratorDisplayShaperColour() const;
         
         
         //---------------------------------------------------------------------

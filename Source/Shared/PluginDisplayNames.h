@@ -304,6 +304,9 @@ namespace PluginDescriptors
         constexpr const char* kLfo2Copy                     = kShortCopyLabel;
         constexpr const char* kLfo2Paste                    = kShortPasteLabel;
 
+        // Patch Edit | Displays Standalone Widget Display Names
+        constexpr const char* kDefaultPatchName             = "--------";
+
         // Patch Manager | Bank Utility Standalone Widget Display Names
         constexpr const char* kBankSelector                 = "BANK SELECTOR";
         constexpr const char* kUnlockBank                   = "UNLOCK";

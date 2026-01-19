@@ -347,6 +347,69 @@ namespace tss
         return getColour(ThemeColours::NumberBox::kDot);
     }
 
+    // EnvelopeDisplay colours -------------------------------------------------
+    juce::Colour Theme::getEnvelopeDisplayBaseColour() const
+    {
+        return getColour(ThemeColours::EnvelopeDisplay::kBase);
+    }
+
+    juce::Colour Theme::getEnvelopeDisplayBackgroundColour() const
+    {
+        return getColour(ThemeColours::EnvelopeDisplay::kBackground);
+    }
+
+    juce::Colour Theme::getEnvelopeDisplayBorderColour() const
+    {
+        return getColour(ThemeColours::EnvelopeDisplay::kBorder);
+    }
+
+    juce::Colour Theme::getEnvelopeDisplayEnvelopeColour() const
+    {
+        return getColour(ThemeColours::EnvelopeDisplay::kEnvelope);
+    }
+
+    // PatchNameDisplay colours ------------------------------------------------
+    juce::Colour Theme::getPatchNameDisplayBaseColour() const
+    {
+        return getColour(ThemeColours::PatchNameDisplay::kBase);
+    }
+
+    juce::Colour Theme::getPatchNameDisplayBackgroundColour() const
+    {
+        return getColour(ThemeColours::PatchNameDisplay::kBackground);
+    }
+
+    juce::Colour Theme::getPatchNameDisplayBorderColour() const
+    {
+        return getColour(ThemeColours::PatchNameDisplay::kBorder);
+    }
+
+    juce::Colour Theme::getPatchNameDisplayTextColour() const
+    {
+        return getColour(ThemeColours::PatchNameDisplay::kText);
+    }
+
+    // TrackGeneratorDisplay colours -------------------------------------------
+    juce::Colour Theme::getTrackGeneratorDisplayBaseColour() const
+    {
+        return getColour(ThemeColours::TrackGeneratorDisplay::kBase);
+    }
+
+    juce::Colour Theme::getTrackGeneratorDisplayBackgroundColour() const
+    {
+        return getColour(ThemeColours::TrackGeneratorDisplay::kBackground);
+    }
+
+    juce::Colour Theme::getTrackGeneratorDisplayBorderColour() const
+    {
+        return getColour(ThemeColours::TrackGeneratorDisplay::kBorder);
+    }
+
+    juce::Colour Theme::getTrackGeneratorDisplayShaperColour() const
+    {
+        return getColour(ThemeColours::TrackGeneratorDisplay::kShaper);
+    }
+
     
     //=========================================================================
     // FONTS

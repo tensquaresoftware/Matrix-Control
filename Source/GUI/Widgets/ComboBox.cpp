@@ -157,7 +157,8 @@ namespace tss
     {
         auto textBounds = bounds;
         textBounds.removeFromLeft(kLeftPadding_);
-        textBounds.removeFromRight(kTriangleBaseSize_ + kRightPadding_);
+        textBounds.removeFromRight(kTriangleBaseSize_);
+        textBounds.removeFromRight(kRightPadding_);
         return textBounds;
     }
 
@@ -204,7 +205,7 @@ namespace tss
             return bounds;
         }
         
-        const auto backgroundWidth = static_cast<float>(width_ - static_cast<int>(kLeftPadding_ + kRightPadding_));
+        const auto backgroundWidth = static_cast<float>(width_);
         const auto backgroundHeight = static_cast<float>(kBackgroundHeight_);
         const auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;
         const auto backgroundY = (bounds.getHeight() - backgroundHeight) / 2.0f;

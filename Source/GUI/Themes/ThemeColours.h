@@ -268,29 +268,29 @@ namespace tss
 
             inline constexpr ColourElement kBackgroundHoover = {
                 "ButtonBackgroundHoover",
-                ColourChart::kDarkGrey1,
-                ColourChart::kDarkGrey1,
+                ColourChart::kBlack,
+                ColourChart::kLightGrey2,
                 ColourChart::kTransparent
             };
 
             inline constexpr ColourElement kTextHoover = {
                 "ButtonTextHoover",
                 ColourChart::kLightGrey2,
-                ColourChart::kLightGrey2,
+                ColourChart::kDarkGrey1,
                 ColourChart::kTransparent
             };
 
             inline constexpr ColourElement kBackgroundClicked = {
                 "ButtonBackgroundClicked",
-                ColourChart::kLightGrey2,
+                ColourChart::kBlack,
                 ColourChart::kLightGrey2,
                 ColourChart::kTransparent
             };
 
             inline constexpr ColourElement kTextClicked = {
                 "ButtonTextClicked",
-                ColourChart::kDarkGrey1,
-                ColourChart::kBlack,
+                ColourChart::kRed,
+                ColourChart::kRed,
                 ColourChart::kTransparent
             };
 
@@ -527,6 +527,99 @@ namespace tss
                 "NumberBoxDot",
                 ColourChart::kRed,
                 ColourChart::kRed,
+                ColourChart::kTransparent
+            };
+        }
+
+        namespace EnvelopeDisplay
+        {
+            inline constexpr ColourElement kBase = {
+                "EnvelopeDisplayBase",
+                ColourChart::kTransparent,
+                ColourChart::kTransparent,
+                ColourChart::kRed
+            };
+
+            inline constexpr ColourElement kBackground = {
+                "EnvelopeDisplayBackground",
+                ColourChart::kBlack,
+                ColourChart::kLightGrey2,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kBorder = {
+                "EnvelopeDisplayBorder",
+                ColourChart::kDarkGrey3,
+                ColourChart::kDarkGrey4,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kEnvelope = {
+                "EnvelopeDisplayEnvelope",
+                ColourChart::kGreen4,
+                ColourChart::kGreen4,
+                ColourChart::kTransparent
+            };
+        }
+
+        namespace PatchNameDisplay
+        {
+            inline constexpr ColourElement kBase = {
+                "PatchNameDisplayBase",
+                ColourChart::kTransparent,
+                ColourChart::kTransparent,
+                ColourChart::kRed
+            };
+
+            inline constexpr ColourElement kBackground = {
+                "PatchNameDisplayBackground",
+                ColourChart::kBlack,
+                ColourChart::kLightGrey2,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kBorder = {
+                "PatchNameDisplayBorder",
+                ColourChart::kDarkGrey3,
+                ColourChart::kDarkGrey4,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kText = {
+                "PatchNameDisplayText",
+                ColourChart::kRed,
+                ColourChart::kRed,
+                ColourChart::kTransparent
+            };
+        }
+
+        namespace TrackGeneratorDisplay
+        {
+            inline constexpr ColourElement kBase = {
+                "TrackGeneratorDisplayBase",
+                ColourChart::kTransparent,
+                ColourChart::kTransparent,
+                ColourChart::kRed
+            };
+
+            inline constexpr ColourElement kBackground = {
+                "TrackGeneratorDisplayBackground",
+                ColourChart::kBlack,
+                ColourChart::kLightGrey2,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kBorder = {
+                "TrackGeneratorDisplayBorder",
+                ColourChart::kDarkGrey3,
+                ColourChart::kDarkGrey4,
+                ColourChart::kTransparent
+            };
+
+            inline constexpr ColourElement kShaper = {
+                "TrackGeneratorDisplayShaper",
+                ColourChart::kGreen4,
+                ColourChart::kGreen4,
                 ColourChart::kTransparent
             };
         }

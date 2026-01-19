@@ -45,8 +45,8 @@ namespace tss
     private:
         inline constexpr static int kVerticalMargin_ = 4;
         inline constexpr static int kBackgroundHeight_ = 16;
-        inline constexpr static int kLeftPadding_ = 3;
-        inline constexpr static int kRightPadding_ = 3;
+        inline constexpr static int kLeftPadding_ = 4;
+        inline constexpr static int kRightPadding_ = 4;
         inline constexpr static int kBorderThickness_ = 1;
         inline constexpr static int kBorderThicknessButtonLike_ = 2;
         inline constexpr static int kTriangleBaseSize_ = 7;

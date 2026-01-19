@@ -93,7 +93,7 @@ namespace PluginDimensions
                 namespace ChildPanels
                 {
                     inline constexpr int kWidth = 150;
-                    inline constexpr int kHeight = 80;
+                    inline constexpr int kHeight = 110; //80;
                 }
             }
             

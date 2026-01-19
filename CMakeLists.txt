@@ -101,6 +101,7 @@ set(PLUGIN_SOURCES
     # GUI - Widgets
     Source/GUI/Widgets/Button.cpp
     Source/GUI/Widgets/ComboBox.cpp
+    Source/GUI/Widgets/EnvelopeDisplay.cpp
     Source/GUI/Widgets/FocusableWidget.cpp
     Source/GUI/Widgets/GroupLabel.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
@@ -109,9 +110,11 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/VerticalSeparator.cpp
     Source/GUI/Widgets/Label.cpp
     Source/GUI/Widgets/HorizontalSeparator.cpp
+    Source/GUI/Widgets/PatchNameDisplay.cpp
     Source/GUI/Widgets/PopupMenu.cpp
     Source/GUI/Widgets/SectionHeader.cpp
     Source/GUI/Widgets/Slider.cpp
+    Source/GUI/Widgets/TrackGeneratorDisplay.cpp
     
     # Loggers
     Source/Core/Loggers/MidiLogger.cpp
