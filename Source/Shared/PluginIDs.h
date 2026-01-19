@@ -336,6 +336,15 @@ namespace StandaloneWidgetIds
     constexpr const char* kLfo2Copy                   = "lfo2Copy";
     constexpr const char* kLfo2Paste                  = "lfo2Paste";
 
+    // Master Edit | MIDI Standalone Widgets IDs
+    constexpr const char* kMidiInit                   = "midiInit";
+
+    // Master Edit | VIBRATO Standalone Widgets IDs
+    constexpr const char* kVibratoInit                = "vibratoInit";
+
+    // Master Edit | MISC Standalone Widgets IDs
+    constexpr const char* kMiscInit                   = "miscInit";
+
     // Patch Manager | Bank Utility Standalone Widgets IDs
     constexpr const char* kUnlockBank                 = "unlockBank";
     constexpr const char* kSelectBank0                = "selectBank0";

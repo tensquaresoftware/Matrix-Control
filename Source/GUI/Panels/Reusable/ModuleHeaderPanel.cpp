@@ -14,11 +14,13 @@ ModuleHeaderPanel::ModuleHeaderPanel(Theme& theme,
                                      WidgetFactory& factory,
                                      const juce::String& moduleId,
                                      ButtonSet buttonSet,
+                                     ModuleType moduleType,
                                      juce::AudioProcessorValueTreeState& apvts,
                                      const juce::String& initWidgetId,
                                      const juce::String& copyWidgetId,
                                      const juce::String& pasteWidgetId)
     : buttonSet_(buttonSet)
+    , moduleType_(moduleType)
     , apvts_(apvts)
 {
     createModuleHeader(theme, factory, moduleId);
@@ -30,11 +32,20 @@ ModuleHeaderPanel::ModuleHeaderPanel(Theme& theme,
 
 void ModuleHeaderPanel::createModuleHeader(Theme& theme, WidgetFactory& factory, const juce::String& moduleId)
 {
+    const auto moduleHeaderWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule;
+    
+    const auto colourVariant = (moduleType_ == ModuleType::PatchEdit)
+        ? tss::ModuleHeader::ColourVariant::Blue
+        : tss::ModuleHeader::ColourVariant::Orange;
+
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
         theme,
         factory.getGroupDisplayName(moduleId),
-        PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule,
-        PluginDimensions::Widgets::Heights::kModuleHeader);
+        moduleHeaderWidth,
+        PluginDimensions::Widgets::Heights::kModuleHeader,
+        colourVariant);
     addAndMakeVisible(*moduleHeader_);
 }
 
@@ -83,7 +94,9 @@ void ModuleHeaderPanel::resized()
 
 void ModuleHeaderPanel::layoutModuleHeader()
 {
-    const auto moduleHeaderWidth = PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule;
+    const auto moduleHeaderWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::ModuleHeader::kMasterEditModule;
     const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;
     const int y = 0;
 

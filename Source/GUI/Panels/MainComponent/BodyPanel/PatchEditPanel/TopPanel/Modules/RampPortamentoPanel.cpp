@@ -17,6 +17,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ModuleIds::kRampPortamento,
         ModuleHeaderPanel::ButtonSet::InitOnly,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kRampPortamentoInit);
     addAndMakeVisible(*moduleHeaderPanel_);
@@ -26,6 +27,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kRamp1Rate,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -34,6 +36,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kRamp1Trigger,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -42,6 +45,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kRamp2Rate,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -50,6 +54,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kRamp2Trigger,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -58,6 +63,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kPortamentoRate,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -66,6 +72,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kPortamentoModByVelocity,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -74,6 +81,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kPortamentoMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -82,6 +90,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kPortamentoLegato,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -90,6 +99,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         PluginDescriptors::ParameterIds::kPortamentoKeyboardMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -98,6 +108,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
         widgetFactory,
         juce::String(),
         ParameterPanel::ParameterType::None,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 

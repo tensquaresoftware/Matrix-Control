@@ -20,11 +20,13 @@ class ModuleHeaderPanel : public juce::Component
 {
 public:
     enum class ButtonSet { InitCopyPaste, InitOnly };
+    enum class ModuleType { PatchEdit, MasterEdit };
 
     ModuleHeaderPanel(tss::Theme& theme,
                      WidgetFactory& factory,
                      const juce::String& moduleId,
                      ButtonSet buttonSet,
+                     ModuleType moduleType,
                      juce::AudioProcessorValueTreeState& apvts,
                      const juce::String& initWidgetId,
                      const juce::String& copyWidgetId = juce::String(),
@@ -45,6 +47,7 @@ private:
     void layoutInitCopyPasteButtons();
 
     ButtonSet buttonSet_;
+    ModuleType moduleType_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
     std::unique_ptr<tss::Button> initButton_;

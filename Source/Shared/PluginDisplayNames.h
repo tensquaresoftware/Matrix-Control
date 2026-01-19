@@ -251,6 +251,15 @@ namespace PluginDescriptors
         constexpr const char* kShortCopyLabel               = "C";
         constexpr const char* kShortPasteLabel              = "P";
 
+        // Master Edit | MIDI Standalone Widget Display Names
+        constexpr const char* kMidiInit                     = kShortInitLabel;
+
+        // Master Edit | VIBRATO Standalone Widget Display Names
+        constexpr const char* kVibratoInit                  = kShortInitLabel;
+
+        // Master Edit | MISC Standalone Widget Display Names
+        constexpr const char* kMiscInit                     = kShortInitLabel;
+
         // Patch Edit | DCO 1 Standalone Widget Display Names
         constexpr const char* kDco1Init                     = kShortInitLabel;
         constexpr const char* kDco1Copy                     = kShortCopyLabel;
@@ -330,7 +339,7 @@ namespace PluginDescriptors
         // Patch Manager | Computer Patches Standalone Widget Display Names
         constexpr const char* kLoadPreviousPatchFile        = "<";
         constexpr const char* kLoadNextPatchFile            = ">";
-        constexpr const char* kSelectPatchFile              = "SELECT A PATCH!";
+        constexpr const char* kSelectPatchFile              = "SELECT A PATCH";
         constexpr const char* kOpenPatchFolder              = "OPEN";
         constexpr const char* kSavePatchAsFile              = "SAVE AS";
         constexpr const char* kSavePatch                    = "SAVE";

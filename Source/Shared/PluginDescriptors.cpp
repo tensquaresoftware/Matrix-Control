@@ -1907,7 +1907,26 @@ const std::array<std::vector<IntParameterDescriptor>, kModulationBusCount> kModu
 // ============================================================================
 
 // Master Edit Standalone Widgets
-const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets = {};
+const std::vector<StandaloneWidgetDescriptor> kMasterEditStandaloneWidgets = {
+    {
+        .widgetId = StandaloneWidgetIds::kMidiInit,
+        .displayName = StandaloneWidgetDisplayNames::kMidiInit,
+        .parentGroupId = ModuleIds::kMidi,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kVibratoInit,
+        .displayName = StandaloneWidgetDisplayNames::kVibratoInit,
+        .parentGroupId = ModuleIds::kVibrato,
+        .widgetType = StandaloneWidgetType::kButton
+    },
+    {
+        .widgetId = StandaloneWidgetIds::kMiscInit,
+        .displayName = StandaloneWidgetDisplayNames::kMiscInit,
+        .parentGroupId = ModuleIds::kMisc,
+        .widgetType = StandaloneWidgetType::kButton
+    }
+};
 
 // ============================================================================
 // Data Definitions | Standalone Widgets | Patch Edit

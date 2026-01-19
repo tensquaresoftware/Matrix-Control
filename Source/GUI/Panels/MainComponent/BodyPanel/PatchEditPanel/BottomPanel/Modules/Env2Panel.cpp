@@ -17,6 +17,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ModuleIds::kEnvelope2,
         ModuleHeaderPanel::ButtonSet::InitCopyPaste,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kEnv2Init,
         PluginDescriptors::StandaloneWidgetIds::kEnv2Copy,
@@ -28,6 +29,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Delay,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -36,6 +38,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Attack,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -44,6 +47,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Decay,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -52,6 +56,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Sustain,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -60,6 +65,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Release,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -68,6 +74,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Amplitude,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -76,6 +83,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2AmplitudeModByVelocity,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -84,6 +92,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2TriggerMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -92,6 +101,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2EnvelopeMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -100,6 +110,7 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv2Lfo1Trigger,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 

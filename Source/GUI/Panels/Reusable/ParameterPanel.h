@@ -19,17 +19,21 @@ class ParameterPanel : public juce::Component
 {
 public:
     enum class ParameterType { Slider, ComboBox, None };
+    enum class ModuleType { PatchEdit, MasterEdit };
 
     ParameterPanel(tss::Theme& theme,
                    WidgetFactory& factory,
                    const juce::String& parameterId,
                    ParameterType type,
+                   ModuleType moduleType,
                    juce::AudioProcessorValueTreeState& apvts);
     ~ParameterPanel() override;
 
     void resized() override;
     void setTheme(tss::Theme& theme);
     int getTotalHeight() const;
+
+    tss::Slider* getSlider() const { return slider_.get(); }
 
 private:
     void createParameterLabel(tss::Theme& theme, WidgetFactory& factory, const juce::String& parameterId);
@@ -43,6 +47,7 @@ private:
     void layoutSeparator(int y);
 
     ParameterType parameterType_;
+    ModuleType moduleType_;
 
     std::unique_ptr<tss::Label> label_;
     std::unique_ptr<tss::Slider> slider_;

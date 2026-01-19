@@ -17,6 +17,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ModuleIds::kVcfVca,
         ModuleHeaderPanel::ButtonSet::InitOnly,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kVcfVcaInit);
     addAndMakeVisible(*moduleHeaderPanel_);
@@ -26,6 +27,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfBalance,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -34,6 +36,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfFequency,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -42,6 +45,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfFrequencyModByEnv1,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -50,6 +54,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfFrequencyModByPressure,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -58,6 +63,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfResonance,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -66,6 +72,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVca1Volume,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -74,6 +81,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVca1ModByVelocity,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -82,6 +90,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVca2ModByEnv2,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -90,6 +99,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfLevers,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -98,6 +108,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
         widgetFactory,
         PluginDescriptors::ParameterIds::kVcfKeyboardPortamento,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 

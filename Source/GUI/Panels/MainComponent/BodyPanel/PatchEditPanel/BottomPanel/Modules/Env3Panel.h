@@ -27,8 +27,8 @@ public:
     void resized() override;
     void setTheme(tss::Theme& theme);
 
-    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::Env3Panel::kWidth; }
-    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::Env3Panel::kHeight; }
+    static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::ChildPanels::kWidth; }
+    static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::ChildPanels::kHeight; }
 
 private:
     

@@ -16,8 +16,10 @@ ParameterPanel::ParameterPanel(Theme& theme,
                                 WidgetFactory& factory,
                                 const juce::String& parameterId,
                                 ParameterType type,
+                                ModuleType moduleType,
                                 juce::AudioProcessorValueTreeState& apvts)
     : parameterType_(type)
+    , moduleType_(moduleType)
 {
     if (type == ParameterType::None)
     {
@@ -33,9 +35,13 @@ ParameterPanel::ParameterPanel(Theme& theme,
 
 void ParameterPanel::createParameterLabel(Theme& theme, WidgetFactory& factory, const juce::String& parameterId)
 {
+    const auto labelWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::Label::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
+
     label_ = std::make_unique<tss::Label>(
         theme,
-        PluginDimensions::Widgets::Widths::Label::kPatchEditModule,
+        labelWidth,
         PluginDimensions::Widgets::Heights::kLabel,
         factory.getParameterDisplayName(parameterId));
     addAndMakeVisible(*label_);
@@ -61,10 +67,14 @@ void ParameterPanel::createSliderWidget(Theme& theme, WidgetFactory& factory, co
 
 void ParameterPanel::createComboBoxWidget(Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
+    const auto comboBoxWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::ComboBox::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule;
+
     comboBox_ = factory.createChoiceParameterComboBox(
         parameterId,
         theme,
-        PluginDimensions::Widgets::Widths::ComboBox::kPatchEditModule,
+        comboBoxWidth,
         PluginDimensions::Widgets::Heights::kComboBox);
     comboBoxAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
         apvts,
@@ -75,9 +85,13 @@ void ParameterPanel::createComboBoxWidget(Theme& theme, WidgetFactory& factory, 
 
 void ParameterPanel::createSeparator(Theme& theme)
 {
+    const auto separatorWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::HorizontalSeparator::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule;
+
     separator_ = std::make_unique<tss::HorizontalSeparator>(
         theme,
-        PluginDimensions::Widgets::Widths::HorizontalSeparator::kPatchEditModule,
+        separatorWidth,
         PluginDimensions::Widgets::Heights::kHorizontalSeparator);
     addAndMakeVisible(*separator_);
 }
@@ -103,7 +117,9 @@ void ParameterPanel::resized()
 
 void ParameterPanel::layoutParameterLabel(int y)
 {
-    const auto labelWidth = PluginDimensions::Widgets::Widths::Label::kPatchEditModule;
+    const auto labelWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::Label::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
     const auto labelHeight = PluginDimensions::Widgets::Heights::kLabel;
 
     if (auto* label = label_.get())
@@ -112,10 +128,14 @@ void ParameterPanel::layoutParameterLabel(int y)
 
 void ParameterPanel::layoutParameterWidget(int y)
 {
-    const auto labelWidth = PluginDimensions::Widgets::Widths::Label::kPatchEditModule;
+    const auto labelWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::Label::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
     const auto sliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
     const auto sliderHeight = tss::Slider::getHeight();
-    const auto comboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kPatchEditModule;
+    const auto comboBoxWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::ComboBox::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule;
     const auto comboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
 
     if (parameterType_ == ParameterType::Slider)
@@ -132,7 +152,9 @@ void ParameterPanel::layoutParameterWidget(int y)
 
 void ParameterPanel::layoutSeparator(int y)
 {
-    const auto separatorWidth = PluginDimensions::Widgets::Widths::HorizontalSeparator::kPatchEditModule;
+    const auto separatorWidth = (moduleType_ == ModuleType::PatchEdit)
+        ? PluginDimensions::Widgets::Widths::HorizontalSeparator::kPatchEditModule
+        : PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule;
     const auto separatorHeight = PluginDimensions::Widgets::Heights::kHorizontalSeparator;
 
     if (auto* separator = separator_.get())

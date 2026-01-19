@@ -17,6 +17,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ModuleIds::kEnvelope3,
         ModuleHeaderPanel::ButtonSet::InitCopyPaste,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kEnv3Init,
         PluginDescriptors::StandaloneWidgetIds::kEnv3Copy,
@@ -28,6 +29,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Delay,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -36,6 +38,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Attack,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -44,6 +47,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Decay,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -52,6 +56,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Sustain,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -60,6 +65,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Release,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -68,6 +74,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Amplitude,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -76,6 +83,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3AmplitudeModByVelocity,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -84,6 +92,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3TriggerMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -92,6 +101,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3EnvelopeMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -100,6 +110,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kEnv3Lfo1Trigger,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 

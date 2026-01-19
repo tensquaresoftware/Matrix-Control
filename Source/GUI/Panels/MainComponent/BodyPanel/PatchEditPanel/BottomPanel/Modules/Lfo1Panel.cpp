@@ -17,6 +17,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ModuleIds::kLfo1,
         ModuleHeaderPanel::ButtonSet::InitCopyPaste,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kLfo1Init,
         PluginDescriptors::StandaloneWidgetIds::kLfo1Copy,
@@ -28,6 +29,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1Speed,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -36,6 +38,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1SpeedModByPressure,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -44,6 +47,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1RetriggerPoint,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -52,6 +56,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1Amplitude,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -60,6 +65,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -68,6 +74,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1Waveform,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -76,6 +83,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1TriggerMode,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -84,6 +92,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1Lag,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -92,6 +101,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kLfo1SampleInput,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -100,6 +110,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         juce::String(),
         ParameterPanel::ParameterType::None,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 

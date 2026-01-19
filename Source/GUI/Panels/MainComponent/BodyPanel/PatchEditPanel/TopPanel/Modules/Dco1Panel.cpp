@@ -17,6 +17,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ModuleIds::kDco1,
         ModuleHeaderPanel::ButtonSet::InitCopyPaste,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kDco1Init,
         PluginDescriptors::StandaloneWidgetIds::kDco1Copy,
@@ -28,6 +29,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1Frequency,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -36,6 +38,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1FrequencyModByLfo1,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -44,6 +47,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1Sync,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -52,6 +56,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1PulseWidth,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -60,6 +65,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1PulseWidthModByLfo2,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -68,6 +74,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1WaveShape,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -76,6 +83,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1WaveSelect,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -84,6 +92,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1Levers,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -92,6 +101,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1KeyboardPortamento,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -100,6 +110,7 @@ Dco1Panel::Dco1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
         widgetFactory,
         PluginDescriptors::ParameterIds::kDco1KeyClick,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 

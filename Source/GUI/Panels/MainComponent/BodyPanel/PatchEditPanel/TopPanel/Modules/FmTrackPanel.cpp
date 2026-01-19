@@ -17,6 +17,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ModuleIds::kFmTrack,
         ModuleHeaderPanel::ButtonSet::InitOnly,
+        ModuleHeaderPanel::ModuleType::PatchEdit,
         apvts_,
         PluginDescriptors::StandaloneWidgetIds::kFmTrackInit);
     addAndMakeVisible(*moduleHeaderPanel_);
@@ -26,6 +27,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kFmAmount,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -34,6 +36,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kFmModByEnv3,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -42,6 +45,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kFmModByPressure,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -50,6 +54,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kTrackPoint1,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -58,6 +63,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kTrackPoint2,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -66,6 +72,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kTrackPoint3,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -74,6 +81,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kTrackPoint4,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -82,6 +90,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kTrackPoint5,
         ParameterPanel::ParameterType::Slider,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -90,6 +99,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         PluginDescriptors::ParameterIds::kTrackInput,
         ParameterPanel::ParameterType::ComboBox,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
@@ -98,6 +108,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
         widgetFactory,
         juce::String(),
         ParameterPanel::ParameterType::None,
+        ParameterPanel::ModuleType::PatchEdit,
         apvts_));
     addAndMakeVisible(*parameterPanels_.back());
 
