@@ -80,6 +80,7 @@ private:
         const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& choiceParams);
     
     static void addPatchEditParameters(juce::AudioProcessorParameterGroup& patchEditGroup);
+    static void addMasterEditParameters(juce::AudioProcessorParameterGroup& masterEditGroup);
     static void addMatrixModulationParameters(juce::AudioProcessorParameterGroup& matrixModulationGroup);
     
     static void addMatrixModulationBusIntParameters(

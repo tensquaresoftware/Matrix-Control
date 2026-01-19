@@ -8,11 +8,13 @@
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include <juce_core/juce_core.h>
 
 using tss::Theme;
 
-InternalPatchesPanel::InternalPatchesPanel(Theme& theme, WidgetFactory& widgetFactory)
+InternalPatchesPanel::InternalPatchesPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme_(&theme)
+    , apvts_(apvts)
 {
     setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
 
@@ -134,6 +136,12 @@ void InternalPatchesPanel::setupLoadPreviousPatchButton(Theme& theme, WidgetFact
         PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    loadPreviousPatchButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*loadPreviousPatchButton_);
 }
 
@@ -143,6 +151,12 @@ void InternalPatchesPanel::setupLoadNextPatchButton(Theme& theme, WidgetFactory&
         PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    loadNextPatchButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*loadNextPatchButton_);
 }
 
@@ -181,6 +195,12 @@ void InternalPatchesPanel::setupInitPatchButton(Theme& theme, WidgetFactory& wid
         PluginDescriptors::StandaloneWidgetIds::kInitPatch,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    initPatchButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kInitPatch,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*initPatchButton_);
 }
 
@@ -190,6 +210,12 @@ void InternalPatchesPanel::setupCopyPatchButton(Theme& theme, WidgetFactory& wid
         PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    copyPatchButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*copyPatchButton_);
 }
 
@@ -199,6 +225,12 @@ void InternalPatchesPanel::setupPastePatchButton(Theme& theme, WidgetFactory& wi
         PluginDescriptors::StandaloneWidgetIds::kPastePatch,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    pastePatchButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kPastePatch,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*pastePatchButton_);
 }
 
@@ -208,6 +240,12 @@ void InternalPatchesPanel::setupStorePatchButton(Theme& theme, WidgetFactory& wi
         PluginDescriptors::StandaloneWidgetIds::kStorePatch,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    storePatchButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kStorePatch,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*storePatchButton_);
 }
 

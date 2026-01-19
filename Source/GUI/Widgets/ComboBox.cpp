@@ -199,6 +199,11 @@ namespace tss
 
     juce::Rectangle<float> ComboBox::calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const
     {
+        if (style_ == Style::ButtonLike)
+        {
+            return bounds;
+        }
+        
         const auto backgroundWidth = static_cast<float>(width_ - static_cast<int>(kLeftPadding_ + kRightPadding_));
         const auto backgroundHeight = static_cast<float>(kBackgroundHeight_);
         const auto backgroundX = (bounds.getWidth() - backgroundWidth) / 2.0f;

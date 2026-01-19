@@ -292,6 +292,15 @@ namespace ParameterIds
 
 namespace StandaloneWidgetIds
 {
+    // Master Edit | MIDI Standalone Widgets IDs
+    constexpr const char* kMidiInit                   = "midiInit";
+
+    // Master Edit | VIBRATO Standalone Widgets IDs
+    constexpr const char* kVibratoInit                = "vibratoInit";
+
+    // Master Edit | MISC Standalone Widgets IDs
+    constexpr const char* kMiscInit                   = "miscInit";
+
     // Patch Edit | DCO 1 Standalone Widgets IDs
     constexpr const char* kDco1Init                   = "dco1Init";
     constexpr const char* kDco1Copy                   = "dco1Copy";
@@ -336,14 +345,18 @@ namespace StandaloneWidgetIds
     constexpr const char* kLfo2Copy                   = "lfo2Copy";
     constexpr const char* kLfo2Paste                  = "lfo2Paste";
 
-    // Master Edit | MIDI Standalone Widgets IDs
-    constexpr const char* kMidiInit                   = "midiInit";
-
-    // Master Edit | VIBRATO Standalone Widgets IDs
-    constexpr const char* kVibratoInit                = "vibratoInit";
-
-    // Master Edit | MISC Standalone Widgets IDs
-    constexpr const char* kMiscInit                   = "miscInit";
+    // Matrix Modulation Standalone Widgets IDs
+    constexpr const char* kMatrixModulationInit       = "matrixModulationInit";
+    constexpr const char* kModulationBus0Init         = "modulationBus0Init";
+    constexpr const char* kModulationBus1Init         = "modulationBus1Init";
+    constexpr const char* kModulationBus2Init         = "modulationBus2Init";
+    constexpr const char* kModulationBus3Init         = "modulationBus3Init";
+    constexpr const char* kModulationBus4Init         = "modulationBus4Init";
+    constexpr const char* kModulationBus5Init         = "modulationBus5Init";
+    constexpr const char* kModulationBus6Init         = "modulationBus6Init";
+    constexpr const char* kModulationBus7Init         = "modulationBus7Init";
+    constexpr const char* kModulationBus8Init         = "modulationBus8Init";
+    constexpr const char* kModulationBus9Init         = "modulationBus9Init";
 
     // Patch Manager | Bank Utility Standalone Widgets IDs
     constexpr const char* kUnlockBank                 = "unlockBank";
@@ -374,7 +387,7 @@ namespace StandaloneWidgetIds
     constexpr const char* kSelectPatchFile            = "selectPatchFile";
     constexpr const char* kOpenPatchFolder            = "openPatchFolder";
     constexpr const char* kSavePatchAs                = "savePatchAsFile";
-    constexpr const char* kSavePatch                  = "savePatch";
+    constexpr const char* kSavePatchFile              = "savePatchFile";    
 }
 
 } // namespace PluginDescriptors

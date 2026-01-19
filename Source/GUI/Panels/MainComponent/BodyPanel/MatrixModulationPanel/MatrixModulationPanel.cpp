@@ -136,11 +136,9 @@ void MatrixModulationPanel::createInitAllBussesButton(Theme& theme)
         PluginDescriptors::StandaloneWidgetDisplayNames::kShortInitLabel);
     initAllBussesButton_->onClick = [this]
     {
-        const auto busIds = createBusIds();
-        for (const auto& busId : busIds)
-        {
-            apvts_.state.setProperty(busId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
-        }
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kMatrixModulationInit,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
     };
     addAndMakeVisible(*initAllBussesButton_);
 }

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Shared/PluginDimensions.h"
 
@@ -19,7 +20,7 @@ class WidgetFactory;
 class BankUtilityPanel : public juce::Component
 {
 public:
-    BankUtilityPanel(tss::Theme& theme, WidgetFactory& widgetFactory);
+    BankUtilityPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BankUtilityPanel() override;
 
     void paint(juce::Graphics&) override;
@@ -34,6 +35,7 @@ private:
     inline constexpr static int kSpacing_ = 5;
 
     tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> bankUtilityModuleHeader_;
     std::unique_ptr<tss::Label> bankSelectorLabel_;

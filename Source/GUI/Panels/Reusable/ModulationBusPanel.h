@@ -42,7 +42,7 @@ private:
     void createSourceComboBox(WidgetFactory& factory, tss::Theme& theme, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
     void createAmountSlider(WidgetFactory& factory, tss::Theme& theme, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts);
     void createDestinationComboBox(int busNumber, tss::Theme& theme, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createInitButton(tss::Theme& theme);
+    void createInitButton(tss::Theme& theme, int busNumber);
     void createSeparator(tss::Theme& theme);
 
     void layoutWidgetRow();

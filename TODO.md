@@ -1,48 +1,43 @@
-# Matrix-Control | TODO
+# Matrix-Control / TODO
 
 ---
 
 - **Auteur:** Guillaume DUPONT
 - **Organisation:** Ten Square Software
-- **Date de révision:** 2026-01-16
+- **Date de révision:** 2026-01-18
 
 ---
 
 ## Général
 
-Implémenter une configuration CMake pour ne plus avoir à gérer de chemins relatifs dans les sources :
+- Faire relire et valider mes cursorrules à l'IA
+- Faire appliquer mes cursorrules en profondeur pour améliorer le code
+- Gérer la lourdeur toujours persistante du code au lancement du plugin
 
-Voici une conversation que j'ai eu avec Claude IA au sujet des chemins relatifs de mon projet qui commencent à être fastidieux à gérer dans les source :
 
-Guillaume : Dans mon projet JUCE en cours de développement avec l'IDE Cursor, j'ai  maintenant un grand nombre de fichiers source avec une arborescence de  fichiers assez élaborée. Les chemins relatifs utilisés dans les #include comment à être un peu pénibles à écrire, avec des "../" à plusieurs  niveaux. Existe-t-il une solution élégante et robuste avec CMake, pour éviter ces  noms de chemins à rallonge dans les sources ? Peut-être l'utilisation  d'alias plus courts, avec les chemins renseignés une fois quelque part,  dans un fichier central ?
 
-Claude IA : Avec CMake, vous avez plusieurs solutions élégantes pour gérer vos chemins d'inclusion. Si vous structurez bien votre projet, vous pouvez n'ajouter que `Source/` :
+## Core
 
-target_include_directories(YourPlugin
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Source
-)
+- Visualiser l'APVTS
+- Retester le MIDI entrant
+- Relire code SysExEncoder, SysExDecoder, SysExValidator
+- Constuire PatchModel (ou PatchDataModel) & MasterModel (ou MasterDataModel)
+- Redondance PatchModel / MasterModel avec APVTS, ou pas ?
+- Construire Clipboard Type Aware (DCO, ENV, LFO)
+
+
 
 ## GUI
 
+- Créer ComboBox `MIDI Input` et `MIDI Output`
+- Créer classe Led, ajouter leds pour message MIDI entrants / sortants
+- Section Patch Manager : imaginer nouveau module `Patch Mutation`
+- Gérer le zoom avec AffineTransformation
+- Améliorer les couleurs du thème Cream
+- Prévoir un thème User et un éditeur de thème ?
 - Supprimer la dépendance Widgets / Theme : Créer une interface ITheme (à faire plus tard)
-- Faire relire et valider mes cursorrules à l'IA
-- Faire appliquer profondément mes cursorrules pour améliorer le code
-- Gérer la lourdeur toujours persistante du code au lancement du plugin
-- Dans PluginDimensions, renommer :
-  - namespace MasterEditSection en MasterEditPanel
-  - namespace PatchEditSection en PatchEditPanel
-  - namespace MatrixModulationSection en MatrixModulationPanel
-  - namespace PatchManagerSection en PatchManagerPanel
 
-- Implémenter dans PluginDimensions les dimensions des :
-  - TopPanel, MiddlePanel et Bottom de PatchEdit
-  - Modules de PatchEdit et MasterEdit (factorisées)
-  - MatrixModulationPanel
-  - BankUtility, InternalPatches et ComputerPatches de PatchManager
-  - Autres ?
 
-- 
 
 ---
 

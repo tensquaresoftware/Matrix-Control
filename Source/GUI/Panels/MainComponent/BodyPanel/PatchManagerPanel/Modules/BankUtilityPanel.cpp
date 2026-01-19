@@ -7,11 +7,13 @@
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include <juce_core/juce_core.h>
 
 using tss::Theme;
 
-BankUtilityPanel::BankUtilityPanel(Theme& theme, WidgetFactory& widgetFactory)
+BankUtilityPanel::BankUtilityPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme_(&theme)
+    , apvts_(apvts)
 {
     setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kBankUtility);
     setupBankSelectorLabel(theme);
@@ -180,6 +182,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank0));
+    selectBank0Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank0,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank0Button_);
 
     selectBank1Button_ = std::make_unique<tss::Button>(
@@ -187,6 +195,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank1));
+    selectBank1Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank1,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank1Button_);
 
     selectBank2Button_ = std::make_unique<tss::Button>(
@@ -194,6 +208,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank2));
+    selectBank2Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank2,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank2Button_);
 
     selectBank3Button_ = std::make_unique<tss::Button>(
@@ -201,6 +221,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank3));
+    selectBank3Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank3,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank3Button_);
 
     selectBank4Button_ = std::make_unique<tss::Button>(
@@ -208,6 +234,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank4));
+    selectBank4Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank4,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank4Button_);
 
     unlockBankButton_ = std::make_unique<tss::Button>(
@@ -215,6 +247,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kUnlockBank));
+    unlockBankButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kUnlockBank,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*unlockBankButton_);
 
     selectBank5Button_ = std::make_unique<tss::Button>(
@@ -222,6 +260,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank5));
+    selectBank5Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank5,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank5Button_);
 
     selectBank6Button_ = std::make_unique<tss::Button>(
@@ -229,6 +273,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank6));
+    selectBank6Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank6,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank6Button_);
 
     selectBank7Button_ = std::make_unique<tss::Button>(
@@ -236,6 +286,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank7));
+    selectBank7Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank7,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank7Button_);
 
     selectBank8Button_ = std::make_unique<tss::Button>(
@@ -243,6 +299,12 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank8));
+    selectBank8Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank8,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank8Button_);
 
     selectBank9Button_ = std::make_unique<tss::Button>(
@@ -250,5 +312,11 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank9));
+    selectBank9Button_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectBank9,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*selectBank9Button_);
 }

@@ -23,7 +23,7 @@ namespace tss
         int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kTopAreaHeight_ = 10;
+        inline constexpr static int kTopAreaHeight_ = 5;
         inline constexpr static int kContentHeight_ = 20;
         inline constexpr static int kTextSpacing_ = 8;
         inline constexpr static int kLineThickness_ = 1;

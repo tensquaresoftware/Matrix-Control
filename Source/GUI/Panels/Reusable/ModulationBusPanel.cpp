@@ -28,7 +28,7 @@ ModulationBusPanel::ModulationBusPanel(int busNumber,
     createSourceComboBox(factory, theme, sourceParamId, apvts);
     createAmountSlider(factory, theme, amountParamId, apvts);
     createDestinationComboBox(busNumber, theme, destinationParamId, apvts);
-    createInitButton(theme);
+    createInitButton(theme, busNumber);
     createSeparator(theme);
 }
 
@@ -87,16 +87,33 @@ void ModulationBusPanel::createDestinationComboBox(int busNumber, Theme& theme, 
     addAndMakeVisible(*destinationComboBox_);
 }
 
-void ModulationBusPanel::createInitButton(Theme& theme)
+void ModulationBusPanel::createInitButton(Theme& theme, int busNumber)
 {
     initButton_ = std::make_unique<tss::Button>(
         theme,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
         PluginDescriptors::StandaloneWidgetDisplayNames::kShortInitLabel);
-    initButton_->onClick = [this]
+    
+    juce::String initBusId;
+    switch (busNumber)
     {
-        apvts_.state.setProperty(busId_, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+        case 0: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus0Init; break;
+        case 1: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus1Init; break;
+        case 2: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus2Init; break;
+        case 3: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus3Init; break;
+        case 4: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus4Init; break;
+        case 5: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus5Init; break;
+        case 6: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus6Init; break;
+        case 7: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus7Init; break;
+        case 8: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus8Init; break;
+        case 9: initBusId = PluginDescriptors::StandaloneWidgetIds::kModulationBus9Init; break;
+        default: return;
+    }
+    
+    initButton_->onClick = [this, initBusId]
+    {
+        apvts_.state.setProperty(initBusId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
     };
     addAndMakeVisible(*initButton_);
 }

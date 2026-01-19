@@ -88,7 +88,7 @@ namespace PluginDimensions
             namespace MiddlePanel
             {
                 inline constexpr int kWidth = 810;
-                inline constexpr int kHeight = 140;
+                inline constexpr int kHeight = 110;
 
                 namespace ChildPanels
                 {
@@ -124,19 +124,19 @@ namespace PluginDimensions
             namespace BankUtilityPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 125;
+                inline constexpr int kHeight = 100;
             }
             
             namespace InternalPatchesPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 125;
+                inline constexpr int kHeight = 100;
             }
             
             namespace ComputerPatchesPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 125;
+                inline constexpr int kHeight = 100;
             }
         }
     }
@@ -244,7 +244,7 @@ namespace PluginDimensions
             inline constexpr int kSectionHeader = 30;
             inline constexpr int kModuleHeader = 30;
             inline constexpr int kModulationBusHeader = 30;
-            inline constexpr int kGroupLabel = 30;
+            inline constexpr int kGroupLabel = 25;
             inline constexpr int kLabel = 20;
             inline constexpr int kButton = 20;
             inline constexpr int kSlider = 20;

@@ -12,7 +12,7 @@
 
 using tss::Theme;
 
-PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory)
+PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme_(&theme)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
         theme,
@@ -20,9 +20,9 @@ PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory)
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchManager),
         tss::SectionHeader::ColourVariant::Blue))
-    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(theme, widgetFactory))
-    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(theme, widgetFactory))
-    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(theme, widgetFactory))
+    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(theme, widgetFactory, apvts))
+    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(theme, widgetFactory, apvts))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(theme, widgetFactory, apvts))
 {
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*bankUtilityPanel_);

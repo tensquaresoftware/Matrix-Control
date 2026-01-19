@@ -2275,7 +2275,7 @@ const std::vector<StandaloneWidgetDescriptor> kComputerPatchesWidgets = {
         .widgetType = StandaloneWidgetType::kButton
     },
     {
-        .widgetId = StandaloneWidgetIds::kSavePatch,
+        .widgetId = StandaloneWidgetIds::kSavePatchFile,
         .displayName = StandaloneWidgetDisplayNames::kSavePatch,
         .parentGroupId = ModuleIds::kComputerPatches,
         .widgetType = StandaloneWidgetType::kButton

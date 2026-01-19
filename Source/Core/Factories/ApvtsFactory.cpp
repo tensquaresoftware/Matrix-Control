@@ -69,7 +69,10 @@ void ApvtsFactory::addParametersToChildGroup(
     {
         // Patch Manager uses ValueTree properties, not APVTS parameters
     }
-    // Master Edit skipped for now
+    else if (childGroupId == PluginDescriptors::SectionIds::kMasterEdit)
+    {
+        addMasterEditParameters(childGroup);
+    }
 }
 
 void ApvtsFactory::addRootGroupsToLayout(
@@ -314,6 +317,61 @@ void ApvtsFactory::addPatchEditParameters(juce::AudioProcessorParameterGroup& pa
         PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kLfo2).toRawUTF8(),
         PluginDescriptors::kLfo2IntParameters,
         PluginDescriptors::kLfo2ChoiceParameters
+    );
+}
+
+void ApvtsFactory::addMasterEditParameters(juce::AudioProcessorParameterGroup& masterEditGroup)
+{
+    std::vector<PluginDescriptors::IntParameterDescriptor> midiIntParams;
+    std::vector<PluginDescriptors::IntParameterDescriptor> vibratoIntParams;
+    std::vector<PluginDescriptors::IntParameterDescriptor> miscIntParams;
+    
+    std::vector<PluginDescriptors::ChoiceParameterDescriptor> midiChoiceParams;
+    std::vector<PluginDescriptors::ChoiceParameterDescriptor> vibratoChoiceParams;
+    std::vector<PluginDescriptors::ChoiceParameterDescriptor> miscChoiceParams;
+    
+    for (const auto& param : PluginDescriptors::kMasterEditIntParameters)
+    {
+        if (param.parentGroupId == PluginDescriptors::ModuleIds::kMidi)
+            midiIntParams.push_back(param);
+        else if (param.parentGroupId == PluginDescriptors::ModuleIds::kVibrato)
+            vibratoIntParams.push_back(param);
+        else if (param.parentGroupId == PluginDescriptors::ModuleIds::kMisc)
+            miscIntParams.push_back(param);
+    }
+    
+    for (const auto& param : PluginDescriptors::kMasterEditChoiceParameters)
+    {
+        if (param.parentGroupId == PluginDescriptors::ModuleIds::kMidi)
+            midiChoiceParams.push_back(param);
+        else if (param.parentGroupId == PluginDescriptors::ModuleIds::kVibrato)
+            vibratoChoiceParams.push_back(param);
+        else if (param.parentGroupId == PluginDescriptors::ModuleIds::kMisc)
+            miscChoiceParams.push_back(param);
+    }
+    
+    addModuleParameters(
+        masterEditGroup,
+        PluginDescriptors::ModuleIds::kMidi,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kMidi).toRawUTF8(),
+        midiIntParams,
+        midiChoiceParams
+    );
+    
+    addModuleParameters(
+        masterEditGroup,
+        PluginDescriptors::ModuleIds::kVibrato,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kVibrato).toRawUTF8(),
+        vibratoIntParams,
+        vibratoChoiceParams
+    );
+    
+    addModuleParameters(
+        masterEditGroup,
+        PluginDescriptors::ModuleIds::kMisc,
+        PluginDescriptors::getGroupDisplayName(PluginDescriptors::ModuleIds::kMisc).toRawUTF8(),
+        miscIntParams,
+        miscChoiceParams
     );
 }
 

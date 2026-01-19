@@ -8,11 +8,13 @@
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include <juce_core/juce_core.h>
 
 using tss::Theme;
 
-ComputerPatchesPanel::ComputerPatchesPanel(Theme& theme, WidgetFactory& widgetFactory)
+ComputerPatchesPanel::ComputerPatchesPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme_(&theme)
+    , apvts_(apvts)
 {
     setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kComputerPatches);
 
@@ -124,6 +126,12 @@ void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(Theme& theme, Widget
         PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatchFile,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    loadPreviousPatchFileButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatchFile,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*loadPreviousPatchFileButton_);
 }
 
@@ -133,6 +141,12 @@ void ComputerPatchesPanel::setupLoadNextPatchFileButton(Theme& theme, WidgetFact
         PluginDescriptors::StandaloneWidgetIds::kLoadNextPatchFile,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    loadNextPatchFileButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kLoadNextPatchFile,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*loadNextPatchFileButton_);
 }
 
@@ -148,6 +162,15 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(Theme& theme)
         kSelectPatchFileEmptyId_);
     selectPatchFileComboBox_->setSelectedId(kSelectPatchFileEmptyId_);
     selectPatchFileComboBox_->setEnabled(false);
+    selectPatchFileComboBox_->onChange = [this]
+    {
+        if (auto* comboBox = selectPatchFileComboBox_.get())
+        {
+            apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSelectPatchFile,
+                                    comboBox->getSelectedId(),
+                                    nullptr);
+        }
+    };
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 
@@ -167,6 +190,12 @@ void ComputerPatchesPanel::setupOpenPatchFolderButton(Theme& theme, WidgetFactor
         PluginDescriptors::StandaloneWidgetIds::kOpenPatchFolder,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    openPatchFolderButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kOpenPatchFolder,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*openPatchFolderButton_);
 }
 
@@ -176,15 +205,27 @@ void ComputerPatchesPanel::setupSavePatchFileAsButton(Theme& theme, WidgetFactor
         PluginDescriptors::StandaloneWidgetIds::kSavePatchAs,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    savePatchFileAsButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSavePatchAs,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*savePatchFileAsButton_);
 }
 
 void ComputerPatchesPanel::setupSavePatchFileButton(Theme& theme, WidgetFactory& widgetFactory)
 {
     savePatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginDescriptors::StandaloneWidgetIds::kSavePatch,
+        PluginDescriptors::StandaloneWidgetIds::kSavePatchFile,
         theme,
         PluginDimensions::Widgets::Heights::kButton);
+    savePatchFileButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kSavePatchFile,
+                                juce::Time::getCurrentTime().toMilliseconds(),
+                                nullptr);
+    };
     addAndMakeVisible(*savePatchFileButton_);
 }
 

@@ -123,7 +123,7 @@ int WidgetFactory::getButtonWidthForWidgetId(const juce::String& widgetId) const
     
     if (widgetId == kLoadPreviousPatch || widgetId == kLoadNextPatch ||
         widgetId == kLoadPreviousPatchFile || widgetId == kLoadNextPatchFile ||
-        widgetId == kOpenPatchFolder || widgetId == kSavePatch ||
+        widgetId == kOpenPatchFolder || widgetId == kSavePatchFile ||
         widgetId == kStorePatch)
     {
         return PluginDimensions::Widgets::Widths::Button::kInternalPatchesUtility;

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Shared/PluginDimensions.h"
 
@@ -20,7 +21,7 @@ class WidgetFactory;
 class ComputerPatchesPanel : public juce::Component
 {
 public:
-    ComputerPatchesPanel(tss::Theme& theme, WidgetFactory& widgetFactory);
+    ComputerPatchesPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~ComputerPatchesPanel() override;
 
     void paint(juce::Graphics&) override;
@@ -37,6 +38,7 @@ private:
     inline constexpr static int kSelectPatchFileEmptyId_ = 1;
 
     tss::Theme* theme_;
+    juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
 
