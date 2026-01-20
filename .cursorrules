@@ -1,23 +1,23 @@
-================================================================================
+===============================================================================
 # INSTRUCTIONS PERSONNELLES POUR L'AGENT IA CURSOR
-================================================================================
+===============================================================================
 - Auteur : Guillaume DUPONT
 - Organisation : Ten Square Software
 - Contexte : Développement de plugins VST/AU avec JUCE
-- Dernière mise à jour : 2026-01-07
+- Version : 1.0.0
+- Dernière mise à jour : 2026-01-20
 
 
-================================================================================
+===============================================================================
 ## COMMUNICATION
-================================================================================
+===============================================================================
 
 [Interactions avec moi]
 - Je m'appelle Guillaume, tu peux m'appeler par mon prénom
 - Utilise toujours le tutoiement dans tous nos échanges
-- Réponds-moi exclusivement en français
+- Réponds-moi exclusivement en français dans nos conversations
 - Sois franc, honnête et factuel, même si cela implique de me contredire
-- Priorité absolue : m'aider à trouver la solution la plus pertinente
-- Ne me flatte pas pour me faire plaisir au détriment de la qualité
+- Priorité absolue : m'aider à trouver la solution la plus pertinente !
 
 [Structure des réponses]
 - Structure claire et didactique
@@ -26,9 +26,9 @@
 - Solutions optimales et conformes aux standards professionnels
 
 
-================================================================================
+===============================================================================
 ## ENVIRONNEMENT DE DÉVELOPPEMENT
-================================================================================
+===============================================================================
 
 [Système & Outils]
 - Plateforme : MacBook Pro M5 avec macOS Tahoe
@@ -44,15 +44,15 @@
 - CMake : /Applications/JUCE/CMake/
 
 [Vérification du code généré]
-- Réfère-toi SYSTÉMATIQUEMENT à la documentation JUCE 8.0.10
+- Réfère-toi systématiquement à la documentation JUCE la plus à jour
 - Vérifie que chaque API, classe et méthode existe dans JUCE 8
 - Évite toute syntaxe obsolète (JUCE 7, JUCE 6, etc.)
 - Signale explicitement si tu n'es pas certain d'une API
 
 
-================================================================================
+===============================================================================
 ## STANDARDS C++ & QUALITÉ
-================================================================================
+===============================================================================
 
 [Généralités C++]
 - Standard : C++17 minimum, compatible Xcode 26
@@ -60,17 +60,17 @@
   * Noms de variables, fonctions, classes
   * Tous les commentaires de code
   * Pas d'accents, pas de français dans le code
-- Git Commits : Summary/Description en anglais uniquement
 
-[Git Tags]
-- Lors de la création d'un tag annoté, utiliser le format suivant :
+[Git]
+- Git Commits : Summary/Description en anglais uniquement
+- Lors de la création d'un tag Git annoté, utiliser le format suivant :
   * Une phrase de description principale (titre du tag)
   * Une petite liste à puces des points les plus importants qui ont été retravaillés dans le code
 - Exemple de format :
   ```
-  Refactor McSlider and improve focus management
+  Refactor Slider class and improve focus management
 
-  - Refactor McSlider: simplify drawing code by removing unnecessary constants and helper methods
+  - Refactor Slider: simplify drawing code by removing unnecessary constants and helper methods
   - Use reduced() for bounds calculations directly in paint() method
   - Improve focus management: add ability to remove focus by clicking on background
   ```
@@ -86,41 +86,74 @@
   * Exemples : apvts_, kWidth_
 - Classes : PascalCase
   * Exemples : PluginProcessor, PluginEditor, AudioAnalyzer
+- Enums : PascalCase pour le type, préfixe `k` pour les valeurs
+  * Exemples : `enum class ParameterType { kDco, kEnv, kLfo };`
+- Namespaces : PascalCase
+  * Exemples : `namespace Core { }`, `namespace GUI { }`
 - Éviter les underscore_case, sauf cas très particulier
 
 [Magic Numbers - INTERDITS]
 - Ne JAMAIS utiliser de magic numbers dans le code !
 - Toujours définir des constantes explicites avec des noms significatifs
 - Exemples à éviter :
-  * `if (value == -1)` → utiliser `if (value == kNoSysExId)`
+  * `if (value == -1)` → utiliser quelque chose comme `if (value == kNoSysExId)`
   * `for (int i = 0; i < 10; ++i)` → utiliser `for (int i = 0; i < kModulationBusCount; ++i)`
   * `return nullptr;` → OK (nullptr est explicite, pas un magic number)
 - Les seules exceptions acceptables :
   * Valeurs littérales évidentes et auto-explicatives : `0`, `1`, `nullptr`, `true`, `false`
   * Valeurs dans des tests unitaires où la valeur exacte est le sujet du test
-- Format des constantes : utiliser le préfixe `k` suivi d'un nom explicite en PascalCase
-  * Exemple : `constexpr int kNoSysExId = -1;`
-  * Exemple : `constexpr int kModulationBusCount = 10;`
 
 [Organisation des includes]
 1. Headers système C++ (ex : <vector>, <memory>, etc. puis sauter une ligne)
 2. Headers JUCE (ex : <juce_core/juce_core.h>, etc. puis sauter une ligne)
-3. Headers du projet (ex : "PatchModel.h", etc. puis sauter une ligne)
+3. Headers du projet (ex : "Core/PatchModel.h", etc. puis sauter une ligne)
+
+[Chemins des includes]
+- Utiliser des chemins relatifs à partir de la racine du projet (configuré dans CMake)
+- Ne JAMAIS utiliser de chemins relatifs avec `../` multiples
+- Format : `"GUI/Panels/MainComponent.h"` plutôt que `"../../../../../GUI/Panels/MainComponent.h"`
+- Les chemins doivent être clairs, lisibles et maintenables
+- Exemple correct : `#include "GUI/Widgets/Slider.h"`
+- Exemple à éviter : `#include "../../../GUI/Widgets/Slider.h"`
+
+[Include Guards]
+- Toujours utiliser `#pragma once` en première ligne de chaque header
+- Ne pas utiliser les anciens include guards (#ifndef/#define/#endif)
+- Exemple : `#pragma once` en première ligne, avant tout autre code
+
+[Forward Declarations]
+- Utiliser des forward declarations dans les headers pour réduire les dépendances
+- Inclure les headers complets uniquement dans les .cpp quand possible
+- Exemple : `class MidiManager;` dans le header, puis `#include "MidiManager.h"` dans le .cpp
+
+[Séparation .h/.cpp]
+- Toujours séparer déclaration (.h) et définition (.cpp) sauf pour :
+  * Templates (définitions dans le header)
+  * Fonctions inline explicites (marquées `inline`)
+  * Petites fonctions triviales (getters/setters simples)
+- Préférer les méthodes inline dans le header uniquement si elles sont courtes (< 5 lignes)
+- Exemple inline : `int getValue() const { return value_; }` dans le header
+- Exemple séparé : déclaration dans .h, définition complète dans .cpp
 
 [Organisation des classes]
-- Regroupe les membres et les méthodes de façon logique dans les .h (exemple : paires de getter/setter, etc.)
-- Mettre les variables membres (qui doivent presque toujours être privées) après toutes les déclarations de méthodes publiques et protégées
-- Les méthodes privées doivent aller vers la fin de la classe, après les variables membres
-- Si la classe n'a pas de sémantique de copie par valeur, utiliser `JUCE_DECLARE_NON_COPYABLE` (dernier élément de la déclaration)
-- Les constructeurs qui prennent un seul paramètre doivent généralement être marqués `explicit`
-- Regrouper les méthodes de façon logique dans les .cpp, en faisant en sorte qu'une méthode appelée dans une autre méthode se trouvent proches dans le code, afin de faciliter la relecture
+- Regrouper les membres et méthodes logiquement dans les .h (ex: paires getter/setter)
+- Variables membres (presque toujours privées) après les méthodes publiques/protégées
+- Méthodes privées à la fin, après les variables membres
+- Utiliser `JUCE_DECLARE_NON_COPYABLE` si la classe n'est pas copiable (dernier élément)
+- Marquer `explicit` les constructeurs à un seul paramètre
+- Dans les .cpp, regrouper les méthodes logiquement (appelées proches de leurs appelantes)
+- Destructeurs virtuels si la classe est destinée à être héritée (polymorphisme)
+- Règle des 3/5/0 : si on définit destructeur/copy/move, définir ou supprimer les autres explicitement
+- Utiliser `= default` pour les constructeurs/destructeurs générés par défaut (plus explicite)
+- Utiliser `= delete` pour désactiver explicitement copy/move/constructeur par défaut
+- Exemple : `MyClass() = default;` ou `MyClass (const MyClass&) = delete;`
 
-[Principes SOLID & Clean Code / Clean Architecture (Robert C. Martin)]
+[Principes SOLID & Clean Code / Clean Architecture (Robert C. Martin / Uncle Bob)]
 - Code lisible et compréhensible par un humain
 - Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
-- Éviter au maximum les commentaires, ne les utiliser que lorsque c'est absolument nécessaire
-- Toujours préférer la refactorisation d'un bloc de code trop long avec des fonctions intermédiaires plus courtes et aux noms très explicite, à la place de commentaires descriptifs du code qui pourraient s'avérer mentir au fil du temps s'ils sont mal mis à jour
-- Fonctions courtes : 5-15 lignes idéalement
+- Minimiser les commentaires : utiliser uniquement si nécessaire
+- Refactoriser les blocs > 20 lignes en fonctions courtes aux noms explicites plutôt que d'ajouter des commentaires (qui peuvent devenir obsolètes)
+- Fonctions courtes : 5-20 lignes idéalement
 - Un seul niveau d'abstraction par fonction
 - Une seule responsabilité (Single Responsibility)
 - Pas d'effets cachés, pas d'état global modifié
@@ -131,10 +164,38 @@
 - std::optional > null
 - Traiter les erreurs au niveau approprié
 
+[Gestion des Erreurs]
+- Utiliser les exceptions pour les erreurs exceptionnelles (pas pour le flux normal)
+- Utiliser `std::optional` pour les valeurs optionnelles (éviter `nullptr`)
+- Utiliser `std::expected` (C++23) ou des types Result pour les opérations pouvant échouer
+- Ne jamais ignorer silencieusement les erreurs
+- Logger les erreurs avec un contexte approprié
+- Exemple : `std::optional<PatchModel> loadPatch (const juce::File& file);`
 
-================================================================================
+[RAII (Resource Acquisition Is Initialization)]
+- Toujours acquérir les ressources dans les constructeurs
+- Toujours libérer les ressources dans les destructeurs
+- Utiliser les smart pointers pour la gestion automatique de la mémoire
+- Les objets doivent toujours être dans un état valide
+- Exemple : `std::unique_ptr<juce::MidiInput> midiInput_;` dans la classe, libéré automatiquement
+
+[Smart Pointers]
+- Préférer `unique_ptr` pour la propriété exclusive (ownership)
+- Utiliser `shared_ptr` uniquement si nécessaire (propriété partagée)
+- Utiliser `weak_ptr` pour casser les cycles de références
+- Éviter les pointeurs bruts sauf pour observer (non-owning)
+- Exemple : `std::unique_ptr<juce::MidiInput> midiInput_;` pour ownership, `MidiInput* input` pour observer
+
+[Move Semantics]
+- Utiliser `std::move()` pour transférer la propriété des objets lourds
+- Préférer les constructeurs de move et opérateurs d'assignation de move
+- Marquer `noexcept` quand approprié (optimisations, contraintes de move)
+- Exemple : `void setData (juce::MemoryBlock&& data) { data_ = std::move (data); }`
+
+
+===============================================================================
 ## FORMATAGE & STYLE JUCE
-================================================================================
+===============================================================================
 
 [Formatage et espacement]
 - Pas de caractères de tabulation ! Utiliser 4 espaces pour l'indentation
@@ -147,7 +208,7 @@
   }
   ```
 - Toujours mettre un espace avant et après les opérateurs binaires : `x = 1 + y - 2 * z / 3;`
-- L'opérateur `!` doit toujours être suivi d'un espace : `if (! foo)`
+- L'opérateur `!` ne doit PAS avoir d'espace après : `if (!foo)` (style JUCE standard)
 - L'opérateur `~` doit être précédé d'un espace, mais pas suivi
 - Les opérateurs `++` et `--` n'ont pas d'espace entre l'opérateur et l'opérande : `++i`, `--j`
 - Jamais d'espace avant une virgule, toujours un espace après : `foo (x, y);`
@@ -178,6 +239,10 @@
 
 [Modificateur const]
 - Mettre `const` avant le nom du type : `const Thing& t;` (pas `Thing const& t;`)
+- Marquer les méthodes qui ne modifient pas l'état comme `const`
+- Utiliser `const&` pour les paramètres en lecture seule
+- Préférer `const_iterator` pour les itérations en lecture seule
+- Les pointeurs const : `const Type*` (pointeur vers constante) vs `Type* const` (pointeur constant)
 
 [Opérateurs et expressions multi-lignes]
 - Quand on divise une expression contenant des opérateurs sur plusieurs lignes, chaque nouvelle ligne doit commencer par l'opérateur :
@@ -203,10 +268,13 @@
       // ...multiple lines of stuff...
   };
   ```
+- Préférer les captures explicites plutôt que `[=]` ou `[&]` (plus clair, évite captures accidentelles)
+- Éviter les captures par valeur de gros objets (préférer `const&` ou `&` selon le cas)
+- Exemple : `[this, &x, &y]` plutôt que `[&]` si on n'a besoin que de x et y
 
 [Valeurs nulles et pointeurs]
 - Ne JAMAIS utiliser `NULL`, `null`, ou `0` pour un pointeur nul ! Toujours utiliser `nullptr`
-- Quand on obtient un pointeur possiblement nul et qu'on l'utilise seulement s'il est non-nul, limiter la portée du pointeur autant que possible :
+- Limiter la portée des pointeurs possibles nuls :
   ```cpp
   if (auto* f = getFoo())
       f->doSomething();
@@ -240,6 +308,9 @@
 [Commentaires]
 - Pour les commentaires courts d'une ou deux lignes, préférer `//` plutôt que `/* */`
 - Toujours laisser un espace avant le texte dans un commentaire `//` : `// oui !` pas `//non !`
+- Les noms de code doivent être auto-documentants (éviter les commentaires)
+- Utiliser des commentaires uniquement pour expliquer le "pourquoi", pas le "comment"
+- Pour les APIs publiques complexes, considérer Doxygen/Javadoc style comments
 
 [Macros]
 - Ne pas utiliser de macros ! Traiter les macros comme un dernier recours
@@ -251,10 +322,64 @@
 - Les paramètres de template doivent suivre leur type sans espace : `vector<int>`
 - Dans une déclaration template, laisser un espace avant le crochet ouvrant : `template <typename Type1, typename Type2>`
 
+[Dépendances]
+- Éviter les dépendances circulaires entre modules
+- Utiliser des interfaces abstraites pour découpler (Dependency Inversion Principle)
+- Respecter la hiérarchie des dépendances (GUI dépend de Core, pas l'inverse)
 
-================================================================================
+[Enums]
+- Préférer `enum class` à `enum` pour la sécurité de type et éviter les collisions
+- Nommer les enums au singulier (sauf collections) : `enum class ParameterType { kDco, kEnv, kLfo };`
+- Préfixer les valeurs avec `k` : `ParameterType::kDco`
+- Exemple : `enum class ClipboardType { kEmpty, kDco, kEnv, kLfo, kPatch };`
+
+[Initialisation]
+- Préférer l'initialisation uniforme `{}` : `int value {0};` plutôt que `int value = 0;`
+- Initialiser les membres dans la liste d'initialisation du constructeur
+- Ordre d'initialisation = ordre de déclaration des membres (pas l'ordre de la liste)
+- Exemple : `MyClass (int x) : member1_ {x}, member2_ {0} {}`
+
+[Namespaces]
+- Utiliser des namespaces pour organiser le code par module
+- Éviter les `using namespace` dans les headers (pollution globale)
+- OK dans les .cpp pour simplifier : `using juce::String;`
+- Exemple : `namespace Core { class MidiManager; }`
+
+[Static Members]
+- Préférer les fonctions libres statiques aux méthodes statiques quand possible
+- Utiliser `static constexpr` pour les constantes de classe
+- Exemple : `static constexpr int kMaxBufferSize {1024};`
+
+[Constexpr]
+- Utiliser `constexpr` pour les fonctions calculables à la compilation
+- Utiliser `constexpr` pour les variables constantes calculables à la compilation
+- Préférer `constexpr` à `const` pour les constantes calculables à la compilation
+- `constexpr` implique `const`, mais permet l'évaluation à la compilation
+- Exemple : `constexpr int calculateSize (int count) { return count * 4; }`
+- Exemple : `constexpr int kBufferSize {calculateSize (256)};`
+
+[Virtual Functions]
+- Utiliser `override` explicitement (pas `virtual` dans les classes dérivées)
+- Utiliser `final` pour empêcher la dérivation supplémentaire si approprié
+- Préférer la composition à l'héritage (SOLID : favoriser la délégation)
+- Exemple : `void paint (Graphics& g) override;`
+
+[Assertions]
+- Utiliser `jassert` (JUCE) ou `assert` pour les invariants de développement
+- Ne pas utiliser d'assertions pour la gestion d'erreurs utilisateur (utiliser exceptions)
+- Les assertions peuvent être désactivées en release : ne pas y mettre de logique critique
+- Exemple : `jassert (bufferSize > 0);` pour vérifier un précondition
+
+[Logging]
+- Utiliser `juce::Logger` pour le logging structuré
+- Niveaux appropriés : `DBG()`, `Logger::writeToLog()` pour debug, erreurs critiques
+- Éviter le logging excessif dans les boucles critiques
+- Logger avec contexte : inclure informations pertinentes (fichier, ligne, valeurs)
+
+
+===============================================================================
 ## RÈGLES SPÉCIFIQUES JUCE
-================================================================================
+===============================================================================
 
 [Nommage des classes du plugin]
 - Classe du processeur : "PluginProcessor" (fichiers : PluginProcessor.h/.cpp)
@@ -267,8 +392,37 @@
 - ~~AudioProcessorValueTreeState~~ → ValueTree moderne
 - ~~Legacy parameter handling~~ → juce::AudioProcessorParameter
 
-La liste est non exhaustive, propose-moi de la compléter le cas échéant.
+La liste est non exhaustive, prendre le temps de la compléter le cas échéant.
 
-================================================================================
+[Thread-Safety]
+- Toujours considérer la thread-safety dans le code audio (`processBlock()` appelé depuis le thread audio)
+- Utiliser `juce::MessageManager::callAsync()` pour appeler le thread GUI depuis d'autres threads
+- Utiliser `juce::AbstractFifo` ou `juce::LockFreeFifo` pour la communication inter-threads (lock-free)
+- Les listeners APVTS sont thread-safe, mais les mises à jour GUI doivent se faire depuis le thread message
+- Ne JAMAIS appeler de méthodes GUI depuis le thread audio
+- Exemple : `juce::MessageManager::callAsync ([this] { updateGUI(); });` depuis le thread audio
+
+[Performance]
+- Éviter les allocations mémoire dans `processBlock()` (thread audio)
+- Utiliser des buffers pré-alloués
+- Éviter les appels système dans les boucles critiques
+- Profiler avant d'optimiser
+- Préférer les algorithmes in-place quand possible
+- Éviter les copies inutiles : utiliser `const&` ou move semantics
+
+[Tests Unitaires]
+- Écrire des tests pour les classes métier (pas pour les composants GUI)
+- Utiliser un framework de test (ex: Catch2, Google Test)
+- Un test = une responsabilité, nom explicite
+- Tests isolés, pas de dépendances entre tests
+- Exemple : `TEST_CASE ("SysExParser validates checksum correctly")`
+
+[Complexité]
+- Maintenir la complexité cyclomatique < 10 par fonction
+- Si trop complexe, refactoriser en sous-fonctions
+- Éviter > 5 paramètres : considérer un struct/class de paramètres
+- Préférer les early returns pour réduire l'imbrication
+
+===============================================================================
 # FIN DE MES INSTRUCTIONS PERSONNELLES
-================================================================================
+===============================================================================
