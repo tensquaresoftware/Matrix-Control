@@ -29,6 +29,7 @@ public:
                    juce::AudioProcessorValueTreeState& apvts);
     ~ParameterPanel() override;
 
+    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
     int getTotalHeight() const;
@@ -46,6 +47,7 @@ private:
     void layoutParameterWidget(int y);
     void layoutSeparator(int y);
 
+    tss::Theme* theme_;
     ParameterType parameterType_;
     ModuleType moduleType_;
 

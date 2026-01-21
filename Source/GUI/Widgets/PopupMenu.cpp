@@ -72,7 +72,8 @@ namespace tss
         auto borderThickness = kBorderThickness_;
         auto borderThicknessInt = static_cast<int>(borderThickness);
         
-        drawBase(g, bounds);
+        g.fillAll(theme->getPopupMenuBackgroundColour());
+        
         drawBackground(g, bounds.reduced(borderThicknessInt));
         
         if (displayMode_ == DisplayMode::SingleColumnScrollable)
@@ -497,17 +498,6 @@ namespace tss
         delete this;
     }
 
-    void PopupMenu::drawBase(juce::Graphics& g, const juce::Rectangle<int>& bounds)
-    {
-        if (! hasValidLookAndFeel())
-        {
-            return;
-        }
-        
-        auto baseColour = theme->getPopupMenuBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void PopupMenu::drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds)
     {

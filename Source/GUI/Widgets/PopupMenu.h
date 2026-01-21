@@ -73,7 +73,6 @@ namespace tss
         void updateHighlightedItem(int itemIndex);
         void selectItem(int itemIndex);
         
-        void drawBase(juce::Graphics& g, const juce::Rectangle<int>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds);
         void drawItems(juce::Graphics& g, const juce::Rectangle<int>& contentBounds);

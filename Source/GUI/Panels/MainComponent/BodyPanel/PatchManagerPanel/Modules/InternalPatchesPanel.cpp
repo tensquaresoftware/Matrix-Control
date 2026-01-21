@@ -16,6 +16,7 @@ InternalPatchesPanel::InternalPatchesPanel(Theme& theme, WidgetFactory& widgetFa
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
 
     setupBrowserGroupLabel(theme);

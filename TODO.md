@@ -29,6 +29,8 @@
 
 ## GUI
 
+- Fond des widgets et panels transparents pour faire apparaître naturellement la couleur de fond de la GUI ?
+- Dco1Panel a été refactorisé avec BaseModulePanel, mais pas les autres modules !
 - Créer ComboBox `MIDI Input` et `MIDI Output`
 - Créer classe Led, ajouter leds pour message MIDI entrants / sortants
 - Section Patch Manager : imaginer nouveau module `Patch Mutation`

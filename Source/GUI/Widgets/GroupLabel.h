@@ -33,7 +33,6 @@ namespace tss
         int height_;
         juce::String labelText_;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLines(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY);

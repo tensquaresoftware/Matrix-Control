@@ -21,6 +21,7 @@ BottomPanel::BottomPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
     , lfo1Panel_(std::make_unique<Lfo1Panel>(theme, widgetFactory, apvts))
     , lfo2Panel_(std::make_unique<Lfo2Panel>(theme, widgetFactory, apvts))
 {
+    setOpaque(true);
     addAndMakeVisible(*env1Panel_);
     addAndMakeVisible(*env2Panel_);
     addAndMakeVisible(*env3Panel_);
@@ -105,7 +106,5 @@ void BottomPanel::setTheme(Theme& theme)
 
     if (auto* panel = lfo2Panel_.get())
         panel->setTheme(theme);
-
-    repaint();
 }
 

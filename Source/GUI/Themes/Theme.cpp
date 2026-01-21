@@ -20,8 +20,6 @@ namespace tss
                 return juce::Colour(element.blackVariant);
             case ColourVariant::Cream:
                 return juce::Colour(element.creamVariant);
-            case ColourVariant::Debug:
-                return juce::Colour(element.debugVariant);
         }
         return juce::Colour(element.blackVariant);
     }
@@ -79,11 +77,6 @@ namespace tss
     }
 
     // SectionHeader colours ----------------------------------------------------
-    juce::Colour Theme::getSectionHeaderBaseColour() const
-    {
-        return getColour(ThemeColours::SectionHeader::kBase);
-    }
-
     juce::Colour Theme::getSectionHeaderContentAreaColour() const
     {
         return getColour(ThemeColours::SectionHeader::kContentArea);
@@ -105,11 +98,6 @@ namespace tss
     }
 
     // ModuleHeader colours -----------------------------------------------------
-    juce::Colour Theme::getModuleHeaderBaseColour() const
-    {
-        return getColour(ThemeColours::ModuleHeader::kBase);
-    }
-
     juce::Colour Theme::getModuleHeaderTextColour() const
     {
         return getColour(ThemeColours::ModuleHeader::kText);
@@ -126,11 +114,6 @@ namespace tss
     }
 
     // GroupLabel colours -----------------------------------------------------
-    juce::Colour Theme::getGroupLabelBaseColour() const
-    {
-        return getColour(ThemeColours::GroupLabel::kBase);
-    }
-
     juce::Colour Theme::getGroupLabelTextColour() const
     {
         return getColour(ThemeColours::GroupLabel::kText);
@@ -152,39 +135,19 @@ namespace tss
         return getColour(ThemeColours::Label::kText);
     }
 
-    juce::Colour Theme::getLabelBaseColour() const
-    {
-        return getColour(ThemeColours::Label::kBase);
-    }
-
     // VerticalSeparator colours ----------------------------------------------
-    juce::Colour Theme::getVerticalSeparatorBaseColour() const
-    {
-        return getColour(ThemeColours::VerticalSeparator::kBase);
-    }
-
     juce::Colour Theme::getVerticalSeparatorLineColour() const
     {
         return getColour(ThemeColours::VerticalSeparator::kLine);
     }
 
     // HorizontalSeparator colours --------------------------------------------
-    juce::Colour Theme::getHorizontalSeparatorBaseColour() const
-    {
-        return getColour(ThemeColours::HorizontalSeparator::kBase);
-    }
-
     juce::Colour Theme::getHorizontalSeparatorLineColour() const
     {
         return getColour(ThemeColours::HorizontalSeparator::kLine);
     }
 
     // Button colours ---------------------------------------------------------
-    juce::Colour Theme::getButtonBaseColour() const
-    {
-        return getColour(ThemeColours::Button::kBase);
-    }
-
     juce::Colour Theme::getButtonBackgroundColourOff() const
     {
         return getColour(ThemeColours::Button::kBackgroundDisabled);
@@ -236,11 +199,6 @@ namespace tss
     }
 
     // Slider colours ---------------------------------------------------------
-    juce::Colour Theme::getSliderBaseColour() const
-    {
-        return getColour(ThemeColours::Slider::kBase);
-    }
-
     juce::Colour Theme::getSliderBackgroundColour(bool isEnabled) const
     {
         return getColour(isEnabled ? ThemeColours::Slider::kBackground : ThemeColours::Slider::kBackgroundDisabled);
@@ -271,11 +229,6 @@ namespace tss
     }
 
     // ComboBox colours -------------------------------------------------------
-    juce::Colour Theme::getComboBoxBaseColour() const
-    {
-        return getColour(ThemeColours::ComboBox::kBase);
-    }
-
     juce::Colour Theme::getComboBoxBackgroundColour(bool isEnabled) const
     {
         return getColour(isEnabled ? ThemeColours::ComboBox::kBackground : ThemeColours::ComboBox::kBackgroundDisabled);
@@ -301,11 +254,6 @@ namespace tss
     }
 
     // PopupMenu colours ------------------------------------------------------
-    juce::Colour Theme::getPopupMenuBaseColour() const
-    {
-        return getColour(ThemeColours::PopupMenu::kBase);
-    }
-
     juce::Colour Theme::getPopupMenuBackgroundColour() const
     {
         return getColour(ThemeColours::PopupMenu::kBackground);
@@ -348,11 +296,6 @@ namespace tss
     }
 
     // EnvelopeDisplay colours -------------------------------------------------
-    juce::Colour Theme::getEnvelopeDisplayBaseColour() const
-    {
-        return getColour(ThemeColours::EnvelopeDisplay::kBase);
-    }
-
     juce::Colour Theme::getEnvelopeDisplayBackgroundColour() const
     {
         return getColour(ThemeColours::EnvelopeDisplay::kBackground);
@@ -369,11 +312,6 @@ namespace tss
     }
 
     // PatchNameDisplay colours ------------------------------------------------
-    juce::Colour Theme::getPatchNameDisplayBaseColour() const
-    {
-        return getColour(ThemeColours::PatchNameDisplay::kBase);
-    }
-
     juce::Colour Theme::getPatchNameDisplayBackgroundColour() const
     {
         return getColour(ThemeColours::PatchNameDisplay::kBackground);
@@ -390,11 +328,6 @@ namespace tss
     }
 
     // TrackGeneratorDisplay colours -------------------------------------------
-    juce::Colour Theme::getTrackGeneratorDisplayBaseColour() const
-    {
-        return getColour(ThemeColours::TrackGeneratorDisplay::kBase);
-    }
-
     juce::Colour Theme::getTrackGeneratorDisplayBackgroundColour() const
     {
         return getColour(ThemeColours::TrackGeneratorDisplay::kBackground);

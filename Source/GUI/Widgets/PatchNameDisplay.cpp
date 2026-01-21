@@ -11,6 +11,7 @@ namespace tss
         , height_(height)
         , patchName_(PluginDescriptors::StandaloneWidgetDisplayNames::kDefaultPatchName)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -33,20 +34,15 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getPatchEditPanelBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawBackground(g, bounds);
         drawBorder(g, bounds);
         drawText(g, bounds);
     }
 
-    void PatchNameDisplay::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme_->getPatchNameDisplayBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void PatchNameDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

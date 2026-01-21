@@ -9,6 +9,7 @@ namespace tss
         ,width_(width)
         , height_(height)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -25,18 +26,13 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawLine(g, bounds);
     }
 
-    void HorizontalSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme_->getHorizontalSeparatorBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void HorizontalSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

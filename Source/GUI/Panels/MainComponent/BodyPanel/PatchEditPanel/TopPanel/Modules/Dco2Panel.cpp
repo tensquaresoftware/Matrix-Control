@@ -12,6 +12,7 @@ Dco2Panel::Dco2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,
@@ -121,6 +122,10 @@ Dco2Panel::~Dco2Panel() = default;
 
 void Dco2Panel::paint(juce::Graphics& g)
 {
+    if (theme_ == nullptr)
+    {
+        return;
+    }
     g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
 }
 

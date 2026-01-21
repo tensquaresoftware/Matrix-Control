@@ -12,6 +12,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,
@@ -119,6 +120,10 @@ RampPortamentoPanel::~RampPortamentoPanel() = default;
 
 void RampPortamentoPanel::paint(juce::Graphics& g)
 {
+    if (theme_ == nullptr)
+    {
+        return;
+    }
     g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
 }
 

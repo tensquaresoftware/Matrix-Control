@@ -17,9 +17,10 @@ class WidgetFactory;
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MainComponent(tss::Theme& theme, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MainComponent() override = default;
 
+    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
 
@@ -28,6 +29,12 @@ public:
     FooterPanel& getFooterPanel() { return footerPanel; }
 
 private:
+    void layoutHeaderPanel(juce::Rectangle<int> bounds, int y);
+    void layoutBodyPanel(juce::Rectangle<int> bounds, int y);
+    void layoutFooterPanel(juce::Rectangle<int> bounds, int y);
+
+    tss::Theme* theme_;
+
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;
     FooterPanel footerPanel;

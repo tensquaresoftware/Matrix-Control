@@ -14,6 +14,7 @@ MiddlePanel::MiddlePanel(Theme& theme)
     , trackGeneratorDisplay_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , patchNameDisplay_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
 {
+    setOpaque(true);
     setSize(getWidth(), getHeight());
 
     addAndMakeVisible(envelope1Display_);
@@ -53,6 +54,5 @@ void MiddlePanel::setTheme(Theme& theme)
     envelope3Display_.setTheme(theme);
     trackGeneratorDisplay_.setTheme(theme);
     patchNameDisplay_.setTheme(theme);
-    repaint();
 }
 

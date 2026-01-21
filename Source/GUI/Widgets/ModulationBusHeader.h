@@ -39,7 +39,6 @@ namespace tss
         juce::String busDestinationText;
         ColourVariant colourVariant;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         

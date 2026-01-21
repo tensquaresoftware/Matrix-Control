@@ -26,7 +26,6 @@ namespace tss
         int width_;
         int height_;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown);

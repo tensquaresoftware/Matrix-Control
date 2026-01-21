@@ -30,7 +30,6 @@ namespace tss
         int height_;
         juce::String patchName_;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);

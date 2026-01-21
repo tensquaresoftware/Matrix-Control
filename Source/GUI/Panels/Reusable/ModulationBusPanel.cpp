@@ -21,9 +21,11 @@ ModulationBusPanel::ModulationBusPanel(int busNumber,
                                       const juce::String& amountParamId,
                                       const juce::String& destinationParamId,
                                       const juce::String& busId)
-    : apvts_(apvts)
+    : theme_(&theme)
+    , apvts_(apvts)
     , busId_(busId)
 {
+    setOpaque(true);
     createBusNumberLabel(busNumber, theme);
     createSourceComboBox(factory, theme, sourceParamId, apvts);
     createAmountSlider(factory, theme, amountParamId, apvts);
@@ -127,8 +129,10 @@ void ModulationBusPanel::createSeparator(Theme& theme)
     addAndMakeVisible(*separator_);
 }
 
-void ModulationBusPanel::paint(juce::Graphics&)
+void ModulationBusPanel::paint(juce::Graphics& g)
 {
+    if (auto* currentTheme = theme_)
+        g.fillAll(currentTheme->getMatrixModulationPanelBackgroundColour());
 }
 
 void ModulationBusPanel::resized()
@@ -188,6 +192,8 @@ void ModulationBusPanel::layoutSeparator(int y)
 
 void ModulationBusPanel::setTheme(Theme& theme)
 {
+    theme_ = &theme;
+
     if (auto* label = busNumberLabel_.get())
         label->setTheme(theme);
 
@@ -205,8 +211,6 @@ void ModulationBusPanel::setTheme(Theme& theme)
 
     if (auto* separator = separator_.get())
         separator->setTheme(theme);
-
-    repaint();
 }
 
 int ModulationBusPanel::getHeight()

@@ -14,8 +14,7 @@ namespace tss
         enum class ColourVariant
         {
             Black,
-            Cream,
-            Debug
+            Cream
         };
 
         explicit Theme(ColourVariant colourVariant);
@@ -43,38 +42,31 @@ namespace tss
         juce::Colour getMasterEditPanelBackgroundColour() const;
 
         // SectionHeader colours ------------------------------------------------
-        juce::Colour getSectionHeaderBaseColour() const;
         juce::Colour getSectionHeaderContentAreaColour() const;
         juce::Colour getSectionHeaderTextColour() const;
         juce::Colour getSectionHeaderLineColourBlue() const;
         juce::Colour getSectionHeaderLineColourOrange() const;
 
         // ModuleHeader colours -------------------------------------------------
-        juce::Colour getModuleHeaderBaseColour() const;
         juce::Colour getModuleHeaderTextColour() const;
         juce::Colour getModuleHeaderLineColourBlue() const;
         juce::Colour getModuleHeaderLineColourOrange() const;
 
         // GroupLabel colours -------------------------------------------------
-        juce::Colour getGroupLabelBaseColour() const;
         juce::Colour getGroupLabelTextColour() const;
         juce::Colour getGroupLabelLineColour() const;
 
         // Label colours ------------------------------------------------------
         juce::Colour getLabelBackgroundColour() const;
         juce::Colour getLabelTextColour() const;
-        juce::Colour getLabelBaseColour() const;
 
         // VerticalSeparator colours ------------------------------------------
-        juce::Colour getVerticalSeparatorBaseColour() const;
         juce::Colour getVerticalSeparatorLineColour() const;
 
         // HorizontalSeparator colours -----------------------------------------
-        juce::Colour getHorizontalSeparatorBaseColour() const;
         juce::Colour getHorizontalSeparatorLineColour() const;
 
         // Button colours -----------------------------------------------------
-        juce::Colour getButtonBaseColour() const;
         juce::Colour getButtonBackgroundColourOff() const;
         juce::Colour getButtonBorderColourOff() const;
         juce::Colour getButtonTextColourOff() const;
@@ -87,7 +79,6 @@ namespace tss
         juce::Colour getButtonTextColourClicked() const;
 
         // Slider colours -----------------------------------------------------
-        juce::Colour getSliderBaseColour() const;
         juce::Colour getSliderBackgroundColour(bool isEnabled = true) const;
         juce::Colour getSliderBorderColour(bool isEnabled = true, bool hasFocus = false) const;
         juce::Colour getSliderTrackColour(bool isEnabled = true) const;
@@ -95,14 +86,12 @@ namespace tss
         juce::Colour getSliderFocusBorderColour() const;
 
         // ComboBox colours ---------------------------------------------------
-        juce::Colour getComboBoxBaseColour() const;
         juce::Colour getComboBoxBackgroundColour(bool isEnabled = true) const;
         juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool hasFocus = false) const;
         juce::Colour getComboBoxTriangleColour(bool isEnabled = true) const;
         juce::Colour getComboBoxTextColour(bool isEnabled = true) const;
 
         // PopupMenu colours --------------------------------------------------
-        juce::Colour getPopupMenuBaseColour() const;
         juce::Colour getPopupMenuBackgroundColour() const;
         juce::Colour getPopupMenuBorderColour() const;
         juce::Colour getPopupMenuSeparatorColour() const;
@@ -115,19 +104,16 @@ namespace tss
         juce::Colour getNumberBoxDotColour() const;
 
         // EnvelopeDisplay colours ----------------------------------------------
-        juce::Colour getEnvelopeDisplayBaseColour() const;
         juce::Colour getEnvelopeDisplayBackgroundColour() const;
         juce::Colour getEnvelopeDisplayBorderColour() const;
         juce::Colour getEnvelopeDisplayEnvelopeColour() const;
 
         // PatchNameDisplay colours ---------------------------------------------
-        juce::Colour getPatchNameDisplayBaseColour() const;
         juce::Colour getPatchNameDisplayBackgroundColour() const;
         juce::Colour getPatchNameDisplayBorderColour() const;
         juce::Colour getPatchNameDisplayTextColour() const;
 
         // TrackGeneratorDisplay colours ----------------------------------------
-        juce::Colour getTrackGeneratorDisplayBaseColour() const;
         juce::Colour getTrackGeneratorDisplayBackgroundColour() const;
         juce::Colour getTrackGeneratorDisplayBorderColour() const;
         juce::Colour getTrackGeneratorDisplayShaperColour() const;

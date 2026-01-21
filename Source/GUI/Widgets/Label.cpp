@@ -10,6 +10,7 @@ namespace tss
         , height_(height)
         , labelText_(text)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -35,19 +36,14 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getGuiBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawBackground(g, bounds);
         drawText(g, bounds);
     }
 
-    void Label::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme_->getLabelBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void Label::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

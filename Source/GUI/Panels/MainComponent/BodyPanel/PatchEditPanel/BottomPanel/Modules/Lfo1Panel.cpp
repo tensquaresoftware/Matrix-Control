@@ -12,6 +12,7 @@ Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,
@@ -121,6 +122,10 @@ Lfo1Panel::~Lfo1Panel() = default;
 
 void Lfo1Panel::paint(juce::Graphics& g)
 {
+    if (theme_ == nullptr)
+    {
+        return;
+    }
     g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
 }
 

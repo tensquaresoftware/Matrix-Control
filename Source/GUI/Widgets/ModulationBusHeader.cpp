@@ -13,6 +13,7 @@ namespace tss
         , busDestinationText(PluginDescriptors::ParameterDisplayNames::kModulationBusDestination)
         , colourVariant(variant)
     {
+        setOpaque(true);
         setSize(width, height);
     }
 
@@ -29,19 +30,14 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme->getMatrixModulationPanelBackgroundColour());
+
         auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawText(g, bounds);
         drawLine(g, bounds);
     }
 
-    void ModulationBusHeader::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        auto baseColour = theme->getModuleHeaderBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void ModulationBusHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

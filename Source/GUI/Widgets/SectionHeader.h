@@ -37,7 +37,6 @@ namespace tss
         juce::String text_;
         ColourVariant colourVariant_;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawContentArea(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

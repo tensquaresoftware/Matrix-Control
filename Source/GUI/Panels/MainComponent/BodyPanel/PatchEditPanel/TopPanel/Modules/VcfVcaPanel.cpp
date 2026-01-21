@@ -12,6 +12,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,
@@ -119,6 +120,10 @@ VcfVcaPanel::~VcfVcaPanel() = default;
 
 void VcfVcaPanel::paint(juce::Graphics& g)
 {
+    if (theme_ == nullptr)
+    {
+        return;
+    }
     g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
 }
 

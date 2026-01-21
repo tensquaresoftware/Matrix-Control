@@ -12,6 +12,7 @@ namespace tss
         , height_(height)
         , style_(style)
     {
+        setOpaque(true);
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
@@ -30,25 +31,20 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getGuiBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
         const auto hasFocus = focusableWidget_.hasFocus() || isPopupOpen_;
 
         const auto backgroundBounds = calculateBackgroundBounds(bounds);
 
-        drawBase(g, bounds);
         drawBackground(g, backgroundBounds, enabled);
         drawBorder(g, bounds, backgroundBounds, enabled, hasFocus);
         drawText(g, bounds, enabled);
         drawTriangle(g, bounds, enabled);
     }
 
-    void ComboBox::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme_->getComboBoxBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {

@@ -18,9 +18,11 @@ ParameterPanel::ParameterPanel(Theme& theme,
                                 ParameterType type,
                                 ModuleType moduleType,
                                 juce::AudioProcessorValueTreeState& apvts)
-    : parameterType_(type)
+    : theme_(&theme)
+    , parameterType_(type)
     , moduleType_(moduleType)
 {
+    setOpaque(true);
     if (type == ParameterType::None)
     {
         createSeparator(theme);
@@ -161,8 +163,24 @@ void ParameterPanel::layoutSeparator(int y)
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
+void ParameterPanel::paint(juce::Graphics& g)
+{
+    if (theme_ == nullptr)
+    {
+        return;
+    }
+
+    const auto backgroundColour = (moduleType_ == ModuleType::PatchEdit)
+        ? theme_->getPatchEditModulePanelBackgroundColour()
+        : theme_->getMasterEditPanelBackgroundColour();
+
+    g.fillAll(backgroundColour);
+}
+
 void ParameterPanel::setTheme(Theme& theme)
 {
+    theme_ = &theme;
+
     if (auto* label = label_.get())
         label->setTheme(theme);
 
@@ -174,8 +192,6 @@ void ParameterPanel::setTheme(Theme& theme)
 
     if (auto* separator = separator_.get())
         separator->setTheme(theme);
-
-    repaint();
 }
 
 int ParameterPanel::getTotalHeight() const

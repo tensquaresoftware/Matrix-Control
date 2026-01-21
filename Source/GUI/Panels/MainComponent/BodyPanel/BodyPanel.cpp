@@ -14,6 +14,7 @@ using tss::VerticalSeparator;
 BodyPanel::BodyPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : theme_(&theme)
 {
+    setOpaque(true);
     patchEditPanel_ = std::make_unique<PatchEditPanel>(theme, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel_);
 
@@ -118,7 +119,5 @@ void BodyPanel::setTheme(Theme& theme)
 
     if (auto* panel = patchManagerPanel_.get())
         panel->setTheme(theme);
-
-    repaint();
 }
 

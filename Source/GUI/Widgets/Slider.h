@@ -50,7 +50,6 @@ namespace tss
         juce::Point<int> dragStartPosition;
         juce::String unit;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
         void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

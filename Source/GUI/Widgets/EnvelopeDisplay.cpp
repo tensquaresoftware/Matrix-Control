@@ -9,6 +9,8 @@ namespace tss
         , width_(width)
         , height_(height)
     {
+        setOpaque(true);
+        setBufferedToImage(false);
         setSize(width_, height_);
     }
 
@@ -27,26 +29,18 @@ namespace tss
 
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawBackground(g, bounds);
         drawBorder(g, bounds);
         drawTriangle(g, bounds);
     }
 
-    void EnvelopeDisplay::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme_->getEnvelopeDisplayBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void EnvelopeDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto backgroundColour = theme_->getEnvelopeDisplayBackgroundColour();
-        const auto contentBounds = bounds.reduced(0, kVerticalPadding_);
-
+        
         g.setColour(backgroundColour);
-        g.fillRect(contentBounds);
+        g.fillRect(bounds);
     }
 
     void EnvelopeDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)

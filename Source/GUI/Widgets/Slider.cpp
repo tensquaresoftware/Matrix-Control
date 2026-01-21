@@ -9,6 +9,7 @@ namespace tss
         , theme(&inTheme)
         , defaultValue(initValue)
     {
+        setOpaque(true);
         setSize(kWidth_, kHeight_);
         setWantsKeyboardFocus(true);
         setInterceptsMouseClicks(true, false);
@@ -38,6 +39,8 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme->getGuiBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
         const auto hasFocus = focusableWidget.hasFocus();
@@ -45,7 +48,6 @@ namespace tss
         const auto backgroundBounds = calculateBackgroundBounds(bounds);
         const auto trackBounds = calculateTrackBounds(backgroundBounds, enabled);
 
-        drawBase(g, bounds);
         drawBackground(g, backgroundBounds, enabled);
         drawBorder(g, bounds, backgroundBounds, enabled, hasFocus);
         drawTrack(g, trackBounds, enabled);
@@ -85,12 +87,6 @@ namespace tss
         return juce::Rectangle<float>(trackArea.getX(), trackArea.getY(), trackWidth, trackArea.getHeight());
     }
 
-    void Slider::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme->getSliderBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void Slider::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {

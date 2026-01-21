@@ -19,10 +19,12 @@ ModuleHeaderPanel::ModuleHeaderPanel(Theme& theme,
                                      const juce::String& initWidgetId,
                                      const juce::String& copyWidgetId,
                                      const juce::String& pasteWidgetId)
-    : buttonSet_(buttonSet)
+    : theme_(&theme)
+    , buttonSet_(buttonSet)
     , moduleType_(moduleType)
     , apvts_(apvts)
 {
+    setOpaque(true);
     createModuleHeader(theme, factory, moduleId);
     createInitButton(theme, factory, initWidgetId);
 
@@ -134,8 +136,24 @@ void ModuleHeaderPanel::layoutInitCopyPasteButtons()
         button->setBounds(panelWidth - pasteButtonWidth - copyButtonWidth - initButtonWidth, y, initButtonWidth, buttonHeight);
 }
 
+void ModuleHeaderPanel::paint(juce::Graphics& g)
+{
+    if (theme_ == nullptr)
+    {
+        return;
+    }
+
+    const auto backgroundColour = (moduleType_ == ModuleType::PatchEdit)
+        ? theme_->getPatchEditModulePanelBackgroundColour()
+        : theme_->getMasterEditPanelBackgroundColour();
+
+    g.fillAll(backgroundColour);
+}
+
 void ModuleHeaderPanel::setTheme(Theme& theme)
 {
+    theme_ = &theme;
+
     if (auto* header = moduleHeader_.get())
         header->setTheme(theme);
 
@@ -147,6 +165,4 @@ void ModuleHeaderPanel::setTheme(Theme& theme)
 
     if (auto* button = pasteButton_.get())
         button->setTheme(theme);
-
-    repaint();
 }

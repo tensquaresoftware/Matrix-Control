@@ -10,6 +10,7 @@ namespace tss
         , height_(height)
         , labelText_(text)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -35,18 +36,14 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getPatchManagerPanelBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawText(g, bounds);
         drawLines(g, bounds);
     }
 
-    void GroupLabel::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        g.setColour(theme_->getGroupLabelBaseColour());
-        g.fillRect(bounds);
-    }
 
     void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

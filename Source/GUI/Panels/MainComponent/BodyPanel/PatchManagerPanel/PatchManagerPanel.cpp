@@ -24,6 +24,7 @@ PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory,
     , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(theme, widgetFactory, apvts))
     , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(theme, widgetFactory, apvts))
 {
+    setOpaque(true);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*bankUtilityPanel_);
     addAndMakeVisible(*internalPatchesPanel_);
@@ -124,7 +125,5 @@ void PatchManagerPanel::setTheme(Theme& theme)
 
     if (auto* panel = computerPatchesPanel_.get())
         panel->setTheme(theme);
-
-    repaint();
 }
 

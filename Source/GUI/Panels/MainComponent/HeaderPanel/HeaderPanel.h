@@ -22,7 +22,6 @@ public:
 
     tss::Button& getButtonBlack() { return blackThemeButton_; }
     tss::Button& getButtonCream() { return creamThemeButton_; }
-    tss::Button& getButtonDebug() { return debugThemeButton_; }
     tss::Button& getButtonDisabled() { return someDisabledButton_; }
 
     static int getHeight() { return kHeight_; }
@@ -40,7 +39,6 @@ private:
 
     tss::Button blackThemeButton_;
     tss::Button creamThemeButton_;
-    tss::Button debugThemeButton_;
     tss::Button someDisabledButton_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)

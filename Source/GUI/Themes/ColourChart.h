@@ -4,10 +4,10 @@
 
 struct ColourChart
 {
+    static constexpr juce::uint32 kTransparent        = 0x00112233;
     static constexpr juce::uint32 kBlack              = 0xFF000000;
     static constexpr juce::uint32 kWhite              = 0xFFFFFFFF;
     static constexpr juce::uint32 kCream              = 0xFFE9E8D5;
-    static constexpr juce::uint32 kTransparent        = 0x00112233;
 
     static constexpr juce::uint32 kDarkGrey1          = 0xFF101010;
     static constexpr juce::uint32 kDarkGrey2          = 0xFF202020;
@@ -22,18 +22,11 @@ struct ColourChart
     static constexpr juce::uint32 kRed                = 0xFFFF0000;
     static constexpr juce::uint32 kOrange             = 0xFFF87A00;
     static constexpr juce::uint32 kYellow             = 0xFFFFFF00;
-    static constexpr juce::uint32 kBlue               = 0xFF004FB0; // 0xFF2C69DA
+    static constexpr juce::uint32 kBlue               = 0xFF004FB0;
     
     static constexpr juce::uint32 kGreen1             = 0xFF002D0E;
     static constexpr juce::uint32 kGreen2             = 0xFF06471C;
     static constexpr juce::uint32 kGreen3             = 0xFF00785E;
     static constexpr juce::uint32 kGreen4             = 0xFF00DDAD;
-
-    static constexpr juce::uint32 kBackgroundDisabled = 0xFF303030;
-    static constexpr juce::uint32 kBorderDisabled     = 0xFF404040;
-    static constexpr juce::uint32 kDecorationDisabled = 0xFF505050;
-    static constexpr juce::uint32 kContentDisabled    = 0xFF505050;
-
-    static constexpr juce::uint32 kContentHoover      = 0xFF151515;
 };
 

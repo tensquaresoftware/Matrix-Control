@@ -7,6 +7,7 @@ namespace tss
     VerticalSeparator::VerticalSeparator(Theme& inTheme)
         : theme(&inTheme)
     {
+        setOpaque(true);
         setSize(kWidth_, kHeight_);
     }
 
@@ -23,18 +24,13 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme->getGuiBackgroundColour());
+
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawLine(g, bounds);
     }
 
-    void VerticalSeparator::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme->getVerticalSeparatorBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void VerticalSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

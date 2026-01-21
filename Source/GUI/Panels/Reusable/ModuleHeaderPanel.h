@@ -33,6 +33,7 @@ public:
                      const juce::String& pasteWidgetId = juce::String());
     ~ModuleHeaderPanel() override;
 
+    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
     static int getHeight() { return PluginDimensions::Widgets::Heights::kModuleHeader; }
@@ -46,6 +47,7 @@ private:
     void layoutInitOnlyButtons();
     void layoutInitCopyPasteButtons();
 
+    tss::Theme* theme_;
     ButtonSet buttonSet_;
     ModuleType moduleType_;
 

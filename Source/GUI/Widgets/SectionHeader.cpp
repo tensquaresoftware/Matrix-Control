@@ -11,6 +11,7 @@ namespace tss
         , text_(text)
         , colourVariant_(variant)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -27,20 +28,16 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getPatchManagerPanelBackgroundColour());
+
         auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawContentArea(g, bounds);
         drawLeftLine(g, bounds);
         drawText(g, bounds);
         drawRightLine(g, bounds);
     }
 
-    void SectionHeader::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        g.setColour(theme_->getSectionHeaderBaseColour());
-        g.fillRect(bounds);
-    }
 
     void SectionHeader::drawContentArea(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

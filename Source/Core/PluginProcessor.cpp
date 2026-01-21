@@ -23,7 +23,9 @@ PluginProcessor::PluginProcessor()
     initializeMidiPortProperties();
     apvts.state.addListener(this);
     
+#if JUCE_DEBUG
     enableApvtsLogging();
+#endif
 }
 
 PluginProcessor::~PluginProcessor()
@@ -98,8 +100,10 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused(sampleRate, samplesPerBlock);
     
+#if JUCE_DEBUG
     enableFileLoggingForSession();
     enableApvtsLogging();
+#endif
     startMidiThread();
 }
 
@@ -114,8 +118,10 @@ void PluginProcessor::startMidiThread()
 void PluginProcessor::releaseResources()
 {
     stopMidiThread();
+#if JUCE_DEBUG
     disableApvtsLogging();
     closeLogFileForSession();
+#endif
 }
 
 void PluginProcessor::stopMidiThread()
@@ -236,115 +242,141 @@ void PluginProcessor::disableApvtsLogging()
     ApvtsLogger::getInstance().setLogToFile(false);
 }
 
-void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                              const juce::Identifier& property)
+juce::String PluginProcessor::getThreadNameForLogging() const
 {
-    juce::var newValue = treeWhosePropertyHasChanged.getProperty(property);
+    if (juce::Thread::getCurrentThread() != nullptr)
+        return juce::Thread::getCurrentThread()->getThreadName();
     
-    juce::String threadName = juce::Thread::getCurrentThread() != nullptr 
-        ? juce::Thread::getCurrentThread()->getThreadName() 
-        : (juce::MessageManager::getInstance()->isThisTheMessageThread() ? "MessageThread" : "Unknown");
+    if (juce::MessageManager::getInstance()->isThisTheMessageThread())
+        return "MessageThread";
     
-    juce::String propertyId = property.toString();
-    juce::String parameterId = propertyId;
+    return "Unknown";
+}
+
+juce::String PluginProcessor::findParameterIdInDirectTree(juce::ValueTree& tree) const
+{
+    juce::Identifier treeType = tree.getType();
+    juce::String treeTypeStr = treeType.toString();
     
-    if (propertyId == "value")
+    if (treeTypeStr == "PARAM")
     {
-        juce::Identifier treeType = treeWhosePropertyHasChanged.getType();
-        juce::String treeTypeStr = treeType.toString();
+        juce::var idProperty = tree.getProperty("id");
+        if (idProperty.isString() && idProperty.toString().isNotEmpty())
+            return idProperty.toString();
         
-        if (treeTypeStr == "PARAM")
-        {
-            juce::var idProperty = treeWhosePropertyHasChanged.getProperty("id");
-            if (idProperty.isString() && idProperty.toString().isNotEmpty())
-            {
-                parameterId = idProperty.toString();
-            }
-            else
-            {
-                idProperty = treeWhosePropertyHasChanged.getProperty("parameterID");
-                if (idProperty.isString() && idProperty.toString().isNotEmpty())
-                {
-                    parameterId = idProperty.toString();
-                }
-                else
-                {
-                    parameterId = treeTypeStr;
-                }
-            }
-        }
-        else
-        {
-            parameterId = treeTypeStr;
-        }
+        idProperty = tree.getProperty("parameterID");
+        if (idProperty.isString() && idProperty.toString().isNotEmpty())
+            return idProperty.toString();
     }
     
+    return treeTypeStr;
+}
+
+juce::String PluginProcessor::findParameterIdInParentTree(juce::ValueTree& tree) const
+{
+    juce::ValueTree parentTree = tree.getParent();
+    if (!parentTree.isValid())
+        return juce::String();
+    
+    juce::Identifier parentType = parentTree.getType();
+    juce::String parentTypeStr = parentType.toString();
+    
+    if (parentTypeStr == "PARAM" || parentTypeStr == "ROOT")
+        return juce::String();
+    
+    juce::String parameterId = parentTypeStr;
     auto* parameter = apvts.getParameter(parameterId);
     
     if (parameter != nullptr)
     {
         juce::String paramId = parameter->getParameterID();
         if (paramId.isNotEmpty())
-        {
             parameterId = paramId;
-        }
     }
-    else if (propertyId == "value")
+    
+    return parameterId;
+}
+
+juce::String PluginProcessor::findParameterIdInChildren(juce::ValueTree& changedTree, const juce::var& newValue) const
+{
+    for (int i = 0; i < apvts.state.getNumChildren(); ++i)
     {
-        juce::ValueTree parentTree = treeWhosePropertyHasChanged.getParent();
-        if (parentTree.isValid())
+        juce::ValueTree child = apvts.state.getChild(i);
+        if (!child.isValid())
+            continue;
+        
+        juce::Identifier childType = child.getType();
+        juce::String childTypeStr = childType.toString();
+        
+        if (childTypeStr == "PARAM")
         {
-            juce::Identifier parentType = parentTree.getType();
-            juce::String parentTypeStr = parentType.toString();
-            
-            if (parentTypeStr != "PARAM" && parentTypeStr != "ROOT")
+            juce::var idProperty = child.getProperty("id");
+            if (idProperty.isString() && idProperty.toString().isNotEmpty())
             {
-                parameterId = parentTypeStr;
-                parameter = apvts.getParameter(parameterId);
-                if (parameter != nullptr)
+                juce::String childParamId = idProperty.toString();
+                if (child == changedTree || 
+                    child.getChildWithProperty("value", newValue) == changedTree)
                 {
-                    juce::String paramId = parameter->getParameterID();
-                    if (paramId.isNotEmpty())
-                    {
-                        parameterId = paramId;
-                    }
+                    return childParamId;
                 }
             }
         }
-        
-        if (parameter == nullptr)
+        else if (child == changedTree)
         {
-            for (int i = 0; i < apvts.state.getNumChildren(); ++i)
-            {
-                juce::ValueTree child = apvts.state.getChild(i);
-                if (child.isValid())
-                {
-                    juce::Identifier childType = child.getType();
-                    juce::String childTypeStr = childType.toString();
-                    
-                    if (childTypeStr == "PARAM")
-                    {
-                        juce::var idProperty = child.getProperty("id");
-                        if (idProperty.isString() && idProperty.toString().isNotEmpty())
-                        {
-                            juce::String childParamId = idProperty.toString();
-                            if (child == treeWhosePropertyHasChanged || 
-                                child.getChildWithProperty("value", newValue) == treeWhosePropertyHasChanged)
-                            {
-                                parameterId = childParamId;
-                                break;
-                            }
-                        }
-                    }
-                    else if (child == treeWhosePropertyHasChanged)
-                    {
-                        parameterId = childTypeStr;
-                        break;
-                    }
-                }
-            }
+            return childTypeStr;
         }
     }
+    
+    return juce::String();
+}
+
+juce::String PluginProcessor::resolveParameterIdFromTree(juce::ValueTree& tree, const juce::Identifier& property) const
+{
+    juce::String propertyId = property.toString();
+    juce::String parameterId = propertyId;
+    
+    if (propertyId != "value")
+        return parameterId;
+    
+    parameterId = findParameterIdInDirectTree(tree);
+    auto* parameter = apvts.getParameter(parameterId);
+    
+    if (parameter != nullptr)
+    {
+        juce::String paramId = parameter->getParameterID();
+        if (paramId.isNotEmpty())
+            parameterId = paramId;
+        
+        return parameterId;
+    }
+    
+    juce::String parentParamId = findParameterIdInParentTree(tree);
+    if (parentParamId.isNotEmpty())
+    {
+        parameter = apvts.getParameter(parentParamId);
+        if (parameter != nullptr)
+        {
+            juce::String paramId = parameter->getParameterID();
+            if (paramId.isNotEmpty())
+                return paramId;
+        }
+        return parentParamId;
+    }
+    
+    juce::var newValue = tree.getProperty(property);
+    juce::String childParamId = findParameterIdInChildren(tree, newValue);
+    if (childParamId.isNotEmpty())
+        return childParamId;
+    
+    return parameterId;
+}
+
+void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                              const juce::Identifier& property)
+{
+    juce::var newValue = treeWhosePropertyHasChanged.getProperty(property);
+    juce::String threadName = getThreadNameForLogging();
+    juce::String parameterId = resolveParameterIdFromTree(treeWhosePropertyHasChanged, property);
     
     ApvtsLogger::getInstance().logValueTreePropertyChanged(
         juce::Identifier(parameterId), 

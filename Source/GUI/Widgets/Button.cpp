@@ -10,6 +10,7 @@ namespace tss
         , width_(width)
         , height_(height)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -29,18 +30,11 @@ namespace tss
         const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
 
-        drawBase(g, bounds);
         drawBackground(g, bounds, enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
         drawBorder(g, bounds, enabled);
         drawText(g, bounds, enabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
     }
 
-    void Button::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme_->getButtonBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void Button::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown)
     {

@@ -8,6 +8,7 @@ namespace tss
         : theme(&inTheme)
         , editable(inEditable)
     {
+        setOpaque(true);
         setSize(width, kHeight_);
     }
 
@@ -44,7 +45,6 @@ namespace tss
 
         const auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawBackground(g, bounds);
         drawBorder(g, bounds);
         drawText(g, bounds);
@@ -67,12 +67,6 @@ namespace tss
         repaint();
     }
 
-    void NumberBox::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto baseColour = theme->getButtonBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void NumberBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

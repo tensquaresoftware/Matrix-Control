@@ -28,7 +28,6 @@ namespace tss
         int width_;
         int height_;
 
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds);

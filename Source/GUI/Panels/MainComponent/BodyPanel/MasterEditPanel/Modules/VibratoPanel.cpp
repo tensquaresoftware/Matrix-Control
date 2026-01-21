@@ -12,6 +12,7 @@ VibratoPanel::VibratoPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,

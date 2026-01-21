@@ -50,6 +50,8 @@ private:
 
     inline constexpr static int kSpacing_ = 5;
 
+    tss::Theme* theme_;
+
     std::unique_ptr<tss::Label> busNumberLabel_;
     std::unique_ptr<tss::ComboBox> sourceComboBox_;
     std::unique_ptr<tss::Slider> amountSlider_;

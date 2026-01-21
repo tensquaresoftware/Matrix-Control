@@ -67,6 +67,12 @@ private:
     void closeLogFileForSession();
     void enableApvtsLogging();
     void disableApvtsLogging();
+    
+    juce::String getThreadNameForLogging() const;
+    juce::String resolveParameterIdFromTree(juce::ValueTree& tree, const juce::Identifier& property) const;
+    juce::String findParameterIdInDirectTree(juce::ValueTree& tree) const;
+    juce::String findParameterIdInParentTree(juce::ValueTree& tree) const;
+    juce::String findParameterIdInChildren(juce::ValueTree& changedTree, const juce::var& newValue) const;
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;

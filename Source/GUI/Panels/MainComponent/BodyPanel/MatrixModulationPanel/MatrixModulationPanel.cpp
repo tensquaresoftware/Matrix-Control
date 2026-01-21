@@ -26,6 +26,7 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& theme, WidgetFactory& widget
         PluginDimensions::Widgets::Widths::ModulationBusHeader::kStandard,
         PluginDimensions::Widgets::Heights::kModulationBusHeader))
 {
+    setOpaque(true);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*modulationBusHeader_);
 
@@ -192,7 +193,5 @@ void MatrixModulationPanel::setTheme(Theme& theme)
         if (bus != nullptr)
             bus->setTheme(theme);
     }
-
-    repaint();
 }
 

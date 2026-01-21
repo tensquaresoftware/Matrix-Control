@@ -12,6 +12,7 @@ MidiPanel::MidiPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,

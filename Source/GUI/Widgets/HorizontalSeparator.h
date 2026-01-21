@@ -26,7 +26,6 @@ namespace tss
         int width_;
         int height_;
         
-        void drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HorizontalSeparator)

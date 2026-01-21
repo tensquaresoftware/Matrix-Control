@@ -14,8 +14,21 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     
     widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
     
-    mainComponent = std::make_unique<MainComponent>(*theme, *widgetFactory, pluginProcessor.getApvts());
+    setOpaque(true);
+    setWantsKeyboardFocus(false);
+    setInterceptsMouseClicks(true, true);
+    
+    setSize(getWidth(), getHeight());
+    
+    const auto editorWidth = getWidth();
+    const auto editorHeight = getHeight();
+    mainComponent = std::make_unique<MainComponent>(*theme, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent);
+    
+    if (auto* component = mainComponent.get())
+    {
+        component->setBounds(getLocalBounds());
+    }
     
     auto& headerPanel = mainComponent->getHeaderPanel();
     headerPanel.getButtonBlack().onClick = [this]
@@ -30,16 +43,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         updateTheme();
     };
     
-    headerPanel.getButtonDebug().onClick = [this]
-    {
-        theme = tss::Theme::create(tss::Theme::ColourVariant::Debug);
-        updateTheme();
-    };
-    
-    setWantsKeyboardFocus(false);
-    setInterceptsMouseClicks(true, true);
-    
-    setSize(getWidth(), getHeight());
+    repaint();
 }
 
 PluginEditor::~PluginEditor() = default;

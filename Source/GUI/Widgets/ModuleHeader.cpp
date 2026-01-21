@@ -11,6 +11,7 @@ namespace tss
         , text_(text)
         , colourVariant_(variant)
     {
+        setOpaque(true);
         setSize(width_, height_);
     }
 
@@ -36,19 +37,14 @@ namespace tss
             return;
         }
 
+        g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
+
         auto bounds = getLocalBounds().toFloat();
 
-        drawBase(g, bounds);
         drawText(g, bounds);
         drawLine(g, bounds);
     }
 
-    void ModuleHeader::drawBase(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        auto baseColour = theme_->getModuleHeaderBaseColour();
-        g.setColour(baseColour);
-        g.fillRect(bounds);
-    }
 
     void ModuleHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {

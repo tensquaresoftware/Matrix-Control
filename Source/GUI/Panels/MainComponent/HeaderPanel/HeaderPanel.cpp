@@ -10,12 +10,11 @@ HeaderPanel::HeaderPanel(Theme& theme)
     : theme_(&theme)
     , blackThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "BLACK")
     , creamThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "CREAM")
-    , debugThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "DEBUG")
     , someDisabledButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "DISABLED")
 {
+    setOpaque(true);
     addAndMakeVisible(blackThemeButton_);
     addAndMakeVisible(creamThemeButton_);
-    addAndMakeVisible(debugThemeButton_);
     someDisabledButton_.setEnabled(false);
     addAndMakeVisible(someDisabledButton_);
 }
@@ -49,15 +48,7 @@ void HeaderPanel::resized()
         buttonHeight
     );
     
-    const auto debugThemeButtonX = creamThemeButtonX + buttonWidth + buttonSpacing;
-    debugThemeButton_.setBounds(
-        bounds.getX() + debugThemeButtonX,
-        bounds.getY() + buttonY,
-        buttonWidth,
-        buttonHeight
-    );
-    
-    const auto someDisabledButtonX = debugThemeButtonX + buttonWidth + buttonSpacing;
+    const auto someDisabledButtonX = creamThemeButtonX + buttonWidth + buttonSpacing;
     someDisabledButton_.setBounds(
         bounds.getX() + someDisabledButtonX,
         bounds.getY() + buttonY,
@@ -71,8 +62,6 @@ void HeaderPanel::setTheme(Theme& theme)
     theme_ = &theme;
     blackThemeButton_.setTheme(theme);
     creamThemeButton_.setTheme(theme);
-    debugThemeButton_.setTheme(theme);
     someDisabledButton_.setTheme(theme);
-    repaint();
 }
 

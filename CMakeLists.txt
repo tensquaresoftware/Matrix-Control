@@ -94,6 +94,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
     
     # GUI - Panels - Reusable
+    Source/GUI/Panels/Reusable/BaseModulePanel.cpp
     Source/GUI/Panels/Reusable/ModuleHeaderPanel.cpp
     Source/GUI/Panels/Reusable/ParameterPanel.cpp
     Source/GUI/Panels/Reusable/ModulationBusPanel.cpp

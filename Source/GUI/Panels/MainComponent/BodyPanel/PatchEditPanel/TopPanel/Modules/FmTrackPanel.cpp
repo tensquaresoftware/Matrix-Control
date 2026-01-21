@@ -12,6 +12,7 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,
@@ -119,6 +120,10 @@ FmTrackPanel::~FmTrackPanel() = default;
 
 void FmTrackPanel::paint(juce::Graphics& g)
 {
+    if (theme_ == nullptr)
+    {
+        return;
+    }
     g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
 }
 

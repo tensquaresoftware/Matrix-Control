@@ -21,6 +21,7 @@ TopPanel::TopPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProces
     , fmTrackPanel_(std::make_unique<FmTrackPanel>(theme, widgetFactory, apvts))
     , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(theme, widgetFactory, apvts))
 {
+    setOpaque(true);
     addAndMakeVisible(*dco1Panel_);
     addAndMakeVisible(*dco2Panel_);
     addAndMakeVisible(*vcfVcaPanel_);
@@ -105,7 +106,5 @@ void TopPanel::setTheme(Theme& theme)
 
     if (auto* panel = rampPortamentoPanel_.get())
         panel->setTheme(theme);
-
-    repaint();
 }
 

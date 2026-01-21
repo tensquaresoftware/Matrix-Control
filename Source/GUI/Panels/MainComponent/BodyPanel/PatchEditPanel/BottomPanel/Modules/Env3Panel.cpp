@@ -12,6 +12,7 @@ Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
     : theme_(&theme)
     , apvts_(apvts)
 {
+    setOpaque(true);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,
@@ -121,6 +122,10 @@ Env3Panel::~Env3Panel() = default;
 
 void Env3Panel::paint(juce::Graphics& g)
 {
+    if (theme_ == nullptr)
+    {
+        return;
+    }
     g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
 }
 

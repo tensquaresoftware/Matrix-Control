@@ -11,6 +11,7 @@ FooterPanel::FooterPanel(Theme& inTheme, juce::AudioProcessorValueTreeState& apv
     : theme(&inTheme)
     , apvts(apvtsRef)
 {
+    setOpaque(true);
     // Écouter les changements de l'APVTS
     apvts.state.addListener(this);
     
@@ -65,7 +66,6 @@ void FooterPanel::resized()
 void FooterPanel::setTheme(Theme& inTheme)
 {
     theme = &inTheme;
-    repaint();
 }
 
 void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
