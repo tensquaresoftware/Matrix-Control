@@ -9,24 +9,24 @@ namespace tss
     class VerticalSeparator : public juce::Component
     {
     public:
-        explicit VerticalSeparator(Theme& inTheme);
+        explicit VerticalSeparator(Theme& theme, int width, int height);
         ~VerticalSeparator() override = default;
 
         void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
 
-        static constexpr int getWidth() { return kWidth_; }
-        static constexpr int getHeight() { return kHeight_; }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kWidth_ = 30;
-        inline constexpr static int kHeight_ = 730;
         inline constexpr static float kLineWidth_ = 4.0f;
+        inline constexpr static float kTopPadding_ = 4.0f;
+        inline constexpr static float kBottomPadding_ = 2.0f;
 
-        Theme* theme = nullptr;
-
-        void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
+        Theme* theme_ = nullptr;
+        int width_;
+        int height_;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VerticalSeparator)
     };

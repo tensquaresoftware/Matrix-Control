@@ -6,18 +6,17 @@ namespace tss
 {
     GroupLabel::GroupLabel(Theme& theme, int width, int height, const juce::String& text)
         : theme_(&theme)
-        ,width_(width)
+        , width_(width)
         , height_(height)
         , labelText_(text)
     {
-        setOpaque(true);
+        setOpaque(false);
         setSize(width_, height_);
     }
 
     void GroupLabel::setTheme(Theme& theme)
     {
         theme_ = &theme;
-        repaint();
     }
 
     void GroupLabel::setText(const juce::String& text)
@@ -31,94 +30,77 @@ namespace tss
 
     void GroupLabel::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
-        {
+        if (theme_ == nullptr || labelText_.isEmpty())
             return;
-        }
 
-        g.fillAll(theme_->getPatchManagerPanelBackgroundColour());
-
-        const auto bounds = getLocalBounds().toFloat();
-
-        drawText(g, bounds);
-        drawLines(g, bounds);
-    }
-
-
-    void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        if (labelText_.isEmpty())
-        {
-            return;
-        }
-
-        const auto textArea = getContentArea(bounds);
-        const auto font = theme_->getBaseFont();
-
-        g.setColour(theme_->getGroupLabelTextColour());
-        g.setFont(font);
-        g.drawText(labelText_, textArea, juce::Justification::centred, false);
-    }
-
-    void GroupLabel::drawLines(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        if (labelText_.isEmpty())
-        {
-            return;
-        }
-
-        const auto textArea = getContentArea(bounds);
+        const auto contentArea = calculateContentArea();
         const auto textWidth = calculateTextWidth();
-        const auto textCentreX = textArea.getCentreX();
-        const auto lineY = textArea.getCentreY();
+
+        drawText(g, contentArea);
+        drawLines(g, contentArea, textWidth);
+    }
+
+    void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& area)
+    {
+        g.setColour(theme_->getGroupLabelTextColour());
+        g.setFont(theme_->getBaseFont());
+        g.drawText(labelText_, area, juce::Justification::centred, false);
+    }
+
+    void GroupLabel::drawLines(juce::Graphics& g, const juce::Rectangle<float>& area, float textWidth)
+    {
         const auto halfTextWidth = textWidth * 0.5f;
+        const auto centreX = area.getCentreX();
+        const auto centreY = area.getCentreY();
 
         g.setColour(theme_->getGroupLabelLineColour());
 
-        drawLeftLine(g, textArea, textCentreX, halfTextWidth, lineY);
-        drawRightLine(g, textArea, textCentreX, halfTextWidth, lineY);
+        drawLeftLine(g, area, centreX, halfTextWidth, centreY);
+        drawRightLine(g, area, centreX, halfTextWidth, centreY);
     }
 
-    void GroupLabel::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY)
+    void GroupLabel::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY)
     {
-        const auto leftLineEndX = textCentreX - halfTextWidth - kTextSpacing_;
-        const auto leftLineWidth = leftLineEndX - textArea.getX();
+        const auto lineEndX = centreX - halfTextWidth - kTextSpacing_;
+        const auto lineWidth = lineEndX - area.getX();
 
-        if (leftLineWidth > 0.0f)
+        if (lineWidth > 0.0f)
         {
             const auto lineThicknessHalf = kLineThickness_ * 0.5f;
-            auto leftLine = textArea;
-            leftLine.setWidth(leftLineWidth);
-            leftLine.setY(lineY - lineThicknessHalf);
-            leftLine.setHeight(kLineThickness_);
-            g.fillRect(leftLine);
+            const auto line = juce::Rectangle<float>(
+                area.getX(),
+                centreY - lineThicknessHalf,
+                lineWidth,
+                kLineThickness_
+            );
+            g.fillRect(line);
         }
     }
 
-    void GroupLabel::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY)
+    void GroupLabel::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY)
     {
-        const auto rightLineStartX = textCentreX + halfTextWidth + kTextSpacing_;
-        const auto rightLineWidth = textArea.getRight() - rightLineStartX;
+        const auto lineStartX = centreX + halfTextWidth + kTextSpacing_;
+        const auto lineWidth = area.getRight() - lineStartX;
 
-        if (rightLineWidth > 0.0f)
+        if (lineWidth > 0.0f)
         {
             const auto lineThicknessHalf = kLineThickness_ * 0.5f;
-            auto rightLine = textArea;
-            rightLine.removeFromLeft(rightLineStartX - textArea.getX());
-            rightLine.setY(lineY - lineThicknessHalf);
-            rightLine.setHeight(kLineThickness_);
-            g.fillRect(rightLine);
+            const auto line = juce::Rectangle<float>(
+                lineStartX,
+                centreY - lineThicknessHalf,
+                lineWidth,
+                kLineThickness_
+            );
+            g.fillRect(line);
         }
     }
 
-    juce::Rectangle<float> GroupLabel::getContentArea(const juce::Rectangle<float>& bounds) const
+    juce::Rectangle<float> GroupLabel::calculateContentArea() const
     {
-        const auto topAreaHeight = kTopAreaHeight_;
-        const auto contentHeight = kContentHeight_;
-        auto textArea = bounds;
-        textArea.removeFromTop(topAreaHeight);
-        textArea.setHeight(contentHeight);
-        return textArea;
+        auto area = getLocalBounds().toFloat();
+        area.removeFromTop(kTopAreaHeight_);
+        area.setHeight(kContentHeight_);
+        return area;
     }
 
     float GroupLabel::calculateTextWidth() const

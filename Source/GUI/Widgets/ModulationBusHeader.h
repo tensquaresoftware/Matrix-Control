@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit ModulationBusHeader(Theme& inTheme, int width, int height, ColourVariant variant = ColourVariant::Blue);
+        explicit ModulationBusHeader(Theme& theme, int width, int height, ColourVariant variant = ColourVariant::Blue);
         ~ModulationBusHeader() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
 
@@ -32,12 +32,12 @@ namespace tss
         inline constexpr static int kTextAreaHeight_ = 20;
         inline constexpr static int kLineThickness_ = 4;
 
-        Theme* theme = nullptr;
-        juce::String busNumberText;
-        juce::String busSourceText;
-        juce::String busAmountText;
-        juce::String busDestinationText;
-        ColourVariant colourVariant;
+        Theme* theme_ = nullptr;
+        juce::String busNumberText_;
+        juce::String busSourceText_;
+        juce::String busAmountText_;
+        juce::String busDestinationText_;
+        ColourVariant colourVariant_;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

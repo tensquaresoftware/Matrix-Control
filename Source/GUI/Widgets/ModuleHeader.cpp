@@ -11,14 +11,13 @@ namespace tss
         , text_(text)
         , colourVariant_(variant)
     {
-        setOpaque(true);
+        setOpaque(false);
         setSize(width_, height_);
     }
 
     void ModuleHeader::setTheme(Theme& theme)
     {
         theme_ = &theme;
-        repaint();
     }
 
     void ModuleHeader::setText(const juce::String& text)
@@ -33,51 +32,40 @@ namespace tss
     void ModuleHeader::paint(juce::Graphics& g)
     {
         if (theme_ == nullptr)
-        {
             return;
-        }
 
-        g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-
-        auto bounds = getLocalBounds().toFloat();
+        const auto bounds = getLocalBounds().toFloat();
 
         drawText(g, bounds);
         drawLine(g, bounds);
     }
 
-
     void ModuleHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         if (text_.isEmpty())
-        {
             return;
-        }
 
-        auto textColour = theme_->getModuleHeaderTextColour();
-        auto font = theme_->getBaseFont().withHeight(16.0f).boldened();
+        const auto font = theme_->getBaseFont().withHeight(kTextFontHeight_).boldened();
 
         auto textBounds = bounds;
         textBounds.setHeight(kTextAreaHeight_);
         textBounds.removeFromLeft(kTextLeftPadding_);
 
-        g.setColour(textColour);
+        g.setColour(theme_->getModuleHeaderTextColour());
         g.setFont(font);
         g.drawText(text_, textBounds, juce::Justification::centredLeft, false);
     }
 
     void ModuleHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto lineColour = getLineColour();
-        
-        auto lineThickness = kLineThickness_;
-        auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
-        auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - lineThickness) / 2.0f;
+        const auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
+        const auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - kLineThickness_) * 0.5f;
         
         auto lineBounds = bounds;
-        lineBounds.setHeight(lineThickness);
+        lineBounds.setHeight(kLineThickness_);
         lineBounds.translate(0.0f, verticalOffset);
 
-        g.setColour(lineColour);
+        g.setColour(getLineColour());
         g.fillRect(lineBounds);
     }
 

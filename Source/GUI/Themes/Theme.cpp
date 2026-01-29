@@ -38,309 +38,301 @@ namespace tss
     // Panel colours ----------------------------------------------------------
     juce::Colour Theme::getHeaderPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kHeaderPanelBackground);
+        return getColour(ThemeColours::Panels::kHeaderPanelBackground);
     }
 
     juce::Colour Theme::getBodyPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kBodyPanelBackground);
+        return getColour(ThemeColours::Panels::kBodyPanelBackground);
     }
 
     juce::Colour Theme::getFooterPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kFooterPanelBackground);
+        return getColour(ThemeColours::Panels::kFooterPanelBackground);
     }
 
     juce::Colour Theme::getPatchEditPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kPatchEditPanelBackground);
+        return getColour(ThemeColours::Panels::kPatchEditPanelBackground);
     }
 
     juce::Colour Theme::getPatchEditModulePanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kPatchEditModulePanelBackground);
+        return getColour(ThemeColours::Panels::kPatchEditModulePanelBackground);
     }
 
     juce::Colour Theme::getMatrixModulationPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kMatrixModulationPanelBackground);
+        return getColour(ThemeColours::Panels::kMatrixModulationPanelBackground);
     }
 
     juce::Colour Theme::getPatchManagerPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kPatchManagerPanelBackground);
+        return getColour(ThemeColours::Panels::kPatchManagerPanelBackground);
     }
 
     juce::Colour Theme::getMasterEditPanelBackgroundColour() const
     {
-        return getColour(ThemeColours::Panel::kMasterEditPanelBackground);
+        return getColour(ThemeColours::Panels::kMasterEditPanelBackground);
     }
 
     // SectionHeader colours ----------------------------------------------------
-    juce::Colour Theme::getSectionHeaderContentAreaColour() const
-    {
-        return getColour(ThemeColours::SectionHeader::kContentArea);
-    }
-
     juce::Colour Theme::getSectionHeaderTextColour() const
     {
-        return getColour(ThemeColours::SectionHeader::kText);
+        return getColour(ThemeColours::Widgets::SectionHeader::kText);
     }
 
     juce::Colour Theme::getSectionHeaderLineColourBlue() const
     {
-        return getColour(ThemeColours::SectionHeader::kLineBlue);
+        return getColour(ThemeColours::Widgets::SectionHeader::kLineBlue);
     }
 
     juce::Colour Theme::getSectionHeaderLineColourOrange() const
     {
-        return getColour(ThemeColours::SectionHeader::kLineOrange);
+        return getColour(ThemeColours::Widgets::SectionHeader::kLineOrange);
     }
 
     // ModuleHeader colours -----------------------------------------------------
     juce::Colour Theme::getModuleHeaderTextColour() const
     {
-        return getColour(ThemeColours::ModuleHeader::kText);
+        return getColour(ThemeColours::Widgets::ModuleHeader::kText);
     }
 
     juce::Colour Theme::getModuleHeaderLineColourBlue() const
     {
-        return getColour(ThemeColours::ModuleHeader::kLineBlue);
+        return getColour(ThemeColours::Widgets::ModuleHeader::kLineBlue);
     }
 
     juce::Colour Theme::getModuleHeaderLineColourOrange() const
     {
-        return getColour(ThemeColours::ModuleHeader::kLineOrange);
+        return getColour(ThemeColours::Widgets::ModuleHeader::kLineOrange);
     }
 
     // GroupLabel colours -----------------------------------------------------
     juce::Colour Theme::getGroupLabelTextColour() const
     {
-        return getColour(ThemeColours::GroupLabel::kText);
+        return getColour(ThemeColours::Widgets::GroupLabel::kText);
     }
 
     juce::Colour Theme::getGroupLabelLineColour() const
     {
-        return getColour(ThemeColours::GroupLabel::kLine);
+        return getColour(ThemeColours::Widgets::GroupLabel::kLine);
     }
 
     // Label colours ----------------------------------------------------------
-    juce::Colour Theme::getLabelBackgroundColour() const
-    {
-        return getColour(ThemeColours::Label::kBackground);
-    }
-
     juce::Colour Theme::getLabelTextColour() const
     {
-        return getColour(ThemeColours::Label::kText);
+        return getColour(ThemeColours::Widgets::Label::kText);
     }
 
     // VerticalSeparator colours ----------------------------------------------
     juce::Colour Theme::getVerticalSeparatorLineColour() const
     {
-        return getColour(ThemeColours::VerticalSeparator::kLine);
+        return getColour(ThemeColours::Widgets::VerticalSeparator::kLine);
     }
 
     // HorizontalSeparator colours --------------------------------------------
     juce::Colour Theme::getHorizontalSeparatorLineColour() const
     {
-        return getColour(ThemeColours::HorizontalSeparator::kLine);
+        return getColour(ThemeColours::Widgets::HorizontalSeparator::kLine);
     }
 
     // Button colours ---------------------------------------------------------
     juce::Colour Theme::getButtonBackgroundColourOff() const
     {
-        return getColour(ThemeColours::Button::kBackgroundDisabled);
+        return getColour(ThemeColours::Widgets::Button::kBackgroundDisabled);
     }
 
     juce::Colour Theme::getButtonBorderColourOff() const
     {
-        return getColour(ThemeColours::Button::kBorderDisabled);
+        return getColour(ThemeColours::Widgets::Button::kBorderDisabled);
     }
 
     juce::Colour Theme::getButtonTextColourOff() const
     {
-        return getColour(ThemeColours::Button::kTextDisabled);
+        return getColour(ThemeColours::Widgets::Button::kTextDisabled);
     }
 
     juce::Colour Theme::getButtonBackgroundColourOn() const
     {
-        return getColour(ThemeColours::Button::kBackground);
+        return getColour(ThemeColours::Widgets::Button::kBackground);
     }
 
     juce::Colour Theme::getButtonBorderColourOn() const
     {
-        return getColour(ThemeColours::Button::kBorder);
+        return getColour(ThemeColours::Widgets::Button::kBorder);
     }
 
     juce::Colour Theme::getButtonTextColourOn() const
     {
-        return getColour(ThemeColours::Button::kText);
+        return getColour(ThemeColours::Widgets::Button::kText);
     }
 
     juce::Colour Theme::getButtonBackgroundColourHoover() const
     {
-        return getColour(ThemeColours::Button::kBackgroundHoover);
+        return getColour(ThemeColours::Widgets::Button::kBackgroundHoover);
     }
 
     juce::Colour Theme::getButtonTextColourHoover() const
     {
-        return getColour(ThemeColours::Button::kTextHoover);
+        return getColour(ThemeColours::Widgets::Button::kTextHoover);
     }
 
     juce::Colour Theme::getButtonBackgroundColourClicked() const
     {
-        return getColour(ThemeColours::Button::kBackgroundClicked);
+        return getColour(ThemeColours::Widgets::Button::kBackgroundClicked);
     }
 
     juce::Colour Theme::getButtonTextColourClicked() const
     {
-        return getColour(ThemeColours::Button::kTextClicked);
+        return getColour(ThemeColours::Widgets::Button::kTextClicked);
     }
 
     // Slider colours ---------------------------------------------------------
-    juce::Colour Theme::getSliderBackgroundColour(bool isEnabled) const
-    {
-        return getColour(isEnabled ? ThemeColours::Slider::kBackground : ThemeColours::Slider::kBackgroundDisabled);
-    }
-
-    juce::Colour Theme::getSliderBorderColour(bool isEnabled, bool hasFocus) const
-    {
-        if (hasFocus)
-        {
-            return getColour(ThemeColours::Slider::kBorderFocus);
-        }
-        return getColour(isEnabled ? ThemeColours::Slider::kBorder : ThemeColours::Slider::kBorderDisabled);
-    }
-
     juce::Colour Theme::getSliderTrackColour(bool isEnabled) const
     {
-        return getColour(isEnabled ? ThemeColours::Slider::kTrack : ThemeColours::Slider::kTrackDisabled);
+        return getColour(isEnabled ? ThemeColours::Widgets::Slider::kTrack : ThemeColours::Widgets::Slider::kTrackDisabled);
+    }
+
+    juce::Colour Theme::getSliderValueBarColour(bool isEnabled) const
+    {
+        return getColour(isEnabled ? ThemeColours::Widgets::Slider::kValueBar : ThemeColours::Widgets::Slider::kValueBarDisabled);
     }
 
     juce::Colour Theme::getSliderTextColour(bool isEnabled) const
     {
-        return getColour(isEnabled ? ThemeColours::Slider::kText : ThemeColours::Slider::kTextDisabled);
+        return getColour(isEnabled ? ThemeColours::Widgets::Slider::kText : ThemeColours::Widgets::Slider::kTextDisabled);
     }
 
     juce::Colour Theme::getSliderFocusBorderColour() const
     {
-        return getSliderBorderColour(true, true);
+        return getColour(ThemeColours::Widgets::Slider::kFocusBorder);
     }
 
     // ComboBox colours -------------------------------------------------------
     juce::Colour Theme::getComboBoxBackgroundColour(bool isEnabled) const
     {
-        return getColour(isEnabled ? ThemeColours::ComboBox::kBackground : ThemeColours::ComboBox::kBackgroundDisabled);
+        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::kBackground : ThemeColours::Widgets::ComboBox::kBackgroundDisabled);
     }
 
-    juce::Colour Theme::getComboBoxBorderColour(bool isEnabled, bool hasFocus) const
+    juce::Colour Theme::getComboBoxFocusBorderColour() const
     {
-        if (hasFocus)
-        {
-            return getColour(ThemeColours::ComboBox::kBorderFocus);
-        }
-        return getColour(isEnabled ? ThemeColours::ComboBox::kBorder : ThemeColours::ComboBox::kBorderDisabled);
+        return getColour(ThemeColours::Widgets::ComboBox::kFocusBorder);
     }
 
     juce::Colour Theme::getComboBoxTriangleColour(bool isEnabled) const
     {
-        return getColour(isEnabled ? ThemeColours::ComboBox::kTriangle : ThemeColours::ComboBox::kTriangleDisabled);
+        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::kTriangle : ThemeColours::Widgets::ComboBox::kTriangleDisabled);
     }
 
     juce::Colour Theme::getComboBoxTextColour(bool isEnabled) const
     {
-        return getColour(isEnabled ? ThemeColours::ComboBox::kText : ThemeColours::ComboBox::kTextDisabled);
+        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::kText : ThemeColours::Widgets::ComboBox::kTextDisabled);
     }
 
     // PopupMenu colours ------------------------------------------------------
     juce::Colour Theme::getPopupMenuBackgroundColour() const
     {
-        return getColour(ThemeColours::PopupMenu::kBackground);
+        return getColour(ThemeColours::Widgets::PopupMenu::kBackground);
     }
 
     juce::Colour Theme::getPopupMenuBorderColour() const
     {
-        return getColour(ThemeColours::PopupMenu::kBorder);
+        return getColour(ThemeColours::Widgets::PopupMenu::kBorder);
     }
 
     juce::Colour Theme::getPopupMenuSeparatorColour() const
     {
-        return getColour(ThemeColours::PopupMenu::kSeparator);
+        return getColour(ThemeColours::Widgets::PopupMenu::kSeparator);
     }
 
     juce::Colour Theme::getPopupMenuTextColour() const
     {
-        return getColour(ThemeColours::PopupMenu::kText);
+        return getColour(ThemeColours::Widgets::PopupMenu::kText);
     }
 
     juce::Colour Theme::getPopupMenuBackgroundHooverColour() const
     {
-        return getColour(ThemeColours::PopupMenu::kBackgroundHoover);
+        return getColour(ThemeColours::Widgets::PopupMenu::kBackgroundHoover);
     }
 
     juce::Colour Theme::getPopupMenuTextHooverColour() const
     {
-        return getColour(ThemeColours::PopupMenu::kTextHoover);
+        return getColour(ThemeColours::Widgets::PopupMenu::kTextHoover);
     }
 
     // NumberBox colours -------------------------------------------------------
     juce::Colour Theme::getNumberBoxTextColour() const
     {
-        return getColour(ThemeColours::NumberBox::kText);
+        return getColour(ThemeColours::Widgets::NumberBox::kText);
     }
 
     juce::Colour Theme::getNumberBoxDotColour() const
     {
-        return getColour(ThemeColours::NumberBox::kDot);
+        return getColour(ThemeColours::Widgets::NumberBox::kDot);
+    }
+
+    juce::Colour Theme::getNumberBoxEditorBackgroundColour() const
+    {
+        return getColour(ThemeColours::Widgets::NumberBox::kEditorBackground);
+    }
+
+    juce::Colour Theme::getNumberBoxEditorSelectionBackgroundColour() const
+    {
+        return getColour(ThemeColours::Widgets::NumberBox::kEditorSelectionBackground);
+    }
+
+    juce::Colour Theme::getNumberBoxEditorTextColour() const
+    {
+        return getColour(ThemeColours::Widgets::NumberBox::kEditorText);
     }
 
     // EnvelopeDisplay colours -------------------------------------------------
     juce::Colour Theme::getEnvelopeDisplayBackgroundColour() const
     {
-        return getColour(ThemeColours::EnvelopeDisplay::kBackground);
+        return getColour(ThemeColours::Widgets::EnvelopeDisplay::kBackground);
     }
 
     juce::Colour Theme::getEnvelopeDisplayBorderColour() const
     {
-        return getColour(ThemeColours::EnvelopeDisplay::kBorder);
+        return getColour(ThemeColours::Widgets::EnvelopeDisplay::kBorder);
     }
 
     juce::Colour Theme::getEnvelopeDisplayEnvelopeColour() const
     {
-        return getColour(ThemeColours::EnvelopeDisplay::kEnvelope);
+        return getColour(ThemeColours::Widgets::EnvelopeDisplay::kEnvelope);
     }
 
     // PatchNameDisplay colours ------------------------------------------------
     juce::Colour Theme::getPatchNameDisplayBackgroundColour() const
     {
-        return getColour(ThemeColours::PatchNameDisplay::kBackground);
+        return getColour(ThemeColours::Widgets::PatchNameDisplay::kBackground);
     }
 
     juce::Colour Theme::getPatchNameDisplayBorderColour() const
     {
-        return getColour(ThemeColours::PatchNameDisplay::kBorder);
+        return getColour(ThemeColours::Widgets::PatchNameDisplay::kBorder);
     }
 
     juce::Colour Theme::getPatchNameDisplayTextColour() const
     {
-        return getColour(ThemeColours::PatchNameDisplay::kText);
+        return getColour(ThemeColours::Widgets::PatchNameDisplay::kText);
     }
 
     // TrackGeneratorDisplay colours -------------------------------------------
     juce::Colour Theme::getTrackGeneratorDisplayBackgroundColour() const
     {
-        return getColour(ThemeColours::TrackGeneratorDisplay::kBackground);
+        return getColour(ThemeColours::Widgets::TrackGeneratorDisplay::kBackground);
     }
 
     juce::Colour Theme::getTrackGeneratorDisplayBorderColour() const
     {
-        return getColour(ThemeColours::TrackGeneratorDisplay::kBorder);
+        return getColour(ThemeColours::Widgets::TrackGeneratorDisplay::kBorder);
     }
 
     juce::Colour Theme::getTrackGeneratorDisplayShaperColour() const
     {
-        return getColour(ThemeColours::TrackGeneratorDisplay::kShaper);
+        return getColour(ThemeColours::Widgets::TrackGeneratorDisplay::kShaper);
     }
 
     

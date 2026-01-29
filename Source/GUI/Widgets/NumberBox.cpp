@@ -1,141 +1,158 @@
 #include "NumberBox.h"
 
+#include <memory>
+
 #include "GUI/Themes/Theme.h"
 
 namespace tss
 {
-    NumberBox::NumberBox(Theme& inTheme, int width, bool inEditable)
-        : theme(&inTheme)
-        , editable(inEditable)
+    NumberBox::NumberBox(Theme& theme, int width, bool editable)
+        : theme_(&theme)
+        , editable_(editable)
     {
         setOpaque(true);
         setSize(width, kHeight_);
     }
 
-    void NumberBox::setTheme(Theme& inTheme)
+    void NumberBox::setTheme(Theme& theme)
     {
-        theme = &inTheme;
-        repaint();
+        theme_ = &theme;
     }
 
     void NumberBox::setValue(int newValue)
     {
-        if (currentValue != newValue)
+        if (currentValue_ != newValue)
         {
-            currentValue = newValue;
+            currentValue_ = newValue;
             repaint();
         }
     }
 
     void NumberBox::setShowDot(bool show)
     {
-        if (showDot != show)
+        if (showDot_ != show)
         {
-            showDot = show;
+            showDot_ = show;
             repaint();
         }
     }
 
     void NumberBox::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
-        {
+        if (theme_ == nullptr)
             return;
-        }
 
         const auto bounds = getLocalBounds().toFloat();
+        const auto text = juce::String(currentValue_);
 
-        drawBackground(g, bounds);
-        drawBorder(g, bounds);
-        drawText(g, bounds);
-        
-        if (showDot)
+        g.setColour(theme_->getButtonBackgroundColourOn());
+        g.fillRect(bounds);
+
+        g.setColour(getBorderColour());
+        g.drawRect(bounds, kBorderThickness_);
+
+        g.setColour(theme_->getNumberBoxTextColour());
+        g.setFont(theme_->getBaseFont());
+        g.drawText(text, bounds, juce::Justification::centred, false);
+
+        if (showDot_)
         {
-            drawDot(g, bounds);
+            const auto textWidth = calculateTextWidth(text);
+            const auto dotPosition = calculateDotPosition(bounds, textWidth);
+
+            g.setColour(theme_->getNumberBoxDotColour());
+            g.fillEllipse(dotPosition.x, dotPosition.y, kDotRadius_ * 2.0f, kDotRadius_ * 2.0f);
         }
     }
 
     void NumberBox::mouseDoubleClick(const juce::MouseEvent&)
     {
-        if (!editable || !isEnabled())
-        {
+        if (!editable_ || !isEnabled())
             return;
-        }
 
-        // TODO: Implement editing functionality
-        // For now, just trigger a repaint to show visual feedback
+        showEditor();
+    }
+
+    juce::Colour NumberBox::getBorderColour() const
+    {
+        if (!isEnabled())
+            return theme_->getButtonBorderColourOff();
+
+        return theme_->getButtonBorderColourOn();
+    }
+
+    float NumberBox::calculateTextWidth(const juce::String& text) const
+    {
+        const auto font = theme_->getBaseFont();
+        juce::GlyphArrangement glyphArrangement;
+        glyphArrangement.addLineOfText(font, text, 0.0f, 0.0f);
+        return glyphArrangement.getBoundingBox(0, -1, true).getWidth();
+    }
+
+    juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
+    {
+        const auto font = theme_->getBaseFont();
+        const auto textRight = bounds.getCentreX() + textWidth * 0.5f;
+        const auto baselineY = bounds.getCentreY() + font.getHeight() * 0.5f - font.getDescent();
+
+        return { textRight + kDotXOffset_, baselineY - kDotRadius_ };
+    }
+
+    void NumberBox::showEditor()
+    {
+        if (editor_ != nullptr)
+            return;
+
+        const auto baseFont = theme_->getBaseFont();
+        const auto editorFont = baseFont.withStyle(juce::Font::bold)
+                                        .withHeight(baseFont.getHeight() + kEditorFontSizeIncrease_);
+
+        editor_ = std::make_unique<juce::TextEditor>();
+        editor_->setBounds(getLocalBounds());
+        editor_->setText(juce::String(currentValue_), false);
+        editor_->setFont(editorFont);
+        editor_->setJustification(juce::Justification::centred);
+        
+        editor_->setColour(juce::TextEditor::backgroundColourId, theme_->getNumberBoxEditorBackgroundColour());
+        editor_->setColour(juce::TextEditor::textColourId, theme_->getNumberBoxEditorTextColour());
+        editor_->setColour(juce::TextEditor::highlightColourId, theme_->getNumberBoxEditorSelectionBackgroundColour());
+        editor_->setColour(juce::TextEditor::highlightedTextColourId, theme_->getNumberBoxEditorTextColour());
+        editor_->setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+        editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+        
+        editor_->setBorder(juce::BorderSize<int>(0));
+        editor_->setIndents(0, 0);
+        editor_->setInputRestrictions(0, "0123456789-");
+
+        editor_->onReturnKey = [this] { handleEditorReturn(); };
+        editor_->onEscapeKey = [this] { hideEditor(); };
+        editor_->onFocusLost = [this] { hideEditor(); };
+
+        addAndMakeVisible(*editor_);
+        editor_->grabKeyboardFocus();
+        editor_->selectAll();
+        editor_->applyFontToAllText(editorFont);
+    }
+
+    void NumberBox::hideEditor()
+    {
+        if (editor_ == nullptr)
+            return;
+
+        removeChildComponent(editor_.get());
+        editor_.reset();
         repaint();
     }
 
-
-    void NumberBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void NumberBox::handleEditorReturn()
     {
-        const auto backgroundColour = theme->getButtonBackgroundColourOn();
-        g.setColour(backgroundColour);
-        g.fillRect(bounds);
-    }
+        if (editor_ == nullptr)
+            return;
 
-    void NumberBox::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto enabled = isEnabled();
-        juce::Colour borderColour;
-        
-        if (!enabled)
-        {
-            borderColour = theme->getButtonBorderColourOff();
-        }
-        else
-        {
-            borderColour = theme->getButtonBorderColourOn();
-        }
-        
-        g.setColour(borderColour);
-        
-        const auto borderThickness = kBorderThickness_;
-        
-        const auto topBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY(), bounds.getWidth(), borderThickness);
-        const auto bottomBorder = juce::Rectangle<float>(bounds.getX(), bounds.getBottom() - borderThickness, bounds.getWidth(), borderThickness);
-        const auto leftBorder = juce::Rectangle<float>(bounds.getX(), bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
-        const auto rightBorder = juce::Rectangle<float>(bounds.getRight() - borderThickness, bounds.getY() + borderThickness, borderThickness, bounds.getHeight() - 2.0f * borderThickness);
-        
-        g.fillRect(topBorder);
-        g.fillRect(bottomBorder);
-        g.fillRect(leftBorder);
-        g.fillRect(rightBorder);
-    }
+        const auto text = editor_->getText();
+        const auto newValue = text.getIntValue();
 
-    void NumberBox::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto textColour = theme->getNumberBoxTextColour();
-        const auto font = theme->getBaseFont();
-
-        g.setColour(textColour);
-        g.setFont(font);
-        
-        const auto text = juce::String(currentValue);
-        g.drawText(text, bounds, juce::Justification::centred, false);
-    }
-
-    void NumberBox::drawDot(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto dotColour = theme->getNumberBoxDotColour();
-        const auto font = theme->getBaseFont();
-        
-        g.setFont(font);
-        
-        const auto text = juce::String(currentValue);
-        
-        juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(font, text, 0.0f, 0.0f);
-        const auto textWidth = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
-        
-        const auto textRight = bounds.getCentreX() + textWidth / 2.0f;
-        const auto baselineY = bounds.getCentreY() + font.getHeight() / 2.0f - font.getDescent();
-        
-        constexpr float dotRadius = 1.5f;
-        constexpr float dotXOffset = 3.0f;
-        
-        g.setColour(dotColour);
-        g.fillEllipse(textRight + dotXOffset, baselineY - dotRadius, dotRadius * 2.0f, dotRadius * 2.0f);
+        setValue(newValue);
+        hideEditor();
     }
 }

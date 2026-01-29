@@ -103,7 +103,6 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/Button.cpp
     Source/GUI/Widgets/ComboBox.cpp
     Source/GUI/Widgets/EnvelopeDisplay.cpp
-    Source/GUI/Widgets/FocusableWidget.cpp
     Source/GUI/Widgets/GroupLabel.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp

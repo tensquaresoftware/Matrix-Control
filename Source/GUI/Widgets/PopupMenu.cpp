@@ -21,8 +21,8 @@ namespace tss
     private:
         PopupMenu& popupMenu_;
     };
-    PopupMenu::PopupMenu(ComboBox& comboBoxRef, DisplayMode displayMode)
-        : comboBox(comboBoxRef)
+    PopupMenu::PopupMenu(ComboBox& comboBox_Ref, DisplayMode displayMode)
+        : comboBox_(comboBox_Ref)
         , displayMode_(displayMode)
     {
         setWantsKeyboardFocus(true);
@@ -30,11 +30,11 @@ namespace tss
         setInterceptsMouseClicks(true, true);
         setOpaque(true);
         
-        if (auto* parent [[maybe_unused]] = comboBox.getParentComponent())
+        if (auto* parent [[maybe_unused]] = comboBox_.getParentComponent())
         {
-            theme = comboBox.theme_;
-            if (auto* currentTheme = theme)
-                cachedFont = currentTheme->getBaseFont();
+            theme_ = comboBox_.theme_;
+            if (auto* currentTheme = theme_)
+                cachedFont_ = currentTheme->getBaseFont();
         }
         
         calculateColumnLayout();
@@ -44,19 +44,19 @@ namespace tss
             setupScrollableContent();
         }
         
-        auto selectedIndex = comboBox.getSelectedItemIndex();
+        auto selectedIndex = comboBox_.getSelectedItemIndex();
         if (isValidItemIndex(selectedIndex))
         {
-            highlightedItemIndex = selectedIndex;
+            highlightedItemIndex_ = selectedIndex;
         }
-        else if (comboBox.getNumItems() > 0)
+        else if (comboBox_.getNumItems() > 0)
         {
-            highlightedItemIndex = 0;
+            highlightedItemIndex_ = 0;
         }
         
-        if (displayMode_ == DisplayMode::SingleColumnScrollable && viewport_ != nullptr && highlightedItemIndex >= 0)
+        if (displayMode_ == DisplayMode::SingleColumnScrollable && viewport_ != nullptr && highlightedItemIndex_ >= 0)
         {
-            auto itemY = highlightedItemIndex * kItemHeight_;
+            auto itemY = highlightedItemIndex_ * kItemHeight_;
             viewport_->setViewPosition(0, itemY);
         }
     }
@@ -72,7 +72,7 @@ namespace tss
         auto borderThickness = kBorderThickness_;
         auto borderThicknessInt = static_cast<int>(borderThickness);
         
-        g.fillAll(theme->getPopupMenuBackgroundColour());
+        g.fillAll(theme_->getPopupMenuBackgroundColour());
         
         drawBackground(g, bounds.reduced(borderThicknessInt));
         
@@ -85,7 +85,7 @@ namespace tss
             auto contentBounds = bounds.reduced(borderThicknessInt);
             drawItems(g, contentBounds);
             
-            if (columnCount > 1)
+            if (columnCount_ > 1)
             {
                 drawVerticalSeparators(g, contentBounds);
             }
@@ -163,10 +163,10 @@ namespace tss
     {
         exitModalState(0);
         
-        comboBox.isPopupOpen_ = false;
-        comboBox.repaint();
+        comboBox_.isPopupOpen_ = false;
+        comboBox_.repaint();
         
-        comboBox.grabKeyboardFocus();
+        comboBox_.grabKeyboardFocus();
         
         if (hasValidParent())
         {
@@ -181,10 +181,10 @@ namespace tss
         {
             exitModalState(0);
             
-            comboBox.isPopupOpen_ = false;
-            comboBox.repaint();
+            comboBox_.isPopupOpen_ = false;
+            comboBox_.repaint();
             
-            comboBox.grabKeyboardFocus();
+            comboBox_.grabKeyboardFocus();
             
             if (hasValidParent())
             {
@@ -196,9 +196,9 @@ namespace tss
         
         if (key.getKeyCode() == juce::KeyPress::returnKey)
         {
-            if (highlightedItemIndex >= 0)
+            if (highlightedItemIndex_ >= 0)
             {
-                selectItem(highlightedItemIndex);
+                selectItem(highlightedItemIndex_);
             }
             return true;
         }
@@ -210,7 +210,7 @@ namespace tss
 
     void PopupMenu::calculateColumnLayout()
     {
-        auto numItems = comboBox.getNumItems();
+        auto numItems = comboBox_.getNumItems();
         if (numItems == 0)
         {
             return;
@@ -218,16 +218,16 @@ namespace tss
         
         if (displayMode_ == DisplayMode::SingleColumnScrollable)
         {
-            columnCount = 1;
-            itemsPerColumn = numItems;
-            columnWidth = comboBox.getBounds().getWidth();
-            scrollableContentHeight = numItems * kItemHeight_;
+            columnCount_ = 1;
+            itemsPerColumn_ = numItems;
+            columnWidth_ = comboBox_.getBounds().getWidth();
+            scrollableContentHeight_ = numItems * kItemHeight_;
         }
         else
         {
-            columnCount = calculateColumnCount(numItems);
-            itemsPerColumn = calculateItemsPerColumn(numItems, columnCount);
-            columnWidth = comboBox.getBounds().getWidth();
+            columnCount_ = calculateColumnCount(numItems);
+            itemsPerColumn_ = calculateItemsPerColumn(numItems, columnCount_);
+            columnWidth_ = comboBox_.getBounds().getWidth();
         }
         
         // Note: setSize() is now called in show() after adding to parent
@@ -253,7 +253,7 @@ namespace tss
 
     juce::Component* PopupMenu::findTopLevelComponent() const
     {
-        auto* component = comboBox.getParentComponent();
+        auto* component = comboBox_.getParentComponent();
         while (component != nullptr)
         {
             auto* parent = component->getParentComponent();
@@ -277,17 +277,17 @@ namespace tss
         auto popupHeight = getHeight();
         
         // Single call to getScreenBounds() for each component
-        auto comboBoxScreenBounds = comboBox.getScreenBounds();
+        auto comboBox_ScreenBounds = comboBox_.getScreenBounds();
         auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
         
         // Calculate all needed values from bounds
-        auto comboX = comboBoxScreenBounds.getX() - topLevelScreenBounds.getX();
-        auto comboY = comboBoxScreenBounds.getY() - topLevelScreenBounds.getY();
-        auto comboWidth = comboBoxScreenBounds.getWidth();
-        auto comboHeight = comboBoxScreenBounds.getHeight();
+        auto comboX = comboBox_ScreenBounds.getX() - topLevelScreenBounds.getX();
+        auto comboY = comboBox_ScreenBounds.getY() - topLevelScreenBounds.getY();
+        auto comboWidth = comboBox_ScreenBounds.getWidth();
+        auto comboHeight = comboBox_ScreenBounds.getHeight();
         
         // Calculate X position
-        auto spaceRight = topLevelScreenBounds.getRight() - comboBoxScreenBounds.getRight();
+        auto spaceRight = topLevelScreenBounds.getRight() - comboBox_ScreenBounds.getRight();
         auto spaceLeft = comboX;
         auto x = (spaceRight < popupWidth && spaceRight < spaceLeft) 
                  ? comboX + comboWidth - popupWidth 
@@ -295,7 +295,7 @@ namespace tss
         
         // Calculate Y position
         auto verticalMargin = ComboBox::getVerticalMargin();
-        auto spaceBelow = topLevelScreenBounds.getBottom() - comboBoxScreenBounds.getBottom();
+        auto spaceBelow = topLevelScreenBounds.getBottom() - comboBox_ScreenBounds.getBottom();
         auto spaceAbove = comboY;
         auto requiredSpace = popupHeight + verticalMargin;
         auto y = comboY + comboHeight + verticalMargin;
@@ -330,20 +330,20 @@ namespace tss
         auto borderThickness = kBorderThickness_;
         auto contentBounds = getLocalBounds().reduced(static_cast<int>(borderThickness));
         
-        if (columnCount == 1)
+        if (columnCount_ == 1)
         {
             auto y = contentBounds.getY() + itemIndex * itemHeight;
             return juce::Rectangle<int>(contentBounds.getX(), y, contentBounds.getWidth(), itemHeight);
         }
         else
         {
-            auto column = itemIndex / itemsPerColumn;
-            auto row = itemIndex % itemsPerColumn;
+            auto column = itemIndex / itemsPerColumn_;
+            auto row = itemIndex % itemsPerColumn_;
             
-            auto x = contentBounds.getX() + column * columnWidth + column * separatorWidth;
+            auto x = contentBounds.getX() + column * columnWidth_ + column * separatorWidth;
             auto y = contentBounds.getY() + row * itemHeight;
             
-            return juce::Rectangle<int>(x, y, columnWidth, itemHeight);
+            return juce::Rectangle<int>(x, y, columnWidth_, itemHeight);
         }
     }
 
@@ -357,7 +357,7 @@ namespace tss
                 if (contentComponent_->getBounds().contains(x, y))
                 {
                     auto row = y / kItemHeight_;
-                    if (row >= 0 && row < comboBox.getNumItems())
+                    if (row >= 0 && row < comboBox_.getNumItems())
                     {
                         return row;
                     }
@@ -379,7 +379,7 @@ namespace tss
         auto column = getColumnFromX(relativeX);
         auto row = getRowFromY(relativeY);
         
-        if (column < 0 || column >= columnCount || row < 0 || row >= itemsPerColumn)
+        if (column < 0 || column >= columnCount_ || row < 0 || row >= itemsPerColumn_)
         {
             return -1;
         }
@@ -396,22 +396,22 @@ namespace tss
 
     int PopupMenu::getColumnFromX(int x) const
     {
-        if (columnCount == 1)
+        if (columnCount_ == 1)
         {
             return 0;
         }
         
         auto relativeX = x;
         
-        if (relativeX < columnWidth)
+        if (relativeX < columnWidth_)
         {
             return 0;
         }
         
-        relativeX -= columnWidth;
+        relativeX -= columnWidth_;
         
         auto separatorWidth = kSeparatorWidth_;
-        for (int column = 1; column < columnCount; ++column)
+        for (int column = 1; column < columnCount_; ++column)
         {
             if (relativeX < separatorWidth)
             {
@@ -420,15 +420,15 @@ namespace tss
             
             relativeX -= separatorWidth;
             
-            if (relativeX < columnWidth)
+            if (relativeX < columnWidth_)
             {
                 return column;
             }
             
-            relativeX -= columnWidth;
+            relativeX -= columnWidth_;
         }
         
-        return columnCount - 1;
+        return columnCount_ - 1;
     }
 
     int PopupMenu::getRowFromY(int y) const
@@ -438,19 +438,19 @@ namespace tss
 
     int PopupMenu::getItemIndexFromColumnAndRow(int column, int row) const
     {
-        if (columnCount == 1)
+        if (columnCount_ == 1)
         {
             return row;
         }
         
-        return column * itemsPerColumn + row;
+        return column * itemsPerColumn_ + row;
     }
 
     void PopupMenu::updateHighlightedItem(int itemIndex)
     {
-        if (highlightedItemIndex != itemIndex)
+        if (highlightedItemIndex_ != itemIndex)
         {
-            highlightedItemIndex = itemIndex;
+            highlightedItemIndex_ = itemIndex;
             
             if (displayMode_ == DisplayMode::SingleColumnScrollable && contentComponent_ != nullptr)
             {
@@ -479,16 +479,16 @@ namespace tss
     {
         exitModalState(0);
         
-            comboBox.isPopupOpen_ = false;
-        comboBox.repaint();
+            comboBox_.isPopupOpen_ = false;
+        comboBox_.repaint();
         
         if (isValidItemIndex(itemIndex))
         {
-            auto itemId = comboBox.getItemId(itemIndex);
-            comboBox.setSelectedId(itemId, juce::sendNotificationSync);
+            auto itemId = comboBox_.getItemId(itemIndex);
+            comboBox_.setSelectedId(itemId, juce::sendNotificationSync);
         }
         
-        comboBox.grabKeyboardFocus();
+        comboBox_.grabKeyboardFocus();
         
         if (hasValidParent())
         {
@@ -506,7 +506,7 @@ namespace tss
             return;
         }
         
-        auto backgroundColour = theme->getPopupMenuBackgroundColour();
+        auto backgroundColour = theme_->getPopupMenuBackgroundColour();
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
@@ -518,14 +518,14 @@ namespace tss
             return;
         }
         
-        auto borderColour = theme->getPopupMenuBorderColour();
+        auto borderColour = theme_->getPopupMenuBorderColour();
         g.setColour(borderColour);
         g.drawRect(bounds.toFloat(), kBorderThickness_);
     }
 
     void PopupMenu::drawItems(juce::Graphics& g, const juce::Rectangle<int>&)
     {
-        auto numItems = comboBox.getNumItems();
+        auto numItems = comboBox_.getNumItems();
         
         for (int i = 0; i < numItems; ++i)
         {
@@ -546,55 +546,55 @@ namespace tss
             return;
         }
         
-        auto isHighlighted = (highlightedItemIndex == itemIndex);
-        auto isActive = comboBox.getItemId(itemIndex) != 0;
+        auto isHighlighted = (highlightedItemIndex_ == itemIndex);
+        auto isActive = comboBox_.getItemId(itemIndex) != 0;
         
         if (isHighlighted && isActive)
         {
-            auto hooverBackgroundColour = theme->getPopupMenuBackgroundHooverColour();
+            auto hooverBackgroundColour = theme_->getPopupMenuBackgroundHooverColour();
             auto hooverBounds = itemBounds.reduced(1);
             g.setColour(hooverBackgroundColour);
             g.fillRect(hooverBounds);
             
-            auto hooverTextColour = theme->getPopupMenuTextHooverColour();
+            auto hooverTextColour = theme_->getPopupMenuTextHooverColour();
             g.setColour(hooverTextColour);
-            g.setFont(cachedFont);
+            g.setFont(cachedFont_);
             
             auto textBounds = itemBounds;
             textBounds.removeFromLeft(kTextLeftPadding_);
-            g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
+            g.drawText(comboBox_.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
         else
         {
-            auto textColour = theme->getPopupMenuTextColour();
+            auto textColour = theme_->getPopupMenuTextColour();
             if (! isActive)
             {
                 textColour = textColour.withAlpha(0.5f);
             }
             
             g.setColour(textColour);
-            g.setFont(cachedFont);
+            g.setFont(cachedFont_);
             
             auto textBounds = itemBounds;
             textBounds.removeFromLeft(kTextLeftPadding_);
-            g.drawText(comboBox.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
+            g.drawText(comboBox_.getItemText(itemIndex), textBounds, juce::Justification::centredLeft, false);
         }
     }
 
     void PopupMenu::drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<int>& contentBounds)
     {
-        if (! hasValidLookAndFeel() || columnCount <= 1)
+        if (! hasValidLookAndFeel() || columnCount_ <= 1)
         {
             return;
         }
         
-        auto separatorColour = theme->getPopupMenuSeparatorColour();
+        auto separatorColour = theme_->getPopupMenuSeparatorColour();
         g.setColour(separatorColour);
         
         auto separatorWidth = kSeparatorWidth_;
-        for (int i = 1; i < columnCount; ++i)
+        for (int i = 1; i < columnCount_; ++i)
         {
-            auto separatorX = contentBounds.getX() + i * columnWidth + (i - 1) * separatorWidth;
+            auto separatorX = contentBounds.getX() + i * columnWidth_ + (i - 1) * separatorWidth;
             g.fillRect(separatorX, contentBounds.getY(), separatorWidth, contentBounds.getHeight());
         }
     }
@@ -621,30 +621,30 @@ namespace tss
 
     void PopupMenu::navigateUp()
     {
-        if (highlightedItemIndex < 0)
+        if (highlightedItemIndex_ < 0)
         {
-            if (comboBox.getNumItems() > 0)
+            if (comboBox_.getNumItems() > 0)
             {
                 updateHighlightedItem(0);
             }
             return;
         }
         
-        if (columnCount == 1)
+        if (columnCount_ == 1)
         {
-            if (highlightedItemIndex > 0)
+            if (highlightedItemIndex_ > 0)
             {
-                updateHighlightedItem(highlightedItemIndex - 1);
+                updateHighlightedItem(highlightedItemIndex_ - 1);
             }
         }
         else
         {
-            auto column = highlightedItemIndex / itemsPerColumn;
-            auto row = highlightedItemIndex % itemsPerColumn;
+            auto column = highlightedItemIndex_ / itemsPerColumn_;
+            auto row = highlightedItemIndex_ % itemsPerColumn_;
             
             if (row > 0)
             {
-                auto newIndex = column * itemsPerColumn + (row - 1);
+                auto newIndex = column * itemsPerColumn_ + (row - 1);
                 if (isValidItemIndex(newIndex))
                 {
                     updateHighlightedItem(newIndex);
@@ -655,47 +655,47 @@ namespace tss
 
     void PopupMenu::navigateDown()
     {
-        if (highlightedItemIndex < 0)
+        if (highlightedItemIndex_ < 0)
         {
-            if (comboBox.getNumItems() > 0)
+            if (comboBox_.getNumItems() > 0)
             {
                 updateHighlightedItem(0);
             }
             return;
         }
         
-        if (columnCount == 1)
+        if (columnCount_ == 1)
         {
-            if (highlightedItemIndex < comboBox.getNumItems() - 1)
+            if (highlightedItemIndex_ < comboBox_.getNumItems() - 1)
             {
-                updateHighlightedItem(highlightedItemIndex + 1);
+                updateHighlightedItem(highlightedItemIndex_ + 1);
             }
         }
         else
         {
-            auto column = highlightedItemIndex / itemsPerColumn;
-            auto lastItemInColumn = juce::jmin((column + 1) * itemsPerColumn - 1, comboBox.getNumItems() - 1);
+            auto column = highlightedItemIndex_ / itemsPerColumn_;
+            auto lastItemInColumn = juce::jmin((column + 1) * itemsPerColumn_ - 1, comboBox_.getNumItems() - 1);
             
-            if (highlightedItemIndex < lastItemInColumn)
+            if (highlightedItemIndex_ < lastItemInColumn)
             {
-                updateHighlightedItem(highlightedItemIndex + 1);
+                updateHighlightedItem(highlightedItemIndex_ + 1);
             }
         }
     }
 
     void PopupMenu::navigateLeft()
     {
-        if (columnCount <= 1 || highlightedItemIndex < 0)
+        if (columnCount_ <= 1 || highlightedItemIndex_ < 0)
         {
             return;
         }
         
-        auto column = highlightedItemIndex / itemsPerColumn;
-        auto row = highlightedItemIndex % itemsPerColumn;
+        auto column = highlightedItemIndex_ / itemsPerColumn_;
+        auto row = highlightedItemIndex_ % itemsPerColumn_;
         
         if (column > 0)
         {
-            auto newIndex = (column - 1) * itemsPerColumn + row;
+            auto newIndex = (column - 1) * itemsPerColumn_ + row;
             if (isValidItemIndex(newIndex))
             {
                 updateHighlightedItem(newIndex);
@@ -705,17 +705,17 @@ namespace tss
 
     void PopupMenu::navigateRight()
     {
-        if (columnCount <= 1 || highlightedItemIndex < 0)
+        if (columnCount_ <= 1 || highlightedItemIndex_ < 0)
         {
             return;
         }
         
-        auto column = highlightedItemIndex / itemsPerColumn;
-        auto row = highlightedItemIndex % itemsPerColumn;
+        auto column = highlightedItemIndex_ / itemsPerColumn_;
+        auto row = highlightedItemIndex_ % itemsPerColumn_;
         
-        if (column < columnCount - 1)
+        if (column < columnCount_ - 1)
         {
-            auto newIndex = (column + 1) * itemsPerColumn + row;
+            auto newIndex = (column + 1) * itemsPerColumn_ + row;
             if (isValidItemIndex(newIndex))
             {
                 updateHighlightedItem(newIndex);
@@ -725,12 +725,12 @@ namespace tss
 
     bool PopupMenu::isValidItemIndex(int itemIndex) const
     {
-        return itemIndex >= 0 && itemIndex < comboBox.getNumItems();
+        return itemIndex >= 0 && itemIndex < comboBox_.getNumItems();
     }
 
     bool PopupMenu::hasValidLookAndFeel() const
     {
-        return theme != nullptr;
+        return theme_ != nullptr;
     }
 
     bool PopupMenu::hasValidParent() const
@@ -741,7 +741,7 @@ namespace tss
     void PopupMenu::setupScrollableContent()
     {
         contentComponent_ = std::make_unique<ScrollableContentComponent>(*this);
-        contentComponent_->setSize(columnWidth, scrollableContentHeight);
+        contentComponent_->setSize(columnWidth_, scrollableContentHeight_);
         
         viewport_ = std::make_unique<juce::Viewport>();
         viewport_->setViewedComponent(contentComponent_.get(), false);
@@ -750,51 +750,51 @@ namespace tss
         addAndMakeVisible(*viewport_);
     }
 
-    void PopupMenu::show(ComboBox& comboBoxRef, DisplayMode displayMode)
+    void PopupMenu::show(ComboBox& comboBox_Ref, DisplayMode displayMode)
     {
-        if (comboBoxRef.getNumItems() == 0)
+        if (comboBox_Ref.getNumItems() == 0)
         {
             return;
         }
 
-        auto* themePtr = comboBoxRef.theme_;
+        auto* themePtr = comboBox_Ref.theme_;
         if (themePtr == nullptr)
         {
             return;
         }
 
-        auto* parent = comboBoxRef.getParentComponent();
+        auto* parent = comboBox_Ref.getParentComponent();
         if (parent == nullptr)
         {
             return;
         }
 
-        auto* topLevelComponent = comboBoxRef.getTopLevelComponent();
+        auto* topLevelComponent = comboBox_Ref.getTopLevelComponent();
         if (topLevelComponent == nullptr)
         {
             return;
         }
 
-        auto popupMenu = std::make_unique<PopupMenu>(comboBoxRef, displayMode);
+        auto popupMenu = std::make_unique<PopupMenu>(comboBox_Ref, displayMode);
         auto* rawPtr = popupMenu.get();
         
         // Calculate size before adding to parent (layout is already calculated in constructor)
-        auto columnCount = rawPtr->columnCount;
-        auto itemsPerColumn = rawPtr->itemsPerColumn;
-        auto columnWidth = rawPtr->columnWidth;
+        auto columnCount_ = rawPtr->columnCount_;
+        auto itemsPerColumn_ = rawPtr->itemsPerColumn_;
+        auto columnWidth_ = rawPtr->columnWidth_;
         auto separatorWidth = kSeparatorWidth_;
         auto itemHeight = kItemHeight_;
         auto borderThickness = kBorderThickness_;
-        auto totalWidth = columnCount * columnWidth + (columnCount - 1) * separatorWidth;
+        auto totalWidth = columnCount_ * columnWidth_ + (columnCount_ - 1) * separatorWidth;
         
         int totalHeight;
         if (displayMode == DisplayMode::SingleColumnScrollable)
         {
-            totalHeight = juce::jmin(rawPtr->scrollableContentHeight, kMaxScrollableHeight_);
+            totalHeight = juce::jmin(rawPtr->scrollableContentHeight_, kMaxScrollableHeight_);
         }
         else
         {
-            totalHeight = itemsPerColumn * itemHeight;
+            totalHeight = itemsPerColumn_ * itemHeight;
         }
         
         auto popupSize = juce::Point<int>(totalWidth + static_cast<int>(borderThickness * 2.0f),
@@ -804,20 +804,20 @@ namespace tss
         auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
         auto verticalMargin = ComboBox::getVerticalMargin();
         
-        auto desiredPopupTopLeft = comboBoxRef.localPointToGlobal(juce::Point<int>(0, comboBoxRef.getHeight() + verticalMargin));
+        auto desiredPopupTopLeft = comboBox_Ref.localPointToGlobal(juce::Point<int>(0, comboBox_Ref.getHeight() + verticalMargin));
         auto popupWidth = popupSize.getX();
         auto popupHeight = popupSize.getY();
         
         // Adjust X position
         if (desiredPopupTopLeft.getX() + popupWidth > topLevelScreenBounds.getRight())
         {
-            desiredPopupTopLeft.setX(comboBoxRef.localPointToGlobal(juce::Point<int>(comboBoxRef.getBounds().getWidth() - popupWidth, 0)).getX());
+            desiredPopupTopLeft.setX(comboBox_Ref.localPointToGlobal(juce::Point<int>(comboBox_Ref.getBounds().getWidth() - popupWidth, 0)).getX());
         }
 
         // Adjust Y position
         if (desiredPopupTopLeft.getY() + popupHeight > topLevelScreenBounds.getBottom())
         {
-            desiredPopupTopLeft.setY(comboBoxRef.localPointToGlobal(juce::Point<int>(0, -popupHeight - verticalMargin)).getY());
+            desiredPopupTopLeft.setY(comboBox_Ref.localPointToGlobal(juce::Point<int>(0, -popupHeight - verticalMargin)).getY());
         }
         
         // Convert screen position to top-level component coordinates

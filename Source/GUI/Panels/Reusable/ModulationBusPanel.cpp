@@ -152,7 +152,7 @@ void ModulationBusPanel::layoutWidgetRow()
     const auto sourceComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationSource;
     const auto sourceComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
     const auto amountSliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
-    const auto amountSliderHeight = tss::Slider::getHeight();
+    const auto amountSliderHeight = PluginDimensions::Widgets::Heights::kSlider;
     const auto destinationComboBoxWidth = PluginDimensions::Widgets::Widths::ComboBox::kMatrixModulationDestination;
     const auto destinationComboBoxHeight = PluginDimensions::Widgets::Heights::kComboBox;
     const auto initButtonWidth = PluginDimensions::Widgets::Widths::Button::kInit;

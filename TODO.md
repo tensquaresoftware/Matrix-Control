@@ -4,13 +4,12 @@
 
 - **Auteur:** Guillaume DUPONT
 - **Organisation:** Ten Square Software
-- **Date de révision:** 2026-01-18
+- **Date de révision:** 2026-01-29
 
 ---
 
 ## Général
 
-- Faire relire et valider mes cursorrules à l'IA
 - Faire appliquer mes cursorrules en profondeur pour améliorer le code
 - Gérer la lourdeur toujours persistante du code au lancement du plugin
 
@@ -30,6 +29,8 @@
 ## GUI
 
 - Fond des widgets et panels transparents pour faire apparaître naturellement la couleur de fond de la GUI ?
+- Supprimer les couleurs inutiles (Background) dans ThemeColours.h
+- Simplifiier ThemeColours : kCommonBackgroundBlack, kCommonBackgroundCream
 - Dco1Panel a été refactorisé avec BaseModulePanel, mais pas les autres modules !
 - Créer ComboBox `MIDI Input` et `MIDI Output`
 - Créer classe Led, ajouter leds pour message MIDI entrants / sortants

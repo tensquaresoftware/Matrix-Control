@@ -42,16 +42,16 @@ namespace tss
         inline constexpr static int kColumnThreshold_ = 10;
         inline constexpr static int kMaxScrollableHeight_ = 300;
 
-        ComboBox& comboBox;
-        Theme* theme = nullptr;
+        ComboBox& comboBox_;
+        Theme* theme_ = nullptr;
         DisplayMode displayMode_;
-        int highlightedItemIndex = -1;
-        juce::Font cachedFont { juce::FontOptions() };
+        int highlightedItemIndex_ = -1;
+        juce::Font cachedFont_ { juce::FontOptions() };
         
-        int columnCount = 1;
-        int itemsPerColumn = 0;
-        int columnWidth = 0;
-        int scrollableContentHeight = 0;
+        int columnCount_ = 1;
+        int itemsPerColumn_ = 0;
+        int columnWidth_ = 0;
+        int scrollableContentHeight_ = 0;
         
         std::unique_ptr<juce::Viewport> viewport_;
         std::unique_ptr<ScrollableContentComponent> contentComponent_;

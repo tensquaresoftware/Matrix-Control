@@ -2,16 +2,13 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "FocusableWidget.h"
+#include "PopupMenu.h"
 
 namespace tss
 {
     class Theme;
     class PopupMenu;
 }
-
-// Include PopupMenu.h to use PopupMenu::DisplayMode in class declaration
-#include "PopupMenu.h"
 
 namespace tss
 {
@@ -53,28 +50,19 @@ namespace tss
         inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
 
         Theme* theme_ = nullptr;
-        FocusableWidget focusableWidget_;
         int width_;
         int height_;
         Style style_;
         bool isPopupOpen_ = false;
+        bool hasFocus_ = false;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        juce::Path createTrianglePath(float x, float y, float baseSize) const;
+        void drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
         
         juce::Rectangle<float> calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const;
-
-        struct BorderStyle
-        {
-            juce::Colour colour;
-            float thickness;
-        };
-        BorderStyle getBorderColourAndThickness(bool enabled) const;
-        void drawMainBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const BorderStyle& borderStyle) const;
-        void drawFocusBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus, float borderThickness) const;
+        juce::Path createTrianglePath(float x, float y, float baseSize) const;
 
         juce::String getSelectedItemText() const;
         juce::Colour getTextColourForCurrentStyle(bool enabled) const;

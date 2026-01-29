@@ -7,6 +7,7 @@
 #include "MasterEditPanel/MasterEditPanel.h"
 #include "PatchManagerPanel/PatchManagerPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "Shared/PluginDimensions.h"
 
 using tss::Theme;
 using tss::VerticalSeparator;
@@ -18,7 +19,11 @@ BodyPanel::BodyPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
     patchEditPanel_ = std::make_unique<PatchEditPanel>(theme, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel_);
 
-    verticalSeparator1_ = std::make_unique<VerticalSeparator>(theme);
+    verticalSeparator1_ = std::make_unique<VerticalSeparator>(
+        theme,
+        PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
+        PluginDimensions::Widgets::Heights::kVerticalSeparator
+    );
     addAndMakeVisible(*verticalSeparator1_);
 
     matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(theme, widgetFactory, apvts);
@@ -27,7 +32,11 @@ BodyPanel::BodyPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
     patchManagerPanel_ = std::make_unique<PatchManagerPanel>(theme, widgetFactory, apvts);
     addAndMakeVisible(*patchManagerPanel_);
 
-    verticalSeparator2_ = std::make_unique<VerticalSeparator>(theme);
+    verticalSeparator2_ = std::make_unique<VerticalSeparator>(
+        theme,
+        PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
+        PluginDimensions::Widgets::Heights::kVerticalSeparator
+    );
     addAndMakeVisible(*verticalSeparator2_);
 
     masterEditPanel_ = std::make_unique<MasterEditPanel>(theme, widgetFactory, apvts);
@@ -63,7 +72,7 @@ void BodyPanel::resized()
         bounds.getY() + verticalSeparator1Y
     );
     
-    const auto matrixModulationPanelX = verticalSeparator1X + VerticalSeparator::getWidth();
+    const auto matrixModulationPanelX = verticalSeparator1X + verticalSeparator1_->getWidth();
     const auto matrixModulationPanelY = padding;
     matrixModulationPanel_->setBounds(
         bounds.getX() + matrixModulationPanelX,
@@ -88,7 +97,7 @@ void BodyPanel::resized()
         bounds.getY() + verticalSeparator2Y
     );
     
-    const auto masterEditPanelX = verticalSeparator2X + VerticalSeparator::getWidth();
+    const auto masterEditPanelX = verticalSeparator2X + verticalSeparator2_->getWidth();
     const auto masterEditPanelY = padding;
     masterEditPanel_->setBounds(
         bounds.getX() + masterEditPanelX,

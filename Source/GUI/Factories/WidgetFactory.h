@@ -81,7 +81,7 @@ private:
     void addChoiceParametersToMap(const std::vector<PluginDescriptors::ChoiceParameterDescriptor>& parameters);
     void addStandaloneWidgetsToMap(const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets);
     
-    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::Theme& theme);
+    std::unique_ptr<tss::Slider> createSliderFromDescriptor(const PluginDescriptors::IntParameterDescriptor* desc, tss::Theme& theme, int width, int height);
     std::unique_ptr<tss::ComboBox> createComboBoxFromDescriptor(const PluginDescriptors::ChoiceParameterDescriptor* desc, tss::Theme& theme, int width, int height);
     
     int getButtonWidthForWidgetId(const juce::String& widgetId) const;

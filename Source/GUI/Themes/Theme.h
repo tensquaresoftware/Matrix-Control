@@ -42,7 +42,6 @@ namespace tss
         juce::Colour getMasterEditPanelBackgroundColour() const;
 
         // SectionHeader colours ------------------------------------------------
-        juce::Colour getSectionHeaderContentAreaColour() const;
         juce::Colour getSectionHeaderTextColour() const;
         juce::Colour getSectionHeaderLineColourBlue() const;
         juce::Colour getSectionHeaderLineColourOrange() const;
@@ -57,7 +56,6 @@ namespace tss
         juce::Colour getGroupLabelLineColour() const;
 
         // Label colours ------------------------------------------------------
-        juce::Colour getLabelBackgroundColour() const;
         juce::Colour getLabelTextColour() const;
 
         // VerticalSeparator colours ------------------------------------------
@@ -79,15 +77,14 @@ namespace tss
         juce::Colour getButtonTextColourClicked() const;
 
         // Slider colours -----------------------------------------------------
-        juce::Colour getSliderBackgroundColour(bool isEnabled = true) const;
-        juce::Colour getSliderBorderColour(bool isEnabled = true, bool hasFocus = false) const;
         juce::Colour getSliderTrackColour(bool isEnabled = true) const;
+        juce::Colour getSliderValueBarColour(bool isEnabled = true) const;
         juce::Colour getSliderTextColour(bool isEnabled = true) const;
         juce::Colour getSliderFocusBorderColour() const;
 
         // ComboBox colours ---------------------------------------------------
         juce::Colour getComboBoxBackgroundColour(bool isEnabled = true) const;
-        juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool hasFocus = false) const;
+        juce::Colour getComboBoxFocusBorderColour() const;
         juce::Colour getComboBoxTriangleColour(bool isEnabled = true) const;
         juce::Colour getComboBoxTextColour(bool isEnabled = true) const;
 
@@ -102,6 +99,9 @@ namespace tss
         // NumberBox colours ---------------------------------------------------
         juce::Colour getNumberBoxTextColour() const;
         juce::Colour getNumberBoxDotColour() const;
+        juce::Colour getNumberBoxEditorBackgroundColour() const;
+        juce::Colour getNumberBoxEditorSelectionBackgroundColour() const;
+        juce::Colour getNumberBoxEditorTextColour() const;
 
         // EnvelopeDisplay colours ----------------------------------------------
         juce::Colour getEnvelopeDisplayBackgroundColour() const;

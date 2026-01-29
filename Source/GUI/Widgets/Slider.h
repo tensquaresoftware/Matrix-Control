@@ -2,8 +2,6 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "FocusableWidget.h"
-
 namespace tss
 {
     class Theme;
@@ -11,12 +9,12 @@ namespace tss
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(Theme& inTheme, double initValue = 0.0);
+        explicit Slider(Theme& theme, int width, int height, double defaultValue = 0.0);
         ~Slider() override = default;
 
-        void setTheme(Theme& inTheme);
+        void setTheme(Theme& theme);
 
-        void setUnit(const juce::String& inUnit);
+        void setUnit(const juce::String& unit);
         juce::String getUnit() const;
 
         void paint(juce::Graphics& g) override;
@@ -31,32 +29,31 @@ namespace tss
 
         bool keyPressed(const juce::KeyPress& key) override;
 
-        static constexpr int getWidth() { return kWidth_; }
-        static constexpr int getHeight() { return kHeight_; }
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kWidth_ = 60;
-        inline constexpr static int kHeight_ = 20;
-        inline constexpr static int kBackgroundWidth_ = 60;
-        inline constexpr static int kBackgroundHeight_ = 16;
+        inline constexpr static int kTrackHeight_ = 16;
         inline constexpr static double kDragSensitivity_ = 0.5;
         inline constexpr static double kShiftKeyStep_ = 10.0;
 
-        Theme* theme = nullptr;
-        FocusableWidget focusableWidget;
+        Theme* theme_ = nullptr;
         
-        double defaultValue = 0.0;
-        double dragStartValue = 0.0;
-        juce::Point<int> dragStartPosition;
-        juce::String unit;
+        int width_;
+        int height_;
+        double defaultValue_ = 0.0;
+        double dragStartValue_ = 0.0;
+        juce::Point<int> dragStartPosition_;
+        juce::String unit_;
+        bool hasFocus_ = false;
 
-        void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus);
         void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
+        void drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
+        void drawFocusBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool hasFocus);
         
-        juce::Rectangle<float> calculateBackgroundBounds(const juce::Rectangle<float>& bounds) const;
-        juce::Rectangle<float> calculateTrackBounds(const juce::Rectangle<float>& backgroundBounds, bool enabled) const;
+        juce::Rectangle<float> calculateTrackBounds(const juce::Rectangle<float>& bounds) const;
+        juce::Rectangle<float> calculateValueBarBounds(const juce::Rectangle<float>& trackBounds, bool enabled) const;
         
         double calculateStepForRange(double rangeLength, bool isShiftPressed) const;
         bool isIncrementKey(int keyCode) const;

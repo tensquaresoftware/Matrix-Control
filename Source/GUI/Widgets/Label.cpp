@@ -10,14 +10,13 @@ namespace tss
         , height_(height)
         , labelText_(text)
     {
-        setOpaque(true);
+        setOpaque(false);
         setSize(width_, height_);
     }
 
     void Label::setTheme(Theme& theme)
     {
         theme_ = &theme;
-        repaint();
     }
 
     void Label::setText(const juce::String& text)
@@ -31,40 +30,13 @@ namespace tss
 
     void Label::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
-        {
+        if (theme_ == nullptr || labelText_.isEmpty())
             return;
-        }
-
-        g.fillAll(theme_->getGuiBackgroundColour());
-
-        const auto bounds = getLocalBounds().toFloat();
-
-        drawBackground(g, bounds);
-        drawText(g, bounds);
-    }
-
-
-    void Label::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto backgroundColour = theme_->getLabelBackgroundColour();
-        const auto backgroundBounds = bounds.reduced(kBackgroundPadding_);
-        
-        g.setColour(backgroundColour);
-        g.fillRect(backgroundBounds);
-    }
-
-    void Label::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        if (labelText_.isEmpty())
-        {
-            return;
-        }
 
         const auto textColour = theme_->getLabelTextColour();
         const auto font = theme_->getBaseFont();
 
-        auto textBounds = bounds.reduced(kBackgroundPadding_);
+        auto textBounds = getLocalBounds().toFloat();
         textBounds.removeFromLeft(kTextLeftPadding_);
 
         g.setColour(textColour);

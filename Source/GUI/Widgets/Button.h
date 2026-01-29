@@ -26,9 +26,9 @@ namespace tss
         int width_;
         int height_;
 
-        void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown);
-        void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
-        void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled, bool isHighlighted, bool isDown);
+        juce::Colour getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const;
+        juce::Colour getBorderColour(bool enabled) const;
+        juce::Colour getTextColour(bool enabled, bool isHighlighted, bool isDown) const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Button)
     };

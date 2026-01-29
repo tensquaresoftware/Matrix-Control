@@ -134,7 +134,7 @@ void ParameterPanel::layoutParameterWidget(int y)
         ? PluginDimensions::Widgets::Widths::Label::kPatchEditModule
         : PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
     const auto sliderWidth = PluginDimensions::Widgets::Widths::Slider::kStandard;
-    const auto sliderHeight = tss::Slider::getHeight();
+    const auto sliderHeight = PluginDimensions::Widgets::Heights::kSlider;
     const auto comboBoxWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ComboBox::kPatchEditModule
         : PluginDimensions::Widgets::Widths::ComboBox::kMasterEditModule;

@@ -32,12 +32,13 @@ namespace tss
         int width_;
         int height_;
         juce::String labelText_;
+        
+        void drawText(juce::Graphics& g, const juce::Rectangle<float>& area);
+        void drawLines(juce::Graphics& g, const juce::Rectangle<float>& area, float textWidth);
+        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY);
+        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY);
 
-        void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        void drawLines(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY);
-        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& textArea, float textCentreX, float halfTextWidth, float lineY);
-        juce::Rectangle<float> getContentArea(const juce::Rectangle<float>& bounds) const;
+        juce::Rectangle<float> calculateContentArea() const;
         float calculateTextWidth() const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GroupLabel)

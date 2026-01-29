@@ -15,9 +15,11 @@ WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
 
 std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
     const PluginDescriptors::IntParameterDescriptor* desc,
-    tss::Theme& theme)
+    tss::Theme& theme,
+    int width,
+    int height)
 {
-    auto slider = std::make_unique<tss::Slider>(theme, static_cast<double>(desc->defaultValue));
+    auto slider = std::make_unique<tss::Slider>(theme, width, height, static_cast<double>(desc->defaultValue));
     slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
     slider->setValue(static_cast<double>(desc->defaultValue));
     return slider;
@@ -46,7 +48,12 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     const auto* desc = findIntParameter(parameterId);
     validator.getIntParameterDescriptorOrThrow(desc, parameterId);
     validator.validateIntParameterValues(desc, parameterId);
-    return createSliderFromDescriptor(desc, theme);
+    return createSliderFromDescriptor(
+        desc,
+        theme,
+        PluginDimensions::Widgets::Widths::Slider::kStandard,
+        PluginDimensions::Widgets::Heights::kSlider
+    );
 }
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(

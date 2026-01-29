@@ -4,45 +4,35 @@
 
 namespace tss
 {
-    VerticalSeparator::VerticalSeparator(Theme& inTheme)
-        : theme(&inTheme)
+    VerticalSeparator::VerticalSeparator(Theme& theme, int width, int height)
+        : theme_(&theme)
+        , width_(width)
+        , height_(height)
     {
-        setOpaque(true);
-        setSize(kWidth_, kHeight_);
+        setOpaque(false);
+        setSize(width_, height_);
     }
 
-    void VerticalSeparator::setTheme(Theme& inTheme)
+    void VerticalSeparator::setTheme(Theme& theme)
     {
-        theme = &inTheme;
-        repaint();
+        theme_ = &theme;
     }
 
     void VerticalSeparator::paint(juce::Graphics& g)
     {
-        if (theme == nullptr)
-        {
+        if (theme_ == nullptr)
             return;
-        }
-
-        g.fillAll(theme->getGuiBackgroundColour());
 
         const auto bounds = getLocalBounds().toFloat();
-
-        drawLine(g, bounds);
-    }
-
-
-    void VerticalSeparator::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
-    {
-        const auto lineColour = theme->getVerticalSeparatorLineColour();
-        const auto lineWidth = kLineWidth_;
-        const auto lineX = bounds.getCentreX() - lineWidth / 2.0f;
+        const auto lineX = bounds.getCentreX() - kLineWidth_ * 0.5f;
         
         auto line = bounds;
+        line.removeFromTop(kTopPadding_);
+        line.removeFromBottom(kBottomPadding_);
         line.setX(lineX);
-        line.setWidth(lineWidth);
+        line.setWidth(kLineWidth_);
         
-        g.setColour(lineColour);
+        g.setColour(theme_->getVerticalSeparatorLineColour());
         g.fillRect(line);
     }
 }

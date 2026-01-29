@@ -9,36 +9,32 @@ namespace tss
         , width_(width)
         , height_(height)
     {
-        setOpaque(true);
-        setBufferedToImage(false);
+        setOpaque(false);
         setSize(width_, height_);
     }
 
     void EnvelopeDisplay::setTheme(Theme& theme)
     {
         theme_ = &theme;
-        repaint();
     }
 
     void EnvelopeDisplay::paint(juce::Graphics& g)
     {
         if (theme_ == nullptr)
-        {
             return;
-        }
 
         const auto bounds = getLocalBounds().toFloat();
+        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kVerticalPadding_));
 
-        drawBackground(g, bounds);
-        drawBorder(g, bounds);
-        drawTriangle(g, bounds);
+        drawBackground(g, contentBounds);
+        drawBorder(g, contentBounds);
+        drawTriangle(g, contentBounds);
     }
 
 
     void EnvelopeDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto backgroundColour = theme_->getEnvelopeDisplayBackgroundColour();
-        
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
@@ -46,25 +42,23 @@ namespace tss
     void EnvelopeDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto borderColour = theme_->getEnvelopeDisplayBorderColour();
-        const auto contentBounds = bounds.reduced(0, kVerticalPadding_);
-
         g.setColour(borderColour);
-        g.drawRect(contentBounds, kBorderThickness_);
+        g.drawRect(bounds, static_cast<float>(kBorderThickness_));
     }
 
     void EnvelopeDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = theme_->getEnvelopeDisplayBorderColour();
-        const auto triangleHeight = kTriangleBase_ * std::sqrt(3.0f) / 2.0f;
+        const auto triangleColour = theme_->getEnvelopeDisplayBorderColour();
+        const auto triangleHeight = kTriangleBase_ * std::sqrt(3.0f) * 0.5f;
         const auto centreX = bounds.getCentreX();
-        const auto baseY = static_cast<float>(height_ - kVerticalPadding_);
+        const auto baseY = bounds.getBottom();
 
         juce::Path triangle;
-        triangle.addTriangle(centreX - kTriangleBase_ / 2.0f, baseY,
-                             centreX + kTriangleBase_ / 2.0f, baseY,
+        triangle.addTriangle(centreX - kTriangleBase_ * 0.5f, baseY,
+                             centreX + kTriangleBase_ * 0.5f, baseY,
                              centreX, baseY + triangleHeight);
 
-        g.setColour(borderColour);
+        g.setColour(triangleColour);
         g.fillPath(triangle);
     }
 }
