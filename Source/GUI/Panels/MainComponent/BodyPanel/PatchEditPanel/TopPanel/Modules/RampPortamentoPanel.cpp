@@ -1,145 +1,37 @@
 #include "RampPortamentoPanel.h"
 
 #include "GUI/Themes/Theme.h"
-#include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
-#include "GUI/Panels/Reusable/ParameterPanel.h"
+#include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
+ModulePanelConfig RampPortamentoPanel::createConfig()
+{
+    ModulePanelConfig config;
+    config.moduleId = PluginDescriptors::ModuleIds::kRampPortamento;
+    config.buttonSet = ModulePanelButtonSet::InitOnly;
+    config.moduleType = ModulePanelModuleType::PatchEdit;
+    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kRampPortamentoInit;
+    
+    config.parameters = {
+        {PluginDescriptors::ParameterIds::kRamp1Rate, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kRamp1Trigger, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kRamp2Rate, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kRamp2Trigger, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kPortamentoRate, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kPortamentoModByVelocity, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kPortamentoMode, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kPortamentoLegato, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kPortamentoKeyboardMode, ModulePanelParameterType::ComboBox},
+        {"", ModulePanelParameterType::None}
+    };
+    
+    return config;
+}
+
 RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , apvts_(apvts)
+    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
-    setOpaque(false);
-    moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ModuleIds::kRampPortamento,
-        ModuleHeaderPanel::ButtonSet::InitOnly,
-        ModuleHeaderPanel::ModuleType::PatchEdit,
-        apvts_,
-        PluginDescriptors::StandaloneWidgetIds::kRampPortamentoInit);
-    addAndMakeVisible(*moduleHeaderPanel_);
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kRamp1Rate,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kRamp1Trigger,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kRamp2Rate,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kRamp2Trigger,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kPortamentoRate,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kPortamentoModByVelocity,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kPortamentoMode,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kPortamentoLegato,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kPortamentoKeyboardMode,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        juce::String(),
-        ParameterPanel::ParameterType::None,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    setSize(getWidth(), getHeight());
-}
-
-RampPortamentoPanel::~RampPortamentoPanel() = default;
-
-void RampPortamentoPanel::resized()
-{
-    auto bounds = getLocalBounds();
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setBounds(bounds.removeFromTop(header->getHeight()));
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
-}
-
-void RampPortamentoPanel::setTheme(Theme& theme)
-{
-    theme_ = &theme;
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setTheme(theme);
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setTheme(theme);
-
-    repaint();
 }

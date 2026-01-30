@@ -1,123 +1,36 @@
 #include "MiscPanel.h"
 
 #include "GUI/Themes/Theme.h"
-#include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
-#include "GUI/Panels/Reusable/ParameterPanel.h"
-#include "GUI/Widgets/Slider.h"
+#include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
+ModulePanelConfig MiscPanel::createConfig()
+{
+    ModulePanelConfig config;
+    config.moduleId = PluginDescriptors::ModuleIds::kMisc;
+    config.buttonSet = ModulePanelButtonSet::InitOnly;
+    config.moduleType = ModulePanelModuleType::MasterEdit;
+    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kMiscInit;
+    
+    config.parameters = {
+        {PluginDescriptors::ParameterIds::kMasterTune, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kMasterTranspose, ModulePanelParameterType::Slider},
+        {"", ModulePanelParameterType::None},
+        {PluginDescriptors::ParameterIds::kBendRange, ModulePanelParameterType::Slider},
+        {"", ModulePanelParameterType::None},
+        {PluginDescriptors::ParameterIds::kUnisonEnable, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kVolumeInvertEnable, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kBankLockEnable, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kMemoryProtectEnable, ModulePanelParameterType::ComboBox}
+    };
+    
+    return config;
+}
+
 MiscPanel::MiscPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , apvts_(apvts)
+    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
-    setOpaque(false);
-    moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ModuleIds::kMisc,
-        ModuleHeaderPanel::ButtonSet::InitOnly,
-        ModuleHeaderPanel::ModuleType::MasterEdit,
-        apvts_,
-        PluginDescriptors::StandaloneWidgetIds::kMiscInit);
-    addAndMakeVisible(*moduleHeaderPanel_);
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kMasterTune,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kMasterTranspose,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-    if (auto* slider = parameterPanels_.back()->getSlider())
-        slider->setUnit("st");
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kBendRange,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-    if (auto* slider = parameterPanels_.back()->getSlider())
-        slider->setUnit("st");
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kUnisonEnable,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kVolumeInvertEnable,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kBankLockEnable,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kMemoryProtectEnable,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::MasterEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    setSize(getWidth(), getHeight());
-}
-
-MiscPanel::~MiscPanel() = default;
-
-void MiscPanel::resized()
-{
-    auto bounds = getLocalBounds();
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setBounds(bounds.removeFromTop(header->getHeight()));
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
-}
-
-void MiscPanel::setTheme(Theme& theme)
-{
-    theme_ = &theme;
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setTheme(theme);
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setTheme(theme);
-
-    repaint();
 }

@@ -17,7 +17,7 @@ BaseModulePanel::BaseModulePanel(Theme& theme,
     , apvts_(apvts)
     , moduleType_(config.moduleType)
 {
-    setOpaque(true);
+    setOpaque(false);
     
     ModuleHeaderPanel::ButtonSet buttonSet = (config.buttonSet == ModulePanelButtonSet::InitCopyPaste)
         ? ModuleHeaderPanel::ButtonSet::InitCopyPaste

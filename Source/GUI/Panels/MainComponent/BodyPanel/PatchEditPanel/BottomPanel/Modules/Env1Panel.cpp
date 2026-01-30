@@ -1,147 +1,39 @@
 #include "Env1Panel.h"
 
 #include "GUI/Themes/Theme.h"
-#include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
-#include "GUI/Panels/Reusable/ParameterPanel.h"
+#include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
+ModulePanelConfig Env1Panel::createConfig()
+{
+    ModulePanelConfig config;
+    config.moduleId = PluginDescriptors::ModuleIds::kEnvelope1;
+    config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
+    config.moduleType = ModulePanelModuleType::PatchEdit;
+    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kEnv1Init;
+    config.copyWidgetId = PluginDescriptors::StandaloneWidgetIds::kEnv1Copy;
+    config.pasteWidgetId = PluginDescriptors::StandaloneWidgetIds::kEnv1Paste;
+    
+    config.parameters = {
+        {PluginDescriptors::ParameterIds::kEnv1Delay, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1Attack, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1Decay, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1Sustain, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1Release, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1Amplitude, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kEnv1TriggerMode, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kEnv1EnvelopeMode, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kEnv1Lfo1Trigger, ModulePanelParameterType::ComboBox}
+    };
+    
+    return config;
+}
+
 Env1Panel::Env1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , apvts_(apvts)
+    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
-    setOpaque(false);
-    moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ModuleIds::kEnvelope1,
-        ModuleHeaderPanel::ButtonSet::InitCopyPaste,
-        ModuleHeaderPanel::ModuleType::PatchEdit,
-        apvts_,
-        PluginDescriptors::StandaloneWidgetIds::kEnv1Init,
-        PluginDescriptors::StandaloneWidgetIds::kEnv1Copy,
-        PluginDescriptors::StandaloneWidgetIds::kEnv1Paste);
-    addAndMakeVisible(*moduleHeaderPanel_);
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Delay,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Attack,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Decay,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Sustain,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Release,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Amplitude,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1AmplitudeModByVelocity,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1TriggerMode,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1EnvelopeMode,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kEnv1Lfo1Trigger,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    setSize(getWidth(), getHeight());
-}
-
-Env1Panel::~Env1Panel() = default;
-
-void Env1Panel::resized()
-{
-    auto bounds = getLocalBounds();
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setBounds(bounds.removeFromTop(header->getHeight()));
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
-}
-
-void Env1Panel::setTheme(Theme& theme)
-{
-    theme_ = &theme;
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setTheme(theme);
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setTheme(theme);
-
-    repaint();
 }

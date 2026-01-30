@@ -1,147 +1,39 @@
 #include "Lfo1Panel.h"
 
 #include "GUI/Themes/Theme.h"
-#include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
-#include "GUI/Panels/Reusable/ParameterPanel.h"
+#include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
 using tss::Theme;
 
+ModulePanelConfig Lfo1Panel::createConfig()
+{
+    ModulePanelConfig config;
+    config.moduleId = PluginDescriptors::ModuleIds::kLfo1;
+    config.buttonSet = ModulePanelButtonSet::InitCopyPaste;
+    config.moduleType = ModulePanelModuleType::PatchEdit;
+    config.initWidgetId = PluginDescriptors::StandaloneWidgetIds::kLfo1Init;
+    config.copyWidgetId = PluginDescriptors::StandaloneWidgetIds::kLfo1Copy;
+    config.pasteWidgetId = PluginDescriptors::StandaloneWidgetIds::kLfo1Paste;
+    
+    config.parameters = {
+        {PluginDescriptors::ParameterIds::kLfo1Speed, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kLfo1SpeedModByPressure, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kLfo1RetriggerPoint, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kLfo1Amplitude, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1, ModulePanelParameterType::Slider},
+        {PluginDescriptors::ParameterIds::kLfo1Waveform, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kLfo1TriggerMode, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kLfo1Lag, ModulePanelParameterType::ComboBox},
+        {PluginDescriptors::ParameterIds::kLfo1SampleInput, ModulePanelParameterType::ComboBox},
+        {"", ModulePanelParameterType::None}
+    };
+    
+    return config;
+}
+
 Lfo1Panel::Lfo1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , apvts_(apvts)
+    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
-    setOpaque(false);
-    moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ModuleIds::kLfo1,
-        ModuleHeaderPanel::ButtonSet::InitCopyPaste,
-        ModuleHeaderPanel::ModuleType::PatchEdit,
-        apvts_,
-        PluginDescriptors::StandaloneWidgetIds::kLfo1Init,
-        PluginDescriptors::StandaloneWidgetIds::kLfo1Copy,
-        PluginDescriptors::StandaloneWidgetIds::kLfo1Paste);
-    addAndMakeVisible(*moduleHeaderPanel_);
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1Speed,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1SpeedModByPressure,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1RetriggerPoint,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1Amplitude,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1AmplitudeModByRamp1,
-        ParameterPanel::ParameterType::Slider,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1Waveform,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1TriggerMode,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1Lag,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        PluginDescriptors::ParameterIds::kLfo1SampleInput,
-        ParameterPanel::ParameterType::ComboBox,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-        theme,
-        widgetFactory,
-        juce::String(),
-        ParameterPanel::ParameterType::None,
-        ParameterPanel::ModuleType::PatchEdit,
-        apvts_));
-    addAndMakeVisible(*parameterPanels_.back());
-
-    setSize(getWidth(), getHeight());
-}
-
-Lfo1Panel::~Lfo1Panel() = default;
-
-void Lfo1Panel::resized()
-{
-    auto bounds = getLocalBounds();
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setBounds(bounds.removeFromTop(header->getHeight()));
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
-}
-
-void Lfo1Panel::setTheme(Theme& theme)
-{
-    theme_ = &theme;
-
-    if (auto* header = moduleHeaderPanel_.get())
-        header->setTheme(theme);
-
-    for (auto& paramPanel : parameterPanels_)
-        if (paramPanel != nullptr)
-            paramPanel->setTheme(theme);
-
-    repaint();
 }
