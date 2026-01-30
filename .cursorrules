@@ -1,411 +1,686 @@
-===============================================================================
-# INSTRUCTIONS PERSONNELLES POUR L'AGENT IA CURSOR
-===============================================================================
-- Auteur : Guillaume DUPONT
-- Organisation : Ten Square Software
-- Contexte : Développement de plugins VST/AU avec JUCE
-- Version : 1.0.0
-- Dernière mise à jour : 2026-01-20
+# Instructions personnelles pour l'Agent IA Cursor
 
+**Auteur** : Guillaume DUPONT  
+**Organisation** : Ten Square Software  
+**Contexte** : Développement de plugins VST/AU avec JUCE  
+**Version** : 2.0.0  
+**Date de mise à jour** : 2026-01-30
 
-===============================================================================
-## COMMUNICATION
-===============================================================================
+---
 
-[Interactions avec moi]
+## 1. Communication
+
+### 1.1 Interactions avec moi
+
 - Je m'appelle Guillaume, tu peux m'appeler par mon prénom
 - Utilise toujours le tutoiement dans tous nos échanges
 - Réponds-moi exclusivement en français dans nos conversations
 - Sois franc, honnête et factuel, même si cela implique de me contredire
 - Priorité absolue : m'aider à trouver la solution la plus pertinente !
 
-[Structure des réponses]
+### 1.2 Structure des réponses
+
 - Structure claire et didactique
 - Objectif : m'aider à progresser
 - Garantir pérennité et maintenabilité du code généré
 - Solutions optimales et conformes aux standards professionnels
-- NE PAS présenter de blocs de code dans le chat lors de modifications/génération
+- **NE PAS** présenter de blocs de code dans le chat lors de modifications/génération
 - Privilégier les résumés et conclusions en langage naturel uniquement
 - Le code est déjà visible dans l'éditeur Cursor, inutile de le répéter dans le chat
 
+---
 
-===============================================================================
-## ENVIRONNEMENT DE DÉVELOPPEMENT
-===============================================================================
+## 2. Process & Workflow
 
-[Système & Outils]
-- Plateforme : MacBook Pro M5 avec macOS Tahoe
-- IDE : Cursor (avec abonnement mensuel Agent IA)
-- Compilateur : Xcode 26
-- Build system : CMake
-- Framework audio : JUCE 8.0.12
+> ⚠️ **OBLIGATOIRE AVANT TOUT CODING**
 
-[Référence JUCE]
-- Installation JUCE sur mon Mac : /Applications/JUCE
-- Documentation officielle : https://docs.juce.com
-- Modules : /Applications/JUCE/modules/
-- CMake : /Applications/JUCE/CMake/
+### 2.1 Workflow en 3 phases
 
-[Vérification du code généré]
+**STOP !** Toujours suivre ce workflow rigoureux :
+
+#### Phase 1 : DESIGN (obligatoire avant de toucher au code)
+
+- Identifier les responsabilités (Single Responsibility Principle)
+- Détecter la duplication potentielle (Don't Repeat Yourself)
+- Choisir les abstractions appropriées (interfaces, classes de base)
+- Planifier les classes/fonctions avec leurs noms explicites
+- Estimer la taille des méthodes (objectif : < 15 lignes)
+- Me poser la question : "Uncle Bob serait-il fier de ce design ?"
+- Dessiner mentalement l'architecture (dépendances, hiérarchie)
+
+#### Phase 2 : IMPLEMENTATION
+
+- Écrire le code en suivant strictement le design de la Phase 1
+- Respecter les limites quantifiables (voir section dédiée ci-dessous)
+- Si une méthode dépasse 15 lignes → **STOP** et extraire des helpers IMMÉDIATEMENT
+- Si je détecte de la duplication (même 3 lignes) → **STOP** et factoriser IMMÉDIATEMENT
+- Si une classe dépasse 200 lignes → **STOP** et réévaluer le design (SRP probablement violé)
+- Nommer chaque fonction pour révéler son intention (pas de `doStuff()` ou `process()` vagues)
+
+#### Phase 3 : AUTO-REVIEW (avant de présenter le code à Guillaume)
+
+- Relire avec un œil critique "Uncle Bob"
+- Vérifier SOLID pour chaque classe (checklist complète ci-dessous)
+- Vérifier que chaque fonction fait UNE SEULE chose
+- Vérifier qu'il n'y a AUCUNE duplication
+- Vérifier les noms : sont-ils tous explicites et révèlent-ils l'intention ?
+- Si la review échoue → retour Phase 1 (ne pas présenter du code non-Clean)
+
+### 2.2 Exception : Prototypage rapide
+
+Si Guillaume demande explicitement un "prototype rapide", "POC", ou "spike", je peux sauter la Phase 1 mais je DOIS proposer un refactoring Clean après validation.
+
+---
+
+## 3. Limites Quantifiables
+
+> 🚫 **Règles strictes, non négociables**
+
+### 3.1 Métriques de code - Limites MAXIMALES
+
+Ces limites sont des **HARD LIMITS**, pas des suggestions :
+
+#### Fonction/Méthode : 15 lignes MAXIMUM (idéal : 5-10)
+
+- **Exception** : méthode `show()` ou orchestration peut aller à 20 lignes SI elle délègue proprement
+- **Au-delà** : extraire immédiatement en helpers avec noms explicites
+
+#### Classe : 200 lignes MAXIMUM (idéal : < 150)
+
+- **Si dépassé** : violation probable du SRP → séparer en plusieurs classes
+
+#### Paramètres de fonction : 3 MAXIMUM
+
+- **Si > 3** : créer un struct/classe de paramètres avec noms explicites
+
+#### Complexité cyclomatique : < 5 par fonction (idéal : 1-3)
+
+- **Trop de `if`/`switch`** → extraire en fonctions séparées ou utiliser polymorphisme
+
+#### Niveaux d'indentation : 2 MAXIMUM
+
+- Pas de `if` imbriqués dans des `for` imbriqués dans des `if`
+- **Solution** : early returns, extraction de fonctions, guard clauses
+
+#### Duplication de code : 0 tolérance absolue
+
+- Même 3 lignes similaires = extraction obligatoire en fonction commune
+- Utiliser des helpers, des templates, ou des fonctions utilitaires
+
+### 3.2 Procédure quand je dépasse une limite
+
+1. **NE PAS** continuer à écrire du code
+2. **STOP** immédiatement
+3. Me demander : "Pourquoi cette limite est dépassée ?"
+4. Répondre honnêtement : "Parce que cette fonction/classe fait plusieurs choses"
+5. Appliquer SRP : extraire les responsabilités en nouvelles fonctions/classes
+6. Recommencer avec le bon design
+
+### 3.3 Signaux d'alarme - Indicateurs de mauvais design
+
+- Je me dis "cette fonction est un peu longue mais ça va" → ❌ **NON**, refactoriser
+- Je vois du code similaire ailleurs → ❌ **NON**, factoriser immédiatement
+- Je ne trouve pas de bon nom pour la fonction → Signe qu'elle fait trop de choses
+- J'ai besoin d'un commentaire pour expliquer → Le code n'est pas assez clair, renommer/refactoriser
+- Je mets un commentaire comme "// Partie 1", "// Partie 2" → Chaque partie = fonction séparée
+
+---
+
+## 4. Auto-Critique
+
+> ✅ **Checklist obligatoire avant de présenter du code**
+
+Avant de présenter du code à Guillaume, je DOIS vérifier systématiquement :
+
+### 4.1 SOLID Check ✓
+
+- [ ] **S**ingle Responsibility : Chaque classe a UNE SEULE responsabilité bien définie ?
+  - Tester : puis-je décrire la classe en une phrase simple sans "et" ?
+- [ ] **O**pen/Closed : Le code est extensible sans modification des classes existantes ?
+  - Utilisation d'abstractions, interfaces, polymorphisme ?
+- [ ] **L**iskov Substitution : Les sous-classes sont substituables sans casser le comportement ?
+  - Les dérivées respectent les contrats de la classe de base ?
+- [ ] **I**nterface Segregation : Pas d'interfaces "fat" forçant à implémenter des méthodes inutiles ?
+  - Interfaces petites et ciblées ?
+- [ ] **D**ependency Inversion : Dépendances vers abstractions, pas implémentations concrètes ?
+  - Les modules de haut niveau ne dépendent pas des détails bas niveau ?
+
+### 4.2 Clean Code Check ✓
+
+- [ ] Toutes les fonctions < 15 lignes ? (idéalement < 10)
+  - Si NON : extraire immédiatement
+- [ ] Tous les noms sont explicites et révèlent l'intention ?
+  - `calculateTotalPrice()` pas `calc()`, `isUserLoggedIn()` pas `check()`
+- [ ] Aucune duplication de code (même pas 3 lignes similaires) ?
+  - Si NON : factoriser en fonction commune
+- [ ] Un seul niveau d'abstraction par fonction ?
+  - Pas de mélange appels haut niveau + manipulations bas niveau
+- [ ] Pas de commentaires explicatifs nécessaires ?
+  - Le code doit être auto-documentant via les noms
+- [ ] Pas de magic numbers ?
+  - Toutes les constantes sont nommées : `kMaxRetries` pas `3`
+- [ ] Pas de code mort ou commenté ?
+  - Supprimer, le versionning (git) garde l'historique
+
+### 4.3 Architecture & Design Check ✓
+
+- [ ] Les dépendances vont dans le bon sens ?
+  - GUI → Core, jamais Core → GUI
+  - Modules de haut niveau → abstractions ← modules bas niveau
+- [ ] Pas de couplage fort entre modules ?
+  - Utilisation d'interfaces pour découpler
+- [ ] Les responsabilités sont clairement séparées ?
+  - Rendering, logique métier, état, coordination : chacun sa classe
+- [ ] Facilement testable ?
+  - Pas de dépendances cachées, injection de dépendances
+
+### 4.4 Lisibilité Check ✓
+
+- [ ] Un développeur qui découvre le code peut le comprendre sans explication ?
+- [ ] Les classes et fonctions ont des noms qui documentent leur rôle ?
+- [ ] La structure est logique et prévisible ?
+- [ ] Il n'y a pas de "surprises" ou effets de bord cachés ?
+
+### 4.5 Règle d'or
+
+> ❌ **Si UN SEUL ✗ → Je ne présente PAS le code**
+>
+> - Je refactorise d'abord jusqu'à ce que TOUS les ✓ soient validés
+> - Ensuite seulement je présente le résultat à Guillaume
+
+---
+
+## 5. Environnement de Développement
+
+### 5.1 Système & Outils
+
+- **Plateforme** : MacBook Pro M5 avec macOS Tahoe
+- **IDE** : Cursor (avec abonnement mensuel Agent IA)
+- **Compilateur** : Xcode 26
+- **Build system** : CMake
+- **Framework audio** : JUCE 8.0.12
+
+### 5.2 Référence JUCE
+
+- **Installation JUCE** : `/Applications/JUCE`
+- **Documentation officielle** : https://docs.juce.com
+- **Modules** : `/Applications/JUCE/modules/`
+- **CMake** : `/Applications/JUCE/CMake/`
+
+### 5.3 Vérification du code généré
+
 - Réfère-toi systématiquement à la documentation JUCE la plus à jour
 - Vérifie que chaque API, classe et méthode existe dans JUCE 8
 - Évite toute syntaxe obsolète (JUCE 7, JUCE 6, etc.)
 - Signale explicitement si tu n'es pas certain d'une API
 
+---
 
-===============================================================================
-## STANDARDS C++ & QUALITÉ
-===============================================================================
+## 6. Standards C++ & Qualité
 
-[Généralités C++]
-- Standard : C++17 minimum, compatible Xcode 26
-- Langage du code source : Anglais uniquement
-  * Noms de variables, fonctions, classes
-  * Tous les commentaires de code
-  * Pas d'accents, pas de français dans le code
+### 6.1 Généralités C++
 
-[Git]
+- **Standard** : C++17 minimum, compatible Xcode 26
+- **Langage du code source** : Anglais uniquement
+  - Noms de variables, fonctions, classes
+  - Tous les commentaires de code
+  - Pas d'accents, pas de français dans le code
+
+### 6.2 Git
+
+#### Commits
+
 - Git Commits : Summary/Description en anglais uniquement
-- Lors de la création d'un tag Git annoté, utiliser le format suivant :
-  * Une phrase de description principale (titre du tag)
-  * Une petite liste à puces des points les plus importants qui ont été retravaillés dans le code
-- Exemple de format :
-  ```
-  Refactor Slider class and improve focus management
 
-  - Refactor Slider: simplify drawing code by removing unnecessary constants and helper methods
-  - Use reduced() for bounds calculations directly in paint() method
-  - Improve focus management: add ability to remove focus by clicking on background
-  ```
+#### Tags annotés
+
+Lors de la création d'un tag Git annoté, utiliser le format suivant :
+
+- Une phrase de description principale (titre du tag)
+- Une petite liste à puces des points les plus importants qui ont été retravaillés dans le code
+
+**Exemple :**
+
+```
+Refactor Slider class and improve focus management
+
+- Refactor Slider: simplify drawing code by removing unnecessary constants and helper methods
+- Use reduced() for bounds calculations directly in paint() method
+- Improve focus management: add ability to remove focus by clicking on background
+```
+
 - Ne pas inclure les détails d'implémentation ni les widgets de test temporaires
 - Se concentrer sur les améliorations architecturales et les changements significatifs du code
 
-[Conventions de nommage]
-- Variables & Méthodes : lowerCamelCase
-  * Exemples : audioBuffer, processMidiEvents(), getSampleRate()
-- Variables et constantes publiques : pas de préfixe ni suffixe
-  * Exemples : pluginFactory, kMaxBufferSize
-- Variables et constantes privées : suffixe underscore (Google Style)
-  * Exemples : apvts_, kWidth_
-- Classes : PascalCase
-  * Exemples : PluginProcessor, PluginEditor, AudioAnalyzer
-- Enums : PascalCase pour le type, préfixe `k` pour les valeurs
-  * Exemples : `enum class ParameterType { kDco, kEnv, kLfo };`
-- Namespaces : PascalCase
-  * Exemples : `namespace Core { }`, `namespace GUI { }`
-- Éviter les underscore_case, sauf cas très particulier
+### 6.3 Conventions de nommage
 
-[Magic Numbers - INTERDITS]
-- Ne JAMAIS utiliser de magic numbers dans le code !
+#### Variables & Méthodes : lowerCamelCase
+
+- Exemples : `audioBuffer`, `processMidiEvents()`, `getSampleRate()`
+
+#### Variables et constantes publiques
+
+- Pas de préfixe ni suffixe
+- Exemples : `pluginFactory`, `kMaxBufferSize`
+
+#### Variables et constantes privées
+
+- Suffixe underscore (Google Style)
+- Exemples : `apvts_`, `kWidth_`
+
+#### Classes : PascalCase
+
+- Exemples : `PluginProcessor`, `PluginEditor`, `AudioAnalyzer`
+
+#### Enums
+
+- PascalCase pour le type, préfixe `k` pour les valeurs
+- Exemples : `enum class ParameterType { kDco, kEnv, kLfo };`
+
+#### Namespaces : PascalCase
+
+- Exemples : `namespace Core { }`, `namespace GUI { }`
+
+#### Règle générale
+
+- Éviter les `underscore_case`, sauf cas très particulier
+
+### 6.4 Magic Numbers - INTERDITS
+
+- **Ne JAMAIS** utiliser de magic numbers dans le code !
 - Toujours définir des constantes explicites avec des noms significatifs
-- Exemples à éviter :
-  * `if (value == -1)` → utiliser quelque chose comme `if (value == kNoSysExId)`
-  * `for (int i = 0; i < 10; ++i)` → utiliser `for (int i = 0; i < kModulationBusCount; ++i)`
-  * `return nullptr;` → OK (nullptr est explicite, pas un magic number)
-- Les seules exceptions acceptables :
-  * Valeurs littérales évidentes et auto-explicatives : `0`, `1`, `nullptr`, `true`, `false`
-  * Valeurs dans des tests unitaires où la valeur exacte est le sujet du test
 
-[Organisation des includes]
-1. Headers système C++ (ex : <vector>, <memory>, etc. puis sauter une ligne)
-2. Headers JUCE (ex : <juce_core/juce_core.h>, etc. puis sauter une ligne)
-3. Headers du projet (ex : "Core/PatchModel.h", etc. puis sauter une ligne)
+#### Exemples à éviter
 
-[Chemins des includes]
+- ❌ `if (value == -1)` → ✅ `if (value == kNoSysExId)`
+- ❌ `for (int i = 0; i < 10; ++i)` → ✅ `for (int i = 0; i < kModulationBusCount; ++i)`
+- ✅ `return nullptr;` → OK (nullptr est explicite, pas un magic number)
+
+#### Exceptions acceptables
+
+- Valeurs littérales évidentes et auto-explicatives : `0`, `1`, `nullptr`, `true`, `false`
+- Valeurs dans des tests unitaires où la valeur exacte est le sujet du test
+
+### 6.5 Organisation des includes
+
+1. Headers système C++ (ex : `<vector>`, `<memory>`, etc. puis sauter une ligne)
+2. Headers JUCE (ex : `<juce_core/juce_core.h>`, etc. puis sauter une ligne)
+3. Headers du projet (ex : `"Core/PatchModel.h"`, etc.)
+
+### 6.6 Chemins des includes
+
 - Utiliser des chemins relatifs à partir de la racine du projet (configuré dans CMake)
-- Ne JAMAIS utiliser de chemins relatifs avec `../` multiples
-- Format : `"GUI/Panels/MainComponent.h"` plutôt que `"../../../../../GUI/Panels/MainComponent.h"`
+- **Ne JAMAIS** utiliser de chemins relatifs avec `../` multiples
+- **Format** : `"GUI/Panels/MainComponent.h"` plutôt que `"../../../../../GUI/Panels/MainComponent.h"`
 - Les chemins doivent être clairs, lisibles et maintenables
-- Exemple correct : `#include "GUI/Widgets/Slider.h"`
-- Exemple à éviter : `#include "../../../GUI/Widgets/Slider.h"`
+- ✅ Exemple correct : `#include "GUI/Widgets/Slider.h"`
+- ❌ Exemple à éviter : `#include "../../../GUI/Widgets/Slider.h"`
 
-[Include Guards]
+### 6.7 Include Guards
+
 - Toujours utiliser `#pragma once` en première ligne de chaque header
-- Ne pas utiliser les anciens include guards (#ifndef/#define/#endif)
+- Ne pas utiliser les anciens include guards (`#ifndef`/`#define`/`#endif`)
 - Exemple : `#pragma once` en première ligne, avant tout autre code
 
-[Forward Declarations]
+### 6.8 Forward Declarations
+
 - Utiliser des forward declarations dans les headers pour réduire les dépendances
-- Inclure les headers complets uniquement dans les .cpp quand possible
-- Exemple : `class MidiManager;` dans le header, puis `#include "MidiManager.h"` dans le .cpp
+- Inclure les headers complets uniquement dans les `.cpp` quand possible
+- Exemple : `class MidiManager;` dans le header, puis `#include "MidiManager.h"` dans le `.cpp`
 
-[Séparation .h/.cpp]
-- Toujours séparer déclaration (.h) et définition (.cpp) sauf pour :
-  * Templates (définitions dans le header)
-  * Fonctions inline explicites (marquées `inline`)
-  * Petites fonctions triviales (getters/setters simples)
-- Préférer les méthodes inline dans le header uniquement si elles sont courtes (< 5 lignes)
-- Exemple inline : `int getValue() const { return value_; }` dans le header
-- Exemple séparé : déclaration dans .h, définition complète dans .cpp
+### 6.9 Séparation .h/.cpp
 
-[Organisation des classes]
-- Regrouper les membres et méthodes logiquement dans les .h (ex: paires getter/setter)
+Toujours séparer déclaration (`.h`) et définition (`.cpp`) **sauf pour** :
+
+- Templates (définitions dans le header)
+- Fonctions inline explicites (marquées `inline`)
+- Petites fonctions triviales (getters/setters simples)
+
+Préférer les méthodes inline dans le header uniquement si elles sont courtes (< 5 lignes)
+
+- ✅ Exemple inline : `int getValue() const { return value_; }` dans le header
+- ✅ Exemple séparé : déclaration dans `.h`, définition complète dans `.cpp`
+
+### 6.10 Organisation des classes
+
+- Regrouper les membres et méthodes logiquement dans les `.h` (ex: paires getter/setter)
 - Variables membres (presque toujours privées) après les méthodes publiques/protégées
 - Méthodes privées à la fin, après les variables membres
 - Utiliser `JUCE_DECLARE_NON_COPYABLE` si la classe n'est pas copiable (dernier élément)
 - Marquer `explicit` les constructeurs à un seul paramètre
-- Dans les .cpp, regrouper les méthodes logiquement (appelées proches de leurs appelantes)
+- Dans les `.cpp`, regrouper les méthodes logiquement (appelées proches de leurs appelantes)
 - Destructeurs virtuels si la classe est destinée à être héritée (polymorphisme)
-- Règle des 3/5/0 : si on définit destructeur/copy/move, définir ou supprimer les autres explicitement
+- **Règle des 3/5/0** : si on définit destructeur/copy/move, définir ou supprimer les autres explicitement
 - Utiliser `= default` pour les constructeurs/destructeurs générés par défaut (plus explicite)
 - Utiliser `= delete` pour désactiver explicitement copy/move/constructeur par défaut
-- Exemple : `MyClass() = default;` ou `MyClass (const MyClass&) = delete;`
+- Exemples : `MyClass() = default;` ou `MyClass(const MyClass&) = delete;`
 
-[Principes SOLID & Clean Code / Clean Architecture (Robert C. Martin / Uncle Bob)]
+### 6.11 Principes SOLID & Clean Code
+
+> Référence : Robert C. Martin / Uncle Bob - Clean Code & Clean Architecture
+
 - Code lisible et compréhensible par un humain
 - Noms TOUJOURS explicites (pas d'abréviations énigmatiques)
 - Minimiser les commentaires : utiliser uniquement si nécessaire
-- Refactoriser les blocs > 20 lignes en fonctions courtes aux noms explicites plutôt que d'ajouter des commentaires (qui peuvent devenir obsolètes)
-- Fonctions courtes : 5-20 lignes idéalement
+- Refactoriser les blocs > 15 lignes en fonctions courtes aux noms explicites plutôt que d'ajouter des commentaires (qui peuvent devenir obsolètes)
 - Un seul niveau d'abstraction par fonction
-- Une seule responsabilité (Single Responsibility)
+- Une seule responsabilité (Single Responsibility Principle)
 - Pas d'effets cachés, pas d'état global modifié
 - DRY (Don't Repeat Yourself)
 - Respecter la Loi de Demeter
 - Privilégier la délégation à l'héritage
 - Exceptions > null pointers
-- std::optional > null
+- `std::optional` > null
 - Traiter les erreurs au niveau approprié
 
-[Gestion des Erreurs]
+### 6.12 Gestion des Erreurs
+
 - Utiliser les exceptions pour les erreurs exceptionnelles (pas pour le flux normal)
 - Utiliser `std::optional` pour les valeurs optionnelles (éviter `nullptr`)
 - Utiliser `std::expected` (C++23) ou des types Result pour les opérations pouvant échouer
 - Ne jamais ignorer silencieusement les erreurs
 - Logger les erreurs avec un contexte approprié
-- Exemple : `std::optional<PatchModel> loadPatch (const juce::File& file);`
+- Exemple : `std::optional<PatchModel> loadPatch(const juce::File& file);`
 
-[RAII (Resource Acquisition Is Initialization)]
+### 6.13 RAII (Resource Acquisition Is Initialization)
+
 - Toujours acquérir les ressources dans les constructeurs
 - Toujours libérer les ressources dans les destructeurs
 - Utiliser les smart pointers pour la gestion automatique de la mémoire
 - Les objets doivent toujours être dans un état valide
 - Exemple : `std::unique_ptr<juce::MidiInput> midiInput_;` dans la classe, libéré automatiquement
 
-[Smart Pointers]
+### 6.14 Smart Pointers
+
 - Préférer `unique_ptr` pour la propriété exclusive (ownership)
 - Utiliser `shared_ptr` uniquement si nécessaire (propriété partagée)
 - Utiliser `weak_ptr` pour casser les cycles de références
 - Éviter les pointeurs bruts sauf pour observer (non-owning)
 - Exemple : `std::unique_ptr<juce::MidiInput> midiInput_;` pour ownership, `MidiInput* input` pour observer
 
-[Move Semantics]
+### 6.15 Move Semantics
+
 - Utiliser `std::move()` pour transférer la propriété des objets lourds
 - Préférer les constructeurs de move et opérateurs d'assignation de move
 - Marquer `noexcept` quand approprié (optimisations, contraintes de move)
-- Exemple : `void setData (juce::MemoryBlock&& data) { data_ = std::move (data); }`
+- Exemple : `void setData(juce::MemoryBlock&& data) { data_ = std::move(data); }`
 
+---
 
-===============================================================================
-## FORMATAGE & STYLE JUCE
-===============================================================================
+## 7. Formatage & Style JUCE
 
-[Formatage et espacement]
-- Pas de caractères de tabulation ! Utiliser 4 espaces pour l'indentation
-- Style Allman pour les accolades (accolade ouvrante sur nouvelle ligne) :
-  ```cpp
-  if (x == 0)        // Oui !
-  {
-      foobar();
-      return "zero";
-  }
-  ```
+### 7.1 Formatage et espacement
+
+#### Indentation
+
+- **Pas de caractères de tabulation** ! Utiliser 4 espaces pour l'indentation
+
+#### Style Allman pour les accolades
+
+Accolade ouvrante sur nouvelle ligne :
+
+```cpp
+if (x == 0)        // Oui !
+{
+    foobar();
+    return "zero";
+}
+```
+
+#### Opérateurs
+
 - Toujours mettre un espace avant et après les opérateurs binaires : `x = 1 + y - 2 * z / 3;`
 - L'opérateur `!` ne doit PAS avoir d'espace après : `if (!foo)` (style JUCE standard)
 - L'opérateur `~` doit être précédé d'un espace, mais pas suivi
 - Les opérateurs `++` et `--` n'ont pas d'espace entre l'opérateur et l'opérande : `++i`, `--j`
-- Jamais d'espace avant une virgule, toujours un espace après : `foo (x, y);`
-- Toujours un espace avant une parenthèse ouvrante contenant du texte : `foo (123);`
+
+#### Espacement général
+
+- Jamais d'espace avant une virgule, toujours un espace après : `foo(x, y);`
+- Toujours un espace avant une parenthèse ouvrante contenant du texte : `foo(123);`
 - Jamais d'espace avant une paire de parenthèses vides : `foo();`
 - Pas d'espace avant un crochet ouvrant utilisé comme index de tableau : `foo[1]`
+
+#### Lignes vides
+
 - Ligne vide avant `if`, `for`, `while`, `do` quand précédés d'une autre instruction
 - Ligne vide après une accolade fermante `}` (sauf si la ligne suivante est juste une autre accolade fermante)
-- Ne pas écrire les `if` sur une seule ligne... sauf pour des séries de `if` similaires alignés verticalement pour montrer un pattern :
-  ```cpp
-  if (x == 1) return "one";
-  if (x == 2) return "two";
-  if (x == 3) return "three";
-  ```
+
+#### Instructions `if`
+
+Ne pas écrire les `if` sur une seule ligne... **sauf** pour des séries de `if` similaires alignés verticalement pour montrer un pattern :
+
+```cpp
+if (x == 1) return "one";
+if (x == 2) return "two";
+if (x == 3) return "three";
+```
+
 - Oublier les accolades pour des instructions `if` trivialement simples d'une ligne
 - Dans un `if-else` avec plusieurs branches, toutes les branches doivent être formatées de la même manière (toutes avec ou toutes sans accolades)
-- Ne JAMAIS mettre un `else` après un `return` ! Utiliser plutôt :
-  ```cpp
-  if (foobar())
-      return doSomething();
-  doSomethingElse();  // Mieux !
-  ```
 
-[Déclarations de pointeurs et références]
+#### Ne JAMAIS mettre un `else` après un `return`
+
+```cpp
+// ✅ Bon
+if (foobar())
+    return doSomething();
+doSomethingElse();
+
+// ❌ Mauvais
+if (foobar())
+    return doSomething();
+else
+    doSomethingElse();
+```
+
+### 7.2 Déclarations de pointeurs et références
+
 - Toujours mettre un espace après le type, jamais avant : `SomeObject* myObject`, `SomeObject& myObject`
 - Ne jamais déclarer plusieurs pointeurs/références du même type dans une seule déclaration
 - Préférer les smart pointers ou typedef pour éviter les astérisques multiples
 
-[Modificateur const]
+### 7.3 Modificateur const
+
 - Mettre `const` avant le nom du type : `const Thing& t;` (pas `Thing const& t;`)
 - Marquer les méthodes qui ne modifient pas l'état comme `const`
 - Utiliser `const&` pour les paramètres en lecture seule
 - Préférer `const_iterator` pour les itérations en lecture seule
 - Les pointeurs const : `const Type*` (pointeur vers constante) vs `Type* const` (pointeur constant)
 
-[Opérateurs et expressions multi-lignes]
-- Quand on divise une expression contenant des opérateurs sur plusieurs lignes, chaque nouvelle ligne doit commencer par l'opérateur :
-  ```cpp
-  auto xyz = foo + bar
-              + func (123)
-              - def + 4321;
-  ```
-- Même principe pour l'opérateur point (méthodes chaînées) :
-  ```cpp
-  auto t = AffineTransform::translation (x, y)
-                         .scaled (2.0f)
-                         .rotated (0.5f);
-  ```
+### 7.4 Opérateurs et expressions multi-lignes
 
-[Lambdas]
-- Style préféré :
-  ```cpp
-  auto myLambda = [] { return 123; };
-  auto myLambda = [this, &x] (int z) -> float { return x + z; };
-  auto longerLambda = [] (int x, int y) -> int
-  {
-      // ...multiple lines of stuff...
-  };
-  ```
+Quand on divise une expression contenant des opérateurs sur plusieurs lignes, chaque nouvelle ligne doit commencer par l'opérateur :
+
+```cpp
+auto xyz = foo + bar
+            + func(123)
+            - def + 4321;
+```
+
+Même principe pour l'opérateur point (méthodes chaînées) :
+
+```cpp
+auto t = AffineTransform::translation(x, y)
+                       .scaled(2.0f)
+                       .rotated(0.5f);
+```
+
+### 7.5 Lambdas
+
+Style préféré :
+
+```cpp
+auto myLambda = [] { return 123; };
+auto myLambda = [this, &x](int z) -> float { return x + z; };
+auto longerLambda = [](int x, int y) -> int
+{
+    // ...multiple lines of stuff...
+};
+```
+
 - Préférer les captures explicites plutôt que `[=]` ou `[&]` (plus clair, évite captures accidentelles)
 - Éviter les captures par valeur de gros objets (préférer `const&` ou `&` selon le cas)
 - Exemple : `[this, &x, &y]` plutôt que `[&]` si on n'a besoin que de x et y
 
-[Valeurs nulles et pointeurs]
-- Ne JAMAIS utiliser `NULL`, `null`, ou `0` pour un pointeur nul ! Toujours utiliser `nullptr`
-- Limiter la portée des pointeurs possibles nuls :
-  ```cpp
-  if (auto* f = getFoo())
-      f->doSomething();
-  // f est hors de portée ici, impossible d'utiliser un pointeur nul par erreur
-  ```
+### 7.6 Valeurs nulles et pointeurs
 
-[Passage de paramètres]
+- **Ne JAMAIS** utiliser `NULL`, `null`, ou `0` pour un pointeur nul ! Toujours utiliser `nullptr`
+- Limiter la portée des pointeurs possibles nuls :
+
+```cpp
+if (auto* f = getFoo())
+    f->doSomething();
+// f est hors de portée ici, impossible d'utiliser un pointeur nul par erreur
+```
+
+### 7.7 Passage de paramètres
+
 - Pour les petits objets POD, toujours passer par valeur, pas par référence
 - Utiliser `const Foo&` seulement pour les objets complexes (Array, String, etc.)
-- Classes JUCE à toujours passer par valeur : Point, Time, RelativeTime, Colour, Identifier, ModifierKeys, JustificationType, Range, PixelRGB, PixelARGB, Rectangle
+- Classes JUCE à toujours passer par valeur : `Point`, `Time`, `RelativeTime`, `Colour`, `Identifier`, `ModifierKeys`, `JustificationType`, `Range`, `PixelRGB`, `PixelARGB`, `Rectangle`
 
-[Opérateurs d'incrémentation]
+### 7.8 Opérateurs d'incrémentation
+
 - Toujours préférer pré-incrémentation à post-incrémentation : `for (int i = 0; i < 10; ++i)`
 
-[Bibliothèque standard]
+### 7.9 Bibliothèque standard
+
 - Toujours préférer les versions std des fonctions plutôt que les équivalents C anciens
 - Utiliser `std::abs`, `std::sqrt`, `std::sin`, `std::cos`, `std::pow` plutôt que `fabs`, `sqrtf`, `powf`, etc.
 
-[Types]
+### 7.10 Types
+
 - Ne jamais utiliser `unsigned` seul - toujours écrire `unsigned int`
 - Utiliser les types JUCE : `int8`, `uint8`, `int16`, `uint16`, `int32`, `uint32`, `int64`, `uint64`
 - Préférer les boucles range-based-for pour itérer sur les conteneurs plutôt que les boucles for brutes
 
-[Auto]
-- Style "almost-always-auto" mais éviter dans certains cas :
-  - `auto x = 0;` → pas OK (pas évident que c'est un int signé)
-  - `for (int i = 0; i < someNumber; ++i)` → OK (clair que c'est un int signé)
-  - `bool someCondition = false;` → OK (plus clair que auto)
-  - `auto someResult = thisReturnsABool();` → OK (utiliser auto si le RHS est une expression)
+### 7.11 Auto
 
-[Commentaires]
+Style "almost-always-auto" mais éviter dans certains cas :
+
+- ❌ `auto x = 0;` → pas OK (pas évident que c'est un int signé)
+- ✅ `for (int i = 0; i < someNumber; ++i)` → OK (clair que c'est un int signé)
+- ✅ `bool someCondition = false;` → OK (plus clair que auto)
+- ✅ `auto someResult = thisReturnsABool();` → OK (utiliser auto si le RHS est une expression)
+
+### 7.12 Commentaires
+
 - Pour les commentaires courts d'une ou deux lignes, préférer `//` plutôt que `/* */`
 - Toujours laisser un espace avant le texte dans un commentaire `//` : `// oui !` pas `//non !`
 - Les noms de code doivent être auto-documentants (éviter les commentaires)
 - Utiliser des commentaires uniquement pour expliquer le "pourquoi", pas le "comment"
 - Pour les APIs publiques complexes, considérer Doxygen/Javadoc style comments
 
-[Macros]
-- Ne pas utiliser de macros ! Traiter les macros comme un dernier recours
+### 7.13 Macros
+
+- **Ne pas utiliser de macros** ! Traiter les macros comme un dernier recours
 - Ne jamais utiliser une macro juste pour contenir une valeur constante ou pour effectuer une fonction qui pourrait être faite comme une vraie fonction inline
 - Si des macros sont utilisées, leur donner des noms qui ne vont pas entrer en conflit avec d'autres codes
 - `#undef` les macros après les avoir utilisées, si possible
 
-[Template]
+### 7.14 Templates
+
 - Les paramètres de template doivent suivre leur type sans espace : `vector<int>`
 - Dans une déclaration template, laisser un espace avant le crochet ouvrant : `template <typename Type1, typename Type2>`
 
-[Dépendances]
+### 7.15 Dépendances
+
 - Éviter les dépendances circulaires entre modules
 - Utiliser des interfaces abstraites pour découpler (Dependency Inversion Principle)
 - Respecter la hiérarchie des dépendances (GUI dépend de Core, pas l'inverse)
 
-[Enums]
+### 7.16 Enums
+
 - Préférer `enum class` à `enum` pour la sécurité de type et éviter les collisions
 - Nommer les enums au singulier (sauf collections) : `enum class ParameterType { kDco, kEnv, kLfo };`
 - Préfixer les valeurs avec `k` : `ParameterType::kDco`
 - Exemple : `enum class ClipboardType { kEmpty, kDco, kEnv, kLfo, kPatch };`
 
-[Initialisation]
+### 7.17 Initialisation
+
 - Préférer l'initialisation uniforme `{}` : `int value {0};` plutôt que `int value = 0;`
 - Initialiser les membres dans la liste d'initialisation du constructeur
 - Ordre d'initialisation = ordre de déclaration des membres (pas l'ordre de la liste)
-- Exemple : `MyClass (int x) : member1_ {x}, member2_ {0} {}`
+- Exemple : `MyClass(int x) : member1_ {x}, member2_ {0} {}`
 
-[Namespaces]
+### 7.18 Namespaces
+
 - Utiliser des namespaces pour organiser le code par module
 - Éviter les `using namespace` dans les headers (pollution globale)
-- OK dans les .cpp pour simplifier : `using juce::String;`
+- OK dans les `.cpp` pour simplifier : `using juce::String;`
 - Exemple : `namespace Core { class MidiManager; }`
 
-[Static Members]
+### 7.19 Static Members
+
 - Préférer les fonctions libres statiques aux méthodes statiques quand possible
 - Utiliser `static constexpr` pour les constantes de classe
 - Exemple : `static constexpr int kMaxBufferSize {1024};`
 
-[Constexpr]
+### 7.20 Constexpr
+
 - Utiliser `constexpr` pour les fonctions calculables à la compilation
 - Utiliser `constexpr` pour les variables constantes calculables à la compilation
 - Préférer `constexpr` à `const` pour les constantes calculables à la compilation
 - `constexpr` implique `const`, mais permet l'évaluation à la compilation
-- Exemple : `constexpr int calculateSize (int count) { return count * 4; }`
-- Exemple : `constexpr int kBufferSize {calculateSize (256)};`
+- Exemples :
 
-[Virtual Functions]
+```cpp
+constexpr int calculateSize(int count) { return count * 4; }
+constexpr int kBufferSize {calculateSize(256)};
+```
+
+### 7.21 Virtual Functions
+
 - Utiliser `override` explicitement (pas `virtual` dans les classes dérivées)
 - Utiliser `final` pour empêcher la dérivation supplémentaire si approprié
 - Préférer la composition à l'héritage (SOLID : favoriser la délégation)
-- Exemple : `void paint (Graphics& g) override;`
+- Exemple : `void paint(Graphics& g) override;`
 
-[Assertions]
+### 7.22 Assertions
+
 - Utiliser `jassert` (JUCE) ou `assert` pour les invariants de développement
 - Ne pas utiliser d'assertions pour la gestion d'erreurs utilisateur (utiliser exceptions)
 - Les assertions peuvent être désactivées en release : ne pas y mettre de logique critique
-- Exemple : `jassert (bufferSize > 0);` pour vérifier un précondition
+- Exemple : `jassert(bufferSize > 0);` pour vérifier une précondition
 
-[Logging]
+### 7.23 Logging
+
 - Utiliser `juce::Logger` pour le logging structuré
 - Niveaux appropriés : `DBG()`, `Logger::writeToLog()` pour debug, erreurs critiques
 - Éviter le logging excessif dans les boucles critiques
 - Logger avec contexte : inclure informations pertinentes (fichier, ligne, valeurs)
 
+---
 
-===============================================================================
-## RÈGLES SPÉCIFIQUES JUCE
-===============================================================================
+## 8. Règles Spécifiques JUCE
 
-[Nommage des classes du plugin]
-- Classe du processeur : "PluginProcessor" (fichiers : PluginProcessor.h/.cpp)
-- Classe de l'éditeur UI : "PluginEditor" (fichiers : PluginEditor.h/.cpp)
+### 8.1 Nommage des classes du plugin
 
-[APIs JUCE dépréciées - À ÉVITER]
-- ~~getCurrentPlaybackSampleRate()~~ → getSampleRate()
-- ~~setPlayConfigDetails()~~ → setBusesLayout()
-- ~~Timer avec callbacks~~ → juce::HighResolutionTimer
-- ~~AudioProcessorValueTreeState~~ → ValueTree moderne
-- ~~Legacy parameter handling~~ → juce::AudioProcessorParameter
+- **Classe du processeur** : `PluginProcessor` (fichiers : `PluginProcessor.h`/`.cpp`)
+- **Classe de l'éditeur UI** : `PluginEditor` (fichiers : `PluginEditor.h`/`.cpp`)
 
-La liste est non exhaustive, prendre le temps de la compléter le cas échéant.
+### 8.2 APIs JUCE dépréciées - À ÉVITER
 
-[Thread-Safety]
+- ~~`getCurrentPlaybackSampleRate()`~~ → `getSampleRate()`
+- ~~`setPlayConfigDetails()`~~ → `setBusesLayout()`
+- ~~`Timer` avec callbacks~~ → `juce::HighResolutionTimer`
+- ~~`AudioProcessorValueTreeState`~~ → `ValueTree` moderne
+- ~~Legacy parameter handling~~ → `juce::AudioProcessorParameter`
+
+> La liste est non exhaustive, prendre le temps de la compléter le cas échéant.
+
+### 8.3 Thread-Safety
+
 - Toujours considérer la thread-safety dans le code audio (`processBlock()` appelé depuis le thread audio)
 - Utiliser `juce::MessageManager::callAsync()` pour appeler le thread GUI depuis d'autres threads
 - Utiliser `juce::AbstractFifo` ou `juce::LockFreeFifo` pour la communication inter-threads (lock-free)
 - Les listeners APVTS sont thread-safe, mais les mises à jour GUI doivent se faire depuis le thread message
-- Ne JAMAIS appeler de méthodes GUI depuis le thread audio
-- Exemple : `juce::MessageManager::callAsync ([this] { updateGUI(); });` depuis le thread audio
+- **Ne JAMAIS** appeler de méthodes GUI depuis le thread audio
+- Exemple : `juce::MessageManager::callAsync([this] { updateGUI(); });` depuis le thread audio
 
-[Performance]
+### 8.4 Performance
+
 - Éviter les allocations mémoire dans `processBlock()` (thread audio)
 - Utiliser des buffers pré-alloués
 - Éviter les appels système dans les boucles critiques
@@ -413,19 +688,21 @@ La liste est non exhaustive, prendre le temps de la compléter le cas échéant.
 - Préférer les algorithmes in-place quand possible
 - Éviter les copies inutiles : utiliser `const&` ou move semantics
 
-[Tests Unitaires]
+### 8.5 Tests Unitaires
+
 - Écrire des tests pour les classes métier (pas pour les composants GUI)
 - Utiliser un framework de test (ex: Catch2, Google Test)
 - Un test = une responsabilité, nom explicite
 - Tests isolés, pas de dépendances entre tests
-- Exemple : `TEST_CASE ("SysExParser validates checksum correctly")`
+- Exemple : `TEST_CASE("SysExParser validates checksum correctly")`
 
-[Complexité]
-- Maintenir la complexité cyclomatique < 10 par fonction
+### 8.6 Complexité
+
+- Maintenir la complexité cyclomatique < 5 par fonction (idéal : 1-3)
 - Si trop complexe, refactoriser en sous-fonctions
-- Éviter > 5 paramètres : considérer un struct/class de paramètres
+- Éviter > 3 paramètres : considérer un struct/class de paramètres
 - Préférer les early returns pour réduire l'imbrication
 
-===============================================================================
-# FIN DE MES INSTRUCTIONS PERSONNELLES
-===============================================================================
+---
+
+**Fin des instructions personnelles**
