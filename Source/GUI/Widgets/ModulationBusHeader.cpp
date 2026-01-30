@@ -29,8 +29,6 @@ namespace tss
             return;
         }
 
-        g.fillAll(theme_->getMatrixModulationPanelBackgroundColour());
-
         auto bounds = getLocalBounds().toFloat();
 
         drawText(g, bounds);

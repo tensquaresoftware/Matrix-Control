@@ -120,15 +120,6 @@ Env1Panel::Env1Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
 
 Env1Panel::~Env1Panel() = default;
 
-void Env1Panel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void Env1Panel::resized()
 {
     auto bounds = getLocalBounds();

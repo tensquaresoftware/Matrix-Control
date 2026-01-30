@@ -36,12 +36,6 @@ MasterEditPanel::MasterEditPanel(Theme& theme, WidgetFactory& widgetFactory, juc
 
 MasterEditPanel::~MasterEditPanel() = default;
 
-void MasterEditPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getMasterEditPanelBackgroundColour());
-}
-
 void MasterEditPanel::resized()
 {
     const auto bounds = getLocalBounds();

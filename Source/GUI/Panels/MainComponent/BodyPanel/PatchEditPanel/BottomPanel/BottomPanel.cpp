@@ -31,12 +31,6 @@ BottomPanel::BottomPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
     setSize(getWidth(), getHeight());
 }
 
-void BottomPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
-}
-
 void BottomPanel::resized()
 {
     const auto bounds = getLocalBounds();

@@ -34,12 +34,6 @@ PatchEditPanel::PatchEditPanel(Theme& theme, WidgetFactory& widgetFactory, juce:
     setSize(getWidth(), getHeight());
 }
 
-void PatchEditPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
-}
-
 void PatchEditPanel::resized()
 {
     const auto bounds = getLocalBounds();

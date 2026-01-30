@@ -120,15 +120,6 @@ Env2Panel::Env2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
 
 Env2Panel::~Env2Panel() = default;
 
-void Env2Panel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void Env2Panel::resized()
 {
     auto bounds = getLocalBounds();

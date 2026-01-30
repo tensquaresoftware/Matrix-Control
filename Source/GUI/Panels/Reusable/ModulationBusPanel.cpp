@@ -129,12 +129,6 @@ void ModulationBusPanel::createSeparator(Theme& theme)
     addAndMakeVisible(*separator_);
 }
 
-void ModulationBusPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getMatrixModulationPanelBackgroundColour());
-}
-
 void ModulationBusPanel::resized()
 {
     const auto widgetRowHeight = PluginDimensions::Widgets::Heights::kLabel;

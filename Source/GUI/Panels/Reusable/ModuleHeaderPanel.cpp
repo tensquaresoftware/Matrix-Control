@@ -136,20 +136,6 @@ void ModuleHeaderPanel::layoutInitCopyPasteButtons()
         button->setBounds(panelWidth - pasteButtonWidth - copyButtonWidth - initButtonWidth, y, initButtonWidth, buttonHeight);
 }
 
-void ModuleHeaderPanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-
-    const auto backgroundColour = (moduleType_ == ModuleType::PatchEdit)
-        ? theme_->getPatchEditModulePanelBackgroundColour()
-        : theme_->getMasterEditPanelBackgroundColour();
-
-    g.fillAll(backgroundColour);
-}
-
 void ModuleHeaderPanel::setTheme(Theme& theme)
 {
     theme_ = &theme;

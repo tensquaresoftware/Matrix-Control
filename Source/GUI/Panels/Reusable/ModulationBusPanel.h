@@ -32,7 +32,6 @@ public:
                       const juce::String& busId);
     ~ModulationBusPanel() override;
 
-    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
     static int getHeight();

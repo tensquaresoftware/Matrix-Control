@@ -48,7 +48,6 @@ public:
                     int height);
     ~BaseModulePanel() override;
 
-    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
 

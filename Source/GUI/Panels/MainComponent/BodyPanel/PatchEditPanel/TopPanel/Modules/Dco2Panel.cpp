@@ -120,15 +120,6 @@ Dco2Panel::Dco2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
 
 Dco2Panel::~Dco2Panel() = default;
 
-void Dco2Panel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void Dco2Panel::resized()
 {
     auto bounds = getLocalBounds();

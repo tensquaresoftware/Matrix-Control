@@ -24,7 +24,6 @@ public:
     InternalPatchesPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~InternalPatchesPanel() override;
 
-    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
 

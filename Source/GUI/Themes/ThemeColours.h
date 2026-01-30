@@ -17,31 +17,12 @@ namespace tss
 
         namespace Common
         {
-            // Common background colour constants for all panels and widgets
-            static constexpr juce::uint32 kCommonBackgroundBlack = ColourChart::kDarkGrey2;
-            static constexpr juce::uint32 kCommonBackgroundCream = ColourChart::kCream;
-
             // Common disabled and interaction colour constants
             static constexpr juce::uint32 kBackgroundDisabled = ColourChart::kDarkGrey3;
             static constexpr juce::uint32 kBorderDisabled = ColourChart::kDarkGrey4;
             static constexpr juce::uint32 kDecorationDisabled = ColourChart::kDarkGrey5;
             static constexpr juce::uint32 kContentDisabled = ColourChart::kDarkGrey5;
             static constexpr juce::uint32 kContentHoover = ColourChart::kDarkGrey1;
-        }
-
-        namespace Gui
-        {
-            inline constexpr ColourElement kCommonBackground = {
-                "CommonBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
-            };
-
-            inline constexpr ColourElement kGuiBackground = {
-                "GuiBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
-            };
         }
 
         namespace Panels
@@ -54,44 +35,14 @@ namespace tss
 
             inline constexpr ColourElement kBodyPanelBackground = {
                 "BodyPanelBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
+                ColourChart::kDarkGrey2,
+                ColourChart::kCream
             };
 
             inline constexpr ColourElement kFooterPanelBackground = {
                 "FooterPanelBackground",
                 ColourChart::kLightGrey1,
                 ColourChart::kLightGrey1
-            };
-
-            inline constexpr ColourElement kPatchEditPanelBackground = {
-                "PatchEditPanelBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
-            };
-
-            inline constexpr ColourElement kMatrixModulationPanelBackground = {
-                "MatrixModulationPanelBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
-            };
-
-            inline constexpr ColourElement kPatchManagerPanelBackground = {
-                "PatchManagerPanelBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
-            };
-
-            inline constexpr ColourElement kMasterEditPanelBackground = {
-                "MasterEditPanelBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
-            };
-
-            inline constexpr ColourElement kPatchEditModulePanelBackground = {
-                "PatchEditModulePanelBackground",
-                Common::kCommonBackgroundBlack,
-                Common::kCommonBackgroundCream
             };
         }
 
@@ -291,86 +242,188 @@ namespace tss
 
             namespace ComboBox
             {
-                inline constexpr ColourElement kBackground = {
-                    "ComboBoxBackground",
-                    ColourChart::kGreen1,
-                    ColourChart::kGreen1
-                };
+                namespace Standard
+                {
+                    inline constexpr ColourElement kBackground = {
+                        "ComboBoxStandardBackground",
+                        ColourChart::kGreen1,
+                        ColourChart::kGreen1
+                    };
 
-                inline constexpr ColourElement kTriangle = {
-                    "ComboBoxTriangle",
-                    ColourChart::kGreen3,
-                    ColourChart::kGreen3
-                };
+                    inline constexpr ColourElement kTriangle = {
+                        "ComboBoxStandardTriangle",
+                        ColourChart::kGreen3,
+                        ColourChart::kGreen3
+                    };
 
-                inline constexpr ColourElement kText = {
-                    "ComboBoxText",
-                    ColourChart::kGreen4,
-                    ColourChart::kGreen4,
-                };
+                    inline constexpr ColourElement kText = {
+                        "ComboBoxStandardText",
+                        ColourChart::kGreen4,
+                        ColourChart::kGreen4,
+                    };
 
-                inline constexpr ColourElement kFocusBorder = {
-                    "ComboBoxFocusBorder",
-                    ColourChart::kGreen2,
-                    ColourChart::kGreen2
-                };
+                    inline constexpr ColourElement kFocusBorder = {
+                        "ComboBoxStandardFocusBorder",
+                        ColourChart::kGreen2,
+                        ColourChart::kGreen2
+                    };
 
-                inline constexpr ColourElement kBackgroundDisabled = {
-                    "ComboBoxBackgroundDisabled",
-                    Common::kBackgroundDisabled,
-                    Common::kBackgroundDisabled
-                };
+                    inline constexpr ColourElement kBackgroundDisabled = {
+                        "ComboBoxStandardBackgroundDisabled",
+                        Common::kBackgroundDisabled,
+                        Common::kBackgroundDisabled
+                    };
 
-                inline constexpr ColourElement kTriangleDisabled = {
-                    "ComboBoxTriangleDisabled",
-                    Common::kDecorationDisabled,
-                    Common::kDecorationDisabled
-                };
+                    inline constexpr ColourElement kTriangleDisabled = {
+                        "ComboBoxStandardTriangleDisabled",
+                        Common::kDecorationDisabled,
+                        Common::kDecorationDisabled
+                    };
 
-                inline constexpr ColourElement kTextDisabled = {
-                    "ComboBoxTextDisabled",
-                    Common::kContentDisabled,
-                    Common::kContentDisabled,
-                };
+                    inline constexpr ColourElement kTextDisabled = {
+                        "ComboBoxStandardTextDisabled",
+                        Common::kContentDisabled,
+                        Common::kContentDisabled,
+                    };
+                }
+
+                namespace ButtonLike
+                {
+                    inline constexpr ColourElement kBackground = {
+                        "ComboBoxButtonLikeBackground",
+                        ColourChart::kBlack,
+                        ColourChart::kLightGrey2
+                    };
+
+                    inline constexpr ColourElement kBorder = {
+                        "ComboBoxButtonLikeBorder",
+                        ColourChart::kDarkGrey3,
+                        ColourChart::kDarkGrey4
+                    };
+
+                    inline constexpr ColourElement kText = {
+                        "ComboBoxButtonLikeText",
+                        ColourChart::kLightGrey2,
+                        ColourChart::kDarkGrey1,
+                    };
+
+                    inline constexpr ColourElement kTriangle = {
+                        "ComboBoxButtonLikeTriangle",
+                        ColourChart::kDarkGrey5,
+                        ColourChart::kDarkGrey1
+                    };
+
+                    inline constexpr ColourElement kBackgroundDisabled = {
+                        "ComboBoxButtonLikeBackgroundDisabled",
+                        Common::kBackgroundDisabled,
+                        Common::kBackgroundDisabled,
+                    };
+
+                    inline constexpr ColourElement kBorderDisabled = {
+                        "ComboBoxButtonLikeBorderDisabled",
+                        Common::kBorderDisabled,
+                        Common::kBorderDisabled,
+                    };
+
+                    inline constexpr ColourElement kTextDisabled = {
+                        "ComboBoxButtonLikeTextDisabled",
+                        Common::kContentDisabled,
+                        Common::kContentDisabled,
+                    };
+
+                    inline constexpr ColourElement kTriangleDisabled = {
+                        "ComboBoxButtonLikeTriangleDisabled",
+                        Common::kContentDisabled,
+                        Common::kContentDisabled
+                    };
+                }
             }
 
             namespace PopupMenu
             {
-                inline constexpr ColourElement kBackground = {
-                    "PopupMenuBackground",
-                    ColourChart::kGreen1,
-                    ColourChart::kGreen1
-                };
+                namespace Standard
+                {
+                    inline constexpr ColourElement kBackground = {
+                        "PopupMenuStandardBackground",
+                        ColourChart::kGreen1,
+                        ColourChart::kGreen1
+                    };
 
-                inline constexpr ColourElement kBorder = {
-                    "PopupMenuBorder",
-                    ColourChart::kGreen4,
-                    ColourChart::kGreen4
-                };
+                    inline constexpr ColourElement kBorder = {
+                        "PopupMenuStandardBorder",
+                        ColourChart::kGreen4,
+                        ColourChart::kGreen4
+                    };
 
-                inline constexpr ColourElement kSeparator = {
-                    "PopupMenuSeparator",
-                    ColourChart::kGreen4,
-                    ColourChart::kGreen4
-                };
+                    inline constexpr ColourElement kSeparator = {
+                        "PopupMenuStandardSeparator",
+                        ColourChart::kGreen4,
+                        ColourChart::kGreen4
+                    };
 
-                inline constexpr ColourElement kText = {
-                    "PopupMenuText",
-                    ColourChart::kGreen4,
-                    ColourChart::kGreen4,
-                };
+                    inline constexpr ColourElement kText = {
+                        "PopupMenuStandardText",
+                        ColourChart::kGreen4,
+                        ColourChart::kGreen4,
+                    };
 
-                inline constexpr ColourElement kBackgroundHoover = {
-                    "PopupMenuBackgroundHoover",
-                    ColourChart::kGreen4,
-                    ColourChart::kGreen4,
-                };
+                    inline constexpr ColourElement kBackgroundHoover = {
+                        "PopupMenuStandardBackgroundHoover",
+                        ColourChart::kGreen4,
+                        ColourChart::kGreen4,
+                    };
 
-                inline constexpr ColourElement kTextHoover = {
-                    "PopupMenuTextHoover",
-                    Common::kContentHoover,
-                    Common::kContentHoover,
-                };
+                    inline constexpr ColourElement kTextHoover = {
+                        "PopupMenuStandardTextHoover",
+                        Common::kContentHoover,
+                        Common::kContentHoover,
+                    };
+                }
+
+                namespace ButtonLike
+                {
+                    inline constexpr ColourElement kBackground = {
+                        "PopupMenuButtonLikeBackground",
+                        ColourChart::kBlack,
+                        ColourChart::kLightGrey2
+                    };
+
+                    inline constexpr ColourElement kBorder = {
+                        "PopupMenuButtonLikeBorder",
+                        ColourChart::kDarkGrey5,
+                        ColourChart::kDarkGrey4
+                    };
+
+                    inline constexpr ColourElement kSeparator = {
+                        "PopupMenuButtonLikeSeparator",
+                        ColourChart::kDarkGrey3,
+                        ColourChart::kDarkGrey4
+                    };
+
+                    inline constexpr ColourElement kText = {
+                        "PopupMenuButtonLikeText",
+                        ColourChart::kLightGrey2,
+                        ColourChart::kDarkGrey1,
+                    };
+
+                    inline constexpr ColourElement kBackgroundHoover = {
+                        "PopupMenuButtonLikeBackgroundHoover",
+                        ColourChart::kLightGrey2,
+                        ColourChart::kLightGrey2
+                    };
+
+                    inline constexpr ColourElement kTextHoover = {
+                        "PopupMenuButtonLikeTextHoover",
+                        ColourChart::kBlack,
+                        ColourChart::kDarkGrey1,
+                    };
+
+                    inline constexpr ColourElement kScrollbar = {
+                        "PopupMenuButtonLikeScrollbar",
+                        ColourChart::kDarkGrey3,
+                        ColourChart::kDarkGrey3
+                    };
+                }
             }
 
             namespace NumberBox

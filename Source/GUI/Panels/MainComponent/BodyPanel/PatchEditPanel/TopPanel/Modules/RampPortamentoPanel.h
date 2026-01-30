@@ -23,7 +23,6 @@ public:
     RampPortamentoPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~RampPortamentoPanel() override;
 
-    void paint(juce::Graphics&) override;
     void resized() override;
     void setTheme(tss::Theme& theme);
 

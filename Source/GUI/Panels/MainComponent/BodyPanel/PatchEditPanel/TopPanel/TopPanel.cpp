@@ -31,12 +31,6 @@ TopPanel::TopPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProces
     setSize(getWidth(), getHeight());
 }
 
-void TopPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchEditPanelBackgroundColour());
-}
-
 void TopPanel::resized()
 {
     const auto bounds = getLocalBounds();

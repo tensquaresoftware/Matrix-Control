@@ -31,8 +31,6 @@ namespace tss
         if (theme_ == nullptr)
             return;
 
-        g.fillAll(theme_->getPatchEditPanelBackgroundColour());
-
         const auto bounds = getLocalBounds().toFloat();
         const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kVerticalPadding_));
 

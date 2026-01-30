@@ -118,15 +118,6 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
 
 VcfVcaPanel::~VcfVcaPanel() = default;
 
-void VcfVcaPanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void VcfVcaPanel::resized()
 {
     auto bounds = getLocalBounds();

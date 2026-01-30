@@ -66,20 +66,6 @@ BaseModulePanel::BaseModulePanel(Theme& theme,
 
 BaseModulePanel::~BaseModulePanel() = default;
 
-void BaseModulePanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-
-    const auto backgroundColour = (moduleType_ == ModulePanelModuleType::PatchEdit)
-        ? theme_->getPatchEditModulePanelBackgroundColour()
-        : theme_->getMasterEditPanelBackgroundColour();
-
-    g.fillAll(backgroundColour);
-}
-
 void BaseModulePanel::resized()
 {
     auto bounds = getLocalBounds();

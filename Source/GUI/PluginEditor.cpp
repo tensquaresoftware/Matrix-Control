@@ -50,7 +50,7 @@ PluginEditor::~PluginEditor() = default;
 
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(theme->getGuiBackgroundColour());
+    g.fillAll(theme->getBodyPanelBackgroundColour());
 }
 
 void PluginEditor::resized()

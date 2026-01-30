@@ -118,15 +118,6 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
 
 RampPortamentoPanel::~RampPortamentoPanel() = default;
 
-void RampPortamentoPanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void RampPortamentoPanel::resized()
 {
     auto bounds = getLocalBounds();

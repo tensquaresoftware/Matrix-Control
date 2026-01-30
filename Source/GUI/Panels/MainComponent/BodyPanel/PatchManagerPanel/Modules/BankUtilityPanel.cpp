@@ -25,12 +25,6 @@ BankUtilityPanel::BankUtilityPanel(Theme& theme, WidgetFactory& widgetFactory, j
 
 BankUtilityPanel::~BankUtilityPanel() = default;
 
-void BankUtilityPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchManagerPanelBackgroundColour());
-}
-
 void BankUtilityPanel::resized()
 {
     const auto moduleHeaderHeight = PluginDimensions::Widgets::Heights::kModuleHeader;

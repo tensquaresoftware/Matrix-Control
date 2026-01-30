@@ -34,12 +34,6 @@ ComputerPatchesPanel::ComputerPatchesPanel(Theme& theme, WidgetFactory& widgetFa
 
 ComputerPatchesPanel::~ComputerPatchesPanel() = default;
 
-void ComputerPatchesPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchManagerPanelBackgroundColour());
-}
-
 void ComputerPatchesPanel::resized()
 {
     int x = 0;
@@ -158,11 +152,27 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(Theme& theme)
         PluginDimensions::Widgets::Widths::ComboBox::kPatchManagerComputerPatches,
         PluginDimensions::Widgets::Heights::kButton,
         tss::ComboBox::Style::ButtonLike);
-    selectPatchFileComboBox_->addItem(
-        PluginDescriptors::StandaloneWidgetDisplayNames::kSelectPatchFile,
-        kSelectPatchFileEmptyId_);
-    selectPatchFileComboBox_->setSelectedId(kSelectPatchFileEmptyId_);
-    selectPatchFileComboBox_->setEnabled(false);
+    
+    const juce::StringArray patchNames = {
+        "TOTOHORN", "1000STRG", "MOOOG_B", "EZYBRASS", "SYNTH",
+        "MIBES", "CHUNK", "MINDSEAR", "CASTILLO", "DESTROY+",
+        "BIG PIK", "M-CHOIR", "STRINGME", ")LIQUID(", "PNO-ELEC",
+        "BED TRAK", "STELLAR", "SYNCAGE", "SHIVERS", "+ ZETA +",
+        "STEELDR.", "TAURUS", "POWRSOLO", "INTERSTL", "REZTFUL",
+        "WATRLNG", "BEELS", "LIKETHIS", "NTHENEWS", "SOFT MIX",
+        "OBXA-A7", "BREATH", "MUTRONO", "SLOWATER", "HAUNTING",
+        "FLANGED", "TENSION", "ECHOTRON", "PIRATES!", "EP SWEP",
+        "DEJAVUE'", "DRAMA", "VIOLINCE", "BOUNCE", "SAGAN'Z",
+        "OB LEAD", "FEEDGIT", "SAMPLE", "TINYPIAN", "GALACTIC"
+    };
+    
+    for (int i = 0; i < patchNames.size(); ++i)
+    {
+        selectPatchFileComboBox_->addItem(patchNames[i], i + 1);
+    }
+    
+    selectPatchFileComboBox_->setSelectedId(1);
+    selectPatchFileComboBox_->setEnabled(true);
     selectPatchFileComboBox_->onChange = [this]
     {
         if (auto* comboBox = selectPatchFileComboBox_.get())

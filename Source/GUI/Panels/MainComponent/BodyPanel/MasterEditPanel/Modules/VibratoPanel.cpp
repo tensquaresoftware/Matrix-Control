@@ -91,11 +91,6 @@ VibratoPanel::VibratoPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
 
 VibratoPanel::~VibratoPanel() = default;
 
-void VibratoPanel::paint(juce::Graphics& g)
-{
-    g.fillAll(theme_->getMasterEditPanelBackgroundColour());
-}
-
 void VibratoPanel::resized()
 {
     auto bounds = getLocalBounds();

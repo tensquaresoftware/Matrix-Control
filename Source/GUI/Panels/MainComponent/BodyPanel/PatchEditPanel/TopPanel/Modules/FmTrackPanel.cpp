@@ -118,15 +118,6 @@ FmTrackPanel::FmTrackPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Aud
 
 FmTrackPanel::~FmTrackPanel() = default;
 
-void FmTrackPanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void FmTrackPanel::resized()
 {
     auto bounds = getLocalBounds();

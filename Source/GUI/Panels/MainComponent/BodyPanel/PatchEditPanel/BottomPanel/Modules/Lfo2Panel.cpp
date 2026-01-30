@@ -120,15 +120,6 @@ Lfo2Panel::Lfo2Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
 
 Lfo2Panel::~Lfo2Panel() = default;
 
-void Lfo2Panel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-    g.fillAll(theme_->getPatchEditModulePanelBackgroundColour());
-}
-
 void Lfo2Panel::resized()
 {
     auto bounds = getLocalBounds();

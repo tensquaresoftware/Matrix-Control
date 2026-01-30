@@ -96,11 +96,6 @@ MiscPanel::MiscPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
 
 MiscPanel::~MiscPanel() = default;
 
-void MiscPanel::paint(juce::Graphics& g)
-{
-    g.fillAll(theme_->getMasterEditPanelBackgroundColour());
-}
-
 void MiscPanel::resized()
 {
     auto bounds = getLocalBounds();

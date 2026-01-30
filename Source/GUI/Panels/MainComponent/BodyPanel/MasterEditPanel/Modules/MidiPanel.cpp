@@ -100,11 +100,6 @@ MidiPanel::MidiPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProc
 
 MidiPanel::~MidiPanel() = default;
 
-void MidiPanel::paint(juce::Graphics& g)
-{
-    g.fillAll(theme_->getMasterEditPanelBackgroundColour());
-}
-
 void MidiPanel::resized()
 {
     auto bounds = getLocalBounds();

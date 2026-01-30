@@ -36,12 +36,6 @@ InternalPatchesPanel::InternalPatchesPanel(Theme& theme, WidgetFactory& widgetFa
 
 InternalPatchesPanel::~InternalPatchesPanel() = default;
 
-void InternalPatchesPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchManagerPanelBackgroundColour());
-}
-
 void InternalPatchesPanel::resized()
 {
     int x = 0;

@@ -24,16 +24,6 @@ MiddlePanel::MiddlePanel(Theme& theme)
     addAndMakeVisible(patchNameDisplay_);
 }
 
-void MiddlePanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-
-    g.fillAll(theme_->getPatchEditPanelBackgroundColour());
-}
-
 void MiddlePanel::resized()
 {
     const auto childWidth = PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth;

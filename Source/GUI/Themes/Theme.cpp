@@ -28,12 +28,6 @@ namespace tss
     //=========================================================================
     // COLOURS
     //=========================================================================
-    
-    // GUI colours ------------------------------------------------------------
-    juce::Colour Theme::getGuiBackgroundColour() const
-    {
-        return getColour(ThemeColours::Gui::kGuiBackground);
-    }
 
     // Panel colours ----------------------------------------------------------
     juce::Colour Theme::getHeaderPanelBackgroundColour() const
@@ -49,31 +43,6 @@ namespace tss
     juce::Colour Theme::getFooterPanelBackgroundColour() const
     {
         return getColour(ThemeColours::Panels::kFooterPanelBackground);
-    }
-
-    juce::Colour Theme::getPatchEditPanelBackgroundColour() const
-    {
-        return getColour(ThemeColours::Panels::kPatchEditPanelBackground);
-    }
-
-    juce::Colour Theme::getPatchEditModulePanelBackgroundColour() const
-    {
-        return getColour(ThemeColours::Panels::kPatchEditModulePanelBackground);
-    }
-
-    juce::Colour Theme::getMatrixModulationPanelBackgroundColour() const
-    {
-        return getColour(ThemeColours::Panels::kMatrixModulationPanelBackground);
-    }
-
-    juce::Colour Theme::getPatchManagerPanelBackgroundColour() const
-    {
-        return getColour(ThemeColours::Panels::kPatchManagerPanelBackground);
-    }
-
-    juce::Colour Theme::getMasterEditPanelBackgroundColour() const
-    {
-        return getColour(ThemeColours::Panels::kMasterEditPanelBackground);
     }
 
     // SectionHeader colours ----------------------------------------------------
@@ -210,55 +179,110 @@ namespace tss
     }
 
     // ComboBox colours -------------------------------------------------------
-    juce::Colour Theme::getComboBoxBackgroundColour(bool isEnabled) const
+    juce::Colour Theme::getComboBoxBackgroundColour(bool isEnabled, bool isButtonLike) const
     {
-        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::kBackground : ThemeColours::Widgets::ComboBox::kBackgroundDisabled);
+        if (isButtonLike)
+        {
+            return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::ButtonLike::kBackground : ThemeColours::Widgets::ComboBox::ButtonLike::kBackgroundDisabled);
+        }
+        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::Standard::kBackground : ThemeColours::Widgets::ComboBox::Standard::kBackgroundDisabled);
     }
 
-    juce::Colour Theme::getComboBoxFocusBorderColour() const
+    juce::Colour Theme::getComboBoxBorderColour(bool isEnabled, bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::ComboBox::kFocusBorder);
+        if (isButtonLike)
+        {
+            return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::ButtonLike::kBorder : ThemeColours::Widgets::ComboBox::ButtonLike::kBorderDisabled);
+        }
+        return getColour(ThemeColours::Widgets::ComboBox::Standard::kBackground);
     }
 
-    juce::Colour Theme::getComboBoxTriangleColour(bool isEnabled) const
+    juce::Colour Theme::getComboBoxFocusBorderColour(bool isButtonLike) const
     {
-        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::kTriangle : ThemeColours::Widgets::ComboBox::kTriangleDisabled);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::ComboBox::ButtonLike::kBorder);
+        }
+        return getColour(ThemeColours::Widgets::ComboBox::Standard::kFocusBorder);
     }
 
-    juce::Colour Theme::getComboBoxTextColour(bool isEnabled) const
+    juce::Colour Theme::getComboBoxTriangleColour(bool isEnabled, bool isButtonLike) const
     {
-        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::kText : ThemeColours::Widgets::ComboBox::kTextDisabled);
+        if (isButtonLike)
+        {
+            return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::ButtonLike::kTriangle : ThemeColours::Widgets::ComboBox::ButtonLike::kTriangleDisabled);
+        }
+        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::Standard::kTriangle : ThemeColours::Widgets::ComboBox::Standard::kTriangleDisabled);
+    }
+
+    juce::Colour Theme::getComboBoxTextColour(bool isEnabled, bool isButtonLike) const
+    {
+        if (isButtonLike)
+        {
+            return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::ButtonLike::kText : ThemeColours::Widgets::ComboBox::ButtonLike::kTextDisabled);
+        }
+        return getColour(isEnabled ? ThemeColours::Widgets::ComboBox::Standard::kText : ThemeColours::Widgets::ComboBox::Standard::kTextDisabled);
     }
 
     // PopupMenu colours ------------------------------------------------------
-    juce::Colour Theme::getPopupMenuBackgroundColour() const
+    juce::Colour Theme::getPopupMenuBackgroundColour(bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::PopupMenu::kBackground);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kBackground);
+        }
+        return getColour(ThemeColours::Widgets::PopupMenu::Standard::kBackground);
     }
 
-    juce::Colour Theme::getPopupMenuBorderColour() const
+    juce::Colour Theme::getPopupMenuBorderColour(bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::PopupMenu::kBorder);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kBorder);
+        }
+        return getColour(ThemeColours::Widgets::PopupMenu::Standard::kBorder);
     }
 
-    juce::Colour Theme::getPopupMenuSeparatorColour() const
+    juce::Colour Theme::getPopupMenuSeparatorColour(bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::PopupMenu::kSeparator);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kSeparator);
+        }
+        return getColour(ThemeColours::Widgets::PopupMenu::Standard::kSeparator);
     }
 
-    juce::Colour Theme::getPopupMenuTextColour() const
+    juce::Colour Theme::getPopupMenuTextColour(bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::PopupMenu::kText);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kText);
+        }
+        return getColour(ThemeColours::Widgets::PopupMenu::Standard::kText);
     }
 
-    juce::Colour Theme::getPopupMenuBackgroundHooverColour() const
+    juce::Colour Theme::getPopupMenuBackgroundHooverColour(bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::PopupMenu::kBackgroundHoover);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kBackgroundHoover);
+        }
+        return getColour(ThemeColours::Widgets::PopupMenu::Standard::kBackgroundHoover);
     }
 
-    juce::Colour Theme::getPopupMenuTextHooverColour() const
+    juce::Colour Theme::getPopupMenuTextHooverColour(bool isButtonLike) const
     {
-        return getColour(ThemeColours::Widgets::PopupMenu::kTextHoover);
+        if (isButtonLike)
+        {
+            return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kTextHoover);
+        }
+        return getColour(ThemeColours::Widgets::PopupMenu::Standard::kTextHoover);
+    }
+
+    juce::Colour Theme::getPopupMenuScrollbarColour(bool isButtonLike) const
+    {
+        jassert(isButtonLike && "PopupMenu scrollbar is only used with ButtonLike style");
+        return getColour(ThemeColours::Widgets::PopupMenu::ButtonLike::kScrollbar);
     }
 
     // NumberBox colours -------------------------------------------------------

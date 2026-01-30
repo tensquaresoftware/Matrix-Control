@@ -35,12 +35,6 @@ PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory,
 
 PatchManagerPanel::~PatchManagerPanel() = default;
 
-void PatchManagerPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getPatchManagerPanelBackgroundColour());
-}
-
 void PatchManagerPanel::resized()
 {
     const auto bounds = getLocalBounds();

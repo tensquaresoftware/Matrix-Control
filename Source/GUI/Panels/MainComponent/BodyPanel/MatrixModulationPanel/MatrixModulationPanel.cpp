@@ -144,12 +144,6 @@ void MatrixModulationPanel::createInitAllBussesButton(Theme& theme)
     addAndMakeVisible(*initAllBussesButton_);
 }
 
-void MatrixModulationPanel::paint(juce::Graphics& g)
-{
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getMatrixModulationPanelBackgroundColour());
-}
-
 void MatrixModulationPanel::resized()
 {
     auto bounds = getLocalBounds();

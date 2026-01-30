@@ -22,7 +22,7 @@ MainComponent::MainComponent(Theme& theme, int width, int height, WidgetFactory&
 void MainComponent::paint(juce::Graphics& g)
 {
     if (theme_ != nullptr)
-        g.fillAll(theme_->getGuiBackgroundColour());
+        g.fillAll(theme_->getBodyPanelBackgroundColour());
 }
 
 void MainComponent::resized()

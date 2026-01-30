@@ -27,19 +27,11 @@ namespace tss
         //=====================================================================
         // COLOURS
         //=====================================================================
-        
-        // GUI colours --------------------------------------------------------
-        juce::Colour getGuiBackgroundColour() const;
 
         // Panel colours ------------------------------------------------------
         juce::Colour getHeaderPanelBackgroundColour() const;
         juce::Colour getBodyPanelBackgroundColour() const;
         juce::Colour getFooterPanelBackgroundColour() const;
-        juce::Colour getPatchEditPanelBackgroundColour() const;
-        juce::Colour getPatchEditModulePanelBackgroundColour() const;
-        juce::Colour getMatrixModulationPanelBackgroundColour() const;
-        juce::Colour getPatchManagerPanelBackgroundColour() const;
-        juce::Colour getMasterEditPanelBackgroundColour() const;
 
         // SectionHeader colours ------------------------------------------------
         juce::Colour getSectionHeaderTextColour() const;
@@ -83,18 +75,20 @@ namespace tss
         juce::Colour getSliderFocusBorderColour() const;
 
         // ComboBox colours ---------------------------------------------------
-        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true) const;
-        juce::Colour getComboBoxFocusBorderColour() const;
-        juce::Colour getComboBoxTriangleColour(bool isEnabled = true) const;
-        juce::Colour getComboBoxTextColour(bool isEnabled = true) const;
+        juce::Colour getComboBoxBackgroundColour(bool isEnabled = true, bool isButtonLike = false) const;
+        juce::Colour getComboBoxBorderColour(bool isEnabled = true, bool isButtonLike = false) const;
+        juce::Colour getComboBoxFocusBorderColour(bool isButtonLike = false) const;
+        juce::Colour getComboBoxTriangleColour(bool isEnabled = true, bool isButtonLike = false) const;
+        juce::Colour getComboBoxTextColour(bool isEnabled = true, bool isButtonLike = false) const;
 
         // PopupMenu colours --------------------------------------------------
-        juce::Colour getPopupMenuBackgroundColour() const;
-        juce::Colour getPopupMenuBorderColour() const;
-        juce::Colour getPopupMenuSeparatorColour() const;
-        juce::Colour getPopupMenuTextColour() const;
-        juce::Colour getPopupMenuBackgroundHooverColour() const;
-        juce::Colour getPopupMenuTextHooverColour() const;
+        juce::Colour getPopupMenuBackgroundColour(bool isButtonLike = false) const;
+        juce::Colour getPopupMenuBorderColour(bool isButtonLike = false) const;
+        juce::Colour getPopupMenuSeparatorColour(bool isButtonLike = false) const;
+        juce::Colour getPopupMenuTextColour(bool isButtonLike = false) const;
+        juce::Colour getPopupMenuBackgroundHooverColour(bool isButtonLike = false) const;
+        juce::Colour getPopupMenuTextHooverColour(bool isButtonLike = false) const;
+        juce::Colour getPopupMenuScrollbarColour(bool isButtonLike = false) const;
 
         // NumberBox colours ---------------------------------------------------
         juce::Colour getNumberBoxTextColour() const;

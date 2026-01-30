@@ -163,20 +163,6 @@ void ParameterPanel::layoutSeparator(int y)
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
-void ParameterPanel::paint(juce::Graphics& g)
-{
-    if (theme_ == nullptr)
-    {
-        return;
-    }
-
-    const auto backgroundColour = (moduleType_ == ModuleType::PatchEdit)
-        ? theme_->getPatchEditModulePanelBackgroundColour()
-        : theme_->getMasterEditPanelBackgroundColour();
-
-    g.fillAll(backgroundColour);
-}
-
 void ParameterPanel::setTheme(Theme& theme)
 {
     theme_ = &theme;
