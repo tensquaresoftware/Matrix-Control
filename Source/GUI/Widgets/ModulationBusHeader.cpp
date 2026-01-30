@@ -13,7 +13,7 @@ namespace tss
         , busDestinationText_(PluginDescriptors::ParameterDisplayNames::kModulationBusDestination)
         , colourVariant_(variant)
     {
-        setOpaque(true);
+        setOpaque(false);
         setSize(width, height);
     }
 

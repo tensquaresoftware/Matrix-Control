@@ -18,9 +18,7 @@ ModulePanelConfig MiscPanel::createConfig()
     config.parameters = {
         {PluginDescriptors::ParameterIds::kMasterTune, ModulePanelParameterType::Slider},
         {PluginDescriptors::ParameterIds::kMasterTranspose, ModulePanelParameterType::Slider},
-        {"", ModulePanelParameterType::None},
         {PluginDescriptors::ParameterIds::kBendRange, ModulePanelParameterType::Slider},
-        {"", ModulePanelParameterType::None},
         {PluginDescriptors::ParameterIds::kUnisonEnable, ModulePanelParameterType::ComboBox},
         {PluginDescriptors::ParameterIds::kVolumeInvertEnable, ModulePanelParameterType::ComboBox},
         {PluginDescriptors::ParameterIds::kBankLockEnable, ModulePanelParameterType::ComboBox},

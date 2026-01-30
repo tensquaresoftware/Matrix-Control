@@ -27,7 +27,7 @@ ModulePanelConfig Env3Panel::createConfig()
         {PluginDescriptors::ParameterIds::kEnv3AmplitudeModByVelocity, ModulePanelParameterType::Slider},
         {PluginDescriptors::ParameterIds::kEnv3TriggerMode, ModulePanelParameterType::ComboBox},
         {PluginDescriptors::ParameterIds::kEnv3EnvelopeMode, ModulePanelParameterType::ComboBox},
-        {"", ModulePanelParameterType::None}
+        {PluginDescriptors::ParameterIds::kEnv3Lfo1Trigger, ModulePanelParameterType::ComboBox}
     };
     
     return config;

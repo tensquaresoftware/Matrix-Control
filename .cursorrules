@@ -231,6 +231,8 @@ Avant de présenter du code à Guillaume, je DOIS vérifier systématiquement :
 #### Commits
 
 - Git Commits : Summary/Description en anglais uniquement
+- **Ne créer de commit que sur demande explicite**
+- Ne jamais committer de manière proactive ou automatique, même après une refactorisation réussie
 
 #### Tags annotés
 

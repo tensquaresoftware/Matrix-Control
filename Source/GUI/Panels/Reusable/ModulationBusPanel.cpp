@@ -25,7 +25,7 @@ ModulationBusPanel::ModulationBusPanel(int busNumber,
     , apvts_(apvts)
     , busId_(busId)
 {
-    setOpaque(true);
+    setOpaque(false);
     createBusNumberLabel(busNumber, theme);
     createSourceComboBox(factory, theme, sourceParamId, apvts);
     createAmountSlider(factory, theme, amountParamId, apvts);

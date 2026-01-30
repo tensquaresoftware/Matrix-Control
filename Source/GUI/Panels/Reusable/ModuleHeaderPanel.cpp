@@ -24,7 +24,7 @@ ModuleHeaderPanel::ModuleHeaderPanel(Theme& theme,
     , moduleType_(moduleType)
     , apvts_(apvts)
 {
-    setOpaque(true);
+    setOpaque(false);
     createModuleHeader(theme, factory, moduleId);
     createInitButton(theme, factory, initWidgetId);
 

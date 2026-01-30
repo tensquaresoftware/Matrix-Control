@@ -22,7 +22,7 @@ ParameterPanel::ParameterPanel(Theme& theme,
     , parameterType_(type)
     , moduleType_(moduleType)
 {
-    setOpaque(true);
+    setOpaque(false);
     if (type == ParameterType::None)
     {
         createSeparator(theme);
