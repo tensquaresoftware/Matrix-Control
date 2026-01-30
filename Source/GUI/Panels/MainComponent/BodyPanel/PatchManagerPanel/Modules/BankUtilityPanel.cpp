@@ -145,8 +145,6 @@ void BankUtilityPanel::setTheme(Theme& theme)
 
     if (auto* button = selectBank9Button_.get())
         button->setTheme(theme);
-
-    repaint();
 }
 
 void BankUtilityPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)

@@ -100,8 +100,6 @@ void InternalPatchesPanel::setTheme(Theme& theme)
 
     if (auto* patchNumber = currentPatchNumber.get())
         patchNumber->setTheme(theme);
-
-    repaint();
 }
 
 void InternalPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)

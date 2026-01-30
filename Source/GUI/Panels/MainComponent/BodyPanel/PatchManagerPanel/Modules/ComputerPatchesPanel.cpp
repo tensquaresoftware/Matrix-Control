@@ -90,8 +90,6 @@ void ComputerPatchesPanel::setTheme(Theme& theme)
 
     if (auto* comboBox = selectPatchFileComboBox_.get())
         comboBox->setTheme(theme);
-
-    repaint();
 }
 
 void ComputerPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)

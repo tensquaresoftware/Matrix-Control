@@ -75,6 +75,5 @@ void MainComponent::setTheme(Theme& theme)
     headerPanel.setTheme(theme);
     bodyPanel.setTheme(theme);
     footerPanel.setTheme(theme);
-    repaint();
 }
 

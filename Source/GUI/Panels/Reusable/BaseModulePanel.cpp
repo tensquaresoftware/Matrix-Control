@@ -88,6 +88,4 @@ void BaseModulePanel::setTheme(Theme& theme)
     for (auto& paramPanel : parameterPanels_)
         if (paramPanel != nullptr)
             paramPanel->setTheme(theme);
-
-    repaint();
 }
