@@ -1,5 +1,6 @@
 #include "ComboBox.h"
-#include "PopupMenu.h"
+#include "MultiColumnPopupMenu.h"
+#include "ScrollablePopupMenu.h"
 
 #include "GUI/Themes/Theme.h"
 
@@ -29,8 +30,6 @@ namespace tss
         if (theme_ == nullptr)
             return;
 
-        g.fillAll(theme_->getGuiBackgroundColour());
-
         const auto bounds = getLocalBounds().toFloat();
         const auto enabled = isEnabled();
         const auto hasFocus = hasFocus_ || isPopupOpen_;
@@ -45,23 +44,8 @@ namespace tss
 
     void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        juce::Colour backgroundColour;
-        
-        if (style_ == Style::ButtonLike)
-        {
-            if (! enabled)
-            {
-                backgroundColour = theme_->getButtonBackgroundColourOff();
-            }
-            else
-            {
-                backgroundColour = theme_->getButtonBackgroundColourOn();
-            }
-        }
-        else
-        {
-            backgroundColour = theme_->getComboBoxBackgroundColour(enabled);
-        }
+        const auto isButtonLike = (style_ == Style::ButtonLike);
+        const auto backgroundColour = theme_->getComboBoxBackgroundColour(enabled, isButtonLike);
         
         g.setColour(backgroundColour);
         g.fillRect(bounds);
@@ -69,9 +53,11 @@ namespace tss
 
     void ComboBox::drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
     {
-        if (style_ == Style::ButtonLike)
+        const auto isButtonLike = (style_ == Style::ButtonLike);
+        
+        if (isButtonLike)
         {
-            const auto borderColour = enabled ? theme_->getButtonBorderColourOn() : theme_->getButtonBorderColourOff();
+            const auto borderColour = theme_->getComboBoxBorderColour(enabled, isButtonLike);
             g.setColour(borderColour);
             g.drawRect(bounds, static_cast<float>(kBorderThicknessButtonLike_));
             return;
@@ -79,7 +65,7 @@ namespace tss
 
         if (hasFocus)
         {
-            const auto focusBorderColour = theme_->getComboBoxFocusBorderColour();
+            const auto focusBorderColour = theme_->getComboBoxFocusBorderColour(isButtonLike);
             g.setColour(focusBorderColour);
             g.drawRect(backgroundBounds, static_cast<float>(kBorderThickness_));
         }
@@ -105,15 +91,8 @@ namespace tss
 
     juce::Colour ComboBox::getTextColourForCurrentStyle(bool enabled) const
     {
-        if (style_ == Style::ButtonLike)
-        {
-            if (! enabled)
-            {
-                return theme_->getButtonTextColourOff();
-            }
-            return theme_->getButtonTextColourOn();
-        }
-        return theme_->getComboBoxTextColour(enabled);
+        const auto isButtonLike = (style_ == Style::ButtonLike);
+        return theme_->getComboBoxTextColour(enabled, isButtonLike);
     }
 
     juce::Rectangle<float> ComboBox::calculateTextBounds(const juce::Rectangle<float>& bounds) const
@@ -135,7 +114,8 @@ namespace tss
 
     void ComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
-        const auto triangleColour = theme_->getComboBoxTriangleColour(enabled);
+        const auto isButtonLike = (style_ == Style::ButtonLike);
+        const auto triangleColour = theme_->getComboBoxTriangleColour(enabled, isButtonLike);
         g.setColour(triangleColour);
 
         const auto triangleBaseSize = kTriangleBaseSize_;
@@ -178,8 +158,7 @@ namespace tss
             return;
         }
 
-        const auto displayMode = determineDisplayMode();
-        showPopupAsynchronously(displayMode);
+        showPopupAsynchronously();
         repaint();
     }
 
@@ -188,23 +167,24 @@ namespace tss
         return isEnabled() && getNumItems() > 0;
     }
 
-    PopupMenu::DisplayMode ComboBox::determineDisplayMode() const
+    void ComboBox::showPopupAsynchronously()
     {
-        if (style_ == Style::ButtonLike)
-        {
-            return PopupMenu::DisplayMode::SingleColumnScrollable;
-        }
-        return PopupMenu::DisplayMode::MultiColumn;
-    }
-
-    void ComboBox::showPopupAsynchronously(PopupMenu::DisplayMode displayMode)
-    {
-        juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this), displayMode]()
+        const auto useScrollableMode = (style_ == Style::ButtonLike);
+        
+        juce::MessageManager::callAsync([safePointer = SafePointer<ComboBox>(this), useScrollableMode]()
         {
             if (safePointer != nullptr && safePointer->canShowPopup())
             {
                 safePointer->isPopupOpen_ = true;
-                PopupMenu::show(*safePointer, displayMode);
+                
+                if (useScrollableMode)
+                {
+                    ScrollablePopupMenu::show(*safePointer);
+                }
+                else
+                {
+                    MultiColumnPopupMenu::show(*safePointer);
+                }
             }
         });
     }

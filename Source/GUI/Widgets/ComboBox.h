@@ -2,12 +2,12 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "PopupMenu.h"
-
 namespace tss
 {
     class Theme;
-    class PopupMenu;
+    class PopupMenuBase;
+    class MultiColumnPopupMenu;
+    class ScrollablePopupMenu;
 }
 
 namespace tss
@@ -70,11 +70,11 @@ namespace tss
         void drawTextInBounds(juce::Graphics& g, const juce::String& text, const juce::Rectangle<float>& textBounds, const juce::Colour& textColour) const;
 
         bool canShowPopup() const;
-        
-        PopupMenu::DisplayMode determineDisplayMode() const;
-        void showPopupAsynchronously(PopupMenu::DisplayMode displayMode);
+        void showPopupAsynchronously();
 
-        friend class PopupMenu;
+        friend class PopupMenuBase;
+        friend class MultiColumnPopupMenu;
+        friend class ScrollablePopupMenu;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComboBox)
     };

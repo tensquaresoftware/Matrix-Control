@@ -104,17 +104,21 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/ComboBox.cpp
     Source/GUI/Widgets/EnvelopeDisplay.cpp
     Source/GUI/Widgets/GroupLabel.cpp
+    Source/GUI/Widgets/HorizontalSeparator.cpp
+    Source/GUI/Widgets/Label.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp
+    Source/GUI/Widgets/MultiColumnPopupMenu.cpp
     Source/GUI/Widgets/NumberBox.cpp
-    Source/GUI/Widgets/VerticalSeparator.cpp
-    Source/GUI/Widgets/Label.cpp
-    Source/GUI/Widgets/HorizontalSeparator.cpp
     Source/GUI/Widgets/PatchNameDisplay.cpp
-    Source/GUI/Widgets/PopupMenu.cpp
+    Source/GUI/Widgets/PopupMenuBase.cpp
+    Source/GUI/Widgets/PopupMenuPositioner.cpp
+    Source/GUI/Widgets/PopupMenuRenderer.cpp
+    Source/GUI/Widgets/ScrollablePopupMenu.cpp
     Source/GUI/Widgets/SectionHeader.cpp
     Source/GUI/Widgets/Slider.cpp
     Source/GUI/Widgets/TrackGeneratorDisplay.cpp
+    Source/GUI/Widgets/VerticalSeparator.cpp
     
     # Loggers
     Source/Core/Loggers/MidiLogger.cpp
