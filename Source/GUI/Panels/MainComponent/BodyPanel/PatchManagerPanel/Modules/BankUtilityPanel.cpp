@@ -15,7 +15,7 @@ BankUtilityPanel::BankUtilityPanel(Theme& theme, WidgetFactory& widgetFactory, j
     : theme_(&theme)
     , apvts_(apvts)
 {
-    setOpaque(true);
+    setOpaque(false);
     setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kBankUtility);
     setupBankSelectorLabel(theme);
     setupSelectBankButtons(theme, widgetFactory);

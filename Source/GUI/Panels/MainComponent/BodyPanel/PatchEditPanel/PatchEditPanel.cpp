@@ -25,7 +25,7 @@ PatchEditPanel::PatchEditPanel(Theme& theme, WidgetFactory& widgetFactory, juce:
     , middlePanel_(std::make_unique<MiddlePanel>(theme))
     , bottomPanel_(std::make_unique<BottomPanel>(theme, widgetFactory, apvts))
 {
-    setOpaque(true);
+    setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*topPanel_);
     addAndMakeVisible(*middlePanel_);

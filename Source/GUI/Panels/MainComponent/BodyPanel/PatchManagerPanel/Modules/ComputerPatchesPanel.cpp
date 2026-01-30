@@ -16,7 +16,7 @@ ComputerPatchesPanel::ComputerPatchesPanel(Theme& theme, WidgetFactory& widgetFa
     : theme_(&theme)
     , apvts_(apvts)
 {
-    setOpaque(true);
+    setOpaque(false);
     setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kComputerPatches);
 
     setupBrowserGroupLabel(theme);

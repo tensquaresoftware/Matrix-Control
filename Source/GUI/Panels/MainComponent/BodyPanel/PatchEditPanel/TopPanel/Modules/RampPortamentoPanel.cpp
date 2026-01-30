@@ -12,7 +12,7 @@ RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFact
     : theme_(&theme)
     , apvts_(apvts)
 {
-    setOpaque(true);
+    setOpaque(false);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,

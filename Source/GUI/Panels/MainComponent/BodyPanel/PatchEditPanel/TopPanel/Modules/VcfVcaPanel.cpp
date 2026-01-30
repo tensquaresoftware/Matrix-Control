@@ -12,7 +12,7 @@ VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::Audio
     : theme_(&theme)
     , apvts_(apvts)
 {
-    setOpaque(true);
+    setOpaque(false);
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
         theme,
         widgetFactory,

@@ -14,7 +14,7 @@ MiddlePanel::MiddlePanel(Theme& theme)
     , trackGeneratorDisplay_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
     , patchNameDisplay_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
 {
-    setOpaque(true);
+    setOpaque(false);
     setSize(getWidth(), getHeight());
 
     addAndMakeVisible(envelope1Display_);

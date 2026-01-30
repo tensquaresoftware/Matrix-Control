@@ -17,7 +17,6 @@ namespace tss
 
         namespace Common
         {
-            // Common disabled and interaction colour constants
             static constexpr juce::uint32 kBackgroundDisabled = ColourChart::kDarkGrey3;
             static constexpr juce::uint32 kBorderDisabled = ColourChart::kDarkGrey4;
             static constexpr juce::uint32 kDecorationDisabled = ColourChart::kDarkGrey5;

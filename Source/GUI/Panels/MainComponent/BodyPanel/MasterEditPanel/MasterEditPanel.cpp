@@ -25,7 +25,7 @@ MasterEditPanel::MasterEditPanel(Theme& theme, WidgetFactory& widgetFactory, juc
     , vibratoPanel_(std::make_unique<VibratoPanel>(theme, widgetFactory, apvts))
     , miscPanel_(std::make_unique<MiscPanel>(theme, widgetFactory, apvts))
 {
-    setOpaque(true);
+    setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*midiPanel_);
     addAndMakeVisible(*vibratoPanel_);
