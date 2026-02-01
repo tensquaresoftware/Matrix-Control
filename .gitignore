@@ -39,3 +39,6 @@ Logs/
 
 # Archives
 Source/Archives/
+
+# Profiling traces (Instruments)
+Documentation/Development/GUI/Profiling/Traces/
