@@ -8,9 +8,14 @@
 
 ---
 
+## GitHub
+
+- Fais un commit et crée un nouveau tag GitHub, dans la continuité des tags existants.
+
+
+
 ## Général
 
-- GitHub : Fais un commit et crée un nouveau tag GitHub, dans la continuité des tags existants.
 - Faire appliquer mes cursorrules en profondeur pour améliorer le code
 - Gérer la lourdeur toujours persistante du code au lancement du plugin
 - Télécharger le code source de Vital Audio et le faire analyser par l'IA

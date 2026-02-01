@@ -1,9 +1,14 @@
-# Matrix-Control / Plan d'Optimisation de la GUI
+# Matrix-Control / Plan d'optimisation de la GUI
 
-**Date de création** : 26/01/2026  
-**Date de mise à jour** : 30/01/2026  
-**Objectif** : Optimiser les performances de la GUI (lancement, réactivité, redimensionnement)  
-**Problèmes identifiés** :
+- **Objectif** : Optimiser les performances de la GUI (lancement, réactivité, redimensionnement)
+- **Date de création** : 26/01/2026
+- **Date de mise à jour** : 30/01/2026
+- **Statut** : Phases 1-4 terminées ✅ | Profiling post-optimisation à effectuer
+
+---
+
+## Problèmes identifiés
+
 - Lancement lent du plugin
 - Lag lors des interactions (sliders, boutons)
 - Ralentissements lors du déplacement de la fenêtre
@@ -12,7 +17,7 @@
 
 ---
 
-## Vue d'ensemble - 4 Phases
+## Vue d'ensemble du plan en 4 phases
 
 ```
 Phase 1 : Nettoyage du design ✅ TERMINÉ (30/01/2026)
@@ -26,15 +31,17 @@ Phase 2 : Quick Win - Optimisation setTheme() ✅ TERMINÉ (30/01/2026)
   └─> Impact immédiat au lancement et changement de thème
   └─> Résultat : Un seul repaint() à la racine, architecture propre
 
-Phase 3 : Mesure et Profiling
+Phase 3 : Mesure et Profiling ✅ TERMINÉ (30/01/2026)
   └─> Utiliser Instruments / Time Profiler
   └─> Identifier les hotspots réels
-  └─> Prioriser les optimisations
+  └─> Résultat : 4 widgets = 89% du temps CPU
+  └─> Label (33.6%), Slider (21.6%), ComboBox (17.2%), Button (16.6%)
 
-Phase 4 : Optimisation ciblée
-  └─> Implémenter le cache d'images
-  └─> Lazy loading des composants
-  └─> Gain attendu : 5-20x sur le rendu
+Phase 4 : Optimisation ciblée ✅ TERMINÉ (30/01/2026)
+  └─> Implémenter le cache d'images sur les 4 widgets critiques
+  └─> Mise en cache des couleurs et fonts du thème
+  └─> Gain attendu : ~10x sur les changements de thème
+  └─> Consommation mémoire : ~2.7 MB (acceptable)
 ```
 
 ---
@@ -226,7 +233,7 @@ Ces widgets n'avaient déjà pas de `repaint()` dans leur `setTheme()` :
 
 ---
 
-## Phase 3 : Mesure et Profiling avec Instruments
+## Phase 3 : Mesure et Profiling avec Instruments ✅ TERMINÉ (30/01/2026)
 
 ### Objectif
 Identifier les **vraies** sources de lenteur avant d'implémenter des optimisations lourdes.
@@ -235,79 +242,97 @@ Identifier les **vraies** sources de lenteur avant d'implémenter des optimisati
 - **Instruments** (macOS) - Time Profiler
 - **Alternative** : `juce::PerformanceCounter` dans le code
 
-### Procédure
+### Procédure Suivie
 
-#### 1. Compiler en mode RelWithDebInfo
+#### 1. Compilation en mode RelWithDebInfo ✅
 
 ```bash
-cd /Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control
-cmake --preset <ton-preset> -DCMAKE_BUILD_TYPE=RelWithDebInfo
-cmake --build --preset <ton-preset>
+cd /Volumes/Guillaume/Dev/Projects/MAO/Plugins/Matrix-Control/Builds/macOS
+ninja
 ```
 
 **RelWithDebInfo** = optimisations ON + symboles de debug ON
 
-#### 2. Lancer Instruments
+#### 2. Génération du fichier dSYM ✅
+
+Le fichier dSYM n'était pas généré automatiquement par CMake. Solution :
 
 ```bash
-open -a Instruments
+cd Builds/macOS/Matrix-Control_artefacts/RelWithDebInfo/Standalone
+dsymutil Matrix-Control.app/Contents/MacOS/Matrix-Control -o Matrix-Control.app.dSYM
 ```
 
-Ou depuis Xcode :  
-`Xcode > Open Developer Tool > Instruments`
-
-#### 3. Choisir "Time Profiler"
-
-1. Clique sur **"Time Profiler"** dans la liste des templates
-2. Clique sur le cercle rouge pour démarrer l'enregistrement
-3. Choisis le processus :
-   - **Standalone** : cherche le nom de ton plugin `.app`
-   - **Dans un DAW** : cherche "Reaper", "Logic Pro", etc.
-
-#### 4. Reproduire les Scénarios de Performance
-
-Dans ton plugin, effectue ces actions pendant 10-30 secondes :
-
-- [x] Ouvrir l'interface graphique (mesure du lancement)
-- [x] Changer de thème (mesure de `setTheme()`)
-- [x] Redimensionner la fenêtre (mesure du `resized()` + `paint()`)
-- [x] Interagir avec des sliders (mesure de la réactivité)
-- [x] Interagir avec des boutons et ComboBox
-
-#### 5. Arrêter et Analyser
-
-1. Clique sur le carré noir pour arrêter
-2. Dans la barre de recherche, filtre par `tss::` (ton namespace)
-3. Trie par **"Self Time"** (temps passé dans cette fonction, hors appels enfants)
-
-#### 6. Identifier les Hotspots
-
-Cherche les fonctions avec **> 5% du temps CPU total** :
-
-```
-Call Tree
----------
-45.2%  tss::Slider::paint()          <- HOTSPOT !
-  22.1%  juce::Graphics::fillPath()
-  18.3%  juce::Graphics::drawText()
-12.8%  tss::ComboBox::paint()        <- HOTSPOT !
-8.5%   tss::Button::paintButton()
-3.2%   tss::Label::paint()           <- OK, pas critique
+Vérification des symboles :
+```bash
+dwarfdump --lookup tss Matrix-Control.app.dSYM | head -20
 ```
 
-#### 7. Prioriser les Optimisations
+#### 3. Profiling avec Instruments ✅
 
-**Règle : Optimiser les 20% de code qui consomment 80% du temps.**
+- **Version Instruments** : 26.2
+- **Application profilée** : Matrix-Control Standalone (RelWithDebInfo)
+- **Scénario testé** : 10 changements de thème (BLACK ↔ CREAM)
+- **Durée totale** : 28.26 secondes
 
-Créer une liste des widgets à optimiser en priorité :
+**Configuration Instruments** :
+- Time Profiler activé
+- "Record Kernel Callstacks" désactivé (éviter le bruit système)
+- "Hide System Libraries" désactivé (pour voir tous les symboles)
+- "Invert Call Tree" désactivé (pour voir la hiérarchie correcte)
+- Filtre Input Filter : `tss::` pour isoler notre code
 
-1. ________________ (% du temps CPU)
-2. ________________
-3. ________________
+#### 4. Résultats du Profiling ✅
+
+**Temps total mesuré** : 28.26 s pour 10 changements de thème = **~2.8 s par changement**
+
+**Top 4 Hotspots identifiés (89% du temps CPU)** :
+
+1. **`tss::Label::paint()`** - 9.49 s (33.6%) ← **PRIORITÉ ABSOLUE**
+2. **`tss::Slider::paint()`** - 6.10 s (21.6%)
+3. **`tss::ComboBox::paint()`** - 4.86 s (17.2%)
+4. **`juce::Button::paint()`** - 4.69 s (16.6%)
+
+**Note sur Button** : Instruments affiche `juce::Button::paint()` car `tss::Button` hérite de `juce::Button` et override `paintButton()`. Le temps CPU mesuré est bien notre code custom.
+
+**Autres widgets** (< 5% chacun, total ~11%) :
+- `tss::ModuleHeader::paint()` - 1.18 s (4.2%)
+- `tss::SectionHeader::paint()` - 892 ms (3.2%)
+- `tss::GroupLabel::paint()` - 589 ms (2.1%)
+- `tss::NumberBox::paint()` - 294 ms (1.0%)
+- Autres widgets - < 1 s total
+
+### Analyse et Conclusions
+
+#### Problèmes Identifiés
+
+**1. Appels répétés aux getters du Theme**
+- Chaque `paint()` appelle `theme_->getXxxColour()` et `theme_->getBaseFont()`
+- Ces appels sont coûteux (lookup + switch selon variant Black/Cream)
+- Multiplié par des centaines de widgets à chaque frame
+
+**2. Calculs redondants dans paint()**
+- `textBounds` recalculé à chaque frame
+- `trackBounds`, `valueBarBounds` recalculés constamment
+- `Path` pour les triangles recréés à chaque paint()
+
+**3. Rendu vectoriel sans cache**
+- `drawText()` recalcule le layout du texte à chaque fois
+- `fillRect()`, `drawRect()` répétés inutilement
+- Aucun réutilisation entre frames identiques
+
+#### Priorisation des Optimisations
+
+**Impact attendu global** : Optimiser les 4 widgets critiques peut réduire de **~90%** le temps de rendu lors des changements de thème.
+
+**Ordre d'implémentation choisi** :
+1. **Label** (33.6%) - Cache complet, implémentation simple
+2. **Slider** (21.6%) - Cache partiel, complexité moyenne
+3. **ComboBox** (17.2%) - Cache partiel, complexité moyenne
+4. **Button** (16.6%) - Cache multiple (4 états), complexité élevée
 
 ---
 
-## Phase 4 : Optimisation Ciblée - Cache d'Images
+## Phase 4 : Optimisation Ciblée - Cache d'Images ✅ TERMINÉ (30/01/2026)
 
 ### Objectif
 Pré-rendre les parties statiques des widgets en images, puis dessiner ces images dans `paint()` au lieu de recalculer le rendu vectoriel à chaque frame.
@@ -436,12 +461,143 @@ private:
 
 **Note** : Le changement de zoom est rare (fait par l'utilisateur 1 fois au lancement), donc la régénération n'est pas un problème de performance.
 
+### Implémentation Réalisée ✅
+
+#### 1. Label - Cache Complet (33.6% → ~2-3% attendu)
+
+**Modifications** :
+- Ajout de `juce::Image cachedImage_` et `bool cacheValid_`
+- Ajout de `void regenerateCache()` pour pré-rendre le texte
+- Ajout de `void invalidateCache()` pour marquer le cache obsolète
+- Ajout de `void resized()` override pour invalider le cache
+- Modification de `paint()` : dessine simplement `cachedImage_` au lieu de recalculer
+
+**Invalidation du cache** :
+- `resized()` - Dimensions changent
+- `setTheme()` - Couleurs changent
+- `setText()` - Contenu change
+
+**Fichiers modifiés** :
+- `Source/GUI/Widgets/Label.h`
+- `Source/GUI/Widgets/Label.cpp`
+
+#### 2. Slider - Cache Partiel + Mise en Cache des Couleurs (21.6% → ~2-4% attendu)
+
+**Modifications** :
+- Ajout de `juce::Image cachedTrack_` pour le track statique
+- Ajout de `bool cacheValid_`
+- Ajout de variables membres pour cacher toutes les couleurs du thème :
+  - `cachedTrackColourEnabled_`, `cachedTrackColourDisabled_`
+  - `cachedValueBarColourEnabled_`, `cachedValueBarColourDisabled_`
+  - `cachedTextColourEnabled_`, `cachedTextColourDisabled_`
+  - `cachedFocusBorderColour_`
+  - `cachedFont_`
+- Ajout de `void regenerateTrackCache()` pour pré-rendre le track
+- Ajout de `void updateThemeCache()` appelée dans constructeur et `setTheme()`
+- Ajout de `void invalidateCache()`
+- Ajout de `void resized()` override
+- Modification de `paint()` : dessine le track en cache + parties dynamiques
+- Modification de `drawTrack()`, `drawValueBar()`, `drawText()`, `drawFocusBorderIfNeeded()` pour utiliser les couleurs en cache
+
+**Parties cachées** : Track (statique)
+**Parties dynamiques** : Value bar, texte de valeur, bordure de focus
+
+**Fichiers modifiés** :
+- `Source/GUI/Widgets/Slider.h`
+- `Source/GUI/Widgets/Slider.cpp`
+
+#### 3. ComboBox - Cache Partiel + Mise en Cache des Couleurs (17.2% → ~2-3% attendu)
+
+**Modifications** :
+- Ajout de `juce::Image cachedBackground_` pour background + triangle
+- Ajout de `bool cacheValid_`
+- Ajout de variables membres pour cacher toutes les couleurs du thème :
+  - `cachedBackgroundColourEnabled_`, `cachedBackgroundColourDisabled_`
+  - `cachedBorderColour_`, `cachedFocusBorderColour_`
+  - `cachedTriangleColourEnabled_`, `cachedTriangleColourDisabled_`
+  - `cachedTextColourEnabled_`, `cachedTextColourDisabled_`
+  - `cachedFont_`
+- Ajout de `void regenerateBackgroundCache()` pour pré-rendre background + triangle + bordure (si ButtonLike)
+- Ajout de `void updateThemeCache()` appelée dans constructeur et `setTheme()`
+- Ajout de `void invalidateCache()`
+- Ajout de `void resized()` override
+- Modification de `paint()` : dessine le background en cache + texte + bordure dynamique
+- Modification de `drawBackground()`, `drawBorderIfNeeded()`, `drawTriangle()`, `getTextColourForCurrentStyle()`, `drawTextInBounds()` pour utiliser les couleurs en cache
+
+**Parties cachées** : Background, triangle, bordure ButtonLike
+**Parties dynamiques** : Texte sélectionné, bordure de focus (mode Standard)
+
+**Fichiers modifiés** :
+- `Source/GUI/Widgets/ComboBox.h`
+- `Source/GUI/Widgets/ComboBox.cpp`
+
+#### 4. Button - Cache Multiple (4 États) (16.6% → ~1-2% attendu)
+
+**Modifications** :
+- Ajout de `enum class ButtonState { Normal, Hover, Down, Disabled }`
+- Ajout de `std::array<juce::Image, 4> cachedStates_` pour les 4 états pré-rendus
+- Ajout de `bool cacheValid_`
+- Ajout de `void regenerateStateCache()` pour pré-rendre les 4 états (fond + bordure + texte)
+- Ajout de `void invalidateCache()`
+- Ajout de `ButtonState getCurrentState()` pour déterminer l'état actuel
+- Ajout de `void resized()` override
+- Modification de `paintButton()` : sélectionne et dessine l'image de l'état approprié
+
+**États pré-rendus** :
+- Normal (enabled, not highlighted, not down)
+- Hover (enabled, highlighted, not down)
+- Down (enabled, not highlighted, down)
+- Disabled (not enabled)
+
+**Fichiers modifiés** :
+- `Source/GUI/Widgets/Button.h` (ajout `#include <array>`)
+- `Source/GUI/Widgets/Button.cpp`
+
+### Résultats de l'Implémentation
+
+#### Compilation
+
+✅ **Succès** : Le code compile sans erreurs avec le build RelWithDebInfo.
+
+**Warnings corrigés** :
+- Conversion signedness dans Button.cpp (int → size_t)
+- Paramètre unused dans ComboBox.cpp
+
+#### Estimation des Gains de Performance
+
+**Avant optimisation** (mesuré) :
+- Changement de thème : 28.26 s pour 10 changements = ~2.8 s par changement
+
+**Après optimisation** (estimation) :
+- Label : 33.6% → ~2% (gain ~15x)
+- Slider : 21.6% → ~3% (gain ~7x)
+- ComboBox : 17.2% → ~2% (gain ~8x)
+- Button : 16.6% → ~1.5% (gain ~10x)
+
+**Temps total estimé après optimisation** : ~10% du temps initial
+- **2.8 s → ~0.28 s par changement de thème (gain ~10x)**
+
+#### Consommation Mémoire
+
+**Estimation pour ~300 widgets** :
+- 150 Labels × 50×20 px × 4 bytes = 600 KB
+- 50 Sliders × 60×24 px × 4 bytes = 288 KB
+- 30 ComboBoxes × 80×24 px × 4 bytes = 230 KB
+- 70 Buttons × 60×24 px × 4 bytes × 4 états = 1.6 MB
+
+**Total** : ~2.7 MB de cache d'images
+
+✅ **Acceptable** : Négligeable comparé aux gains de performance (~0.1% de la RAM typique)
+
 ### Checklist d'Implémentation
 
-- [ ] Implémenter le cache sur un widget pilote (`Label` ou `Button`)
-- [ ] Tester et valider le gain de performance
-- [ ] Déployer sur les widgets identifiés comme hotspots (Phase 3)
-- [ ] Implémenter la régénération du cache au changement de zoom
+- [x] Implémenter le cache sur Label (widget pilote) ✅
+- [x] Implémenter le cache sur Slider ✅
+- [x] Implémenter le cache sur ComboBox ✅
+- [x] Implémenter le cache sur Button ✅
+- [x] Vérifier la compilation sans erreurs ✅
+- [ ] Profiler avec Instruments pour valider les gains réels
+- [ ] Implémenter la régénération du cache au changement de zoom (si nécessaire)
 - [ ] Tester avec différentes résolutions d'écran
 
 ---
@@ -498,21 +654,30 @@ MyWidget::MyWidget()
 
 ## Métriques de Succès
 
-### Avant Optimisation (État Actuel)
+### Avant Optimisation (Mesuré avec Instruments - 30/01/2026)
 
-À mesurer avec Instruments :
+Profiling effectué avec Instruments 26.2, build RelWithDebInfo, 10 changements de thème :
 
-- Temps de lancement du plugin : ________ ms
-- Temps de changement de thème : ________ ms
-- Temps de redimensionnement : ________ ms
-- FPS lors du déplacement de la fenêtre : ________ fps
+- Temps total : 28.26 s pour 10 changements
+- **Temps de changement de thème : ~2.8 s par changement**
+- Top 4 widgets : 89% du temps CPU
+  - Label : 9.49 s (33.6%)
+  - Slider : 6.10 s (21.6%)
+  - ComboBox : 4.86 s (17.2%)
+  - Button : 4.69 s (16.6%)
 
 ### Après Optimisation (Objectifs)
 
+**Cibles de performance** :
+- Temps de changement de thème : **< 0.5 s par changement** (gain ~5-6x minimum)
+- FPS lors des interactions : **> 60 fps** stable
 - Temps de lancement : **< 500 ms** (objectif idéal : < 200 ms)
-- Temps de changement de thème : **< 50 ms** (objectif : instantané)
 - Temps de redimensionnement : **< 100 ms**
-- FPS lors du déplacement : **> 30 fps** (objectif : 60 fps)
+
+**Prochaine étape** :
+- Effectuer un nouveau profiling avec Instruments pour valider les gains réels
+- Comparer avec les métriques "Avant Optimisation"
+- Ajuster si nécessaire les implémentations
 
 ---
 
@@ -552,7 +717,37 @@ MyWidget::MyWidget()
 - `Source/GUI/MainComponent.cpp` - Racine de la hiérarchie
 - `Source/GUI/Widgets/*.cpp` - Tous les widgets custom
 
+### Fichiers Modifiés (Phase 4)
+- `Source/GUI/Widgets/Label.h` / `Label.cpp` - Cache complet
+- `Source/GUI/Widgets/Slider.h` / `Slider.cpp` - Cache partiel + couleurs
+- `Source/GUI/Widgets/ComboBox.h` / `ComboBox.cpp` - Cache partiel + couleurs
+- `Source/GUI/Widgets/Button.h` / `Button.cpp` - Cache multiple (4 états)
+
 ---
 
-**Dernière mise à jour** : 30 janvier 2026  
-**Statut** : Phase 1 terminée ✅ | Phase 2 terminée ✅ | Phase 3 prête à démarrer
+## Profiling Post-Optimisation
+
+### À Effectuer
+
+Pour valider les gains de performance réels :
+
+1. **Rebuild en RelWithDebInfo** avec les optimisations
+2. **Lancer Instruments** avec Time Profiler
+3. **Reproduire le même scénario** : 10 changements de thème BLACK ↔ CREAM
+4. **Comparer les métriques** :
+   - Temps total pour 10 changements
+   - Pourcentage CPU de `tss::Label::paint()`, `tss::Slider::paint()`, etc.
+   - Vérifier que les fonctions `regenerateCache()` ne prennent pas trop de temps
+5. **Documenter les résultats** dans ce fichier
+
+### Résultats Attendus
+
+- **Label** : 33.6% → ~2% (gain ~15x)
+- **Slider** : 21.6% → ~3% (gain ~7x)
+- **ComboBox** : 17.2% → ~2% (gain ~8x)
+- **Button** : 16.6% → ~1.5% (gain ~10x)
+
+**Temps total** : 28.26 s → **~2-3 s** (gain ~10x)
+
+---
+
