@@ -1,5 +1,7 @@
 # Matrix-Control
 
+![Matrix-Control GUI](https://raw.githubusercontent.com/tensquaresoftware/Matrix-Control/main/Assets/GUI-WIP-2026-01-02.png)
+
 [![Status: Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-FFA500?style=for-the-badge)](https://github.com/tensquaresoftware/Matrix-Control)
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/Matrix-Control)
 [![Framework: JUCE 8](https://img.shields.io/badge/Framework-JUCE%208-5765A4?style=for-the-badge)](https://juce.com)
