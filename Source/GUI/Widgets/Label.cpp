@@ -58,13 +58,9 @@ namespace tss
         if (width <= 0 || height <= 0)
             return;
 
-        const float pixelScale = getPixelScale();
-        const int imageWidth = static_cast<int>(width * pixelScale);
-        const int imageHeight = static_cast<int>(height * pixelScale);
-
-        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
+        // Create image at component size - JUCE handles HiDPI automatically
+        cachedImage_ = juce::Image(juce::Image::ARGB, width, height, true);
         juce::Graphics g(cachedImage_);
-        g.addTransform(juce::AffineTransform::scale(pixelScale));
 
         auto textBounds = juce::Rectangle<float>(0.0f, 0.0f, 
                                                    static_cast<float>(width), 
