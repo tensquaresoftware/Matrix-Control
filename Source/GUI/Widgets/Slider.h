@@ -18,6 +18,7 @@ namespace tss
         juce::String getUnit() const;
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
 
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
@@ -46,6 +47,23 @@ namespace tss
         juce::Point<int> dragStartPosition_;
         juce::String unit_;
         bool hasFocus_ = false;
+
+        // Image cache
+        juce::Image cachedImage_;
+        bool cacheValid_ = false;
+        double cachedValue_ = 0.0;
+
+        // Theme cache
+        juce::Colour cachedTrackColour_;
+        juce::Colour cachedValueBarColour_;
+        juce::Colour cachedTextColour_;
+        juce::Colour cachedFocusBorderColour_;
+        juce::Font cachedFont_;
+
+        void regenerateCache();
+        void invalidateCache();
+        void updateThemeCache();
+        float getPixelScale() const;
 
         void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
