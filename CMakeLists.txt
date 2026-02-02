@@ -61,6 +61,11 @@ set(PLUGIN_SOURCES
     
     # GUI - Themes
     Source/GUI/Themes/Theme.cpp
+    Source/GUI/Themes/Skin.cpp
+    
+    # GUI - OpenGL
+    Source/GUI/OpenGL/OpenGlComponent.cpp
+    Source/GUI/OpenGL/OpenGlImageComponent.cpp
     
     # GUI - Main Component
     Source/GUI/MainComponent.cpp
@@ -177,6 +182,7 @@ target_link_libraries(Matrix-Control
         juce::juce_audio_utils
         juce::juce_dsp
         juce::juce_gui_basics
+        juce::juce_opengl
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
