@@ -184,7 +184,7 @@ Press `F5` in Cursor to start debugging.
 
 ## About the author
 
-Guillaume DuPont — instructional designer, synthesizer enthusiast, and occasional developer. Based in Montpellier, France.
+Guillaume DUPONT — instructional designer, synthesizer enthusiast, and occasional developer. Based in Montpellier, France.
 
 - [Matrix-1000 Editor (Max for Live)](https://www.maxforlive.com/library/device/6806/matrix-1000-editor)
 - [Matrix-1000 Editor Presentation at Montpellier Ableton User Group / FASTLANE (YouTube)](https://www.youtube.com/watch?v=DLOBp0x1ykY)
