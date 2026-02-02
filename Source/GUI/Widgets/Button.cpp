@@ -36,8 +36,7 @@ namespace tss
 
         if (it != cachedImages_.end() && it->second.isValid())
         {
-            g.drawImage(it->second, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::fillDestination);
+            g.drawImageAt(it->second, 0, 0);
         }
     }
 
@@ -54,18 +53,13 @@ namespace tss
         if (width <= 0 || height <= 0)
             return;
 
-        const float pixelScale = getPixelScale();
-        const int imageWidth = juce::roundToInt(width * pixelScale);
-        const int imageHeight = juce::roundToInt(height * pixelScale);
-
-        // Pre-render all button states
+        // Pre-render all button states at logical size (JUCE handles HiDPI automatically)
         cachedImages_.clear();
 
         for (auto state : {ButtonState::Normal, ButtonState::Hover, ButtonState::Pressed, ButtonState::Disabled})
         {
-            juce::Image stateImage(juce::Image::ARGB, imageWidth, imageHeight, true);
+            juce::Image stateImage(juce::Image::ARGB, width, height, true);
             juce::Graphics g(stateImage);
-            g.addTransform(juce::AffineTransform::scale(pixelScale));
 
             renderButtonState(g, state);
 
