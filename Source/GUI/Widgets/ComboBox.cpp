@@ -17,12 +17,16 @@ namespace tss
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
+        updateThemeCache();
     }
 
     void ComboBox::setTheme(Theme& theme)
     {
         theme_ = &theme;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
+        updateThemeCache();
+        invalidateCache();
+        repaint();
     }
 
     void ComboBox::paint(juce::Graphics& g)
@@ -30,7 +34,49 @@ namespace tss
         if (theme_ == nullptr)
             return;
 
-        const auto bounds = getLocalBounds().toFloat();
+        // Invalidate cache if selection changed
+        const auto currentIndex = getSelectedItemIndex();
+        
+        if (currentIndex != cachedSelectedIndex_ || !cacheValid_)
+            invalidateCache();
+
+        if (!cacheValid_)
+            regenerateCache();
+
+        if (cachedImage_.isValid())
+        {
+            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
+                       juce::RectanglePlacement::stretchToFit);
+        }
+    }
+
+    void ComboBox::resized()
+    {
+        invalidateCache();
+    }
+
+    void ComboBox::regenerateCache()
+    {
+        const auto width = getWidth();
+        const auto height = getHeight();
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        const float pixelScale = getPixelScale();
+        const int imageWidth = juce::roundToInt(width * pixelScale);
+        const int imageHeight = juce::roundToInt(height * pixelScale);
+
+        // Create HiDPI image at physical resolution
+        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
+        juce::Graphics g(cachedImage_);
+        
+        // Scale graphics context to match physical resolution
+        g.addTransform(juce::AffineTransform::scale(pixelScale));
+
+        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
+                                                    static_cast<float>(width), 
+                                                    static_cast<float>(height));
         const auto enabled = isEnabled();
         const auto hasFocus = hasFocus_ || isPopupOpen_;
         const auto backgroundBounds = calculateBackgroundBounds(bounds);
@@ -39,34 +85,61 @@ namespace tss
         drawText(g, bounds, enabled);
         drawTriangle(g, bounds, enabled);
         drawBorderIfNeeded(g, bounds, backgroundBounds, enabled, hasFocus);
+
+        cachedSelectedIndex_ = getSelectedItemIndex();
+        cacheValid_ = true;
+    }
+
+    void ComboBox::invalidateCache()
+    {
+        cacheValid_ = false;
+    }
+
+    void ComboBox::updateThemeCache()
+    {
+        if (theme_ == nullptr)
+            return;
+
+        const bool enabled = isEnabled();
+        const bool isButtonLike = (style_ == Style::ButtonLike);
+        
+        cachedBackgroundColour_ = theme_->getComboBoxBackgroundColour(enabled, isButtonLike);
+        cachedTextColour_ = theme_->getComboBoxTextColour(enabled, isButtonLike);
+        cachedBorderColour_ = theme_->getComboBoxBorderColour(enabled, isButtonLike);
+        cachedFocusBorderColour_ = theme_->getComboBoxFocusBorderColour(isButtonLike);
+        cachedFont_ = theme_->getBaseFont();
+    }
+
+    float ComboBox::getPixelScale() const
+    {
+        const auto* display = juce::Desktop::getInstance()
+                                  .getDisplays()
+                                  .getDisplayForRect(getScreenBounds());
+        const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
+        return displayScale;
     }
 
 
-    void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+    void ComboBox::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
     {
-        const auto isButtonLike = (style_ == Style::ButtonLike);
-        const auto backgroundColour = theme_->getComboBoxBackgroundColour(enabled, isButtonLike);
-        
-        g.setColour(backgroundColour);
+        g.setColour(cachedBackgroundColour_);
         g.fillRect(bounds);
     }
 
-    void ComboBox::drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool enabled, bool hasFocus)
+    void ComboBox::drawBorderIfNeeded(juce::Graphics& g, const juce::Rectangle<float>& bounds, const juce::Rectangle<float>& backgroundBounds, bool /*enabled*/, bool hasFocus)
     {
         const auto isButtonLike = (style_ == Style::ButtonLike);
         
         if (isButtonLike)
         {
-            const auto borderColour = theme_->getComboBoxBorderColour(enabled, isButtonLike);
-            g.setColour(borderColour);
+            g.setColour(cachedBorderColour_);
             g.drawRect(bounds, static_cast<float>(kBorderThicknessButtonLike_));
             return;
         }
 
         if (hasFocus)
         {
-            const auto focusBorderColour = theme_->getComboBoxFocusBorderColour(isButtonLike);
-            g.setColour(focusBorderColour);
+            g.setColour(cachedFocusBorderColour_);
             g.drawRect(backgroundBounds, static_cast<float>(kBorderThickness_));
         }
     }
@@ -89,10 +162,9 @@ namespace tss
         return juce::String();
     }
 
-    juce::Colour ComboBox::getTextColourForCurrentStyle(bool enabled) const
+    juce::Colour ComboBox::getTextColourForCurrentStyle(bool /*enabled*/) const
     {
-        const auto isButtonLike = (style_ == Style::ButtonLike);
-        return theme_->getComboBoxTextColour(enabled, isButtonLike);
+        return cachedTextColour_;
     }
 
     juce::Rectangle<float> ComboBox::calculateTextBounds(const juce::Rectangle<float>& bounds) const
@@ -106,9 +178,8 @@ namespace tss
 
     void ComboBox::drawTextInBounds(juce::Graphics& g, const juce::String& text, const juce::Rectangle<float>& textBounds, const juce::Colour& textColour) const
     {
-        const auto font = theme_->getBaseFont();
         g.setColour(textColour);
-        g.setFont(font);
+        g.setFont(cachedFont_);
         g.drawText(text, textBounds, juce::Justification::centredLeft, false);
     }
 
@@ -205,6 +276,7 @@ namespace tss
         if (isEnabled() && !hasFocus_)
         {
             hasFocus_ = true;
+            invalidateCache();
             repaint();
         }
     }
@@ -212,6 +284,7 @@ namespace tss
     void ComboBox::focusLost(juce::Component::FocusChangeType)
     {
         hasFocus_ = false;
+        invalidateCache();
         repaint();
     }
 }

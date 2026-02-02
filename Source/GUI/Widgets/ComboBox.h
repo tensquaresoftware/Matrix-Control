@@ -28,6 +28,7 @@ namespace tss
         void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
         void showPopup() override;
 
         void mouseDown(const juce::MouseEvent& e) override;
@@ -55,6 +56,23 @@ namespace tss
         Style style_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
+
+        // Image cache
+        juce::Image cachedImage_;
+        bool cacheValid_ = false;
+        int cachedSelectedIndex_ = -1;
+
+        // Theme cache
+        juce::Colour cachedBackgroundColour_;
+        juce::Colour cachedTextColour_;
+        juce::Colour cachedBorderColour_;
+        juce::Colour cachedFocusBorderColour_;
+        juce::Font cachedFont_;
+
+        void regenerateCache();
+        void invalidateCache();
+        void updateThemeCache();
+        float getPixelScale() const;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);
