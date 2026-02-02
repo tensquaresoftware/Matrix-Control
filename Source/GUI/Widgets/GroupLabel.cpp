@@ -12,11 +12,16 @@ namespace tss
     {
         setOpaque(false);
         setSize(width_, height_);
+        updateThemeCache();
+        calculateTextWidth();
     }
 
     void GroupLabel::setTheme(Theme& theme)
     {
         theme_ = &theme;
+        updateThemeCache();
+        invalidateCache();
+        repaint();
     }
 
     void GroupLabel::setText(const juce::String& text)
@@ -24,6 +29,8 @@ namespace tss
         if (labelText_ != text)
         {
             labelText_ = text;
+            calculateTextWidth();
+            invalidateCache();
             repaint();
         }
     }
@@ -33,17 +40,69 @@ namespace tss
         if (theme_ == nullptr || labelText_.isEmpty())
             return;
 
-        const auto contentArea = calculateContentArea();
-        const auto textWidth = calculateTextWidth();
+        if (!cacheValid_)
+            regenerateCache();
 
+        if (cachedImage_.isValid())
+            g.drawImageAt(cachedImage_, 0, 0);
+    }
+
+    void GroupLabel::resized()
+    {
+        invalidateCache();
+    }
+
+    void GroupLabel::regenerateCache()
+    {
+        const auto width = getWidth();
+        const auto height = getHeight();
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        const float pixelScale = getPixelScale();
+        const int imageWidth = static_cast<int>(width * pixelScale);
+        const int imageHeight = static_cast<int>(height * pixelScale);
+
+        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
+        juce::Graphics g(cachedImage_);
+        g.addTransform(juce::AffineTransform::scale(pixelScale));
+
+        const auto contentArea = calculateContentArea();
         drawText(g, contentArea);
-        drawLines(g, contentArea, textWidth);
+        drawLines(g, contentArea, cachedTextWidth_);
+
+        cacheValid_ = true;
+    }
+
+    void GroupLabel::invalidateCache()
+    {
+        cacheValid_ = false;
+    }
+
+    void GroupLabel::updateThemeCache()
+    {
+        if (theme_ == nullptr)
+            return;
+
+        cachedTextColour_ = theme_->getGroupLabelTextColour();
+        cachedLineColour_ = theme_->getGroupLabelLineColour();
+        cachedFont_ = theme_->getBaseFont();
+    }
+
+    float GroupLabel::getPixelScale() const
+    {
+        const auto* display = juce::Desktop::getInstance()
+                                  .getDisplays()
+                                  .getDisplayForRect(getScreenBounds());
+
+        return display != nullptr ? static_cast<float>(display->scale) : 1.0f;
     }
 
     void GroupLabel::drawText(juce::Graphics& g, const juce::Rectangle<float>& area)
     {
-        g.setColour(theme_->getGroupLabelTextColour());
-        g.setFont(theme_->getBaseFont());
+        g.setColour(cachedTextColour_);
+        g.setFont(cachedFont_);
         g.drawText(labelText_, area, juce::Justification::centred, false);
     }
 
@@ -53,7 +112,7 @@ namespace tss
         const auto centreX = area.getCentreX();
         const auto centreY = area.getCentreY();
 
-        g.setColour(theme_->getGroupLabelLineColour());
+        g.setColour(cachedLineColour_);
 
         drawLeftLine(g, area, centreX, halfTextWidth, centreY);
         drawRightLine(g, area, centreX, halfTextWidth, centreY);
@@ -103,18 +162,18 @@ namespace tss
         return area;
     }
 
-    float GroupLabel::calculateTextWidth() const
+    void GroupLabel::calculateTextWidth()
     {
         if (labelText_.isEmpty() || theme_ == nullptr)
         {
-            return 0.0f;
+            cachedTextWidth_ = 0.0f;
+            return;
         }
 
-        const auto font = theme_->getBaseFont();
         juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(font, labelText_, 0.0f, 0.0f);
+        glyphArrangement.addLineOfText(cachedFont_, labelText_, 0.0f, 0.0f);
         const auto bounds = glyphArrangement.getBoundingBox(0, -1, true);
-        return bounds.getWidth();
+        cachedTextWidth_ = bounds.getWidth();
     }
 }
 
