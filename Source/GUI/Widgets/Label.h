@@ -18,6 +18,7 @@ namespace tss
         juce::String getText() const { return labelText_; }
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
 
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
@@ -29,6 +30,17 @@ namespace tss
         int width_;
         int height_;
         juce::String labelText_;
+        
+        // Cache optimization
+        juce::Image cachedImage_;
+        bool cacheValid_ {false};
+        juce::Colour cachedTextColour_;
+        juce::Font cachedFont_;
+        
+        void regenerateCache();
+        void invalidateCache();
+        void updateThemeCache();
+        float getPixelScale() const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)
     };
