@@ -24,6 +24,7 @@ namespace tss
         juce::String getText() const { return text_; }
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
 
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
@@ -39,6 +40,20 @@ namespace tss
         Theme* theme_ = nullptr;
         juce::String text_;
         ColourVariant colourVariant_;
+
+        // Image cache
+        juce::Image cachedImage_;
+        bool cacheValid_ = false;
+
+        // Theme cache
+        juce::Colour cachedTextColour_;
+        juce::Colour cachedLineColour_;
+        juce::Font cachedFont_;
+
+        void regenerateCache();
+        void invalidateCache();
+        void updateThemeCache();
+        float getPixelScale() const;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

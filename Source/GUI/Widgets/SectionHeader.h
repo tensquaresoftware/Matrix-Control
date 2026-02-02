@@ -21,6 +21,7 @@ namespace tss
         void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
 
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
@@ -38,13 +39,28 @@ namespace tss
         juce::String text_;
         ColourVariant colourVariant_;
 
+        // Image cache
+        juce::Image cachedImage_;
+        bool cacheValid_ = false;
+
+        // Theme cache
+        juce::Colour cachedTextColour_;
+        juce::Colour cachedLineColour_;
+        juce::Font cachedFont_;
+        float cachedTextWidth_ = 0.0f;
+
+        void regenerateCache();
+        void invalidateCache();
+        void updateThemeCache();
+        float getPixelScale() const;
+
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawLines(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& contentArea);
         
         juce::Colour getLineColour() const;
-        float calculateTextWidth() const;
+        void calculateTextWidth();
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SectionHeader)
     };

@@ -13,11 +13,15 @@ namespace tss
     {
         setOpaque(false);
         setSize(width_, height_);
+        updateThemeCache();
     }
 
     void ModuleHeader::setTheme(Theme& theme)
     {
         theme_ = &theme;
+        updateThemeCache();
+        invalidateCache();
+        repaint();
     }
 
     void ModuleHeader::setText(const juce::String& text)
@@ -25,19 +29,82 @@ namespace tss
         if (text_ != text)
         {
             text_ = text;
+            invalidateCache();
             repaint();
         }
     }
 
     void ModuleHeader::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (theme_ == nullptr || text_.isEmpty())
             return;
 
-        const auto bounds = getLocalBounds().toFloat();
+        if (!cacheValid_)
+            regenerateCache();
+
+        if (cachedImage_.isValid())
+        {
+            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
+                       juce::RectanglePlacement::stretchToFit);
+        }
+    }
+
+    void ModuleHeader::resized()
+    {
+        invalidateCache();
+    }
+
+    void ModuleHeader::regenerateCache()
+    {
+        const auto width = getWidth();
+        const auto height = getHeight();
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        const float pixelScale = getPixelScale();
+        const int imageWidth = juce::roundToInt(width * pixelScale);
+        const int imageHeight = juce::roundToInt(height * pixelScale);
+
+        // Create HiDPI image at physical resolution
+        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
+        juce::Graphics g(cachedImage_);
+        
+        // Scale graphics context to match physical resolution
+        g.addTransform(juce::AffineTransform::scale(pixelScale));
+
+        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
+                                                    static_cast<float>(width), 
+                                                    static_cast<float>(height));
 
         drawText(g, bounds);
         drawLine(g, bounds);
+
+        cacheValid_ = true;
+    }
+
+    void ModuleHeader::invalidateCache()
+    {
+        cacheValid_ = false;
+    }
+
+    void ModuleHeader::updateThemeCache()
+    {
+        if (theme_ == nullptr)
+            return;
+
+        cachedTextColour_ = theme_->getModuleHeaderTextColour();
+        cachedLineColour_ = getLineColour();
+        cachedFont_ = theme_->getBaseFont().withHeight(kTextFontHeight_).boldened();
+    }
+
+    float ModuleHeader::getPixelScale() const
+    {
+        const auto* display = juce::Desktop::getInstance()
+                                  .getDisplays()
+                                  .getDisplayForRect(getScreenBounds());
+        const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
+        return displayScale;
     }
 
     void ModuleHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
@@ -45,14 +112,12 @@ namespace tss
         if (text_.isEmpty())
             return;
 
-        const auto font = theme_->getBaseFont().withHeight(kTextFontHeight_).boldened();
-
         auto textBounds = bounds;
         textBounds.setHeight(kTextAreaHeight_);
         textBounds.removeFromLeft(kTextLeftPadding_);
 
-        g.setColour(theme_->getModuleHeaderTextColour());
-        g.setFont(font);
+        g.setColour(cachedTextColour_);
+        g.setFont(cachedFont_);
         g.drawText(text_, textBounds, juce::Justification::centredLeft, false);
     }
 
@@ -65,7 +130,7 @@ namespace tss
         lineBounds.setHeight(kLineThickness_);
         lineBounds.translate(0.0f, verticalOffset);
 
-        g.setColour(getLineColour());
+        g.setColour(cachedLineColour_);
         g.fillRect(lineBounds);
     }
 
