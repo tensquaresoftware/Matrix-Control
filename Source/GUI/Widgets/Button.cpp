@@ -36,8 +36,16 @@ namespace tss
 
         if (it != cachedImages_.end() && it->second.isValid())
         {
-            g.drawImage(it->second, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
+            const auto bounds = getLocalBounds();
+            const float pixelScale = getPixelScale();
+            
+            // Draw the HiDPI image scaled down to logical size
+            // Use drawImageWithin to avoid any stretching artifacts
+            g.drawImageWithin(it->second, 
+                            bounds.getX(), bounds.getY(), 
+                            bounds.getWidth(), bounds.getHeight(),
+                            juce::RectanglePlacement::stretchToFit,
+                            false); // No resampling quality needed
         }
     }
 
@@ -63,7 +71,7 @@ namespace tss
 
         for (auto state : {ButtonState::Normal, ButtonState::Hover, ButtonState::Pressed, ButtonState::Disabled})
         {
-            // Create HiDPI image at physical resolution
+            // Create HiDPI image at physical resolution with clear background
             juce::Image stateImage(juce::Image::ARGB, imageWidth, imageHeight, true);
             juce::Graphics g(stateImage);
             
