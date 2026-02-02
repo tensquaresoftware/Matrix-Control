@@ -42,7 +42,10 @@ namespace tss
             regenerateCache();
 
         if (cachedImage_.isValid())
-            g.drawImageAt(cachedImage_, 0, 0);
+        {
+            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
+                       juce::RectanglePlacement::stretchToFit);
+        }
     }
 
     void Label::resized()
@@ -58,9 +61,16 @@ namespace tss
         if (width <= 0 || height <= 0)
             return;
 
-        // Create image at component size - JUCE handles HiDPI automatically
-        cachedImage_ = juce::Image(juce::Image::ARGB, width, height, true);
+        const float pixelScale = getPixelScale();
+        const int imageWidth = juce::roundToInt(width * pixelScale);
+        const int imageHeight = juce::roundToInt(height * pixelScale);
+
+        // Create HiDPI image at physical resolution
+        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
         juce::Graphics g(cachedImage_);
+        
+        // Scale graphics context to match physical resolution
+        g.addTransform(juce::AffineTransform::scale(pixelScale));
 
         auto textBounds = juce::Rectangle<float>(0.0f, 0.0f, 
                                                    static_cast<float>(width), 
