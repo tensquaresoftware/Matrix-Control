@@ -37,7 +37,7 @@ namespace tss
         if (it != cachedImages_.end() && it->second.isValid())
         {
             g.drawImage(it->second, getLocalBounds().toFloat(),
-                       juce::RectanglePlacement::stretchToFit);
+                       juce::RectanglePlacement::fillDestination);
         }
     }
 
