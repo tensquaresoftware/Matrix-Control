@@ -15,32 +15,83 @@ namespace tss
     {
         setOpaque(false);
         setSize(width, height);
+        cachedTextColour_ = theme_->getModuleHeaderTextColour();
+        cachedLineColour_ = getLineColour();
+        cachedFont_ = theme_->getBaseFont().withHeight(16.0f).boldened();
     }
 
     void ModulationBusHeader::setTheme(Theme& theme)
     {
         theme_ = &theme;
+        cachedTextColour_ = theme_->getModuleHeaderTextColour();
+        cachedLineColour_ = getLineColour();
+        cachedFont_ = theme_->getBaseFont().withHeight(16.0f).boldened();
+        invalidateCache();
+        repaint();
     }
 
     void ModulationBusHeader::paint(juce::Graphics& g)
     {
         if (theme_ == nullptr)
-        {
             return;
-        }
 
-        auto bounds = getLocalBounds().toFloat();
+        if (!cacheValid_)
+            regenerateCache();
+
+        if (cachedImage_.isValid())
+        {
+            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
+                       juce::RectanglePlacement::stretchToFit);
+        }
+    }
+
+    void ModulationBusHeader::resized()
+    {
+        invalidateCache();
+    }
+
+    void ModulationBusHeader::regenerateCache()
+    {
+        const auto width = getWidth();
+        const auto height = getHeight();
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        const float pixelScale = getPixelScale();
+        const int imageWidth = juce::roundToInt(width * pixelScale);
+        const int imageHeight = juce::roundToInt(height * pixelScale);
+
+        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
+        juce::Graphics g(cachedImage_);
+        g.addTransform(juce::AffineTransform::scale(pixelScale));
+
+        auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
+                                              static_cast<float>(width), 
+                                              static_cast<float>(height));
 
         drawText(g, bounds);
         drawLine(g, bounds);
+
+        cacheValid_ = true;
+    }
+
+    void ModulationBusHeader::invalidateCache()
+    {
+        cacheValid_ = false;
+    }
+
+    float ModulationBusHeader::getPixelScale() const
+    {
+        const auto* display = juce::Desktop::getInstance()
+                                  .getDisplays()
+                                  .getDisplayForRect(getScreenBounds());
+        return display != nullptr ? static_cast<float>(display->scale) : 1.0f;
     }
 
 
     void ModulationBusHeader::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto textColour = theme_->getModuleHeaderTextColour();
-        auto font = theme_->getBaseFont().withHeight(16.0f).boldened();
-
         auto textArea = bounds;
         textArea.setHeight(kTextAreaHeight_);
         textArea.removeFromLeft(kTextLeftPadding_);
@@ -48,8 +99,8 @@ namespace tss
         auto x = textArea.getX();
         auto y = textArea.getY();
 
-        g.setColour(textColour);
-        g.setFont(font);
+        g.setColour(cachedTextColour_);
+        g.setFont(cachedFont_);
 
         drawBusNumberText(g, x, y);
         x += kBusNumberTextWidth_;
@@ -89,8 +140,6 @@ namespace tss
 
     void ModulationBusHeader::drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        auto lineColour = getLineColour();
-        
         auto lineThickness = kLineThickness_;
         auto lineAreaHeight = bounds.getHeight() - kTextAreaHeight_;
         auto verticalOffset = kTextAreaHeight_ + (lineAreaHeight - lineThickness) / 2.0f;
@@ -99,7 +148,7 @@ namespace tss
         lineBounds.setHeight(lineThickness);
         lineBounds.translate(0.0f, verticalOffset);
 
-        g.setColour(lineColour);
+        g.setColour(cachedLineColour_);
         g.fillRect(lineBounds);
     }
 

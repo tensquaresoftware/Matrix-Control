@@ -21,6 +21,7 @@ namespace tss
         void setTheme(Theme& theme);
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
 
     private:
         inline constexpr static int kBusNumberTextWidth_ = 15;
@@ -38,6 +39,17 @@ namespace tss
         juce::String busAmountText_;
         juce::String busDestinationText_;
         ColourVariant colourVariant_;
+
+        // Image cache
+        juce::Image cachedImage_;
+        bool cacheValid_ = false;
+        juce::Colour cachedTextColour_;
+        juce::Colour cachedLineColour_;
+        juce::Font cachedFont_;
+
+        void regenerateCache();
+        void invalidateCache();
+        float getPixelScale() const;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
