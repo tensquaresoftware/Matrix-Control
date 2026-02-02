@@ -12,11 +12,16 @@ namespace tss
     {
         setOpaque(true);
         setSize(width, kHeight_);
+        updateThemeCache();
+        updateTextWidthCache();
     }
 
     void NumberBox::setTheme(Theme& theme)
     {
         theme_ = &theme;
+        updateThemeCache();
+        invalidateCache();
+        repaint();
     }
 
     void NumberBox::setValue(int newValue)
@@ -24,6 +29,8 @@ namespace tss
         if (currentValue_ != newValue)
         {
             currentValue_ = newValue;
+            updateTextWidthCache();
+            invalidateCache();
             repaint();
         }
     }
@@ -33,6 +40,7 @@ namespace tss
         if (showDot_ != show)
         {
             showDot_ = show;
+            invalidateCache();
             repaint();
         }
     }
@@ -42,27 +50,104 @@ namespace tss
         if (theme_ == nullptr)
             return;
 
-        const auto bounds = getLocalBounds().toFloat();
-        const auto text = juce::String(currentValue_);
+        if (!cacheValid_)
+            regenerateCache();
 
-        g.setColour(theme_->getButtonBackgroundColourOn());
+        if (cachedImage_.isValid())
+        {
+            g.drawImage(cachedImage_, getLocalBounds().toFloat(),
+                       juce::RectanglePlacement::stretchToFit);
+        }
+    }
+
+    void NumberBox::resized()
+    {
+        invalidateCache();
+    }
+
+    void NumberBox::regenerateCache()
+    {
+        const auto width = getWidth();
+        const auto height = getHeight();
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        const float pixelScale = getPixelScale();
+        const int imageWidth = juce::roundToInt(width * pixelScale);
+        const int imageHeight = juce::roundToInt(height * pixelScale);
+
+        // Create HiDPI image at physical resolution
+        cachedImage_ = juce::Image(juce::Image::ARGB, imageWidth, imageHeight, true);
+        juce::Graphics g(cachedImage_);
+        
+        // Scale graphics context to match physical resolution
+        g.addTransform(juce::AffineTransform::scale(pixelScale));
+
+        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
+                                                    static_cast<float>(width), 
+                                                    static_cast<float>(height));
+
+        g.setColour(cachedBackgroundColour_);
         g.fillRect(bounds);
 
-        g.setColour(getBorderColour());
+        g.setColour(cachedBorderColour_);
         g.drawRect(bounds, kBorderThickness_);
 
-        g.setColour(theme_->getNumberBoxTextColour());
-        g.setFont(theme_->getBaseFont());
-        g.drawText(text, bounds, juce::Justification::centred, false);
+        g.setColour(cachedTextColour_);
+        g.setFont(cachedFont_);
+        g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
 
         if (showDot_)
         {
-            const auto textWidth = calculateTextWidth(text);
-            const auto dotPosition = calculateDotPosition(bounds, textWidth);
+            const auto dotPosition = calculateDotPosition(bounds, cachedTextWidth_);
 
-            g.setColour(theme_->getNumberBoxDotColour());
+            g.setColour(cachedDotColour_);
             g.fillEllipse(dotPosition.x, dotPosition.y, kDotRadius_ * 2.0f, kDotRadius_ * 2.0f);
         }
+
+        cacheValid_ = true;
+    }
+
+    void NumberBox::invalidateCache()
+    {
+        cacheValid_ = false;
+    }
+
+    void NumberBox::updateThemeCache()
+    {
+        if (theme_ == nullptr)
+            return;
+
+        cachedBackgroundColour_ = theme_->getButtonBackgroundColourOn();
+        cachedBorderColour_ = getBorderColour();
+        cachedTextColour_ = theme_->getNumberBoxTextColour();
+        cachedDotColour_ = theme_->getNumberBoxDotColour();
+        cachedFont_ = theme_->getBaseFont();
+    }
+
+    void NumberBox::updateTextWidthCache()
+    {
+        cachedValueText_ = juce::String(currentValue_);
+        
+        if (theme_ == nullptr)
+        {
+            cachedTextWidth_ = 0.0f;
+            return;
+        }
+
+        juce::GlyphArrangement glyphArrangement;
+        glyphArrangement.addLineOfText(cachedFont_, cachedValueText_, 0.0f, 0.0f);
+        cachedTextWidth_ = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
+    }
+
+    float NumberBox::getPixelScale() const
+    {
+        const auto* display = juce::Desktop::getInstance()
+                                  .getDisplays()
+                                  .getDisplayForRect(getScreenBounds());
+        const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
+        return displayScale;
     }
 
     void NumberBox::mouseDoubleClick(const juce::MouseEvent&)
@@ -81,19 +166,10 @@ namespace tss
         return theme_->getButtonBorderColourOn();
     }
 
-    float NumberBox::calculateTextWidth(const juce::String& text) const
-    {
-        const auto font = theme_->getBaseFont();
-        juce::GlyphArrangement glyphArrangement;
-        glyphArrangement.addLineOfText(font, text, 0.0f, 0.0f);
-        return glyphArrangement.getBoundingBox(0, -1, true).getWidth();
-    }
-
     juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
     {
-        const auto font = theme_->getBaseFont();
         const auto textRight = bounds.getCentreX() + textWidth * 0.5f;
-        const auto baselineY = bounds.getCentreY() + font.getHeight() * 0.5f - font.getDescent();
+        const auto baselineY = bounds.getCentreY() + cachedFont_.getHeight() * 0.5f - cachedFont_.getDescent();
 
         return { textRight + kDotXOffset_, baselineY - kDotRadius_ };
     }

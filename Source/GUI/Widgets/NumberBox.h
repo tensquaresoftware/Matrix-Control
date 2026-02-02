@@ -21,6 +21,7 @@ namespace tss
         bool getShowDot() const { return showDot_; }
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
 
         static constexpr int getHeight() { return kHeight_; }
@@ -38,8 +39,28 @@ namespace tss
         bool showDot_ = false;
         std::unique_ptr<juce::TextEditor> editor_;
 
+        // Image cache
+        juce::Image cachedImage_;
+        bool cacheValid_ = false;
+
+        // Theme cache
+        juce::Colour cachedBackgroundColour_;
+        juce::Colour cachedBorderColour_;
+        juce::Colour cachedTextColour_;
+        juce::Colour cachedDotColour_;
+        juce::Font cachedFont_;
+        
+        // Cached text width (expensive GlyphArrangement)
+        float cachedTextWidth_ = 0.0f;
+        juce::String cachedValueText_;
+
+        void regenerateCache();
+        void invalidateCache();
+        void updateThemeCache();
+        void updateTextWidthCache();
+        float getPixelScale() const;
+
         juce::Colour getBorderColour() const;
-        float calculateTextWidth(const juce::String& text) const;
         juce::Point<float> calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const;
         
         void showEditor();
