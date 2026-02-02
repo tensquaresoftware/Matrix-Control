@@ -1,22 +1,38 @@
 #include "HeaderPanel.h"
 
-#include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Themes/Theme.h"
-#include "Shared/PluginDimensions.h"
 
 using tss::Theme;
 
 HeaderPanel::HeaderPanel(Theme& theme)
     : theme_(&theme)
-    , blackThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "BLACK")
-    , creamThemeButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "CREAM")
-    , someDisabledButton_(theme, PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme, PluginDimensions::Widgets::Heights::kButton, "DISABLED")
+    , skinLabel_(theme, kLabelWidth_, kControlHeight_, "SKIN:")
+    , skinComboBox_(theme, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
+    , zoomLabel_(theme, kLabelWidth_, kControlHeight_, "ZOOM:")
+    , zoomComboBox_(theme, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
 {
     setOpaque(true);
-    addAndMakeVisible(blackThemeButton_);
-    addAndMakeVisible(creamThemeButton_);
-    someDisabledButton_.setEnabled(false);
-    addAndMakeVisible(someDisabledButton_);
+    
+    addAndMakeVisible(skinLabel_);
+    
+    skinComboBox_.addItem("Black", 1);
+    skinComboBox_.addItem("Cream", 2);
+    skinComboBox_.setSelectedId(1, juce::dontSendNotification);
+    addAndMakeVisible(skinComboBox_);
+    
+    addAndMakeVisible(zoomLabel_);
+    
+    zoomComboBox_.addItem("50%", 1);
+    zoomComboBox_.addItem("75%", 2);
+    zoomComboBox_.addItem("90%", 3);
+    zoomComboBox_.addItem("100%", 4);
+    zoomComboBox_.addItem("125%", 5);
+    zoomComboBox_.addItem("150%", 6);
+    zoomComboBox_.addItem("200%", 7);
+    zoomComboBox_.setSelectedId(4, juce::dontSendNotification);
+    addAndMakeVisible(zoomComboBox_);
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -27,41 +43,49 @@ void HeaderPanel::paint(juce::Graphics& g)
 void HeaderPanel::resized()
 {
     const auto bounds = getLocalBounds();
-    const auto buttonSpacing = getButtonSpacing();
-    const auto buttonWidth = PluginDimensions::Widgets::Widths::Button::kHeaderPanelTheme;
-    const auto buttonHeight = PluginDimensions::Widgets::Heights::kButton;
-    const auto buttonY = (getHeight() - buttonHeight) / 2;
+    const auto spacing = getSpacing();
+    const auto controlY = (getHeight() - kControlHeight_) / 2;
     
-    const auto blackThemeButtonX = buttonSpacing;
-    blackThemeButton_.setBounds(
-        bounds.getX() + blackThemeButtonX,
-        bounds.getY() + buttonY,
-        buttonWidth,
-        buttonHeight
+    int currentX = spacing;
+    
+    skinLabel_.setBounds(
+        bounds.getX() + currentX,
+        bounds.getY() + controlY,
+        kLabelWidth_,
+        kControlHeight_
     );
+    currentX += kLabelWidth_ + spacing;
     
-    const auto creamThemeButtonX = blackThemeButtonX + buttonWidth + buttonSpacing;
-    creamThemeButton_.setBounds(
-        bounds.getX() + creamThemeButtonX,
-        bounds.getY() + buttonY,
-        buttonWidth,
-        buttonHeight
+    skinComboBox_.setBounds(
+        bounds.getX() + currentX,
+        bounds.getY() + controlY,
+        kComboBoxWidth_,
+        kControlHeight_
     );
+    currentX += kComboBoxWidth_ + spacing * 2;
     
-    const auto someDisabledButtonX = creamThemeButtonX + buttonWidth + buttonSpacing;
-    someDisabledButton_.setBounds(
-        bounds.getX() + someDisabledButtonX,
-        bounds.getY() + buttonY,
-        buttonWidth,
-        buttonHeight
+    zoomLabel_.setBounds(
+        bounds.getX() + currentX,
+        bounds.getY() + controlY,
+        kLabelWidth_,
+        kControlHeight_
+    );
+    currentX += kLabelWidth_ + spacing;
+    
+    zoomComboBox_.setBounds(
+        bounds.getX() + currentX,
+        bounds.getY() + controlY,
+        kComboBoxWidth_,
+        kControlHeight_
     );
 }
 
 void HeaderPanel::setTheme(Theme& theme)
 {
     theme_ = &theme;
-    blackThemeButton_.setTheme(theme);
-    creamThemeButton_.setTheme(theme);
-    someDisabledButton_.setTheme(theme);
+    skinLabel_.setTheme(theme);
+    skinComboBox_.setTheme(theme);
+    zoomLabel_.setTheme(theme);
+    zoomComboBox_.setTheme(theme);
 }
 

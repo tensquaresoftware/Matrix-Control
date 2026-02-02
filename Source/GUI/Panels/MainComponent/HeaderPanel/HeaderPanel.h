@@ -2,12 +2,14 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/Label.h"
+#include "GUI/Widgets/ComboBox.h"
 
 namespace tss
 {
     class Theme;
-    class Button;
+    class Label;
+    class ComboBox;
 }
 
 class HeaderPanel : public juce::Component
@@ -20,26 +22,25 @@ public:
     void resized() override;
     void setTheme(tss::Theme& theme);
 
-    tss::Button& getButtonBlack() { return blackThemeButton_; }
-    tss::Button& getButtonCream() { return creamThemeButton_; }
-    tss::Button& getButtonDisabled() { return someDisabledButton_; }
+    tss::ComboBox& getSkinComboBox() { return skinComboBox_; }
+    tss::ComboBox& getZoomComboBox() { return zoomComboBox_; }
 
     static int getHeight() { return kHeight_; }
-    static int getButtonWidth() { return kButtonWidth_; }
-    static int getButtonHeight() { return kButtonHeight_; }
-    static int getButtonSpacing() { return kButtonSpacing_; }
+    static int getSpacing() { return kSpacing_; }
 
 private:
     inline constexpr static int kHeight_ = 30;
-    inline constexpr static int kButtonWidth_ = 70;
-    inline constexpr static int kButtonHeight_ = 20;
-    inline constexpr static int kButtonSpacing_ = 5;
+    inline constexpr static int kSpacing_ = 5;
+    inline constexpr static int kLabelWidth_ = 40;
+    inline constexpr static int kComboBoxWidth_ = 80;
+    inline constexpr static int kControlHeight_ = 20;
 
     tss::Theme* theme_;
 
-    tss::Button blackThemeButton_;
-    tss::Button creamThemeButton_;
-    tss::Button someDisabledButton_;
+    tss::Label skinLabel_;
+    tss::ComboBox skinComboBox_;
+    tss::Label zoomLabel_;
+    tss::ComboBox zoomComboBox_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderPanel)
 };

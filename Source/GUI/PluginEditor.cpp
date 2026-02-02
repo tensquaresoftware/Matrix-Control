@@ -31,16 +31,42 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     }
     
     auto& headerPanel = mainComponent->getHeaderPanel();
-    headerPanel.getButtonBlack().onClick = [this]
+    
+    headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
     {
-        theme = tss::Theme::create(tss::Theme::ColourVariant::Black);
-        updateTheme();
+        const auto selectedId = headerPanel.getSkinComboBox().getSelectedId();
+        if (selectedId == 1)
+        {
+            theme = tss::Theme::create(tss::Theme::ColourVariant::Black);
+            updateTheme();
+        }
+        else if (selectedId == 2)
+        {
+            theme = tss::Theme::create(tss::Theme::ColourVariant::Cream);
+            updateTheme();
+        }
     };
     
-    headerPanel.getButtonCream().onClick = [this]
+    headerPanel.getZoomComboBox().onChange = [&headerPanel]
     {
-        theme = tss::Theme::create(tss::Theme::ColourVariant::Cream);
-        updateTheme();
+        const auto selectedId = headerPanel.getZoomComboBox().getSelectedId();
+        float zoomFactor = 1.0f;
+        
+        switch (selectedId)
+        {
+            case 1: zoomFactor = 0.5f; break;   // 50%
+            case 2: zoomFactor = 0.75f; break;  // 75%
+            case 3: zoomFactor = 0.9f; break;   // 90%
+            case 4: zoomFactor = 1.0f; break;   // 100%
+            case 5: zoomFactor = 1.25f; break;  // 125%
+            case 6: zoomFactor = 1.5f; break;   // 150%
+            case 7: zoomFactor = 2.0f; break;   // 200%
+            default: zoomFactor = 1.0f; break;
+        }
+        
+        // TODO: Implement zoom functionality (Phase 7)
+        // For now, just log the selected zoom factor
+        juce::ignoreUnused(zoomFactor);
     };
     
     repaint();
