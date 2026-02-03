@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <map>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -32,27 +32,11 @@ namespace tss
         };
 
         inline constexpr static int kBorderThickness_ = 2;
-        
-        enum class ButtonState
-        {
-            Normal = 0,
-            Hover = 1,
-            Down = 2,
-            Disabled = 3
-        };
 
         Skin* skin_ = nullptr;
         int width_;
         int height_;
-        
-        std::array<juce::Image, 4> cachedStates_;
-        bool cacheValid_ = false;
-        
-        void regenerateStateCache();
-        void invalidateCache();
-        ButtonState getCurrentState(bool enabled, bool isHighlighted, bool isDown) const;
 
-        // Multi-state image cache
         std::map<ButtonState, juce::Image> cachedImages_;
         bool cacheValid_ = false;
 

@@ -48,21 +48,6 @@ namespace tss
         juce::String unit_;
         bool hasFocus_ = false;
         
-        juce::Image cachedTrack_;
-        bool cacheValid_ = false;
-        juce::Colour cachedTrackColourEnabled_;
-        juce::Colour cachedTrackColourDisabled_;
-        juce::Colour cachedValueBarColourEnabled_;
-        juce::Colour cachedValueBarColourDisabled_;
-        juce::Colour cachedTextColourEnabled_;
-        juce::Colour cachedTextColourDisabled_;
-        juce::Colour cachedFocusBorderColour_;
-        juce::Font cachedFont_;
-        
-        void regenerateTrackCache();
-        void invalidateCache();
-        void updateThemeCache();
-
         // Image cache
         juce::Image cachedImage_;
         bool cacheValid_ = false;

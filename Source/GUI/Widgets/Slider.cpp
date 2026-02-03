@@ -88,9 +88,7 @@ namespace tss
         const auto trackBounds = calculateTrackBounds(bounds);
         const auto valueBarBounds = calculateValueBarBounds(trackBounds, enabled);
 
-        if (cachedTrack_.isValid())
-            g.drawImageAt(cachedTrack_, 0, 0);
-
+        drawTrack(g, trackBounds, enabled);
         drawValueBar(g, valueBarBounds, enabled);
         drawText(g, bounds, enabled);
         drawFocusBorderIfNeeded(g, trackBounds, hasFocus_);
@@ -124,11 +122,6 @@ namespace tss
                                   .getDisplayForRect(getScreenBounds());
         const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
         return displayScale;
-    }
-    
-    void Slider::resized()
-    {
-        invalidateCache();
     }
 
     juce::Rectangle<float> Slider::calculateTrackBounds(const juce::Rectangle<float>& bounds) const
@@ -317,46 +310,6 @@ namespace tss
         auto newValue = increment ? currentValue + step : currentValue - step;
         newValue = juce::jlimit(range.getStart(), range.getEnd(), newValue);
         setValue(newValue, juce::sendNotificationSync);
-    }
-    
-    void Slider::regenerateTrackCache()
-    {
-        const auto width = getWidth();
-        const auto height = getHeight();
-        
-        if (width <= 0 || height <= 0)
-            return;
-        
-        cachedTrack_ = juce::Image(juce::Image::ARGB, width, height, true);
-        juce::Graphics g(cachedTrack_);
-        
-        const auto bounds = cachedTrack_.getBounds().toFloat();
-        const auto trackBounds = calculateTrackBounds(bounds);
-        
-        g.setColour(cachedTrackColourEnabled_);
-        g.fillRect(trackBounds);
-        
-        cacheValid_ = true;
-    }
-    
-    void Slider::invalidateCache()
-    {
-        cacheValid_ = false;
-    }
-    
-    void Slider::updateThemeCache()
-    {
-        if (theme_ == nullptr)
-            return;
-        
-        cachedTrackColourEnabled_ = theme_->getSliderTrackColour(true);
-        cachedTrackColourDisabled_ = theme_->getSliderTrackColour(false);
-        cachedValueBarColourEnabled_ = theme_->getSliderValueBarColour(true);
-        cachedValueBarColourDisabled_ = theme_->getSliderValueBarColour(false);
-        cachedTextColourEnabled_ = theme_->getSliderTextColour(true);
-        cachedTextColourDisabled_ = theme_->getSliderTextColour(false);
-        cachedFocusBorderColour_ = theme_->getSliderFocusBorderColour();
-        cachedFont_ = theme_->getBaseFont();
     }
 }
 
