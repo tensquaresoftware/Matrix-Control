@@ -707,4 +707,25 @@ constexpr int kBufferSize {calculateSize(256)};
 
 ---
 
+## 9. Documentation Markdown (plans, refactorisations)
+
+### 9.1 Emplacement des fichiers Markdown de planification
+
+Lorsque je crée des fichiers Markdown lors de plans de refactorisation, optimisations ou autres opérations planifiées, je les stocke **directement** dans :
+
+`Documentation/Development/Refactorisation/`
+
+### 9.2 Convention de nommage
+
+- **Date** au début : `YYYY-MM-DD-`
+- **Noms en anglais** uniquement
+- **Une majuscule au début de chaque mot**
+- **Séparateur** : tiret `-`
+- **Pas de mots d'arrêt** (de, la, l', the, of, etc.)
+- **Noms explicites** reflétant le contenu du document
+
+**Exemple :** `2026-02-03-Theme-To-Skin-Migration-Phase-Six-Summary.md`
+
+---
+
 **Fin des instructions personnelles**
