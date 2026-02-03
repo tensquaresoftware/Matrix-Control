@@ -1,6 +1,6 @@
 #include "InternalPatchesPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
@@ -10,26 +10,25 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
-using tss::Theme;
 
-InternalPatchesPanel::InternalPatchesPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
-    setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
+    setupModuleHeader(skin, widgetFactory, PluginDescriptors::ModuleIds::kInternalPatches);
 
-    setupBrowserGroupLabel(theme);
-    setupLoadPreviousPatchButton(theme, widgetFactory);
-    setupLoadNextPatchButton(theme, widgetFactory);
-    setupCurrentBankNumberBox(theme);
-    setupCurrentPatchNumberBox(theme);
+    setupBrowserGroupLabel(skin);
+    setupLoadPreviousPatchButton(skin, widgetFactory);
+    setupLoadNextPatchButton(skin, widgetFactory);
+    setupCurrentBankNumberBox(skin);
+    setupCurrentPatchNumberBox(skin);
 
-    setupUtilityGroupLabel(theme);
-    setupInitPatchButton(theme, widgetFactory);
-    setupCopyPatchButton(theme, widgetFactory);
-    setupPastePatchButton(theme, widgetFactory);
-    setupStorePatchButton(theme, widgetFactory);
+    setupUtilityGroupLabel(skin);
+    setupInitPatchButton(skin, widgetFactory);
+    setupCopyPatchButton(skin, widgetFactory);
+    setupPastePatchButton(skin, widgetFactory);
+    setupStorePatchButton(skin, widgetFactory);
 
     setSize(getWidth(), getHeight());
 }
@@ -82,30 +81,30 @@ void InternalPatchesPanel::resized()
     layoutStorePatchButton(x, y);
 }
 
-void InternalPatchesPanel::setTheme(Theme& theme)
+void InternalPatchesPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = moduleHeader.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setTheme(theme);
+        browserLabel->setSkin(skin);
 
     if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setTheme(theme);
+        utilityLabel->setSkin(skin);
 
     if (auto* bankNumber = currentBankNumber.get())
-        bankNumber->setTheme(theme);
+        bankNumber->setSkin(skin);
 
     if (auto* patchNumber = currentPatchNumber.get())
-        patchNumber->setTheme(theme);
+        patchNumber->setSkin(skin);
 }
 
-void InternalPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void InternalPatchesPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader = std::make_unique<tss::ModuleHeader>(
-        theme, 
+        skin, 
         widgetFactory.getGroupDisplayName(moduleId),
         PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -113,21 +112,21 @@ void InternalPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widget
     addAndMakeVisible(*moduleHeader);
 }
 
-void InternalPatchesPanel::setupBrowserGroupLabel(Theme& theme)
+void InternalPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
 {
     browserGroupLabel = std::make_unique<tss::GroupLabel>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesBrowser);
     addAndMakeVisible(*browserGroupLabel);
 }
 
-void InternalPatchesPanel::setupLoadPreviousPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+void InternalPatchesPanel::setupLoadPreviousPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadPreviousPatchButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatch,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadPreviousPatchButton_->onClick = [this]
     {
@@ -138,11 +137,11 @@ void InternalPatchesPanel::setupLoadPreviousPatchButton(Theme& theme, WidgetFact
     addAndMakeVisible(*loadPreviousPatchButton_);
 }
 
-void InternalPatchesPanel::setupLoadNextPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+void InternalPatchesPanel::setupLoadNextPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadNextPatchButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kLoadNextPatch,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadNextPatchButton_->onClick = [this]
     {
@@ -153,40 +152,40 @@ void InternalPatchesPanel::setupLoadNextPatchButton(Theme& theme, WidgetFactory&
     addAndMakeVisible(*loadNextPatchButton_);
 }
 
-void InternalPatchesPanel::setupCurrentBankNumberBox(Theme& theme)
+void InternalPatchesPanel::setupCurrentBankNumberBox(tss::Skin& skin)
 {
     currentBankNumber = std::make_unique<tss::NumberBox>(
-        theme, 
+        skin, 
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber, 
         false);
     currentBankNumber->setShowDot(true);
     addAndMakeVisible(*currentBankNumber);
 }
 
-void InternalPatchesPanel::setupCurrentPatchNumberBox(Theme& theme)
+void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::Skin& skin)
 {
     currentPatchNumber = std::make_unique<tss::NumberBox>(
-        theme, 
+        skin, 
         PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber, 
         true);
     addAndMakeVisible(*currentPatchNumber);
 }
 
-void InternalPatchesPanel::setupUtilityGroupLabel(Theme& theme)
+void InternalPatchesPanel::setupUtilityGroupLabel(tss::Skin& skin)
 {
     utilityGroupLabel = std::make_unique<tss::GroupLabel>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kInternalPatchesUtility,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDescriptors::StandaloneWidgetDisplayNames::kInternalPatchesUtility);
     addAndMakeVisible(*utilityGroupLabel);
 }
 
-void InternalPatchesPanel::setupInitPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+void InternalPatchesPanel::setupInitPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     initPatchButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kInitPatch,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     initPatchButton_->onClick = [this]
     {
@@ -197,11 +196,11 @@ void InternalPatchesPanel::setupInitPatchButton(Theme& theme, WidgetFactory& wid
     addAndMakeVisible(*initPatchButton_);
 }
 
-void InternalPatchesPanel::setupCopyPatchButton(Theme& theme, WidgetFactory& widgetFactory)
+void InternalPatchesPanel::setupCopyPatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     copyPatchButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kCopyPatch,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     copyPatchButton_->onClick = [this]
     {
@@ -212,11 +211,11 @@ void InternalPatchesPanel::setupCopyPatchButton(Theme& theme, WidgetFactory& wid
     addAndMakeVisible(*copyPatchButton_);
 }
 
-void InternalPatchesPanel::setupPastePatchButton(Theme& theme, WidgetFactory& widgetFactory)
+void InternalPatchesPanel::setupPastePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     pastePatchButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kPastePatch,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     pastePatchButton_->onClick = [this]
     {
@@ -227,11 +226,11 @@ void InternalPatchesPanel::setupPastePatchButton(Theme& theme, WidgetFactory& wi
     addAndMakeVisible(*pastePatchButton_);
 }
 
-void InternalPatchesPanel::setupStorePatchButton(Theme& theme, WidgetFactory& widgetFactory)
+void InternalPatchesPanel::setupStorePatchButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     storePatchButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kStorePatch,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     storePatchButton_->onClick = [this]
     {

@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -16,7 +16,7 @@ class WidgetFactory;
 class MidiPanel : public BaseModulePanel
 {
 public:
-    MidiPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MidiPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MidiPanel() override = default;
 
     static int getWidth() { return PluginDimensions::Panels::MasterEditPanel::ChildPanels::kWidth; }

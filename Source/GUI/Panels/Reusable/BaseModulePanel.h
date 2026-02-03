@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -40,7 +40,7 @@ struct ModulePanelConfig
 class BaseModulePanel : public juce::Component
 {
 public:
-    BaseModulePanel(tss::Theme& theme,
+    BaseModulePanel(tss::Skin& skin,
                     WidgetFactory& widgetFactory,
                     juce::AudioProcessorValueTreeState& apvts,
                     const ModulePanelConfig& config,
@@ -49,10 +49,10 @@ public:
     ~BaseModulePanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
 protected:
-    tss::Theme* theme_;
+    tss::Skin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
     ModulePanelModuleType moduleType_;
 

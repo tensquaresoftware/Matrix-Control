@@ -2,13 +2,13 @@
 #include "MultiColumnPopupMenu.h"
 #include "ScrollablePopupMenu.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    ComboBox::ComboBox(Theme& theme, int width, int height, Style style)
+    ComboBox::ComboBox(tss::Skin& skin, int width, int height, Style style)
         : juce::ComboBox()
-        , theme_(&theme)
+        , skin_(&skin)
         , width_(width)
         , height_(height)
         , style_(style)
@@ -17,21 +17,21 @@ namespace tss
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
-        updateThemeCache();
+        updateSkinCache();
     }
 
-    void ComboBox::setTheme(Theme& theme)
+    void ComboBox::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
+        skin_ = &skin;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
-        updateThemeCache();
+        updateSkinCache();
         invalidateCache();
         repaint();
     }
 
     void ComboBox::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         // Invalidate cache if selection changed
@@ -95,19 +95,19 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void ComboBox::updateThemeCache()
+    void ComboBox::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         const bool enabled = isEnabled();
         const bool isButtonLike = (style_ == Style::ButtonLike);
         
-        cachedBackgroundColour_ = theme_->getComboBoxBackgroundColour(enabled, isButtonLike);
-        cachedTextColour_ = theme_->getComboBoxTextColour(enabled, isButtonLike);
-        cachedBorderColour_ = theme_->getComboBoxBorderColour(enabled, isButtonLike);
-        cachedFocusBorderColour_ = theme_->getComboBoxFocusBorderColour(isButtonLike);
-        cachedFont_ = theme_->getBaseFont();
+        cachedBackgroundColour_ = skin_->getComboBoxBackgroundColour(enabled, isButtonLike);
+        cachedTextColour_ = skin_->getComboBoxTextColour(enabled, isButtonLike);
+        cachedBorderColour_ = skin_->getComboBoxBorderColour(enabled, isButtonLike);
+        cachedFocusBorderColour_ = skin_->getComboBoxFocusBorderColour(isButtonLike);
+        cachedFont_ = skin_->getBaseFont();
     }
 
     float ComboBox::getPixelScale() const
@@ -186,7 +186,7 @@ namespace tss
     void ComboBox::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
     {
         const auto isButtonLike = (style_ == Style::ButtonLike);
-        const auto triangleColour = theme_->getComboBoxTriangleColour(enabled, isButtonLike);
+        const auto triangleColour = skin_->getComboBoxTriangleColour(enabled, isButtonLike);
         g.setColour(triangleColour);
 
         const auto triangleBaseSize = kTriangleBaseSize_;

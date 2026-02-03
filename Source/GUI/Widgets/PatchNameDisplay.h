@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class PatchNameDisplay : public juce::Component
     {
     public:
-        explicit PatchNameDisplay(Theme& theme, int width, int height);
+        explicit PatchNameDisplay(Skin& skin, int width, int height);
         ~PatchNameDisplay() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
         void setPatchName(const juce::String& patchName);
         
         void paint(juce::Graphics& g) override;
@@ -25,7 +25,7 @@ namespace tss
         inline constexpr static int kVerticalPadding_ = 15;
         inline constexpr static float kFontHeight_ = 28.0f;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
         juce::String patchName_;

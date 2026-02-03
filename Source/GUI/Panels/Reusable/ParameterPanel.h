@@ -6,7 +6,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class Label;
     class Slider;
     class ComboBox;
@@ -21,7 +21,7 @@ public:
     enum class ParameterType { Slider, ComboBox, None };
     enum class ModuleType { PatchEdit, MasterEdit };
 
-    ParameterPanel(tss::Theme& theme,
+    ParameterPanel(tss::Skin& skin,
                    WidgetFactory& factory,
                    const juce::String& parameterId,
                    ParameterType type,
@@ -30,23 +30,23 @@ public:
     ~ParameterPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
     int getTotalHeight() const;
 
     tss::Slider* getSlider() const { return slider_.get(); }
 
 private:
-    void createParameterLabel(tss::Theme& theme, WidgetFactory& factory, const juce::String& parameterId);
-    void createParameterWidget(tss::Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
-    void createSliderWidget(tss::Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
-    void createComboBoxWidget(tss::Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
-    void createSeparator(tss::Theme& theme);
+    void createParameterLabel(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId);
+    void createParameterWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
+    void createSliderWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
+    void createComboBoxWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts);
+    void createSeparator(tss::Skin& skin);
 
     void layoutParameterLabel(int y);
     void layoutParameterWidget(int y);
     void layoutSeparator(int y);
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
     ParameterType parameterType_;
     ModuleType moduleType_;
 

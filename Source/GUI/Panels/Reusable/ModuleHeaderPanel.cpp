@@ -1,16 +1,15 @@
 #include "ModuleHeaderPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 ModuleHeaderPanel::~ModuleHeaderPanel() = default;
 
-ModuleHeaderPanel::ModuleHeaderPanel(Theme& theme,
+ModuleHeaderPanel::ModuleHeaderPanel(tss::Skin& skin,
                                      WidgetFactory& factory,
                                      const juce::String& moduleId,
                                      ButtonSet buttonSet,
@@ -19,20 +18,20 @@ ModuleHeaderPanel::ModuleHeaderPanel(Theme& theme,
                                      const juce::String& initWidgetId,
                                      const juce::String& copyWidgetId,
                                      const juce::String& pasteWidgetId)
-    : theme_(&theme)
+    : skin_(&skin)
     , buttonSet_(buttonSet)
     , moduleType_(moduleType)
     , apvts_(apvts)
 {
     setOpaque(false);
-    createModuleHeader(theme, factory, moduleId);
-    createInitButton(theme, factory, initWidgetId);
+    createModuleHeader(skin, factory, moduleId);
+    createInitButton(skin, factory, initWidgetId);
 
     if (buttonSet == ButtonSet::InitCopyPaste)
-        createCopyPasteButtons(theme, factory, copyWidgetId, pasteWidgetId);
+        createCopyPasteButtons(skin, factory, copyWidgetId, pasteWidgetId);
 }
 
-void ModuleHeaderPanel::createModuleHeader(Theme& theme, WidgetFactory& factory, const juce::String& moduleId)
+void ModuleHeaderPanel::createModuleHeader(tss::Skin& skin, WidgetFactory& factory, const juce::String& moduleId)
 {
     const auto moduleHeaderWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ModuleHeader::kPatchEditModule
@@ -43,7 +42,7 @@ void ModuleHeaderPanel::createModuleHeader(Theme& theme, WidgetFactory& factory,
         : tss::ModuleHeader::ColourVariant::Orange;
 
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
-        theme,
+        skin,
         factory.getGroupDisplayName(moduleId),
         moduleHeaderWidth,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -51,9 +50,9 @@ void ModuleHeaderPanel::createModuleHeader(Theme& theme, WidgetFactory& factory,
     addAndMakeVisible(*moduleHeader_);
 }
 
-void ModuleHeaderPanel::createInitButton(Theme& theme, WidgetFactory& factory, const juce::String& initWidgetId)
+void ModuleHeaderPanel::createInitButton(tss::Skin& skin, WidgetFactory& factory, const juce::String& initWidgetId)
 {
-    initButton_ = factory.createStandaloneButton(initWidgetId, theme, PluginDimensions::Widgets::Heights::kButton);
+    initButton_ = factory.createStandaloneButton(initWidgetId, skin, PluginDimensions::Widgets::Heights::kButton);
     initButton_->onClick = [this, initWidgetId]
     {
         apvts_.state.setProperty(initWidgetId,
@@ -63,9 +62,9 @@ void ModuleHeaderPanel::createInitButton(Theme& theme, WidgetFactory& factory, c
     addAndMakeVisible(*initButton_);
 }
 
-void ModuleHeaderPanel::createCopyPasteButtons(Theme& theme, WidgetFactory& factory, const juce::String& copyWidgetId, const juce::String& pasteWidgetId)
+void ModuleHeaderPanel::createCopyPasteButtons(tss::Skin& skin, WidgetFactory& factory, const juce::String& copyWidgetId, const juce::String& pasteWidgetId)
 {
-    copyButton_ = factory.createStandaloneButton(copyWidgetId, theme, PluginDimensions::Widgets::Heights::kButton);
+    copyButton_ = factory.createStandaloneButton(copyWidgetId, skin, PluginDimensions::Widgets::Heights::kButton);
     copyButton_->onClick = [this, copyWidgetId]
     {
         apvts_.state.setProperty(copyWidgetId,
@@ -74,7 +73,7 @@ void ModuleHeaderPanel::createCopyPasteButtons(Theme& theme, WidgetFactory& fact
     };
     addAndMakeVisible(*copyButton_);
 
-    pasteButton_ = factory.createStandaloneButton(pasteWidgetId, theme, PluginDimensions::Widgets::Heights::kButton);
+    pasteButton_ = factory.createStandaloneButton(pasteWidgetId, skin, PluginDimensions::Widgets::Heights::kButton);
     pasteButton_->onClick = [this, pasteWidgetId]
     {
         apvts_.state.setProperty(pasteWidgetId,
@@ -136,19 +135,19 @@ void ModuleHeaderPanel::layoutInitCopyPasteButtons()
         button->setBounds(panelWidth - pasteButtonWidth - copyButtonWidth - initButtonWidth, y, initButtonWidth, buttonHeight);
 }
 
-void ModuleHeaderPanel::setTheme(Theme& theme)
+void ModuleHeaderPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = moduleHeader_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* button = initButton_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = copyButton_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = pasteButton_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 }

@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class Label;
     class ComboBox;
     class Slider;
@@ -24,7 +24,7 @@ class ModulationBusPanel : public juce::Component
 public:
     ModulationBusPanel(int busNumber,
                       WidgetFactory& factory,
-                      tss::Theme& theme,
+                      tss::Skin& skin,
                       juce::AudioProcessorValueTreeState& apvts,
                       const juce::String& sourceParamId,
                       const juce::String& amountParamId,
@@ -33,23 +33,23 @@ public:
     ~ModulationBusPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
     static int getHeight();
 
 private:
-    void createBusNumberLabel(int busNumber, tss::Theme& theme);
-    void createSourceComboBox(WidgetFactory& factory, tss::Theme& theme, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createAmountSlider(WidgetFactory& factory, tss::Theme& theme, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createDestinationComboBox(int busNumber, tss::Theme& theme, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createInitButton(tss::Theme& theme, int busNumber);
-    void createSeparator(tss::Theme& theme);
+    void createBusNumberLabel(int busNumber, tss::Skin& skin);
+    void createSourceComboBox(WidgetFactory& factory, tss::Skin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
+    void createAmountSlider(WidgetFactory& factory, tss::Skin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts);
+    void createDestinationComboBox(int busNumber, tss::Skin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts);
+    void createInitButton(tss::Skin& skin, int busNumber);
+    void createSeparator(tss::Skin& skin);
 
     void layoutWidgetRow();
     void layoutSeparator(int y);
 
     inline constexpr static int kSpacing_ = 5;
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     std::unique_ptr<tss::Label> busNumberLabel_;
     std::unique_ptr<tss::ComboBox> sourceComboBox_;

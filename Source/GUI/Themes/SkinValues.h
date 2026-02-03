@@ -86,6 +86,14 @@ namespace tss
         kComboBoxTriangleDisabled,
         kComboBoxTextEnabled,
         kComboBoxTextDisabled,
+        kComboBoxButtonLikeBackground,
+        kComboBoxButtonLikeBackgroundDisabled,
+        kComboBoxButtonLikeBorder,
+        kComboBoxButtonLikeBorderDisabled,
+        kComboBoxButtonLikeText,
+        kComboBoxButtonLikeTextDisabled,
+        kComboBoxButtonLikeTriangle,
+        kComboBoxButtonLikeTriangleDisabled,
         
         // PopupMenu colours
         kPopupMenuBackground,
@@ -95,6 +103,13 @@ namespace tss
         kPopupMenuBackgroundHover,
         kPopupMenuTextHover,
         kPopupMenuScrollbar,
+        kPopupMenuBackgroundButtonLike,
+        kPopupMenuBorderButtonLike,
+        kPopupMenuSeparatorButtonLike,
+        kPopupMenuTextButtonLike,
+        kPopupMenuBackgroundHoverButtonLike,
+        kPopupMenuTextHoverButtonLike,
+        kPopupMenuScrollbarButtonLike,
         
         // NumberBox colours
         kNumberBoxText,

@@ -1,25 +1,25 @@
 #include "GroupLabel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    GroupLabel::GroupLabel(Theme& theme, int width, int height, const juce::String& text)
-        : theme_(&theme)
+    GroupLabel::GroupLabel(tss::Skin& skin, int width, int height, const juce::String& text)
+        : skin_(&skin)
         , width_(width)
         , height_(height)
         , labelText_(text)
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateThemeCache();
+        updateSkinCache();
         calculateTextWidth();
     }
 
-    void GroupLabel::setTheme(Theme& theme)
+    void GroupLabel::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        updateThemeCache();
+        skin_ = &skin;
+        updateSkinCache();
         invalidateCache();
         repaint();
     }
@@ -37,7 +37,7 @@ namespace tss
 
     void GroupLabel::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr || labelText_.isEmpty())
+        if (skin_ == nullptr || labelText_.isEmpty())
             return;
 
         if (!cacheValid_)
@@ -86,14 +86,14 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void GroupLabel::updateThemeCache()
+    void GroupLabel::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = theme_->getGroupLabelTextColour();
-        cachedLineColour_ = theme_->getGroupLabelLineColour();
-        cachedFont_ = theme_->getBaseFont();
+        cachedTextColour_ = skin_->getGroupLabelTextColour();
+        cachedLineColour_ = skin_->getGroupLabelLineColour();
+        cachedFont_ = skin_->getBaseFont();
     }
 
     float GroupLabel::getPixelScale() const
@@ -170,7 +170,7 @@ namespace tss
 
     void GroupLabel::calculateTextWidth()
     {
-        if (labelText_.isEmpty() || theme_ == nullptr)
+        if (labelText_.isEmpty() || skin_ == nullptr)
         {
             cachedTextWidth_ = 0.0f;
             return;

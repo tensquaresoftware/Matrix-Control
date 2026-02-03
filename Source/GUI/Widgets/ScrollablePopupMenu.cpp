@@ -2,7 +2,7 @@
 #include "ComboBox.h"
 #include "PopupMenuPositioner.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
@@ -117,12 +117,12 @@ namespace tss
 
     void ScrollablePopupMenu::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
         {
             return;
         }
 
-        g.fillAll(theme_->getPopupMenuBackgroundColour(isButtonLike_));
+        g.fillAll(skin_->getPopupMenuBackgroundColour(isButtonLike_));
         
         const auto bounds = getLocalBounds();
         const auto borderThickness = static_cast<int>(kBorderThickness_);
@@ -151,9 +151,9 @@ namespace tss
         viewport_->setScrollBarsShown(true, false);
         viewport_->setScrollBarThickness(8);
         
-        if (auto* currentTheme = theme_)
+        if (auto* currentSkin = skin_)
         {
-            const auto scrollbarColour = currentTheme->getPopupMenuScrollbarColour(isButtonLike_);
+            const auto scrollbarColour = currentSkin->getPopupMenuScrollbarColour(isButtonLike_);
             scrollbarLookAndFeel_ = std::make_unique<ScrollableViewportLookAndFeel>(scrollbarColour);
             viewport_->setLookAndFeel(scrollbarLookAndFeel_.get());
         }

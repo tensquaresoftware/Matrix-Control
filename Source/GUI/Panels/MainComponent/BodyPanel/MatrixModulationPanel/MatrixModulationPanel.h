@@ -12,7 +12,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class SectionHeader;
     class ModulationBusHeader;
     class Button;
@@ -23,11 +23,11 @@ class WidgetFactory;
 class MatrixModulationPanel : public juce::Component
 {
 public:
-    MatrixModulationPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MatrixModulationPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MatrixModulationPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getWidth() { return PluginDimensions::Panels::MatrixModulationPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::MatrixModulationPanel::kHeight; }
@@ -47,9 +47,9 @@ private:
     std::array<const char*, PluginDescriptors::kModulationBusCount> createDestinationParameterIds() const;
     ModulationBusParameterArrays createModulationBusParameterArrays() const;
 
-    void createInitAllBussesButton(tss::Theme& theme);
+    void createInitAllBussesButton(tss::Skin& skin);
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;

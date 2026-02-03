@@ -2,23 +2,21 @@
 
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
-using tss::Theme;
-
-HeaderPanel::HeaderPanel(Theme& theme)
-    : theme_(&theme)
-    , skinLabel_(theme, kLabelWidth_, kControlHeight_, "SKIN:")
-    , skinComboBox_(theme, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
-    , zoomLabel_(theme, kLabelWidth_, kControlHeight_, "ZOOM:")
-    , zoomComboBox_(theme, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
+HeaderPanel::HeaderPanel(tss::Skin& skin)
+    : skin_(&skin)
+    , skinLabel_(skin, kLabelWidth_, kControlHeight_, "SKIN :")
+    , skinComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
+    , zoomLabel_(skin, kLabelWidth_, kControlHeight_, "ZOOM :")
+    , zoomComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
 {
     setOpaque(true);
     
     addAndMakeVisible(skinLabel_);
     
-    skinComboBox_.addItem("Black", 1);
-    skinComboBox_.addItem("Cream", 2);
+    skinComboBox_.addItem("BLACK", 1);
+    skinComboBox_.addItem("CREAM", 2);
     skinComboBox_.setSelectedId(1, juce::dontSendNotification);
     addAndMakeVisible(skinComboBox_);
     
@@ -37,7 +35,7 @@ HeaderPanel::HeaderPanel(Theme& theme)
 
 void HeaderPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(theme_->getHeaderPanelBackgroundColour());
+    g.fillAll(skin_->getHeaderPanelBackgroundColour());
 }
 
 void HeaderPanel::resized()
@@ -80,12 +78,12 @@ void HeaderPanel::resized()
     );
 }
 
-void HeaderPanel::setTheme(Theme& theme)
+void HeaderPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
-    skinLabel_.setTheme(theme);
-    skinComboBox_.setTheme(theme);
-    zoomLabel_.setTheme(theme);
-    zoomComboBox_.setTheme(theme);
+    skin_ = &skin;
+    skinLabel_.setSkin(skin);
+    skinComboBox_.setSkin(skin);
+    zoomLabel_.setSkin(skin);
+    zoomComboBox_.setSkin(skin);
 }
 

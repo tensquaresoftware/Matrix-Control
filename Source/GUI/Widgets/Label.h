@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class Label : public juce::Component
     {
     public:
-        explicit Label(Theme& theme, int width, int height, const juce::String& text = juce::String());
+        explicit Label(Skin& skin, int width, int height, const juce::String& text = juce::String());
         ~Label() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
         
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -26,7 +26,7 @@ namespace tss
     private:
         inline constexpr static int kTextLeftPadding_ = 2;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
         juce::String labelText_;
@@ -39,7 +39,7 @@ namespace tss
         
         void regenerateCache();
         void invalidateCache();
-        void updateThemeCache();
+        void updateSkinCache();
         float getPixelScale() const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Label)

@@ -6,20 +6,19 @@
 #include "Modules/Lfo1Panel.h"
 #include "Modules/Lfo2Panel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 BottomPanel::~BottomPanel() = default;
 
-BottomPanel::BottomPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , env1Panel_(std::make_unique<Env1Panel>(theme, widgetFactory, apvts))
-    , env2Panel_(std::make_unique<Env2Panel>(theme, widgetFactory, apvts))
-    , env3Panel_(std::make_unique<Env3Panel>(theme, widgetFactory, apvts))
-    , lfo1Panel_(std::make_unique<Lfo1Panel>(theme, widgetFactory, apvts))
-    , lfo2Panel_(std::make_unique<Lfo2Panel>(theme, widgetFactory, apvts))
+BottomPanel::BottomPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
+    , env1Panel_(std::make_unique<Env1Panel>(skin, widgetFactory, apvts))
+    , env2Panel_(std::make_unique<Env2Panel>(skin, widgetFactory, apvts))
+    , env3Panel_(std::make_unique<Env3Panel>(skin, widgetFactory, apvts))
+    , lfo1Panel_(std::make_unique<Lfo1Panel>(skin, widgetFactory, apvts))
+    , lfo2Panel_(std::make_unique<Lfo2Panel>(skin, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*env1Panel_);
@@ -82,23 +81,23 @@ void BottomPanel::resized()
     );
 }
 
-void BottomPanel::setTheme(Theme& theme)
+void BottomPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* panel = env1Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = env2Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = env3Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = lfo1Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = lfo2Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 }
 

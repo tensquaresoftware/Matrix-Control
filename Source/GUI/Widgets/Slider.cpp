@@ -1,12 +1,12 @@
 #include "Slider.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    Slider::Slider(Theme& theme, int width, int height, double defaultValue)
+    Slider::Slider(tss::Skin& skin, int width, int height, double defaultValue)
         : juce::Slider(juce::Slider::LinearBarVertical, juce::Slider::NoTextBox)
-        , theme_(&theme)
+        , skin_(&skin)
         , width_(width)
         , height_(height)
         , defaultValue_(defaultValue)
@@ -15,13 +15,13 @@ namespace tss
         setSize(width_, height_);
         setWantsKeyboardFocus(true);
         setInterceptsMouseClicks(true, false);
-        updateThemeCache();
+        updateSkinCache();
     }
 
-    void Slider::setTheme(Theme& theme)
+    void Slider::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        updateThemeCache();
+        skin_ = &skin;
+        updateSkinCache();
         invalidateCache();
         repaint();
     }
@@ -40,7 +40,7 @@ namespace tss
 
     void Slider::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         // Invalidate cache if value changed (Slider is dynamic)
@@ -102,17 +102,17 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void Slider::updateThemeCache()
+    void Slider::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         const bool enabled = isEnabled();
-        cachedTrackColour_ = theme_->getSliderTrackColour(enabled);
-        cachedValueBarColour_ = theme_->getSliderValueBarColour(enabled);
-        cachedTextColour_ = theme_->getSliderTextColour(enabled);
-        cachedFocusBorderColour_ = theme_->getSliderFocusBorderColour();
-        cachedFont_ = theme_->getBaseFont();
+        cachedTrackColour_ = skin_->getSliderTrackColour(enabled);
+        cachedValueBarColour_ = skin_->getSliderValueBarColour(enabled);
+        cachedTextColour_ = skin_->getSliderTextColour(enabled);
+        cachedFocusBorderColour_ = skin_->getSliderFocusBorderColour();
+        cachedFont_ = skin_->getBaseFont();
     }
 
     float Slider::getPixelScale() const

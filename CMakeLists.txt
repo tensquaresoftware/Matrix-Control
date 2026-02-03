@@ -60,7 +60,6 @@ set(PLUGIN_SOURCES
     Source/Core/MIDI/SysEx/SysExEncoder.cpp
     
     # GUI - Themes
-    Source/GUI/Themes/Theme.cpp
     Source/GUI/Themes/Skin.cpp
     
     # GUI - OpenGL

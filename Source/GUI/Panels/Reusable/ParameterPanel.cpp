@@ -1,6 +1,6 @@
 #include "ParameterPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/ComboBox.h"
@@ -8,58 +8,57 @@
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 ParameterPanel::~ParameterPanel() = default;
 
-ParameterPanel::ParameterPanel(Theme& theme,
+ParameterPanel::ParameterPanel(tss::Skin& skin,
                                 WidgetFactory& factory,
                                 const juce::String& parameterId,
                                 ParameterType type,
                                 ModuleType moduleType,
                                 juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+    : skin_(&skin)
     , parameterType_(type)
     , moduleType_(moduleType)
 {
     setOpaque(false);
     if (type == ParameterType::None)
     {
-        createSeparator(theme);
+        createSeparator(skin);
     }
     else
     {
-        createParameterLabel(theme, factory, parameterId);
-        createParameterWidget(theme, factory, parameterId, apvts);
-        createSeparator(theme);
+        createParameterLabel(skin, factory, parameterId);
+        createParameterWidget(skin, factory, parameterId, apvts);
+        createSeparator(skin);
     }
 }
 
-void ParameterPanel::createParameterLabel(Theme& theme, WidgetFactory& factory, const juce::String& parameterId)
+void ParameterPanel::createParameterLabel(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId)
 {
     const auto labelWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::Label::kPatchEditModule
         : PluginDimensions::Widgets::Widths::Label::kMasterEditModule;
 
     label_ = std::make_unique<tss::Label>(
-        theme,
+        skin,
         labelWidth,
         PluginDimensions::Widgets::Heights::kLabel,
         factory.getParameterDisplayName(parameterId));
     addAndMakeVisible(*label_);
 }
 
-void ParameterPanel::createParameterWidget(Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
+void ParameterPanel::createParameterWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
     if (parameterType_ == ParameterType::Slider)
-        createSliderWidget(theme, factory, parameterId, apvts);
+        createSliderWidget(skin, factory, parameterId, apvts);
     else
-        createComboBoxWidget(theme, factory, parameterId, apvts);
+        createComboBoxWidget(skin, factory, parameterId, apvts);
 }
 
-void ParameterPanel::createSliderWidget(Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
+void ParameterPanel::createSliderWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
-    slider_ = factory.createIntParameterSlider(parameterId, theme);
+    slider_ = factory.createIntParameterSlider(parameterId, skin);
     sliderAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         apvts,
         parameterId,
@@ -67,7 +66,7 @@ void ParameterPanel::createSliderWidget(Theme& theme, WidgetFactory& factory, co
     addAndMakeVisible(*slider_);
 }
 
-void ParameterPanel::createComboBoxWidget(Theme& theme, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
+void ParameterPanel::createComboBoxWidget(tss::Skin& skin, WidgetFactory& factory, const juce::String& parameterId, juce::AudioProcessorValueTreeState& apvts)
 {
     const auto comboBoxWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::ComboBox::kPatchEditModule
@@ -75,7 +74,7 @@ void ParameterPanel::createComboBoxWidget(Theme& theme, WidgetFactory& factory, 
 
     comboBox_ = factory.createChoiceParameterComboBox(
         parameterId,
-        theme,
+        skin,
         comboBoxWidth,
         PluginDimensions::Widgets::Heights::kComboBox);
     comboBoxAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
@@ -85,14 +84,14 @@ void ParameterPanel::createComboBoxWidget(Theme& theme, WidgetFactory& factory, 
     addAndMakeVisible(*comboBox_);
 }
 
-void ParameterPanel::createSeparator(Theme& theme)
+void ParameterPanel::createSeparator(tss::Skin& skin)
 {
     const auto separatorWidth = (moduleType_ == ModuleType::PatchEdit)
         ? PluginDimensions::Widgets::Widths::HorizontalSeparator::kPatchEditModule
         : PluginDimensions::Widgets::Widths::HorizontalSeparator::kMasterEditModule;
 
     separator_ = std::make_unique<tss::HorizontalSeparator>(
-        theme,
+        skin,
         separatorWidth,
         PluginDimensions::Widgets::Heights::kHorizontalSeparator);
     addAndMakeVisible(*separator_);
@@ -163,21 +162,21 @@ void ParameterPanel::layoutSeparator(int y)
         separator->setBounds(0, y, separatorWidth, separatorHeight);
 }
 
-void ParameterPanel::setTheme(Theme& theme)
+void ParameterPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* label = label_.get())
-        label->setTheme(theme);
+        label->setSkin(skin);
 
     if (auto* slider = slider_.get())
-        slider->setTheme(theme);
+        slider->setSkin(skin);
 
     if (auto* comboBox = comboBox_.get())
-        comboBox->setTheme(theme);
+        comboBox->setSkin(skin);
 
     if (auto* separator = separator_.get())
-        separator->setTheme(theme);
+        separator->setSkin(skin);
 }
 
 int ParameterPanel::getTotalHeight() const

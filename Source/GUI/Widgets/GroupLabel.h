@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class GroupLabel : public juce::Component
     {
     public:
-        explicit GroupLabel(Theme& theme, int width, int height, const juce::String& text = juce::String());
+        explicit GroupLabel(Skin& skin, int width, int height, const juce::String& text = juce::String());
         ~GroupLabel() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void setText(const juce::String& text);
         juce::String getText() const { return labelText_; }
@@ -29,7 +29,7 @@ namespace tss
         inline constexpr static int kTextSpacing_ = 8;
         inline constexpr static int kLineThickness_ = 1;
         
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
         juce::String labelText_;
@@ -44,7 +44,7 @@ namespace tss
         
         void regenerateCache();
         void invalidateCache();
-        void updateThemeCache();
+        void updateSkinCache();
         float getPixelScale() const;
         
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& area);

@@ -1,19 +1,17 @@
 #include "BaseModulePanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Panels/Reusable/ModuleHeaderPanel.h"
 #include "GUI/Panels/Reusable/ParameterPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
-
-BaseModulePanel::BaseModulePanel(Theme& theme,
+BaseModulePanel::BaseModulePanel(tss::Skin& skin,
                                  WidgetFactory& widgetFactory,
                                  juce::AudioProcessorValueTreeState& apvts,
                                  const ModulePanelConfig& config,
                                  int width,
                                  int height)
-    : theme_(&theme)
+    : skin_(&skin)
     , apvts_(apvts)
     , moduleType_(config.moduleType)
 {
@@ -28,7 +26,7 @@ BaseModulePanel::BaseModulePanel(Theme& theme,
         : ModuleHeaderPanel::ModuleType::MasterEdit;
     
     moduleHeaderPanel_ = std::make_unique<ModuleHeaderPanel>(
-        theme,
+        skin,
         widgetFactory,
         config.moduleId,
         buttonSet,
@@ -52,7 +50,7 @@ BaseModulePanel::BaseModulePanel(Theme& theme,
             : ParameterPanel::ModuleType::MasterEdit;
         
         parameterPanels_.push_back(std::make_unique<ParameterPanel>(
-            theme,
+            skin,
             widgetFactory,
             paramConfig.parameterId,
             paramType,
@@ -78,14 +76,14 @@ void BaseModulePanel::resized()
             paramPanel->setBounds(bounds.removeFromTop(paramPanel->getTotalHeight()));
 }
 
-void BaseModulePanel::setTheme(Theme& theme)
+void BaseModulePanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = moduleHeaderPanel_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     for (auto& paramPanel : parameterPanels_)
         if (paramPanel != nullptr)
-            paramPanel->setTheme(theme);
+            paramPanel->setSkin(skin);
 }

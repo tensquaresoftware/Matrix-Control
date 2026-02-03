@@ -1,12 +1,12 @@
 #include "PatchNameDisplay.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "Shared/PluginDisplayNames.h"
 
 namespace tss
 {
-    PatchNameDisplay::PatchNameDisplay(Theme& theme, int width, int height)
-        : theme_(&theme)
+    PatchNameDisplay::PatchNameDisplay(tss::Skin& skin, int width, int height)
+        : skin_(&skin)
         , width_(width)
         , height_(height)
         , patchName_(PluginDescriptors::StandaloneWidgetDisplayNames::kDefaultPatchName)
@@ -15,9 +15,9 @@ namespace tss
         setSize(width_, height_);
     }
 
-    void PatchNameDisplay::setTheme(Theme& theme)
+    void PatchNameDisplay::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
+        skin_ = &skin;
     }
 
     void PatchNameDisplay::setPatchName(const juce::String& patchName)
@@ -28,7 +28,7 @@ namespace tss
 
     void PatchNameDisplay::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         const auto bounds = getLocalBounds().toFloat();
@@ -42,22 +42,22 @@ namespace tss
 
     void PatchNameDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = theme_->getPatchNameDisplayBackgroundColour();
+        const auto backgroundColour = skin_->getPatchNameDisplayBackgroundColour();
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void PatchNameDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = theme_->getPatchNameDisplayBorderColour();
+        const auto borderColour = skin_->getPatchNameDisplayBorderColour();
         g.setColour(borderColour);
         g.drawRect(bounds, static_cast<float>(kBorderThickness_));
     }
 
     void PatchNameDisplay::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto textColour = theme_->getPatchNameDisplayTextColour();
-        const auto font = theme_->getBaseFont().withHeight(kFontHeight_);
+        const auto textColour = skin_->getPatchNameDisplayTextColour();
+        const auto font = skin_->getBaseFont().withHeight(kFontHeight_);
 
         g.setColour(textColour);
         g.setFont(font);

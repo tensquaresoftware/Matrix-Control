@@ -4,26 +4,25 @@
 #include "Modules/VibratoPanel.h"
 #include "Modules/MiscPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDimensions.h"
 #include "Shared/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
-MasterEditPanel::MasterEditPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+MasterEditPanel::MasterEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        theme, 
+        skin, 
         PluginDimensions::Widgets::Widths::SectionHeader::kMasterEdit,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMasterEdit),
         tss::SectionHeader::ColourVariant::Orange))
-    , midiPanel_(std::make_unique<MidiPanel>(theme, widgetFactory, apvts))
-    , vibratoPanel_(std::make_unique<VibratoPanel>(theme, widgetFactory, apvts))
-    , miscPanel_(std::make_unique<MiscPanel>(theme, widgetFactory, apvts))
+    , midiPanel_(std::make_unique<MidiPanel>(skin, widgetFactory, apvts))
+    , vibratoPanel_(std::make_unique<VibratoPanel>(skin, widgetFactory, apvts))
+    , miscPanel_(std::make_unique<MiscPanel>(skin, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -73,20 +72,20 @@ void MasterEditPanel::resized()
     );
 }
 
-void MasterEditPanel::setTheme(Theme& theme)
+void MasterEditPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = sectionHeader_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* panel = midiPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = vibratoPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = miscPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 }
 

@@ -6,20 +6,19 @@
 #include "Modules/FmTrackPanel.h"
 #include "Modules/RampPortamentoPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 TopPanel::~TopPanel() = default;
 
-TopPanel::TopPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , dco1Panel_(std::make_unique<Dco1Panel>(theme, widgetFactory, apvts))
-    , dco2Panel_(std::make_unique<Dco2Panel>(theme, widgetFactory, apvts))
-    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(theme, widgetFactory, apvts))
-    , fmTrackPanel_(std::make_unique<FmTrackPanel>(theme, widgetFactory, apvts))
-    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(theme, widgetFactory, apvts))
+TopPanel::TopPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
+    , dco1Panel_(std::make_unique<Dco1Panel>(skin, widgetFactory, apvts))
+    , dco2Panel_(std::make_unique<Dco2Panel>(skin, widgetFactory, apvts))
+    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(skin, widgetFactory, apvts))
+    , fmTrackPanel_(std::make_unique<FmTrackPanel>(skin, widgetFactory, apvts))
+    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(skin, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*dco1Panel_);
@@ -82,23 +81,23 @@ void TopPanel::resized()
     );
 }
 
-void TopPanel::setTheme(Theme& theme)
+void TopPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* panel = dco1Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = dco2Panel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = vcfVcaPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = fmTrackPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = rampPortamentoPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 }
 

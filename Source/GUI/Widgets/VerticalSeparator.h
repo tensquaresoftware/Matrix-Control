@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class VerticalSeparator : public juce::Component
     {
     public:
-        explicit VerticalSeparator(Theme& theme, int width, int height);
+        explicit VerticalSeparator(Skin& skin, int width, int height);
         ~VerticalSeparator() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -25,7 +25,7 @@ namespace tss
         inline constexpr static float kTopPadding_ = 4.0f;
         inline constexpr static float kBottomPadding_ = 2.0f;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
 

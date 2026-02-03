@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -22,11 +22,11 @@ class RampPortamentoPanel;
 class TopPanel : public juce::Component
 {
 public:
-    TopPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    TopPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~TopPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::kHeight; }
@@ -34,7 +34,7 @@ public:
 
 private:
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     std::unique_ptr<Dco1Panel> dco1Panel_;
     std::unique_ptr<Dco2Panel> dco2Panel_;

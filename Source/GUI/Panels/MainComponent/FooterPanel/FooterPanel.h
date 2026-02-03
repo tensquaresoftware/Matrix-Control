@@ -5,19 +5,19 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class FooterPanel : public juce::Component,
                     public juce::ValueTree::Listener
 {
 public:
-    FooterPanel(tss::Theme& inTheme, juce::AudioProcessorValueTreeState& apvtsRef);
+    FooterPanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvtsRef);
     ~FooterPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& inTheme);
+    void setSkin(tss::Skin& skin);
 
     static int getHeight() { return kHeight_; }
 
@@ -39,7 +39,7 @@ private:
     inline constexpr static int kPadding_ = 8;
     inline constexpr static int kIconSize_ = 14;
     
-    tss::Theme* theme;
+    tss::Skin* skin_;
     juce::AudioProcessorValueTreeState& apvts;
     
     juce::String currentMessage;

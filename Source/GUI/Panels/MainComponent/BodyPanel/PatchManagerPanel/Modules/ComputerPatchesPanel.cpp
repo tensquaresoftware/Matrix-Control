@@ -1,6 +1,6 @@
 #include "ComputerPatchesPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
 #include "GUI/Widgets/Button.h"
@@ -10,24 +10,23 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
-using tss::Theme;
 
-ComputerPatchesPanel::ComputerPatchesPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+ComputerPatchesPanel::ComputerPatchesPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
-    setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kComputerPatches);
+    setupModuleHeader(skin, widgetFactory, PluginDescriptors::ModuleIds::kComputerPatches);
 
-    setupBrowserGroupLabel(theme);
-    setupLoadPreviousPatchFileButton(theme, widgetFactory);
-    setupLoadNextPatchFileButton(theme, widgetFactory);
-    setupSelectPatchFileComboBox(theme);
+    setupBrowserGroupLabel(skin);
+    setupLoadPreviousPatchFileButton(skin, widgetFactory);
+    setupLoadNextPatchFileButton(skin, widgetFactory);
+    setupSelectPatchFileComboBox(skin);
 
-    setupUtilityGroupLabel(theme);
-    setupOpenPatchFolderButton(theme, widgetFactory);
-    setupSavePatchFileAsButton(theme, widgetFactory);
-    setupSavePatchFileButton(theme, widgetFactory);
+    setupUtilityGroupLabel(skin);
+    setupOpenPatchFolderButton(skin, widgetFactory);
+    setupSavePatchFileAsButton(skin, widgetFactory);
+    setupSavePatchFileButton(skin, widgetFactory);
 
     setSize(getWidth(), getHeight());
 }
@@ -75,27 +74,27 @@ void ComputerPatchesPanel::resized()
     layoutSavePatchFileButton(x, y);
 }
 
-void ComputerPatchesPanel::setTheme(Theme& theme)
+void ComputerPatchesPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = moduleHeader_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* browserLabel = browserGroupLabel.get())
-        browserLabel->setTheme(theme);
+        browserLabel->setSkin(skin);
 
     if (auto* utilityLabel = utilityGroupLabel.get())
-        utilityLabel->setTheme(theme);
+        utilityLabel->setSkin(skin);
 
     if (auto* comboBox = selectPatchFileComboBox_.get())
-        comboBox->setTheme(theme);
+        comboBox->setSkin(skin);
 }
 
-void ComputerPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void ComputerPatchesPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     moduleHeader_ = std::make_unique<tss::ModuleHeader>(
-        theme, 
+        skin, 
         widgetFactory.getGroupDisplayName(moduleId),
         PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -103,21 +102,21 @@ void ComputerPatchesPanel::setupModuleHeader(Theme& theme, WidgetFactory& widget
     addAndMakeVisible(*moduleHeader_);
 }
 
-void ComputerPatchesPanel::setupBrowserGroupLabel(Theme& theme)
+void ComputerPatchesPanel::setupBrowserGroupLabel(tss::Skin& skin)
 {
     browserGroupLabel = std::make_unique<tss::GroupLabel>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesBrowser,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDescriptors::StandaloneWidgetDisplayNames::kComputerPatchesBrowser);
     addAndMakeVisible(*browserGroupLabel);
 }
 
-void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(Theme& theme, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadPreviousPatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kLoadPreviousPatchFile,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadPreviousPatchFileButton_->onClick = [this]
     {
@@ -128,11 +127,11 @@ void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(Theme& theme, Widget
     addAndMakeVisible(*loadPreviousPatchFileButton_);
 }
 
-void ComputerPatchesPanel::setupLoadNextPatchFileButton(Theme& theme, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupLoadNextPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     loadNextPatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kLoadNextPatchFile,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     loadNextPatchFileButton_->onClick = [this]
     {
@@ -143,10 +142,10 @@ void ComputerPatchesPanel::setupLoadNextPatchFileButton(Theme& theme, WidgetFact
     addAndMakeVisible(*loadNextPatchFileButton_);
 }
 
-void ComputerPatchesPanel::setupSelectPatchFileComboBox(Theme& theme)
+void ComputerPatchesPanel::setupSelectPatchFileComboBox(tss::Skin& skin)
 {
     selectPatchFileComboBox_ = std::make_unique<tss::ComboBox>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::ComboBox::kPatchManagerComputerPatches,
         PluginDimensions::Widgets::Heights::kButton,
         tss::ComboBox::Style::ButtonLike);
@@ -183,21 +182,21 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(Theme& theme)
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 
-void ComputerPatchesPanel::setupUtilityGroupLabel(Theme& theme)
+void ComputerPatchesPanel::setupUtilityGroupLabel(tss::Skin& skin)
 {
     utilityGroupLabel = std::make_unique<tss::GroupLabel>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::GroupLabel::kComputerPatchesUtility,
         PluginDimensions::Widgets::Heights::kGroupLabel,
         PluginDescriptors::StandaloneWidgetDisplayNames::kComputerPatchesUtility);
     addAndMakeVisible(*utilityGroupLabel);
 }
 
-void ComputerPatchesPanel::setupOpenPatchFolderButton(Theme& theme, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     openPatchFolderButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kOpenPatchFolder,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     openPatchFolderButton_->onClick = [this]
     {
@@ -208,11 +207,11 @@ void ComputerPatchesPanel::setupOpenPatchFolderButton(Theme& theme, WidgetFactor
     addAndMakeVisible(*openPatchFolderButton_);
 }
 
-void ComputerPatchesPanel::setupSavePatchFileAsButton(Theme& theme, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupSavePatchFileAsButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     savePatchFileAsButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kSavePatchAs,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     savePatchFileAsButton_->onClick = [this]
     {
@@ -223,11 +222,11 @@ void ComputerPatchesPanel::setupSavePatchFileAsButton(Theme& theme, WidgetFactor
     addAndMakeVisible(*savePatchFileAsButton_);
 }
 
-void ComputerPatchesPanel::setupSavePatchFileButton(Theme& theme, WidgetFactory& widgetFactory)
+void ComputerPatchesPanel::setupSavePatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     savePatchFileButton_ = widgetFactory.createStandaloneButton(
         PluginDescriptors::StandaloneWidgetIds::kSavePatchFile,
-        theme,
+        skin,
         PluginDimensions::Widgets::Heights::kButton);
     savePatchFileButton_->onClick = [this]
     {

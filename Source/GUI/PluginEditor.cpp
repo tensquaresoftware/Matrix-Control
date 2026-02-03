@@ -1,6 +1,6 @@
 #include "Core/PluginProcessor.h"
 #include "PluginEditor.h"
-#include "Themes/Theme.h"
+#include "Themes/Skin.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
@@ -10,7 +10,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
-    theme = tss::Theme::create(tss::Theme::ColourVariant::Black);
+    skin = tss::Skin::create(tss::Skin::ColourVariant::Black);
     
     widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
     
@@ -22,7 +22,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     
     const auto editorWidth = getWidth();
     const auto editorHeight = getHeight();
-    mainComponent = std::make_unique<MainComponent>(*theme, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
+    mainComponent = std::make_unique<MainComponent>(*skin, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent);
     
     if (auto* component = mainComponent.get())
@@ -37,13 +37,13 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         const auto selectedId = headerPanel.getSkinComboBox().getSelectedId();
         if (selectedId == 1)
         {
-            theme = tss::Theme::create(tss::Theme::ColourVariant::Black);
-            updateTheme();
+            skin = tss::Skin::create(tss::Skin::ColourVariant::Black);
+            updateSkin();
         }
         else if (selectedId == 2)
         {
-            theme = tss::Theme::create(tss::Theme::ColourVariant::Cream);
-            updateTheme();
+            skin = tss::Skin::create(tss::Skin::ColourVariant::Cream);
+            updateSkin();
         }
     };
     
@@ -76,7 +76,7 @@ PluginEditor::~PluginEditor() = default;
 
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(theme->getBodyPanelBackgroundColour());
+    g.fillAll(skin->getBodyPanelBackgroundColour());
 }
 
 void PluginEditor::resized()
@@ -90,10 +90,10 @@ void PluginEditor::mouseDown(const juce::MouseEvent&)
     unfocusAllComponents();
 }
 
-void PluginEditor::updateTheme()
+void PluginEditor::updateSkin()
 {
     if (auto* widget = mainComponent.get())
-        widget->setTheme(*theme);
+        widget->setSkin(*skin);
     repaint();
 }
 

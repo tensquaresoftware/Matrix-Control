@@ -1,6 +1,6 @@
 #include "MatrixModulationPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
@@ -9,20 +9,19 @@
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 MatrixModulationPanel::~MatrixModulationPanel() = default;
 
-MatrixModulationPanel::MatrixModulationPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+MatrixModulationPanel::MatrixModulationPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
     , apvts_(apvts)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kMatrixModulation,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kMatrixModulation)))
     , modulationBusHeader_(std::make_unique<tss::ModulationBusHeader>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::ModulationBusHeader::kStandard,
         PluginDimensions::Widgets::Heights::kModulationBusHeader))
 {
@@ -32,7 +31,7 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& theme, WidgetFactory& widget
 
     const auto parameterArrays = createModulationBusParameterArrays();
 
-    createInitAllBussesButton(theme);
+    createInitAllBussesButton(skin);
 
     modulationBuses_.reserve(PluginDescriptors::kModulationBusCount);
     for (int busNumber = 0; busNumber < PluginDescriptors::kModulationBusCount; ++busNumber)
@@ -41,7 +40,7 @@ MatrixModulationPanel::MatrixModulationPanel(Theme& theme, WidgetFactory& widget
         auto bus = std::make_unique<ModulationBusPanel>(
             busNumber,
             widgetFactory,
-            theme,
+            skin,
             apvts_,
             parameterArrays.sourceParameterIds[busNumberAsSizeT],
             parameterArrays.amountParameterIds[busNumberAsSizeT],
@@ -128,10 +127,10 @@ MatrixModulationPanel::ModulationBusParameterArrays MatrixModulationPanel::creat
     return arrays;
 }
 
-void MatrixModulationPanel::createInitAllBussesButton(Theme& theme)
+void MatrixModulationPanel::createInitAllBussesButton(tss::Skin& skin)
 {
     initAllBussesButton_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kInit,
         PluginDimensions::Widgets::Heights::kButton,
         PluginDescriptors::StandaloneWidgetDisplayNames::kShortInitLabel);
@@ -169,23 +168,23 @@ void MatrixModulationPanel::resized()
     }
 }
 
-void MatrixModulationPanel::setTheme(Theme& theme)
+void MatrixModulationPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = sectionHeader_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* busHeader = modulationBusHeader_.get())
-        busHeader->setTheme(theme);
+        busHeader->setSkin(skin);
 
     if (auto* button = initAllBussesButton_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     for (auto& bus : modulationBuses_)
     {
         if (bus != nullptr)
-            bus->setTheme(theme);
+            bus->setSkin(skin);
     }
 }
 

@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class ModuleHeader;
     class Button;
 }
@@ -22,7 +22,7 @@ public:
     enum class ButtonSet { InitCopyPaste, InitOnly };
     enum class ModuleType { PatchEdit, MasterEdit };
 
-    ModuleHeaderPanel(tss::Theme& theme,
+    ModuleHeaderPanel(tss::Skin& skin,
                      WidgetFactory& factory,
                      const juce::String& moduleId,
                      ButtonSet buttonSet,
@@ -34,19 +34,19 @@ public:
     ~ModuleHeaderPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
     static int getHeight() { return PluginDimensions::Widgets::Heights::kModuleHeader; }
 
 private:
-    void createModuleHeader(tss::Theme& theme, WidgetFactory& factory, const juce::String& moduleId);
-    void createInitButton(tss::Theme& theme, WidgetFactory& factory, const juce::String& initWidgetId);
-    void createCopyPasteButtons(tss::Theme& theme, WidgetFactory& factory, const juce::String& copyWidgetId, const juce::String& pasteWidgetId);
+    void createModuleHeader(tss::Skin& skin, WidgetFactory& factory, const juce::String& moduleId);
+    void createInitButton(tss::Skin& skin, WidgetFactory& factory, const juce::String& initWidgetId);
+    void createCopyPasteButtons(tss::Skin& skin, WidgetFactory& factory, const juce::String& copyWidgetId, const juce::String& pasteWidgetId);
 
     void layoutModuleHeader();
     void layoutInitOnlyButtons();
     void layoutInitCopyPasteButtons();
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
     ButtonSet buttonSet_;
     ModuleType moduleType_;
 

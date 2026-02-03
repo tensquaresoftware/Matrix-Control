@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -16,7 +16,7 @@ class WidgetFactory;
 class Dco1Panel : public BaseModulePanel
 {
 public:
-    Dco1Panel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Dco1Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Dco1Panel() override = default;
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::ChildPanels::kWidth; }

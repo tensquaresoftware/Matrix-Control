@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class Slider : public juce::Slider
     {
     public:
-        explicit Slider(Theme& theme, int width, int height, double defaultValue = 0.0);
+        explicit Slider(Skin& skin, int width, int height, double defaultValue = 0.0);
         ~Slider() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void setUnit(const juce::String& unit);
         juce::String getUnit() const;
@@ -38,7 +38,7 @@ namespace tss
         inline constexpr static double kDragSensitivity_ = 0.5;
         inline constexpr static double kShiftKeyStep_ = 10.0;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         
         int width_;
         int height_;
@@ -53,7 +53,7 @@ namespace tss
         bool cacheValid_ = false;
         double cachedValue_ = 0.0;
 
-        // Theme cache
+        // Skin cache
         juce::Colour cachedTrackColour_;
         juce::Colour cachedValueBarColour_;
         juce::Colour cachedTextColour_;
@@ -62,7 +62,7 @@ namespace tss
 
         void regenerateCache();
         void invalidateCache();
-        void updateThemeCache();
+        void updateSkinCache();
         float getPixelScale() const;
 
         void drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

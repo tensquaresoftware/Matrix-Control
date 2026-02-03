@@ -1,25 +1,25 @@
 #include "ModuleHeader.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    ModuleHeader::ModuleHeader(Theme& theme, const juce::String& text, int width, int height, ColourVariant variant)
+    ModuleHeader::ModuleHeader(tss::Skin& skin, const juce::String& text, int width, int height, ColourVariant variant)
         : width_(width)
         , height_(height)
-        , theme_(&theme)
+        , skin_(&skin)
         , text_(text)
         , colourVariant_(variant)
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateThemeCache();
+        updateSkinCache();
     }
 
-    void ModuleHeader::setTheme(Theme& theme)
+    void ModuleHeader::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        updateThemeCache();
+        skin_ = &skin;
+        updateSkinCache();
         invalidateCache();
         repaint();
     }
@@ -36,7 +36,7 @@ namespace tss
 
     void ModuleHeader::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr || text_.isEmpty())
+        if (skin_ == nullptr || text_.isEmpty())
             return;
 
         if (!cacheValid_)
@@ -88,14 +88,14 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void ModuleHeader::updateThemeCache()
+    void ModuleHeader::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = theme_->getModuleHeaderTextColour();
+        cachedTextColour_ = skin_->getModuleHeaderTextColour();
         cachedLineColour_ = getLineColour();
-        cachedFont_ = theme_->getBaseFont().withHeight(kTextFontHeight_).boldened();
+        cachedFont_ = skin_->getBaseFont().withHeight(kTextFontHeight_).boldened();
     }
 
     float ModuleHeader::getPixelScale() const
@@ -137,8 +137,8 @@ namespace tss
     juce::Colour ModuleHeader::getLineColour() const
     {
         return (colourVariant_ == ColourVariant::Blue) 
-            ? theme_->getModuleHeaderLineColourBlue() 
-            : theme_->getModuleHeaderLineColourOrange();
+            ? skin_->getModuleHeaderLineColourBlue() 
+            : skin_->getModuleHeaderLineColourOrange();
     }
 }
 

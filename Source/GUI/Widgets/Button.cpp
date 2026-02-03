@@ -2,13 +2,13 @@
 
 #include <map>
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    Button::Button(Theme& theme, int width, int height, const juce::String& text)
+    Button::Button(tss::Skin& skin, int width, int height, const juce::String& text)
         : juce::Button(text)
-        , theme_(&theme)
+        , skin_(&skin)
         , width_(width)
         , height_(height)
     {
@@ -16,16 +16,16 @@ namespace tss
         setSize(width_, height_);
     }
 
-    void Button::setTheme(Theme& theme)
+    void Button::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
+        skin_ = &skin;
         invalidateCache();
         repaint();
     }
 
     void Button::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         if (!cacheValid_)
@@ -131,7 +131,7 @@ namespace tss
         if (!buttonText.isEmpty())
         {
             g.setColour(getTextColour(enabled, isHighlighted, isDown));
-            g.setFont(theme_->getBaseFont());
+            g.setFont(skin_->getBaseFont());
             g.drawText(buttonText, bounds, juce::Justification::centred, false);
         }
     }
@@ -139,37 +139,37 @@ namespace tss
     juce::Colour Button::getBackgroundColour(bool enabled, bool isHighlighted, bool isDown) const
     {
         if (!enabled)
-            return theme_->getButtonBackgroundColourOff();
+            return skin_->getButtonBackgroundColourOff();
 
         if (isDown)
-            return theme_->getButtonBackgroundColourClicked();
+            return skin_->getButtonBackgroundColourClicked();
 
         if (isHighlighted)
-            return theme_->getButtonBackgroundColourHoover();
+            return skin_->getButtonBackgroundColourHoover();
 
-        return theme_->getButtonBackgroundColourOn();
+        return skin_->getButtonBackgroundColourOn();
     }
 
     juce::Colour Button::getBorderColour(bool enabled) const
     {
         if (!enabled)
-            return theme_->getButtonBorderColourOff();
+            return skin_->getButtonBorderColourOff();
 
-        return theme_->getButtonBorderColourOn();
+        return skin_->getButtonBorderColourOn();
     }
 
     juce::Colour Button::getTextColour(bool enabled, bool isHighlighted, bool isDown) const
     {
         if (!enabled)
-            return theme_->getButtonTextColourOff();
+            return skin_->getButtonTextColourOff();
 
         if (isDown)
-            return theme_->getButtonTextColourClicked();
+            return skin_->getButtonTextColourClicked();
 
         if (isHighlighted)
-            return theme_->getButtonTextColourHoover();
+            return skin_->getButtonTextColourHoover();
 
-        return theme_->getButtonTextColourOn();
+        return skin_->getButtonTextColourOn();
     }
 }
 

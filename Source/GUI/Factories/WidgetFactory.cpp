@@ -15,11 +15,11 @@ WidgetFactory::WidgetFactory(juce::AudioProcessorValueTreeState& inApvts)
 
 std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
     const PluginDescriptors::IntParameterDescriptor* desc,
-    tss::Theme& theme,
+    tss::Skin& skin,
     int width,
     int height)
 {
-    auto slider = std::make_unique<tss::Slider>(theme, width, height, static_cast<double>(desc->defaultValue));
+    auto slider = std::make_unique<tss::Slider>(skin, width, height, static_cast<double>(desc->defaultValue));
     slider->setRange(static_cast<double>(desc->minValue), static_cast<double>(desc->maxValue), 1.0);
     slider->setValue(static_cast<double>(desc->defaultValue));
     return slider;
@@ -27,11 +27,11 @@ std::unique_ptr<tss::Slider> WidgetFactory::createSliderFromDescriptor(
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
     const PluginDescriptors::ChoiceParameterDescriptor* desc,
-    tss::Theme& theme,
+    tss::Skin& skin,
     int width,
     int height)
 {
-    auto comboBox = std::make_unique<tss::ComboBox>(theme, width, height);
+    auto comboBox = std::make_unique<tss::ComboBox>(skin, width, height);
     
     for (const auto& choice : desc->choices)
         comboBox->addItem(choice, comboBox->getNumItems() + 1);
@@ -42,7 +42,7 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createComboBoxFromDescriptor(
 
 std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     const juce::String& parameterId,
-    tss::Theme& theme)
+    tss::Skin& skin)
 {
     validator.throwIfParameterIdEmpty(parameterId);
     const auto* desc = findIntParameter(parameterId);
@@ -50,7 +50,7 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
     validator.validateIntParameterValues(desc, parameterId);
     return createSliderFromDescriptor(
         desc,
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Slider::kStandard,
         PluginDimensions::Widgets::Heights::kSlider
     );
@@ -58,7 +58,7 @@ std::unique_ptr<tss::Slider> WidgetFactory::createIntParameterSlider(
 
 std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     const juce::String& parameterId,
-    tss::Theme& theme,
+    tss::Skin& skin,
     int width,
     int height)
 {
@@ -66,12 +66,12 @@ std::unique_ptr<tss::ComboBox> WidgetFactory::createChoiceParameterComboBox(
     const auto* desc = findChoiceParameter(parameterId);
     validator.getChoiceParameterDescriptorOrThrow(desc, parameterId);
     validator.validateChoiceParameterValues(desc, parameterId);
-    return createComboBoxFromDescriptor(desc, theme, width, height);
+    return createComboBoxFromDescriptor(desc, skin, width, height);
 }
 
 std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     const juce::String& widgetId,
-    tss::Theme& theme,
+    tss::Skin& skin,
     int height)
 {
     validator.throwIfWidgetIdEmpty(widgetId);
@@ -82,7 +82,7 @@ std::unique_ptr<tss::Button> WidgetFactory::createStandaloneButton(
     const auto buttonWidth = getButtonWidthForWidgetId(widgetId);
     
     return std::make_unique<tss::Button>(
-        theme, 
+        skin, 
         buttonWidth,
         height,
         desc->displayName

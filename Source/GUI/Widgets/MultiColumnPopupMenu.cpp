@@ -2,7 +2,7 @@
 #include "ComboBox.h"
 #include "PopupMenuPositioner.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
@@ -24,12 +24,12 @@ namespace tss
 
     void MultiColumnPopupMenu::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
         {
             return;
         }
 
-        g.fillAll(theme_->getPopupMenuBackgroundColour(isButtonLike_));
+        g.fillAll(skin_->getPopupMenuBackgroundColour(isButtonLike_));
         
         const auto bounds = getLocalBounds();
         const auto borderThickness = static_cast<int>(kBorderThickness_);

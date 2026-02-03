@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class SectionHeader : public juce::Component
     {
@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit SectionHeader(Theme& theme, int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
+        explicit SectionHeader(Skin& skin, int width, int height, const juce::String& text = juce::String(), ColourVariant variant = ColourVariant::Blue);
         ~SectionHeader() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -35,7 +35,7 @@ namespace tss
 
         int width_;
         int height_;
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         juce::String text_;
         ColourVariant colourVariant_;
 
@@ -43,7 +43,7 @@ namespace tss
         juce::Image cachedImage_;
         bool cacheValid_ = false;
 
-        // Theme cache
+        // Skin cache
         juce::Colour cachedTextColour_;
         juce::Colour cachedLineColour_;
         juce::Font cachedFont_;
@@ -51,7 +51,7 @@ namespace tss
 
         void regenerateCache();
         void invalidateCache();
-        void updateThemeCache();
+        void updateSkinCache();
         float getPixelScale() const;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& contentArea);

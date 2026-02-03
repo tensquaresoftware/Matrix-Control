@@ -1,24 +1,24 @@
 #include "PopupMenuBase.h"
 #include "ComboBox.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
     PopupMenuBase::PopupMenuBase(ComboBox& comboBox, bool isButtonLike)
         : comboBox_(comboBox)
         , isButtonLike_(isButtonLike)
-        , renderer_(*comboBox.theme_, isButtonLike)
+        , renderer_(*comboBox.skin_, isButtonLike)
     {
         setWantsKeyboardFocus(true);
         setAlwaysOnTop(true);
         setInterceptsMouseClicks(true, true);
         setOpaque(true);
         
-        theme_ = comboBox_.theme_;
-        if (auto* currentTheme = theme_)
+        skin_ = comboBox_.skin_;
+        if (auto* currentSkin = skin_)
         {
-            cachedFont_ = currentTheme->getBaseFont();
+            cachedFont_ = currentSkin->getBaseFont();
         }
     }
 

@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -16,7 +16,7 @@ class WidgetFactory;
 class FmTrackPanel : public BaseModulePanel
 {
 public:
-    FmTrackPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    FmTrackPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~FmTrackPanel() override = default;
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::ChildPanels::kWidth; }

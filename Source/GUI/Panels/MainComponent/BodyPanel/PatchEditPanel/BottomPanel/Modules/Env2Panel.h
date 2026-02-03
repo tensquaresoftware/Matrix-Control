@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -16,7 +16,7 @@ class WidgetFactory;
 class Env2Panel : public BaseModulePanel
 {
 public:
-    Env2Panel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    Env2Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~Env2Panel() override = default;
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::ChildPanels::kWidth; }

@@ -9,17 +9,17 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class MiddlePanel : public juce::Component
 {
 public:
-    MiddlePanel(tss::Theme& theme);
+    MiddlePanel(tss::Skin& skin);
     ~MiddlePanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::MiddlePanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::MiddlePanel::kHeight; }
@@ -27,7 +27,7 @@ public:
 private:
     inline constexpr static int kSpacing = 15;
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     tss::EnvelopeDisplay envelope1Display_;
     tss::EnvelopeDisplay envelope2Display_;

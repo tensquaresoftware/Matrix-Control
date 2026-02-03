@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class PopupMenuBase;
     class MultiColumnPopupMenu;
     class ScrollablePopupMenu;
@@ -22,10 +22,10 @@ namespace tss
             ButtonLike
         };
 
-        explicit ComboBox(Theme& theme, int width, int height, Style style = Style::Standard);
+        explicit ComboBox(Skin& skin, int width, int height, Style style = Style::Standard);
         ~ComboBox() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -50,7 +50,7 @@ namespace tss
         inline constexpr static int kTriangleBaseSize_ = 7;
         inline constexpr static float kTriangleHeightFactor_ = 0.8660254f;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
         Style style_;
@@ -62,7 +62,7 @@ namespace tss
         bool cacheValid_ = false;
         int cachedSelectedIndex_ = -1;
 
-        // Theme cache
+        // Skin cache
         juce::Colour cachedBackgroundColour_;
         juce::Colour cachedTextColour_;
         juce::Colour cachedBorderColour_;
@@ -71,7 +71,7 @@ namespace tss
 
         void regenerateCache();
         void invalidateCache();
-        void updateThemeCache();
+        void updateSkinCache();
         float getPixelScale() const;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

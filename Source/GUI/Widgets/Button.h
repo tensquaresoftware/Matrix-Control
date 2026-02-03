@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class Button : public juce::Button
     {
     public:
-        explicit Button(Theme& theme, int width, int height, const juce::String& text = {});
+        explicit Button(Skin& skin, int width, int height, const juce::String& text = {});
         ~Button() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
         
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
         void resized() override;
@@ -31,7 +31,7 @@ namespace tss
 
         inline constexpr static int kBorderThickness_ = 2;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
 

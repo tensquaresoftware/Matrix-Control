@@ -1,30 +1,30 @@
 #include "VerticalSeparator.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    VerticalSeparator::VerticalSeparator(Theme& theme, int width, int height)
-        : theme_(&theme)
+    VerticalSeparator::VerticalSeparator(tss::Skin& skin, int width, int height)
+        : skin_(&skin)
         , width_(width)
         , height_(height)
     {
         setOpaque(false);
         setSize(width_, height_);
-        cachedLineColour_ = theme_->getVerticalSeparatorLineColour();
+        cachedLineColour_ = skin_->getVerticalSeparatorLineColour();
     }
 
-    void VerticalSeparator::setTheme(Theme& theme)
+    void VerticalSeparator::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        cachedLineColour_ = theme_->getVerticalSeparatorLineColour();
+        skin_ = &skin;
+        cachedLineColour_ = skin_->getVerticalSeparatorLineColour();
         invalidateCache();
         repaint();
     }
 
     void VerticalSeparator::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         if (!cacheValid_)

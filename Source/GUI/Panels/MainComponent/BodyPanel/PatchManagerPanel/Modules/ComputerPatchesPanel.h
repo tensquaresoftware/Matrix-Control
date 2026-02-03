@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class ModuleHeader;
     class GroupLabel;
     class Button;
@@ -21,11 +21,11 @@ class WidgetFactory;
 class ComputerPatchesPanel : public juce::Component
 {
 public:
-    ComputerPatchesPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    ComputerPatchesPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~ComputerPatchesPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getWidth() { return PluginDimensions::Panels::PatchManagerPanel::ComputerPatchesPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::ComputerPatchesPanel::kHeight; }
@@ -36,7 +36,7 @@ private:
     inline constexpr static int kSpacing_ = 5;
     inline constexpr static int kSelectPatchFileEmptyId_ = 1;
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
     juce::AudioProcessorValueTreeState& apvts_;
 
     std::unique_ptr<tss::ModuleHeader> moduleHeader_;
@@ -52,15 +52,15 @@ private:
     std::unique_ptr<tss::Button> savePatchFileAsButton_;
     std::unique_ptr<tss::Button> savePatchFileButton_;
 
-    void setupModuleHeader(tss::Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupBrowserGroupLabel(tss::Theme& theme);
-    void setupLoadPreviousPatchFileButton(tss::Theme& theme, WidgetFactory& widgetFactory);
-    void setupLoadNextPatchFileButton(tss::Theme& theme, WidgetFactory& widgetFactory);
-    void setupSelectPatchFileComboBox(tss::Theme& theme);
-    void setupUtilityGroupLabel(tss::Theme& theme);
-    void setupOpenPatchFolderButton(tss::Theme& theme, WidgetFactory& widgetFactory);
-    void setupSavePatchFileAsButton(tss::Theme& theme, WidgetFactory& widgetFactory);
-    void setupSavePatchFileButton(tss::Theme& theme, WidgetFactory& widgetFactory);
+    void setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
+    void setupBrowserGroupLabel(tss::Skin& skin);
+    void setupLoadPreviousPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupLoadNextPatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupSelectPatchFileComboBox(tss::Skin& skin);
+    void setupUtilityGroupLabel(tss::Skin& skin);
+    void setupOpenPatchFolderButton(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupSavePatchFileAsButton(tss::Skin& skin, WidgetFactory& widgetFactory);
+    void setupSavePatchFileButton(tss::Skin& skin, WidgetFactory& widgetFactory);
 
     void layoutModuleHeader(int x, int y);
     void layoutBrowserGroupLabel(int x, int y);

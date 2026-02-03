@@ -4,7 +4,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "Core/PluginProcessor.h"
-#include "Themes/Theme.h"
+#include "Themes/Skin.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
 #include "Panels/MainComponent/FooterPanel/FooterPanel.h"
@@ -31,11 +31,11 @@ private:
 
     PluginProcessor& pluginProcessor;
     
-    std::unique_ptr<tss::Theme> theme;
+    std::unique_ptr<tss::Skin> skin;
     std::unique_ptr<WidgetFactory> widgetFactory;
     std::unique_ptr<MainComponent> mainComponent;
     
-    void updateTheme();
+    void updateSkin();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 };

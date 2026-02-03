@@ -1,11 +1,11 @@
 #include "TrackGeneratorDisplay.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    TrackGeneratorDisplay::TrackGeneratorDisplay(Theme& theme, int width, int height)
-        : theme_(&theme)
+    TrackGeneratorDisplay::TrackGeneratorDisplay(tss::Skin& skin, int width, int height)
+        : skin_(&skin)
         , width_(width)
         , height_(height)
     {
@@ -13,14 +13,14 @@ namespace tss
         setSize(width_, height_);
     }
 
-    void TrackGeneratorDisplay::setTheme(Theme& theme)
+    void TrackGeneratorDisplay::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
+        skin_ = &skin;
     }
 
     void TrackGeneratorDisplay::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         const auto bounds = getLocalBounds().toFloat();
@@ -34,21 +34,21 @@ namespace tss
 
     void TrackGeneratorDisplay::drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto backgroundColour = theme_->getTrackGeneratorDisplayBackgroundColour();
+        const auto backgroundColour = skin_->getTrackGeneratorDisplayBackgroundColour();
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
 
     void TrackGeneratorDisplay::drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto borderColour = theme_->getTrackGeneratorDisplayBorderColour();
+        const auto borderColour = skin_->getTrackGeneratorDisplayBorderColour();
         g.setColour(borderColour);
         g.drawRect(bounds, static_cast<float>(kBorderThickness_));
     }
 
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
-        const auto triangleColour = theme_->getTrackGeneratorDisplayBorderColour();
+        const auto triangleColour = skin_->getTrackGeneratorDisplayBorderColour();
         const auto triangleHeight = kTriangleBase_ * std::sqrt(3.0f) * 0.5f;
         const auto centreX = bounds.getCentreX();
         const auto baseY = bounds.getY();

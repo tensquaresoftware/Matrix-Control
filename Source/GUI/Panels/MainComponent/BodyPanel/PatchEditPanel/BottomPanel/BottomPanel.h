@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -22,11 +22,11 @@ class Lfo2Panel;
 class BottomPanel : public juce::Component
 {
 public:
-    BottomPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BottomPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BottomPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::kHeight; }
@@ -34,7 +34,7 @@ public:
 
 private:
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     std::unique_ptr<Env1Panel> env1Panel_;
     std::unique_ptr<Env2Panel> env2Panel_;

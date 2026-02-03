@@ -4,13 +4,13 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class ComboBox;
 
     class PopupMenuRenderer
     {
     public:
-        PopupMenuRenderer(Theme& theme, bool isButtonLike);
+        PopupMenuRenderer(Skin& skin, bool isButtonLike);
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds) const;
         void drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const;
@@ -23,7 +23,7 @@ namespace tss
     private:
         inline constexpr static int kTextLeftPadding_ = 3;
 
-        Theme& theme_;
+        Skin& skin_;
         bool isButtonLike_;
     };
 }

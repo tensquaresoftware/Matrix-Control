@@ -1,26 +1,26 @@
 #include "SectionHeader.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    SectionHeader::SectionHeader(Theme& theme, int width, int height, const juce::String& text, ColourVariant variant)
+    SectionHeader::SectionHeader(tss::Skin& skin, int width, int height, const juce::String& text, ColourVariant variant)
         : width_(width)
         , height_(height)
-        , theme_(&theme)
+        , skin_(&skin)
         , text_(text)
         , colourVariant_(variant)
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateThemeCache();
+        updateSkinCache();
         calculateTextWidth();
     }
 
-    void SectionHeader::setTheme(Theme& theme)
+    void SectionHeader::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        updateThemeCache();
+        skin_ = &skin;
+        updateSkinCache();
         calculateTextWidth();
         invalidateCache();
         repaint();
@@ -28,7 +28,7 @@ namespace tss
 
     void SectionHeader::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr || text_.isEmpty())
+        if (skin_ == nullptr || text_.isEmpty())
             return;
 
         if (!cacheValid_)
@@ -81,14 +81,14 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void SectionHeader::updateThemeCache()
+    void SectionHeader::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = theme_->getSectionHeaderTextColour();
+        cachedTextColour_ = skin_->getSectionHeaderTextColour();
         cachedLineColour_ = getLineColour();
-        cachedFont_ = theme_->getBaseFont().withHeight(kTextFontHeight_);
+        cachedFont_ = skin_->getBaseFont().withHeight(kTextFontHeight_);
     }
 
     float SectionHeader::getPixelScale() const
@@ -155,13 +155,13 @@ namespace tss
     juce::Colour SectionHeader::getLineColour() const
     {
         return (colourVariant_ == ColourVariant::Blue) 
-            ? theme_->getSectionHeaderLineColourBlue() 
-            : theme_->getSectionHeaderLineColourOrange();
+            ? skin_->getSectionHeaderLineColourBlue() 
+            : skin_->getSectionHeaderLineColourOrange();
     }
 
     void SectionHeader::calculateTextWidth()
     {
-        if (text_.isEmpty() || theme_ == nullptr)
+        if (text_.isEmpty() || skin_ == nullptr)
         {
             cachedTextWidth_ = 0.0f;
             return;

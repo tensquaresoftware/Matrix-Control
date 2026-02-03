@@ -1,18 +1,17 @@
 #include "MiddlePanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
-using tss::Theme;
 
 MiddlePanel::~MiddlePanel() = default;
 
-MiddlePanel::MiddlePanel(Theme& theme)
-    : theme_(&theme)
-    , envelope1Display_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , envelope2Display_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , envelope3Display_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , trackGeneratorDisplay_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
-    , patchNameDisplay_(theme, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+MiddlePanel::MiddlePanel(tss::Skin& skin)
+    : skin_(&skin)
+    , envelope1Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+    , envelope2Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+    , envelope3Display_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+    , trackGeneratorDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
+    , patchNameDisplay_(skin, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kWidth, PluginDimensions::Panels::PatchEditPanel::MiddlePanel::ChildPanels::kHeight)
 {
     setOpaque(false);
     setSize(getWidth(), getHeight());
@@ -36,13 +35,13 @@ void MiddlePanel::resized()
     patchNameDisplay_.setBounds(trackGeneratorDisplay_.getBounds().getRight() + kSpacing, 0, childWidth, childHeight);
 }
 
-void MiddlePanel::setTheme(Theme& theme)
+void MiddlePanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
-    envelope1Display_.setTheme(theme);
-    envelope2Display_.setTheme(theme);
-    envelope3Display_.setTheme(theme);
-    trackGeneratorDisplay_.setTheme(theme);
-    patchNameDisplay_.setTheme(theme);
+    skin_ = &skin;
+    envelope1Display_.setSkin(skin);
+    envelope2Display_.setSkin(skin);
+    envelope3Display_.setSkin(skin);
+    trackGeneratorDisplay_.setSkin(skin);
+    patchNameDisplay_.setSkin(skin);
 }
 

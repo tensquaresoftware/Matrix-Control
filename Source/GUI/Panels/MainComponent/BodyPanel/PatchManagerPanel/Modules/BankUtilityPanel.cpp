@@ -1,6 +1,6 @@
 #include "BankUtilityPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"
@@ -9,16 +9,15 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
 
-using tss::Theme;
 
-BankUtilityPanel::BankUtilityPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+BankUtilityPanel::BankUtilityPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
     , apvts_(apvts)
 {
     setOpaque(false);
-    setupModuleHeader(theme, widgetFactory, PluginDescriptors::ModuleIds::kBankUtility);
-    setupBankSelectorLabel(theme);
-    setupSelectBankButtons(theme, widgetFactory);
+    setupModuleHeader(skin, widgetFactory, PluginDescriptors::ModuleIds::kBankUtility);
+    setupBankSelectorLabel(skin);
+    setupSelectBankButtons(skin, widgetFactory);
 
     setSize(getWidth(), getHeight());
 }
@@ -103,54 +102,54 @@ void BankUtilityPanel::resized()
         button->setBounds(x, y, buttonWidth, buttonHeight);
 }
 
-void BankUtilityPanel::setTheme(Theme& theme)
+void BankUtilityPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = bankUtilityModuleHeader_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* label = bankSelectorLabel_.get())
-        label->setTheme(theme);
+        label->setSkin(skin);
 
     if (auto* button = selectBank0Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank1Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank2Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank3Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank4Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = unlockBankButton_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank5Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank6Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank7Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank8Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 
     if (auto* button = selectBank9Button_.get())
-        button->setTheme(theme);
+        button->setSkin(skin);
 }
 
-void BankUtilityPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFactory, const juce::String& moduleId)
+void BankUtilityPanel::setupModuleHeader(tss::Skin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
 {
     bankUtilityModuleHeader_ = std::make_unique<tss::ModuleHeader>(
-        theme, 
+        skin, 
         widgetFactory.getGroupDisplayName(moduleId),
         PluginDimensions::Widgets::Widths::ModuleHeader::kPatchManagerModule,
         PluginDimensions::Widgets::Heights::kModuleHeader,
@@ -158,20 +157,20 @@ void BankUtilityPanel::setupModuleHeader(Theme& theme, WidgetFactory& widgetFact
     addAndMakeVisible(*bankUtilityModuleHeader_);
 }
 
-void BankUtilityPanel::setupBankSelectorLabel(Theme& theme)
+void BankUtilityPanel::setupBankSelectorLabel(tss::Skin& skin)
 {
     bankSelectorLabel_ = std::make_unique<tss::Label>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Label::kPatchManagerBankSelector,
         PluginDimensions::Widgets::Heights::kLabel,
         PluginDescriptors::StandaloneWidgetDisplayNames::kBankSelector);
     addAndMakeVisible(*bankSelectorLabel_);
 }
 
-void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widgetFactory)
+void BankUtilityPanel::setupSelectBankButtons(tss::Skin& skin, WidgetFactory& widgetFactory)
 {
     selectBank0Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank0));
@@ -184,7 +183,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank0Button_);
 
     selectBank1Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank1));
@@ -197,7 +196,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank1Button_);
 
     selectBank2Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank2));
@@ -210,7 +209,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank2Button_);
 
     selectBank3Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank3));
@@ -223,7 +222,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank3Button_);
 
     selectBank4Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank4));
@@ -236,7 +235,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank4Button_);
 
     unlockBankButton_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerUnlockBank,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kUnlockBank));
@@ -249,7 +248,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*unlockBankButton_);
 
     selectBank5Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank5));
@@ -262,7 +261,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank5Button_);
 
     selectBank6Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank6));
@@ -275,7 +274,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank6Button_);
 
     selectBank7Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank7));
@@ -288,7 +287,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank7Button_);
 
     selectBank8Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank8));
@@ -301,7 +300,7 @@ void BankUtilityPanel::setupSelectBankButtons(Theme& theme, WidgetFactory& widge
     addAndMakeVisible(*selectBank8Button_);
 
     selectBank9Button_ = std::make_unique<tss::Button>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::Button::kPatchManagerBankSelect,
         PluginDimensions::Widgets::Heights::kButton,
         widgetFactory.getStandaloneWidgetDisplayName(PluginDescriptors::StandaloneWidgetIds::kSelectBank9));

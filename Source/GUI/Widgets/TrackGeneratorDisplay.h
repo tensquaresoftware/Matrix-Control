@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class TrackGeneratorDisplay : public juce::Component
     {
     public:
-        explicit TrackGeneratorDisplay(Theme& theme, int width, int height);
+        explicit TrackGeneratorDisplay(Skin& skin, int width, int height);
         ~TrackGeneratorDisplay() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
         
         void paint(juce::Graphics& g) override;
 
@@ -24,7 +24,7 @@ namespace tss
         inline constexpr static int kVerticalPadding_ = 15;
         inline constexpr static float kTriangleBase_ = 10.0f;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int width_;
         int height_;
 

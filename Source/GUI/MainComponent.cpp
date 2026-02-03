@@ -1,15 +1,13 @@
 #include "MainComponent.h"
 
 #include "GUI/Factories/WidgetFactory.h"
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
-using tss::Theme;
-
-MainComponent::MainComponent(Theme& theme, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
-    , headerPanel(theme)
-    , bodyPanel(theme, widgetFactory, apvts)
-    , footerPanel(theme, apvts)
+MainComponent::MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
+    , headerPanel(skin)
+    , bodyPanel(skin, widgetFactory, apvts)
+    , footerPanel(skin, apvts)
 {
     setOpaque(true);
     setSize(width, height);
@@ -21,8 +19,8 @@ MainComponent::MainComponent(Theme& theme, int width, int height, WidgetFactory&
 
 void MainComponent::paint(juce::Graphics& g)
 {
-    if (theme_ != nullptr)
-        g.fillAll(theme_->getBodyPanelBackgroundColour());
+    if (skin_ != nullptr)
+        g.fillAll(skin_->getBodyPanelBackgroundColour());
 }
 
 void MainComponent::resized()
@@ -69,11 +67,11 @@ void MainComponent::layoutFooterPanel(juce::Rectangle<int> bounds, int y)
     );
 }
 
-void MainComponent::setTheme(Theme& theme)
+void MainComponent::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
-    headerPanel.setTheme(theme);
-    bodyPanel.setTheme(theme);
-    footerPanel.setTheme(theme);
+    skin_ = &skin;
+    headerPanel.setSkin(skin);
+    bodyPanel.setSkin(skin);
+    footerPanel.setSkin(skin);
 }
 

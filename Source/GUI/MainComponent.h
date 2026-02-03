@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -17,12 +17,12 @@ class WidgetFactory;
 class MainComponent : public juce::Component
 {
 public:
-    MainComponent(tss::Theme& theme, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    MainComponent(tss::Skin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~MainComponent() override = default;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }
@@ -33,7 +33,7 @@ private:
     void layoutBodyPanel(juce::Rectangle<int> bounds, int y);
     void layoutFooterPanel(juce::Rectangle<int> bounds, int y);
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;

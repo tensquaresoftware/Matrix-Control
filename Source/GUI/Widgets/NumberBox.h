@@ -4,15 +4,15 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class NumberBox : public juce::Component
     {
     public:
-        explicit NumberBox(Theme& theme, int width, bool editable);
+        explicit NumberBox(Skin& skin, int width, bool editable);
         ~NumberBox() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
@@ -33,7 +33,7 @@ namespace tss
         inline constexpr static float kDotXOffset_ = 3.0f;
         inline constexpr static float kEditorFontSizeIncrease_ = 4.0f;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         int currentValue_ = 0;
         bool editable_ = false;
         bool showDot_ = false;
@@ -43,7 +43,7 @@ namespace tss
         juce::Image cachedImage_;
         bool cacheValid_ = false;
 
-        // Theme cache
+        // Skin cache
         juce::Colour cachedBackgroundColour_;
         juce::Colour cachedBorderColour_;
         juce::Colour cachedTextColour_;
@@ -56,7 +56,7 @@ namespace tss
 
         void regenerateCache();
         void invalidateCache();
-        void updateThemeCache();
+        void updateSkinCache();
         void updateTextWidthCache();
         float getPixelScale() const;
 

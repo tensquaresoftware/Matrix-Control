@@ -2,24 +2,24 @@
 
 #include <memory>
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    NumberBox::NumberBox(Theme& theme, int width, bool editable)
-        : theme_(&theme)
+    NumberBox::NumberBox(tss::Skin& skin, int width, bool editable)
+        : skin_(&skin)
         , editable_(editable)
     {
         setOpaque(true);
         setSize(width, kHeight_);
-        updateThemeCache();
+        updateSkinCache();
         updateTextWidthCache();
     }
 
-    void NumberBox::setTheme(Theme& theme)
+    void NumberBox::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        updateThemeCache();
+        skin_ = &skin;
+        updateSkinCache();
         invalidateCache();
         repaint();
     }
@@ -47,7 +47,7 @@ namespace tss
 
     void NumberBox::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
         if (!cacheValid_)
@@ -114,23 +114,23 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void NumberBox::updateThemeCache()
+    void NumberBox::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
-        cachedBackgroundColour_ = theme_->getButtonBackgroundColourOn();
+        cachedBackgroundColour_ = skin_->getButtonBackgroundColourOn();
         cachedBorderColour_ = getBorderColour();
-        cachedTextColour_ = theme_->getNumberBoxTextColour();
-        cachedDotColour_ = theme_->getNumberBoxDotColour();
-        cachedFont_ = theme_->getBaseFont();
+        cachedTextColour_ = skin_->getNumberBoxTextColour();
+        cachedDotColour_ = skin_->getNumberBoxDotColour();
+        cachedFont_ = skin_->getBaseFont();
     }
 
     void NumberBox::updateTextWidthCache()
     {
         cachedValueText_ = juce::String(currentValue_);
         
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
         {
             cachedTextWidth_ = 0.0f;
             return;
@@ -161,9 +161,9 @@ namespace tss
     juce::Colour NumberBox::getBorderColour() const
     {
         if (!isEnabled())
-            return theme_->getButtonBorderColourOff();
+            return skin_->getButtonBorderColourOff();
 
-        return theme_->getButtonBorderColourOn();
+        return skin_->getButtonBorderColourOn();
     }
 
     juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
@@ -179,7 +179,7 @@ namespace tss
         if (editor_ != nullptr)
             return;
 
-        const auto baseFont = theme_->getBaseFont();
+        const auto baseFont = skin_->getBaseFont();
         const auto editorFont = baseFont.withStyle(juce::Font::bold)
                                         .withHeight(baseFont.getHeight() + kEditorFontSizeIncrease_);
 
@@ -189,10 +189,10 @@ namespace tss
         editor_->setFont(editorFont);
         editor_->setJustification(juce::Justification::centred);
         
-        editor_->setColour(juce::TextEditor::backgroundColourId, theme_->getNumberBoxEditorBackgroundColour());
-        editor_->setColour(juce::TextEditor::textColourId, theme_->getNumberBoxEditorTextColour());
-        editor_->setColour(juce::TextEditor::highlightColourId, theme_->getNumberBoxEditorSelectionBackgroundColour());
-        editor_->setColour(juce::TextEditor::highlightedTextColourId, theme_->getNumberBoxEditorTextColour());
+        editor_->setColour(juce::TextEditor::backgroundColourId, skin_->getNumberBoxEditorBackgroundColour());
+        editor_->setColour(juce::TextEditor::textColourId, skin_->getNumberBoxEditorTextColour());
+        editor_->setColour(juce::TextEditor::highlightColourId, skin_->getNumberBoxEditorSelectionBackgroundColour());
+        editor_->setColour(juce::TextEditor::highlightedTextColourId, skin_->getNumberBoxEditorTextColour());
         editor_->setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
         editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
         

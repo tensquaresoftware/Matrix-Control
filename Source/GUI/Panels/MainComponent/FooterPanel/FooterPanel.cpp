@@ -1,14 +1,12 @@
 #include "FooterPanel.h"
 
-#include "GUI/Themes/Theme.h"
-
-using tss::Theme;
+#include "GUI/Themes/Skin.h"
 
 const juce::Identifier FooterPanel::kMessageTextId("uiMessageText");
 const juce::Identifier FooterPanel::kMessageSeverityId("uiMessageSeverity");
 
-FooterPanel::FooterPanel(Theme& inTheme, juce::AudioProcessorValueTreeState& apvtsRef)
-    : theme(&inTheme)
+FooterPanel::FooterPanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& apvtsRef)
+    : skin_(&skin)
     , apvts(apvtsRef)
 {
     setOpaque(true);
@@ -36,7 +34,7 @@ FooterPanel::~FooterPanel()
 
 void FooterPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(theme->getFooterPanelBackgroundColour());
+    g.fillAll(skin_->getFooterPanelBackgroundColour());
     
     if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
         return;
@@ -45,7 +43,7 @@ void FooterPanel::paint(juce::Graphics& g)
     
     // Couleur du texte selon la sévérité
     g.setColour(getSeverityColour(currentSeverity));
-    g.setFont(theme->getBaseFont());
+    g.setFont(skin_->getBaseFont());
     
     // Icône (optionnel)
     const juce::String icon = getSeverityIcon(currentSeverity);
@@ -63,9 +61,9 @@ void FooterPanel::resized()
 {
 }
 
-void FooterPanel::setTheme(Theme& inTheme)
+void FooterPanel::setSkin(tss::Skin& skin)
 {
-    theme = &inTheme;
+    skin_ = &skin;
 }
 
 void FooterPanel::valueTreePropertyChanged(juce::ValueTree& tree,
@@ -102,7 +100,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
     switch (severity)
     {
         case MessageSeverity::None:
-            return theme->getLabelTextColour();
+            return skin_->getLabelTextColour();
         case MessageSeverity::Info:
             return juce::Colour(0xFF808080);  // Gris
         case MessageSeverity::Success:
@@ -112,7 +110,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::Error:
             return juce::Colour(0xFFFF0000);  // Rouge
         default:
-            return theme->getLabelTextColour();
+            return skin_->getLabelTextColour();
     }
 }
 

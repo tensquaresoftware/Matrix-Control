@@ -9,7 +9,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class SectionHeader;
 }
 
@@ -21,18 +21,18 @@ class ComputerPatchesPanel;
 class PatchManagerPanel : public juce::Component
 {
 public:
-    PatchManagerPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    PatchManagerPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~PatchManagerPanel() override;
 
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getWidth() { return PluginDimensions::Panels::PatchManagerPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::kHeight; }
 
 private:
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     std::unique_ptr<tss::SectionHeader> sectionHeader_;
     std::unique_ptr<BankUtilityPanel> bankUtilityPanel_;

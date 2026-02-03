@@ -1,11 +1,10 @@
 #include "Env3Panel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 ModulePanelConfig Env3Panel::createConfig()
 {
@@ -33,7 +32,7 @@ ModulePanelConfig Env3Panel::createConfig()
     return config;
 }
 
-Env3Panel::Env3Panel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+Env3Panel::Env3Panel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
 }

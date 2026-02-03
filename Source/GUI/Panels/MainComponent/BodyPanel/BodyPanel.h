@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
     class VerticalSeparator;
 }
 
@@ -21,12 +21,12 @@ class WidgetFactory;
 class BodyPanel : public juce::Component
 {
 public:
-    BodyPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    BodyPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~BodyPanel() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
-    void setTheme(tss::Theme& theme);
+    void setSkin(tss::Skin& skin);
 
     static int getHeight() { return kHeight_; }
     static int getPadding() { return kPadding_; }
@@ -35,7 +35,7 @@ private:
     inline constexpr static int kHeight_ = 730;
     inline constexpr static int kPadding_ = 15;
 
-    tss::Theme* theme_;
+    tss::Skin* skin_;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel_;
     std::unique_ptr<tss::VerticalSeparator> verticalSeparator1_;

@@ -50,7 +50,299 @@ namespace tss
 
     juce::Font Skin::getBaseFont() const
     {
-        return juce::Font(juce::FontOptions{}.withHeight(10.0f));
+        juce::Font font(juce::FontOptions().withHeight(14.0f));
+
+        const auto availableTypefaces = juce::Font::findAllTypefaceNames();
+        for (const auto& name : availableTypefaces)
+        {
+            if (name.containsIgnoreCase("PT Sans Narrow"))
+            {
+                font = juce::Font(juce::FontOptions(name, 14.0f, juce::Font::plain));
+                break;
+            }
+        }
+
+        return font;
+    }
+
+    juce::Colour Skin::getHeaderPanelBackgroundColour() const
+    {
+        return getColour(SkinColourId::kHeaderPanelBackground);
+    }
+
+    juce::Colour Skin::getBodyPanelBackgroundColour() const
+    {
+        return getColour(SkinColourId::kBodyPanelBackground);
+    }
+
+    juce::Colour Skin::getFooterPanelBackgroundColour() const
+    {
+        return getColour(SkinColourId::kFooterPanelBackground);
+    }
+
+    juce::Colour Skin::getSectionHeaderTextColour() const
+    {
+        return getColour(SkinColourId::kSectionHeaderText);
+    }
+
+    juce::Colour Skin::getSectionHeaderLineColourBlue() const
+    {
+        return getColour(SkinColourId::kSectionHeaderLineBlue);
+    }
+
+    juce::Colour Skin::getSectionHeaderLineColourOrange() const
+    {
+        return getColour(SkinColourId::kSectionHeaderLineOrange);
+    }
+
+    juce::Colour Skin::getModuleHeaderTextColour() const
+    {
+        return getColour(SkinColourId::kModuleHeaderText);
+    }
+
+    juce::Colour Skin::getModuleHeaderLineColourBlue() const
+    {
+        return getColour(SkinColourId::kModuleHeaderLineBlue);
+    }
+
+    juce::Colour Skin::getModuleHeaderLineColourOrange() const
+    {
+        return getColour(SkinColourId::kModuleHeaderLineOrange);
+    }
+
+    juce::Colour Skin::getGroupLabelTextColour() const
+    {
+        return getColour(SkinColourId::kGroupLabelText);
+    }
+
+    juce::Colour Skin::getGroupLabelLineColour() const
+    {
+        return getColour(SkinColourId::kGroupLabelLine);
+    }
+
+    juce::Colour Skin::getLabelTextColour() const
+    {
+        return getColour(SkinColourId::kLabelText);
+    }
+
+    juce::Colour Skin::getVerticalSeparatorLineColour() const
+    {
+        return getColour(SkinColourId::kVerticalSeparatorLine);
+    }
+
+    juce::Colour Skin::getHorizontalSeparatorLineColour() const
+    {
+        return getColour(SkinColourId::kHorizontalSeparatorLine);
+    }
+
+    juce::Colour Skin::getButtonBackgroundColourOff() const
+    {
+        return getColour(SkinColourId::kButtonBackgroundOff);
+    }
+
+    juce::Colour Skin::getButtonBorderColourOff() const
+    {
+        return getColour(SkinColourId::kButtonBorderOff);
+    }
+
+    juce::Colour Skin::getButtonTextColourOff() const
+    {
+        return getColour(SkinColourId::kButtonTextOff);
+    }
+
+    juce::Colour Skin::getButtonBackgroundColourOn() const
+    {
+        return getColour(SkinColourId::kButtonBackgroundOn);
+    }
+
+    juce::Colour Skin::getButtonBorderColourOn() const
+    {
+        return getColour(SkinColourId::kButtonBorderOn);
+    }
+
+    juce::Colour Skin::getButtonTextColourOn() const
+    {
+        return getColour(SkinColourId::kButtonTextOn);
+    }
+
+    juce::Colour Skin::getButtonBackgroundColourHoover() const
+    {
+        return getColour(SkinColourId::kButtonBackgroundHover);
+    }
+
+    juce::Colour Skin::getButtonTextColourHoover() const
+    {
+        return getColour(SkinColourId::kButtonTextHover);
+    }
+
+    juce::Colour Skin::getButtonBackgroundColourClicked() const
+    {
+        return getColour(SkinColourId::kButtonBackgroundClicked);
+    }
+
+    juce::Colour Skin::getButtonTextColourClicked() const
+    {
+        return getColour(SkinColourId::kButtonTextClicked);
+    }
+
+    juce::Colour Skin::getSliderTrackColour(bool isEnabled) const
+    {
+        return getColour(isEnabled ? SkinColourId::kSliderTrackEnabled : SkinColourId::kSliderTrackDisabled);
+    }
+
+    juce::Colour Skin::getSliderValueBarColour(bool isEnabled) const
+    {
+        return getColour(isEnabled ? SkinColourId::kSliderValueBarEnabled : SkinColourId::kSliderValueBarDisabled);
+    }
+
+    juce::Colour Skin::getSliderTextColour(bool isEnabled) const
+    {
+        return getColour(isEnabled ? SkinColourId::kSliderTextEnabled : SkinColourId::kSliderTextDisabled);
+    }
+
+    juce::Colour Skin::getSliderFocusBorderColour() const
+    {
+        return getColour(SkinColourId::kSliderFocusBorder);
+    }
+
+    juce::Colour Skin::getComboBoxBackgroundColour(bool isEnabled, bool isButtonLike) const
+    {
+        if (isButtonLike)
+            return getColour(isEnabled ? SkinColourId::kComboBoxButtonLikeBackground : SkinColourId::kComboBoxButtonLikeBackgroundDisabled);
+        return getColour(isEnabled ? SkinColourId::kComboBoxBackgroundEnabled : SkinColourId::kComboBoxBackgroundDisabled);
+    }
+
+    juce::Colour Skin::getComboBoxBorderColour(bool isEnabled, bool isButtonLike) const
+    {
+        if (isButtonLike)
+            return getColour(isEnabled ? SkinColourId::kComboBoxButtonLikeBorder : SkinColourId::kComboBoxButtonLikeBorderDisabled);
+        return getColour(isEnabled ? SkinColourId::kComboBoxBorderEnabled : SkinColourId::kComboBoxBorderDisabled);
+    }
+
+    juce::Colour Skin::getComboBoxFocusBorderColour(bool isButtonLike) const
+    {
+        if (isButtonLike)
+            return getColour(SkinColourId::kComboBoxButtonLikeBorder);
+        return getColour(SkinColourId::kComboBoxFocusBorder);
+    }
+
+    juce::Colour Skin::getComboBoxTriangleColour(bool isEnabled, bool isButtonLike) const
+    {
+        if (isButtonLike)
+            return getColour(isEnabled ? SkinColourId::kComboBoxButtonLikeTriangle : SkinColourId::kComboBoxButtonLikeTriangleDisabled);
+        return getColour(isEnabled ? SkinColourId::kComboBoxTriangleEnabled : SkinColourId::kComboBoxTriangleDisabled);
+    }
+
+    juce::Colour Skin::getComboBoxTextColour(bool isEnabled, bool isButtonLike) const
+    {
+        if (isButtonLike)
+            return getColour(isEnabled ? SkinColourId::kComboBoxButtonLikeText : SkinColourId::kComboBoxButtonLikeTextDisabled);
+        return getColour(isEnabled ? SkinColourId::kComboBoxTextEnabled : SkinColourId::kComboBoxTextDisabled);
+    }
+
+    juce::Colour Skin::getPopupMenuBackgroundColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuBackgroundButtonLike : SkinColourId::kPopupMenuBackground);
+    }
+
+    juce::Colour Skin::getPopupMenuBorderColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuBorderButtonLike : SkinColourId::kPopupMenuBorder);
+    }
+
+    juce::Colour Skin::getPopupMenuSeparatorColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuSeparatorButtonLike : SkinColourId::kPopupMenuSeparator);
+    }
+
+    juce::Colour Skin::getPopupMenuTextColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuTextButtonLike : SkinColourId::kPopupMenuText);
+    }
+
+    juce::Colour Skin::getPopupMenuBackgroundHooverColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuBackgroundHoverButtonLike : SkinColourId::kPopupMenuBackgroundHover);
+    }
+
+    juce::Colour Skin::getPopupMenuTextHooverColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuTextHoverButtonLike : SkinColourId::kPopupMenuTextHover);
+    }
+
+    juce::Colour Skin::getPopupMenuScrollbarColour(bool isButtonLike) const
+    {
+        return getColour(isButtonLike ? SkinColourId::kPopupMenuScrollbarButtonLike : SkinColourId::kPopupMenuScrollbar);
+    }
+
+    juce::Colour Skin::getNumberBoxTextColour() const
+    {
+        return getColour(SkinColourId::kNumberBoxText);
+    }
+
+    juce::Colour Skin::getNumberBoxDotColour() const
+    {
+        return getColour(SkinColourId::kNumberBoxDot);
+    }
+
+    juce::Colour Skin::getNumberBoxEditorBackgroundColour() const
+    {
+        return getColour(SkinColourId::kNumberBoxEditorBackground);
+    }
+
+    juce::Colour Skin::getNumberBoxEditorSelectionBackgroundColour() const
+    {
+        return getColour(SkinColourId::kNumberBoxEditorSelectionBackground);
+    }
+
+    juce::Colour Skin::getNumberBoxEditorTextColour() const
+    {
+        return getColour(SkinColourId::kNumberBoxEditorText);
+    }
+
+    juce::Colour Skin::getEnvelopeDisplayBackgroundColour() const
+    {
+        return getColour(SkinColourId::kEnvelopeDisplayBackground);
+    }
+
+    juce::Colour Skin::getEnvelopeDisplayBorderColour() const
+    {
+        return getColour(SkinColourId::kEnvelopeDisplayBorder);
+    }
+
+    juce::Colour Skin::getEnvelopeDisplayEnvelopeColour() const
+    {
+        return getColour(SkinColourId::kEnvelopeDisplayEnvelope);
+    }
+
+    juce::Colour Skin::getPatchNameDisplayBackgroundColour() const
+    {
+        return getColour(SkinColourId::kPatchNameDisplayBackground);
+    }
+
+    juce::Colour Skin::getPatchNameDisplayBorderColour() const
+    {
+        return getColour(SkinColourId::kPatchNameDisplayBorder);
+    }
+
+    juce::Colour Skin::getPatchNameDisplayTextColour() const
+    {
+        return getColour(SkinColourId::kPatchNameDisplayText);
+    }
+
+    juce::Colour Skin::getTrackGeneratorDisplayBackgroundColour() const
+    {
+        return getColour(SkinColourId::kTrackGeneratorDisplayBackground);
+    }
+
+    juce::Colour Skin::getTrackGeneratorDisplayBorderColour() const
+    {
+        return getColour(SkinColourId::kTrackGeneratorDisplayBorder);
+    }
+
+    juce::Colour Skin::getTrackGeneratorDisplayShaperColour() const
+    {
+        return getColour(SkinColourId::kTrackGeneratorDisplayShaper);
     }
 
     void Skin::initializeDefaultValues()
@@ -121,6 +413,14 @@ namespace tss
         colours_[SkinColourId::kComboBoxTriangleDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTriangleDisabled.blackVariant);
         colours_[SkinColourId::kComboBoxTextEnabled] = juce::Colour(Widgets::ComboBox::Standard::kText.blackVariant);
         colours_[SkinColourId::kComboBoxTextDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTextDisabled.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBackground] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackground.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBackgroundDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackgroundDisabled.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBorder] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorder.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBorderDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorderDisabled.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeText] = juce::Colour(Widgets::ComboBox::ButtonLike::kText.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeTextDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTextDisabled.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeTriangle] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangle.blackVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeTriangleDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangleDisabled.blackVariant);
 
         colours_[SkinColourId::kPopupMenuBackground] = juce::Colour(Widgets::PopupMenu::Standard::kBackground.blackVariant);
         colours_[SkinColourId::kPopupMenuBorder] = juce::Colour(Widgets::PopupMenu::Standard::kBorder.blackVariant);
@@ -129,6 +429,13 @@ namespace tss
         colours_[SkinColourId::kPopupMenuBackgroundHover] = juce::Colour(Widgets::PopupMenu::Standard::kBackgroundHoover.blackVariant);
         colours_[SkinColourId::kPopupMenuTextHover] = juce::Colour(Widgets::PopupMenu::Standard::kTextHoover.blackVariant);
         colours_[SkinColourId::kPopupMenuScrollbar] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.blackVariant);
+        colours_[SkinColourId::kPopupMenuBackgroundButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackground.blackVariant);
+        colours_[SkinColourId::kPopupMenuBorderButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBorder.blackVariant);
+        colours_[SkinColourId::kPopupMenuSeparatorButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kSeparator.blackVariant);
+        colours_[SkinColourId::kPopupMenuTextButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kText.blackVariant);
+        colours_[SkinColourId::kPopupMenuBackgroundHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackgroundHoover.blackVariant);
+        colours_[SkinColourId::kPopupMenuTextHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kTextHoover.blackVariant);
+        colours_[SkinColourId::kPopupMenuScrollbarButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.blackVariant);
 
         colours_[SkinColourId::kNumberBoxText] = juce::Colour(Widgets::NumberBox::kText.blackVariant);
         colours_[SkinColourId::kNumberBoxDot] = juce::Colour(Widgets::NumberBox::kDot.blackVariant);
@@ -201,6 +508,14 @@ namespace tss
         colours_[SkinColourId::kComboBoxTriangleDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTriangleDisabled.creamVariant);
         colours_[SkinColourId::kComboBoxTextEnabled] = juce::Colour(Widgets::ComboBox::Standard::kText.creamVariant);
         colours_[SkinColourId::kComboBoxTextDisabled] = juce::Colour(Widgets::ComboBox::Standard::kTextDisabled.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBackground] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackground.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBackgroundDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBackgroundDisabled.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBorder] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorder.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeBorderDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kBorderDisabled.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeText] = juce::Colour(Widgets::ComboBox::ButtonLike::kText.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeTextDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTextDisabled.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeTriangle] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangle.creamVariant);
+        colours_[SkinColourId::kComboBoxButtonLikeTriangleDisabled] = juce::Colour(Widgets::ComboBox::ButtonLike::kTriangleDisabled.creamVariant);
 
         colours_[SkinColourId::kPopupMenuBackground] = juce::Colour(Widgets::PopupMenu::Standard::kBackground.creamVariant);
         colours_[SkinColourId::kPopupMenuBorder] = juce::Colour(Widgets::PopupMenu::Standard::kBorder.creamVariant);
@@ -209,6 +524,13 @@ namespace tss
         colours_[SkinColourId::kPopupMenuBackgroundHover] = juce::Colour(Widgets::PopupMenu::Standard::kBackgroundHoover.creamVariant);
         colours_[SkinColourId::kPopupMenuTextHover] = juce::Colour(Widgets::PopupMenu::Standard::kTextHoover.creamVariant);
         colours_[SkinColourId::kPopupMenuScrollbar] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.creamVariant);
+        colours_[SkinColourId::kPopupMenuBackgroundButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackground.creamVariant);
+        colours_[SkinColourId::kPopupMenuBorderButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBorder.creamVariant);
+        colours_[SkinColourId::kPopupMenuSeparatorButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kSeparator.creamVariant);
+        colours_[SkinColourId::kPopupMenuTextButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kText.creamVariant);
+        colours_[SkinColourId::kPopupMenuBackgroundHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kBackgroundHoover.creamVariant);
+        colours_[SkinColourId::kPopupMenuTextHoverButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kTextHoover.creamVariant);
+        colours_[SkinColourId::kPopupMenuScrollbarButtonLike] = juce::Colour(Widgets::PopupMenu::ButtonLike::kScrollbar.creamVariant);
 
         colours_[SkinColourId::kNumberBoxText] = juce::Colour(Widgets::NumberBox::kText.creamVariant);
         colours_[SkinColourId::kNumberBoxDot] = juce::Colour(Widgets::NumberBox::kDot.creamVariant);

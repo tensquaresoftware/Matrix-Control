@@ -8,7 +8,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 }
 
 class WidgetFactory;
@@ -16,7 +16,7 @@ class WidgetFactory;
 class VibratoPanel : public BaseModulePanel
 {
 public:
-    VibratoPanel(tss::Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
+    VibratoPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
     ~VibratoPanel() override = default;
 
     static int getWidth() { return PluginDimensions::Panels::MasterEditPanel::ChildPanels::kWidth; }

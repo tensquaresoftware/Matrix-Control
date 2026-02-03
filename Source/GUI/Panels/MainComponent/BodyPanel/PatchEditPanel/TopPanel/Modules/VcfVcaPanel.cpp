@@ -1,11 +1,10 @@
 #include "VcfVcaPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 ModulePanelConfig VcfVcaPanel::createConfig()
 {
@@ -31,7 +30,7 @@ ModulePanelConfig VcfVcaPanel::createConfig()
     return config;
 }
 
-VcfVcaPanel::VcfVcaPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+VcfVcaPanel::VcfVcaPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
 }

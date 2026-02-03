@@ -1,11 +1,10 @@
 #include "RampPortamentoPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Panels/Reusable/BaseModulePanel.h"
 #include "Shared/PluginDescriptors.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
 ModulePanelConfig RampPortamentoPanel::createConfig()
 {
@@ -31,7 +30,7 @@ ModulePanelConfig RampPortamentoPanel::createConfig()
     return config;
 }
 
-RampPortamentoPanel::RampPortamentoPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : BaseModulePanel(theme, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
+RampPortamentoPanel::RampPortamentoPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : BaseModulePanel(skin, widgetFactory, apvts, createConfig(), getWidth(), getHeight())
 {
 }

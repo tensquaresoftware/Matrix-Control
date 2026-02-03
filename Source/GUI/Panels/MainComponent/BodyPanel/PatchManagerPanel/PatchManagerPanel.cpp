@@ -4,25 +4,24 @@
 #include "Modules/InternalPatchesPanel.h"
 #include "Modules/ComputerPatchesPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/PluginDescriptors.h"
 #include "Shared/PluginDimensions.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using tss::Theme;
 
-PatchManagerPanel::PatchManagerPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+PatchManagerPanel::PatchManagerPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
     , sectionHeader_(std::make_unique<tss::SectionHeader>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::SectionHeader::kPatchManager,
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchManager),
         tss::SectionHeader::ColourVariant::Blue))
-    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(theme, widgetFactory, apvts))
-    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(theme, widgetFactory, apvts))
-    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(theme, widgetFactory, apvts))
+    , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, widgetFactory, apvts))
+    , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, widgetFactory, apvts))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -104,20 +103,20 @@ void PatchManagerPanel::layoutComputerPatchesPanel(const juce::Rectangle<int>& b
     }
 }
 
-void PatchManagerPanel::setTheme(Theme& theme)
+void PatchManagerPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* header = sectionHeader_.get())
-        header->setTheme(theme);
+        header->setSkin(skin);
 
     if (auto* panel = bankUtilityPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = internalPatchesPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = computerPatchesPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 }
 

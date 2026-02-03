@@ -1,19 +1,19 @@
 #include "PopupMenuRenderer.h"
 #include "ComboBox.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    PopupMenuRenderer::PopupMenuRenderer(Theme& theme, bool isButtonLike)
-        : theme_(theme)
+    PopupMenuRenderer::PopupMenuRenderer(tss::Skin& skin, bool isButtonLike)
+        : skin_(skin)
         , isButtonLike_(isButtonLike)
     {
     }
 
     void PopupMenuRenderer::drawBackground(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
     {
-        const auto backgroundColour = theme_.getPopupMenuBackgroundColour(isButtonLike_);
+        const auto backgroundColour = skin_.getPopupMenuBackgroundColour(isButtonLike_);
         g.setColour(backgroundColour);
         g.fillRect(bounds);
     }
@@ -21,7 +21,7 @@ namespace tss
     void PopupMenuRenderer::drawBorder(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
     {
         constexpr float kBorderThickness = 1.0f;
-        const auto borderColour = theme_.getPopupMenuBorderColour(isButtonLike_);
+        const auto borderColour = skin_.getPopupMenuBorderColour(isButtonLike_);
         g.setColour(borderColour);
         g.drawRect(bounds.toFloat(), kBorderThickness);
     }
@@ -35,12 +35,12 @@ namespace tss
         
         if (isHighlighted && isActive)
         {
-            const auto hooverBackgroundColour = theme_.getPopupMenuBackgroundHooverColour(isButtonLike_);
+            const auto hooverBackgroundColour = skin_.getPopupMenuBackgroundHooverColour(isButtonLike_);
             const auto hooverBounds = itemBounds.reduced(1);
             g.setColour(hooverBackgroundColour);
             g.fillRect(hooverBounds);
             
-            const auto hooverTextColour = theme_.getPopupMenuTextHooverColour(isButtonLike_);
+            const auto hooverTextColour = skin_.getPopupMenuTextHooverColour(isButtonLike_);
             g.setColour(hooverTextColour);
             g.setFont(font);
             
@@ -50,7 +50,7 @@ namespace tss
         }
         else
         {
-            auto textColour = theme_.getPopupMenuTextColour(isButtonLike_);
+            auto textColour = skin_.getPopupMenuTextColour(isButtonLike_);
             if (! isActive)
             {
                 textColour = textColour.withAlpha(0.5f);
@@ -73,7 +73,7 @@ namespace tss
             return;
         }
         
-        const auto separatorColour = theme_.getPopupMenuSeparatorColour(isButtonLike_);
+        const auto separatorColour = skin_.getPopupMenuSeparatorColour(isButtonLike_);
         g.setColour(separatorColour);
         
         for (int i = 1; i < columnCount; ++i)

@@ -1,6 +1,6 @@
 #include "BodyPanel.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/VerticalSeparator.h"
 #include "PatchEditPanel/PatchEditPanel.h"
 #include "MatrixModulationPanel/MatrixModulationPanel.h"
@@ -9,37 +9,36 @@
 #include "GUI/Factories/WidgetFactory.h"
 #include "Shared/PluginDimensions.h"
 
-using tss::Theme;
 using tss::VerticalSeparator;
 
-BodyPanel::BodyPanel(Theme& theme, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
-    : theme_(&theme)
+BodyPanel::BodyPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
+    : skin_(&skin)
 {
     setOpaque(true);
-    patchEditPanel_ = std::make_unique<PatchEditPanel>(theme, widgetFactory, apvts);
+    patchEditPanel_ = std::make_unique<PatchEditPanel>(skin, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel_);
 
     verticalSeparator1_ = std::make_unique<VerticalSeparator>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
         PluginDimensions::Widgets::Heights::kVerticalSeparator
     );
     addAndMakeVisible(*verticalSeparator1_);
 
-    matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(theme, widgetFactory, apvts);
+    matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(skin, widgetFactory, apvts);
     addAndMakeVisible(*matrixModulationPanel_);
 
-    patchManagerPanel_ = std::make_unique<PatchManagerPanel>(theme, widgetFactory, apvts);
+    patchManagerPanel_ = std::make_unique<PatchManagerPanel>(skin, widgetFactory, apvts);
     addAndMakeVisible(*patchManagerPanel_);
 
     verticalSeparator2_ = std::make_unique<VerticalSeparator>(
-        theme,
+        skin,
         PluginDimensions::Widgets::Widths::VerticalSeparator::kStandard,
         PluginDimensions::Widgets::Heights::kVerticalSeparator
     );
     addAndMakeVisible(*verticalSeparator2_);
 
-    masterEditPanel_ = std::make_unique<MasterEditPanel>(theme, widgetFactory, apvts);
+    masterEditPanel_ = std::make_unique<MasterEditPanel>(skin, widgetFactory, apvts);
     addAndMakeVisible(*masterEditPanel_);
 }
 
@@ -47,8 +46,8 @@ BodyPanel::~BodyPanel() = default;
 
 void BodyPanel::paint(juce::Graphics& g)
 {
-    if (auto* currentTheme = theme_)
-        g.fillAll(currentTheme->getBodyPanelBackgroundColour());
+    if (skin_ != nullptr)
+        g.fillAll(skin_->getBodyPanelBackgroundColour());
 }
 
 void BodyPanel::resized()
@@ -107,26 +106,26 @@ void BodyPanel::resized()
     );
 }
 
-void BodyPanel::setTheme(Theme& theme)
+void BodyPanel::setSkin(tss::Skin& skin)
 {
-    theme_ = &theme;
+    skin_ = &skin;
 
     if (auto* panel = patchEditPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* separator = verticalSeparator1_.get())
-        separator->setTheme(theme);
+        separator->setSkin(skin);
 
     if (auto* panel = matrixModulationPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* separator = verticalSeparator2_.get())
-        separator->setTheme(theme);
+        separator->setSkin(skin);
 
     if (auto* panel = masterEditPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 
     if (auto* panel = patchManagerPanel_.get())
-        panel->setTheme(theme);
+        panel->setSkin(skin);
 }
 

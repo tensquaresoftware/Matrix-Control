@@ -4,7 +4,7 @@
 
 namespace tss
 {
-    class Theme;
+    class Skin;
 
     class ModulationBusHeader : public juce::Component
     {
@@ -15,10 +15,10 @@ namespace tss
             Orange
         };
 
-        explicit ModulationBusHeader(Theme& theme, int width, int height, ColourVariant variant = ColourVariant::Blue);
+        explicit ModulationBusHeader(Skin& skin, int width, int height, ColourVariant variant = ColourVariant::Blue);
         ~ModulationBusHeader() override = default;
 
-        void setTheme(Theme& theme);
+        void setSkin(Skin& skin);
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -33,7 +33,7 @@ namespace tss
         inline constexpr static int kTextAreaHeight_ = 20;
         inline constexpr static int kLineThickness_ = 4;
 
-        Theme* theme_ = nullptr;
+        Skin* skin_ = nullptr;
         juce::String busNumberText_;
         juce::String busSourceText_;
         juce::String busAmountText_;

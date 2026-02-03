@@ -1,24 +1,24 @@
 #include "Label.h"
 
-#include "GUI/Themes/Theme.h"
+#include "GUI/Themes/Skin.h"
 
 namespace tss
 {
-    Label::Label(Theme& theme, int width, int height, const juce::String& text)
-        : theme_(&theme)
+    Label::Label(tss::Skin& skin, int width, int height, const juce::String& text)
+        : skin_(&skin)
         , width_(width)
         , height_(height)
         , labelText_(text)
     {
         setOpaque(false);
         setSize(width_, height_);
-        updateThemeCache();
+        updateSkinCache();
     }
 
-    void Label::setTheme(Theme& theme)
+    void Label::setSkin(tss::Skin& skin)
     {
-        theme_ = &theme;
-        updateThemeCache();
+        skin_ = &skin;
+        updateSkinCache();
         invalidateCache();
         repaint();
     }
@@ -35,7 +35,7 @@ namespace tss
 
     void Label::paint(juce::Graphics& g)
     {
-        if (theme_ == nullptr || labelText_.isEmpty())
+        if (skin_ == nullptr || labelText_.isEmpty())
             return;
 
         if (!cacheValid_)
@@ -89,13 +89,13 @@ namespace tss
         cacheValid_ = false;
     }
 
-    void Label::updateThemeCache()
+    void Label::updateSkinCache()
     {
-        if (theme_ == nullptr)
+        if (skin_ == nullptr)
             return;
 
-        cachedTextColour_ = theme_->getLabelTextColour();
-        cachedFont_ = theme_->getBaseFont();
+        cachedTextColour_ = skin_->getLabelTextColour();
+        cachedFont_ = skin_->getBaseFont();
     }
 
     float Label::getPixelScale() const
