@@ -56,6 +56,22 @@ namespace tss
         Style style_;
         bool isPopupOpen_ = false;
         bool hasFocus_ = false;
+        
+        juce::Image cachedBackground_;
+        bool cacheValid_ = false;
+        juce::Colour cachedBackgroundColourEnabled_;
+        juce::Colour cachedBackgroundColourDisabled_;
+        juce::Colour cachedBorderColour_;
+        juce::Colour cachedFocusBorderColour_;
+        juce::Colour cachedTriangleColourEnabled_;
+        juce::Colour cachedTriangleColourDisabled_;
+        juce::Colour cachedTextColourEnabled_;
+        juce::Colour cachedTextColourDisabled_;
+        juce::Font cachedFont_;
+        
+        void regenerateBackgroundCache();
+        void invalidateCache();
+        void updateThemeCache();
 
         // Image cache
         juce::Image cachedImage_;

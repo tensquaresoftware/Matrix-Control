@@ -81,9 +81,10 @@ namespace tss
         const auto hasFocus = hasFocus_ || isPopupOpen_;
         const auto backgroundBounds = calculateBackgroundBounds(bounds);
 
-        drawBackground(g, backgroundBounds, enabled);
+        if (cachedBackground_.isValid())
+            g.drawImageAt(cachedBackground_, 0, 0);
+
         drawText(g, bounds, enabled);
-        drawTriangle(g, bounds, enabled);
         drawBorderIfNeeded(g, bounds, backgroundBounds, enabled, hasFocus);
 
         cachedSelectedIndex_ = getSelectedItemIndex();
@@ -117,6 +118,11 @@ namespace tss
                                   .getDisplayForRect(getScreenBounds());
         const float displayScale = display != nullptr ? static_cast<float>(display->scale) : 1.0f;
         return displayScale;
+    }
+    
+    void ComboBox::resized()
+    {
+        invalidateCache();
     }
 
 
@@ -286,6 +292,69 @@ namespace tss
         hasFocus_ = false;
         invalidateCache();
         repaint();
+    }
+    
+    void ComboBox::regenerateBackgroundCache()
+    {
+        const auto width = getWidth();
+        const auto height = getHeight();
+        
+        if (width <= 0 || height <= 0)
+            return;
+        
+        cachedBackground_ = juce::Image(juce::Image::ARGB, width, height, true);
+        juce::Graphics g(cachedBackground_);
+        
+        const auto bounds = cachedBackground_.getBounds().toFloat();
+        const auto backgroundBounds = calculateBackgroundBounds(bounds);
+        
+        const auto isButtonLike = (style_ == Style::ButtonLike);
+        const auto backgroundColour = cachedBackgroundColourEnabled_;
+        
+        g.setColour(backgroundColour);
+        g.fillRect(backgroundBounds);
+        
+        const auto triangleColour = cachedTriangleColourEnabled_;
+        g.setColour(triangleColour);
+        
+        const auto triangleBaseSize = kTriangleBaseSize_;
+        const auto triangleHeight = triangleBaseSize * kTriangleHeightFactor_;
+        const auto triangleX = bounds.getRight() - triangleBaseSize - kRightPadding_;
+        const auto triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
+        
+        const auto trianglePath = createTrianglePath(triangleX, triangleY, triangleBaseSize);
+        g.fillPath(trianglePath);
+        
+        if (isButtonLike)
+        {
+            g.setColour(cachedBorderColour_);
+            g.drawRect(bounds, static_cast<float>(kBorderThicknessButtonLike_));
+        }
+        
+        cacheValid_ = true;
+    }
+    
+    void ComboBox::invalidateCache()
+    {
+        cacheValid_ = false;
+    }
+    
+    void ComboBox::updateThemeCache()
+    {
+        if (theme_ == nullptr)
+            return;
+        
+        const auto isButtonLike = (style_ == Style::ButtonLike);
+        
+        cachedBackgroundColourEnabled_ = theme_->getComboBoxBackgroundColour(true, isButtonLike);
+        cachedBackgroundColourDisabled_ = theme_->getComboBoxBackgroundColour(false, isButtonLike);
+        cachedBorderColour_ = theme_->getComboBoxBorderColour(true, isButtonLike);
+        cachedFocusBorderColour_ = theme_->getComboBoxFocusBorderColour(isButtonLike);
+        cachedTriangleColourEnabled_ = theme_->getComboBoxTriangleColour(true, isButtonLike);
+        cachedTriangleColourDisabled_ = theme_->getComboBoxTriangleColour(false, isButtonLike);
+        cachedTextColourEnabled_ = theme_->getComboBoxTextColour(true, isButtonLike);
+        cachedTextColourDisabled_ = theme_->getComboBoxTextColour(false, isButtonLike);
+        cachedFont_ = theme_->getBaseFont();
     }
 }
 
