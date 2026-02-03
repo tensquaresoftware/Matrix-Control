@@ -37,9 +37,8 @@ namespace tss
         if (it != cachedImages_.end() && it->second.isValid())
         {
             const auto bounds = getLocalBounds();
-            const float pixelScale = getPixelScale();
             
-            // Draw the HiDPI image scaled down to logical size
+            // Draw the HiDPI image scaled to logical size
             // Use drawImageWithin to avoid any stretching artifacts
             g.drawImageWithin(it->second, 
                             bounds.getX(), bounds.getY(), 
@@ -56,8 +55,9 @@ namespace tss
 
     void Button::regenerateCache()
     {
-        const auto width = getWidth();
-        const auto height = getHeight();
+        const auto localBounds = getLocalBounds();
+        const auto width = localBounds.getWidth();
+        const auto height = localBounds.getHeight();
 
         if (width <= 0 || height <= 0)
             return;
@@ -113,9 +113,9 @@ namespace tss
 
     void Button::renderButtonState(juce::Graphics& g, ButtonState state)
     {
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
-                                                    static_cast<float>(width_), 
-                                                    static_cast<float>(height_));
+        // Use actual component bounds from layout, not constructor params
+        const auto localBounds = getLocalBounds();
+        const auto bounds = localBounds.toFloat();
         const auto buttonText = getButtonText();
 
         bool enabled = (state != ButtonState::Disabled);
