@@ -19,9 +19,7 @@ namespace tss
     void ModuleHeader::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        updateSkinCache();
         invalidateCache();
-        repaint();
     }
 
     void ModuleHeader::setText(const juce::String& text)

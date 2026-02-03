@@ -19,9 +19,7 @@ namespace tss
     void GroupLabel::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        updateSkinCache();
         invalidateCache();
-        repaint();
     }
 
     void GroupLabel::setText(const juce::String& text)

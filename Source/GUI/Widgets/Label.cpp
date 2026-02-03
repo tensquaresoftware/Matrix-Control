@@ -18,9 +18,7 @@ namespace tss
     void Label::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        updateSkinCache();
         invalidateCache();
-        repaint();
     }
 
     void Label::setText(const juce::String& text)

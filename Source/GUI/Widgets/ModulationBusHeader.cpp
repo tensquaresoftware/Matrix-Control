@@ -23,11 +23,7 @@ namespace tss
     void ModulationBusHeader::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        cachedTextColour_ = skin_->getModuleHeaderTextColour();
-        cachedLineColour_ = getLineColour();
-        cachedFont_ = skin_->getBaseFont().withHeight(16.0f).boldened();
         invalidateCache();
-        repaint();
     }
 
     void ModulationBusHeader::paint(juce::Graphics& g)

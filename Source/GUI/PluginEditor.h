@@ -31,7 +31,9 @@ private:
 
     PluginProcessor& pluginProcessor;
     
-    std::unique_ptr<tss::Skin> skin;
+    std::unique_ptr<tss::Skin> skinBlack_;
+    std::unique_ptr<tss::Skin> skinCream_;
+    tss::Skin* skin_ = nullptr;
     std::unique_ptr<WidgetFactory> widgetFactory;
     std::unique_ptr<MainComponent> mainComponent;
     

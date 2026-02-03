@@ -20,7 +20,6 @@ namespace tss
     {
         skin_ = &skin;
         invalidateCache();
-        repaint();
     }
 
     void Button::paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)

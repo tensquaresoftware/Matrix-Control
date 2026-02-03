@@ -19,9 +19,7 @@ namespace tss
     void NumberBox::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        updateSkinCache();
         invalidateCache();
-        repaint();
     }
 
     void NumberBox::setValue(int newValue)

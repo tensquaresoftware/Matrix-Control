@@ -20,10 +20,7 @@ namespace tss
     void SectionHeader::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        updateSkinCache();
-        calculateTextWidth();
         invalidateCache();
-        repaint();
     }
 
     void SectionHeader::paint(juce::Graphics& g)

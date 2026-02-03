@@ -17,9 +17,7 @@ namespace tss
     void VerticalSeparator::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        cachedLineColour_ = skin_->getVerticalSeparatorLineColour();
         invalidateCache();
-        repaint();
     }
 
     void VerticalSeparator::paint(juce::Graphics& g)

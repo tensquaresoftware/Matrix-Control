@@ -17,9 +17,7 @@ namespace tss
     void HorizontalSeparator::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        cachedLineColour_ = skin_->getHorizontalSeparatorLineColour();
         invalidateCache();
-        repaint();
     }
 
     void HorizontalSeparator::paint(juce::Graphics& g)

@@ -10,7 +10,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
-    skin = tss::Skin::create(tss::Skin::ColourVariant::Black);
+    skinBlack_ = tss::Skin::create(tss::Skin::ColourVariant::Black);
+    skinCream_ = tss::Skin::create(tss::Skin::ColourVariant::Cream);
+    skin_ = skinBlack_.get();
     
     widgetFactory = std::make_unique<WidgetFactory>(pluginProcessor.getApvts());
     
@@ -22,7 +24,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     
     const auto editorWidth = getWidth();
     const auto editorHeight = getHeight();
-    mainComponent = std::make_unique<MainComponent>(*skin, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
+    mainComponent = std::make_unique<MainComponent>(*skin_, editorWidth, editorHeight, *widgetFactory, pluginProcessor.getApvts());
     addAndMakeVisible(*mainComponent);
     
     if (auto* component = mainComponent.get())
@@ -35,16 +37,9 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     headerPanel.getSkinComboBox().onChange = [this, &headerPanel]
     {
         const auto selectedId = headerPanel.getSkinComboBox().getSelectedId();
-        if (selectedId == 1)
-        {
-            skin = tss::Skin::create(tss::Skin::ColourVariant::Black);
-            updateSkin();
-        }
-        else if (selectedId == 2)
-        {
-            skin = tss::Skin::create(tss::Skin::ColourVariant::Cream);
-            updateSkin();
-        }
+        
+        skin_ = (selectedId == 1) ? skinBlack_.get() : skinCream_.get();
+        updateSkin();
     };
     
     headerPanel.getZoomComboBox().onChange = [&headerPanel]
@@ -76,7 +71,7 @@ PluginEditor::~PluginEditor() = default;
 
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(skin->getBodyPanelBackgroundColour());
+    g.fillAll(skin_->getBodyPanelBackgroundColour());
 }
 
 void PluginEditor::resized()
@@ -93,7 +88,7 @@ void PluginEditor::mouseDown(const juce::MouseEvent&)
 void PluginEditor::updateSkin()
 {
     if (auto* widget = mainComponent.get())
-        widget->setSkin(*skin);
+        widget->setSkin(*skin_);
     repaint();
 }
 

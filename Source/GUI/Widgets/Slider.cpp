@@ -21,9 +21,7 @@ namespace tss
     void Slider::setSkin(tss::Skin& skin)
     {
         skin_ = &skin;
-        updateSkinCache();
         invalidateCache();
-        repaint();
     }
 
     void Slider::setUnit(const juce::String& unit)

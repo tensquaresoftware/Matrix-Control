@@ -24,9 +24,7 @@ namespace tss
     {
         skin_ = &skin;
         setColour(juce::ComboBox::textColourId, juce::Colours::transparentBlack);
-        updateSkinCache();
         invalidateCache();
-        repaint();
     }
 
     void ComboBox::paint(juce::Graphics& g)
