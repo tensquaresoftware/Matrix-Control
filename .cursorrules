@@ -198,6 +198,7 @@ Avant de présenter du code à Guillaume, je DOIS vérifier systématiquement :
 - **IDE** : Cursor (avec abonnement mensuel Agent IA)
 - **Compilateur** : Xcode 26
 - **Build system** : CMake
+- **Répertoire de build** : `Builds/` (sous-dossiers `macOS/`, `Windows/`, `Linux/`) — ne pas utiliser `build/` à la racine
 - **Framework audio** : JUCE 8.0.12
 
 ### 5.2 Référence JUCE

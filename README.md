@@ -122,29 +122,39 @@ export JUCE_DIR=/Applications/JUCE
 
 ```bash
 # Configure (using Ninja)
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake -B Builds/macOS -G Ninja -DCMAKE_BUILD_TYPE=Debug
 
 # Build all formats
-cmake --build build --config Debug
+cmake --build Builds/macOS --config Debug
 
 # Or build specific format
-cmake --build build --target Matrix-Control_Standalone --config Debug
-cmake --build build --target Matrix-Control_AU --config Debug
-cmake --build build --target Matrix-Control_VST3 --config Debug
+cmake --build Builds/macOS --target Matrix-Control_Standalone --config Debug
+cmake --build Builds/macOS --target Matrix-Control_AU --config Debug
+cmake --build Builds/macOS --target Matrix-Control_VST3 --config Debug
 ```
 
 #### Windows
 
 ```powershell
 # Configure (using Visual Studio 2022)
-cmake -B build -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Debug
+cmake -B Builds/Windows -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Debug
 
 # Build all formats
-cmake --build build --config Debug
+cmake --build Builds/Windows --config Debug
 
 # Or build specific format
-cmake --build build --target Matrix-Control_Standalone --config Debug
-cmake --build build --target Matrix-Control_VST3 --config Debug
+cmake --build Builds/Windows --target Matrix-Control_Standalone --config Debug
+cmake --build Builds/Windows --target Matrix-Control_VST3 --config Debug
+```
+
+#### Linux
+
+```bash
+# Configure (using Ninja)
+cmake -B Builds/Linux -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+# Build all formats
+cmake --build Builds/Linux --config Debug
 ```
 
 > **Note:** Audio Unit (AU) format is only available on macOS. On Windows, only VST3 and Standalone formats are built.
