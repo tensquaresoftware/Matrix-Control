@@ -20,6 +20,7 @@ PluginProcessor::PluginProcessor()
     , midiManager(std::make_unique<MidiManager>(apvts))
 {
     validatePluginDescriptorsAtStartup();
+    buildChoiceParameterMap();
     initializeMidiPortProperties();
     apvts.state.addListener(this);
     
@@ -244,13 +245,24 @@ void PluginProcessor::disableApvtsLogging()
 
 juce::String PluginProcessor::getThreadNameForLogging() const
 {
+    juce::String threadName;
+    
     if (juce::Thread::getCurrentThread() != nullptr)
-        return juce::Thread::getCurrentThread()->getThreadName();
+        threadName = juce::Thread::getCurrentThread()->getThreadName();
+    else if (juce::MessageManager::getInstance()->isThisTheMessageThread())
+        threadName = "MessageThread";
+    else
+        threadName = "Unknown";
     
-    if (juce::MessageManager::getInstance()->isThisTheMessageThread())
-        return "MessageThread";
+    // Simplifier les noms de threads
+    if (threadName == "MessageThread")
+        return "Message";
+    if (threadName.startsWith("Audio"))
+        return "Audio";
+    if (threadName.startsWith("MIDI") || threadName.startsWith("Midi"))
+        return "MIDI";
     
-    return "Unknown";
+    return threadName;
 }
 
 juce::String PluginProcessor::findParameterIdInDirectTree(juce::ValueTree& tree) const
@@ -378,12 +390,33 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     juce::String threadName = getThreadNameForLogging();
     juce::String parameterId = resolveParameterIdFromTree(treeWhosePropertyHasChanged, property);
     
+    // Chercher le label du choix si c'est un paramètre Choice
+    juce::String choiceLabel;
+    if (newValue.isInt() || newValue.isInt64() || newValue.isDouble())
+    {
+        int intValue = static_cast<int>(newValue);
+        choiceLabel = getChoiceLabel(parameterId, intValue);
+    }
+    
     ApvtsLogger::getInstance().logValueTreePropertyChanged(
-        juce::Identifier(parameterId), 
-        juce::var(), 
-        newValue, 
-        threadName
+        juce::Identifier(parameterId),
+        juce::var(),
+        newValue,
+        threadName,
+        choiceLabel
     );
+    
+    // Gestion du changement de banque (Property)
+    if (parameterId == PluginDescriptors::StandaloneWidgetIds::kCurrentBankNumber)
+    {
+        // TODO: Envoyer commande SysEx pour changer de banque
+    }
+    
+    // Gestion du changement de patch (Property)
+    if (parameterId == PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber)
+    {
+        // TODO: Envoyer commande SysEx pour charger le patch
+    }
 }
 
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,
@@ -418,6 +451,30 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
 {
     juce::ignoreUnused(treeWhichHasBeenChanged);
     ApvtsLogger::getInstance().logStateReplaced();
+}
+
+void PluginProcessor::buildChoiceParameterMap()
+{
+    auto allChoiceParams = ApvtsFactory::getAllChoiceParameters();
+    
+    for (const auto& param : allChoiceParams)
+    {
+        choiceParameterMap_[param.parameterId] = param;
+    }
+}
+
+juce::String PluginProcessor::getChoiceLabel(const juce::String& parameterId, int value) const
+{
+    auto it = choiceParameterMap_.find(parameterId);
+    if (it == choiceParameterMap_.end())
+        return "";
+    
+    const auto& descriptor = it->second;
+    
+    if (value < 0 || value >= descriptor.choices.size())
+        return "";
+    
+    return descriptor.choices[value];
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

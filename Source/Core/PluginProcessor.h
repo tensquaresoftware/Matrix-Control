@@ -1,8 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <map>
 
 #include <juce_audio_processors/juce_audio_processors.h>
+
+#include "Shared/PluginDescriptors.h"
 
 class MidiManager;
 
@@ -73,9 +76,13 @@ private:
     juce::String findParameterIdInDirectTree(juce::ValueTree& tree) const;
     juce::String findParameterIdInParentTree(juce::ValueTree& tree) const;
     juce::String findParameterIdInChildren(juce::ValueTree& changedTree, const juce::var& newValue) const;
+    
+    void buildChoiceParameterMap();
+    juce::String getChoiceLabel(const juce::String& parameterId, int value) const;
 
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<MidiManager> midiManager;
+    std::map<juce::String, PluginDescriptors::ChoiceParameterDescriptor> choiceParameterMap_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };
