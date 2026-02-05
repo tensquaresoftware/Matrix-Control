@@ -35,7 +35,8 @@ public:
     void logValueTreePropertyChanged(const juce::Identifier& property,
                                     const juce::var& oldValue,
                                     const juce::var& newValue,
-                                    const juce::String& threadName = "");
+                                    const juce::String& threadName = "",
+                                    const juce::String& choiceLabel = "");
     
     void logAttachmentCreated(const juce::String& parameterId, 
                              const juce::String& widgetType);

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "ApvtsLogger.h"
 
@@ -406,28 +407,39 @@ void ApvtsLogger::logParameterChanged(const juce::String& parameterId,
 void ApvtsLogger::logValueTreePropertyChanged(const juce::Identifier& property,
                                               const juce::var& oldValue,
                                               const juce::var& newValue,
-                                              const juce::String& threadName)
+                                              const juce::String& threadName,
+                                              const juce::String& choiceLabel)
 {
+    juce::ignoreUnused(oldValue);
+    
     if (LogLevel::kDebug > currentLogLevel)
         return;
     
-    juce::String levelColumn = formatLogLevelColumn(LogLevel::kDebug);
-    juce::String timestamp = getTimestamp();
-    juce::String prefix = levelColumn + " " + timestamp + " - ";
+    juce::String newValueStr;
     
-    juce::String firstLine = "ValueTree property changed: " + property.toString();
-    
-    int maxLineWidth = getEffectiveLineWidth();
-    int prefixLength = prefix.length();
-    
-    juce::String continuationPrefix;
-    for (int i = 0; i < prefixLength; ++i)
+    // Détecter si c'est un timestamp de bouton (très grand nombre)
+    // Les timestamps Unix en millisecondes sont > 1000000000000 (année 2001+)
+    bool isButtonClick = false;
+    if (newValue.isInt64() || newValue.isDouble())
     {
-        continuationPrefix += " ";
+        int64_t value = static_cast<int64_t>(newValue);
+        if (value > 1000000000000LL)
+        {
+            isButtonClick = true;
+            newValueStr = "clicked";
+        }
     }
     
-    juce::String oldValueStr = formatVarValue(oldValue);
-    juce::String newValueStr = formatVarValue(newValue);
+    if (!isButtonClick)
+    {
+        newValueStr = formatVarValue(newValue);
+        
+        // Ajouter le label du choix si fourni
+        if (choiceLabel.isNotEmpty())
+        {
+            newValueStr += " (" + choiceLabel + ")";
+        }
+    }
     
     juce::String effectiveThreadName = threadName;
     if (effectiveThreadName.isEmpty())
@@ -435,34 +447,28 @@ void ApvtsLogger::logValueTreePropertyChanged(const juce::Identifier& property,
         effectiveThreadName = getCurrentThreadName();
     }
     
-    juce::String continuationLine = "Old: " + oldValueStr + " | New: " + newValueStr;
+    // Format : [DEBUG] timestamp - Thread: xxx | parameter changed: value (label)
+    //       ou [DEBUG] timestamp - Thread: xxx | button clicked
+    juce::String levelColumn = formatLogLevelColumn(LogLevel::kDebug);
+    juce::String timestamp = getTimestamp();
+    
+    juce::String message = levelColumn + " " + timestamp + " - ";
     
     if (effectiveThreadName.isNotEmpty())
     {
-        continuationLine += " | Thread: " + effectiveThreadName;
+        message += "Thread: " + effectiveThreadName + " | ";
     }
     
-    if (prefixLength + firstLine.length() + continuationLine.length() + 3 <= maxLineWidth)
+    if (isButtonClick)
     {
-        juce::String message = firstLine + " | " + continuationLine.substring(4);
-        logMessage(LogLevel::kDebug, message);
+        message += property.toString() + " > Clicked";
     }
     else
     {
-        juce::String fullMessage = prefix + firstLine + "\n" + continuationPrefix + continuationLine;
-        
-        juce::StringArray lines;
-        lines.addLines(fullMessage);
-        
-        for (int i = 0; i < lines.size(); ++i)
-        {
-            juce::String line = lines[i];
-            if (line.isNotEmpty())
-            {
-                writeLog(line);
-            }
-        }
+        message += property.toString() + " > New value: " + newValueStr;
     }
+    
+    writeLog(message);
 }
 
 void ApvtsLogger::logAttachmentCreated(const juce::String& parameterId, 
@@ -597,7 +603,13 @@ juce::String ApvtsLogger::formatVarValue(const juce::var& value) const
     
     if (value.isDouble())
     {
-        return juce::String(value.operator double(), 6);
+        double dVal = value.operator double();
+        // Si c'est un entier déguisé en double (ex: 25.000000)
+        if (std::abs(dVal - std::round(dVal)) < 0.0001)
+        {
+            return juce::String(static_cast<int>(std::round(dVal)));
+        }
+        return juce::String(dVal, 2);
     }
     
     if (value.isString())
@@ -610,16 +622,29 @@ juce::String ApvtsLogger::formatVarValue(const juce::var& value) const
 
 juce::String ApvtsLogger::getCurrentThreadName() const
 {
+    juce::String threadName;
+    
     if (juce::Thread::getCurrentThread() != nullptr)
     {
-        return juce::Thread::getCurrentThread()->getThreadName();
+        threadName = juce::Thread::getCurrentThread()->getThreadName();
     }
-    
-    if (juce::MessageManager::getInstance()->isThisTheMessageThread())
+    else if (juce::MessageManager::getInstance()->isThisTheMessageThread())
     {
-        return "MessageThread";
+        threadName = "MessageThread";
+    }
+    else
+    {
+        threadName = "Unknown";
     }
     
-    return "Unknown";
+    // Simplifier les noms de threads
+    if (threadName == "MessageThread")
+        return "Message";
+    if (threadName.startsWith("Audio"))
+        return "Audio";
+    if (threadName.startsWith("MIDI") || threadName.startsWith("Midi"))
+        return "MIDI";
+    
+    return threadName;
 }
 
