@@ -9,13 +9,17 @@ namespace tss
     class NumberBox : public juce::Component
     {
     public:
-        explicit NumberBox(Skin& skin, int width, bool editable);
+        using ValueChangedCallback = std::function<void(int)>;
+        
+        explicit NumberBox(Skin& skin, int width, bool editable, int minValue, int maxValue);
         ~NumberBox() override = default;
 
         void setSkin(Skin& skin);
 
         void setValue(int newValue);
         int getValue() const { return currentValue_; }
+        
+        void setOnValueChanged(ValueChangedCallback callback);
 
         void setShowDot(bool show);
         bool getShowDot() const { return showDot_; }
@@ -35,9 +39,12 @@ namespace tss
 
         Skin* skin_ = nullptr;
         int currentValue_ = 0;
+        int minValue_ = 0;
+        int maxValue_ = 99;
         bool editable_ = false;
         bool showDot_ = false;
         std::unique_ptr<juce::TextEditor> editor_;
+        ValueChangedCallback onValueChanged_;
 
         // Image cache
         juce::Image cachedImage_;

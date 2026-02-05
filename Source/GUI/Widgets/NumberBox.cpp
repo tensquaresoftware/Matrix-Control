@@ -6,8 +6,10 @@
 
 namespace tss
 {
-    NumberBox::NumberBox(tss::Skin& skin, int width, bool editable)
+    NumberBox::NumberBox(tss::Skin& skin, int width, bool editable, int minValue, int maxValue)
         : skin_(&skin)
+        , minValue_(minValue)
+        , maxValue_(maxValue)
         , editable_(editable)
         , cachedFont_(juce::FontOptions())
     {
@@ -25,13 +27,23 @@ namespace tss
 
     void NumberBox::setValue(int newValue)
     {
-        if (currentValue_ != newValue)
+        const int clampedValue = juce::jlimit(minValue_, maxValue_, newValue);
+        
+        if (currentValue_ != clampedValue)
         {
-            currentValue_ = newValue;
+            currentValue_ = clampedValue;
             updateTextWidthCache();
             invalidateCache();
             repaint();
+            
+            if (onValueChanged_)
+                onValueChanged_(clampedValue);
         }
+    }
+    
+    void NumberBox::setOnValueChanged(ValueChangedCallback callback)
+    {
+        onValueChanged_ = std::move(callback);
     }
 
     void NumberBox::setShowDot(bool show)
@@ -197,7 +209,7 @@ namespace tss
         
         editor_->setBorder(juce::BorderSize<int>(0));
         editor_->setIndents(0, 0);
-        editor_->setInputRestrictions(0, "0123456789-");
+        editor_->setInputRestrictions(0, "0123456789");
 
         editor_->onReturnKey = [this] { handleEditorReturn(); };
         editor_->onEscapeKey = [this] { hideEditor(); };
@@ -225,9 +237,17 @@ namespace tss
             return;
 
         const auto text = editor_->getText();
-        const auto newValue = text.getIntValue();
+        
+        if (text.isEmpty())
+        {
+            hideEditor();
+            return;
+        }
+        
+        const int rawValue = text.getIntValue();
+        const int clampedValue = juce::jlimit(minValue_, maxValue_, rawValue);
 
-        setValue(newValue);
+        setValue(clampedValue);
         hideEditor();
     }
 }
