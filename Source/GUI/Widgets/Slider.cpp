@@ -10,6 +10,7 @@ namespace tss
         , width_(width)
         , height_(height)
         , defaultValue_(defaultValue)
+        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width_, height_);
@@ -42,7 +43,7 @@ namespace tss
             return;
 
         // Invalidate cache if value changed (Slider is dynamic)
-        if (getValue() != cachedValue_)
+        if (!juce::approximatelyEqual(getValue(), cachedValue_))
             invalidateCache();
 
         if (!cacheValid_)
@@ -159,13 +160,13 @@ namespace tss
         }
     }
 
-    void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+    void Slider::drawTrack(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
     {
         g.setColour(cachedTrackColour_);
         g.fillRect(bounds);
     }
 
-    void Slider::drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+    void Slider::drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
     {
         if (bounds.isEmpty())
             return;
@@ -174,7 +175,7 @@ namespace tss
         g.fillRect(bounds);
     }
 
-    void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled)
+    void Slider::drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool /*enabled*/)
     {
         auto valueText = juce::String(static_cast<int>(std::round(getValue())));
         

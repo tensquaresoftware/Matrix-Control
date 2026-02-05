@@ -12,6 +12,7 @@ namespace tss
         , busAmountText_(PluginDescriptors::ParameterDisplayNames::kModulationBusAmount)
         , busDestinationText_(PluginDescriptors::ParameterDisplayNames::kModulationBusDestination)
         , colourVariant_(variant)
+        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width, height);

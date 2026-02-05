@@ -9,6 +9,7 @@ namespace tss
     NumberBox::NumberBox(tss::Skin& skin, int width, bool editable)
         : skin_(&skin)
         , editable_(editable)
+        , cachedFont_(juce::FontOptions())
     {
         setOpaque(true);
         setSize(width, kHeight_);

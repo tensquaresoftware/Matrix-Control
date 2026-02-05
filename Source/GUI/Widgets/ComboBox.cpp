@@ -12,6 +12,7 @@ namespace tss
         , width_(width)
         , height_(height)
         , style_(style)
+        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width_, height_);

@@ -65,7 +65,6 @@
                 ]
             },
             "group": "build",
-            "dependsOn": ["CMake: Configure"],
             "problemMatcher": [
                 "$gcc",
                 "$msCompile"
@@ -88,7 +87,6 @@
                 ]
             },
             "group": "build",
-            "dependsOn": ["CMake: Configure"],
             "problemMatcher": [
                 "$gcc"
             ],
@@ -129,7 +127,6 @@
                 ]
             },
             "group": "build",
-            "dependsOn": ["CMake: Configure"],
             "problemMatcher": [
                 "$gcc",
                 "$msCompile"
@@ -165,7 +162,6 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn": ["CMake: Configure"],
             "problemMatcher": [
                 "$gcc",
                 "$msCompile"

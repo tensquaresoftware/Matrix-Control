@@ -10,6 +10,7 @@ namespace tss
         , skin_(&skin)
         , text_(text)
         , colourVariant_(variant)
+        , cachedFont_(juce::FontOptions())
     {
         setOpaque(false);
         setSize(width_, height_);
