@@ -328,8 +328,8 @@ namespace PluginDescriptors
         // Patch Manager | Internal Patches Standalone Widget Display Names
         constexpr const char* kLoadPreviousPatch            = "<";
         constexpr const char* kLoadNextPatch                = ">";
-        constexpr const char* kCurrentBankNumber            = "";
-        constexpr const char* kCurrentPatchNumber           = "";
+        constexpr const char* kCurrentBankNumber            = "CURRENT BANK";
+        constexpr const char* kCurrentPatchNumber           = "CURRENT PATCH";
         constexpr const char* kInitPatch                    = "INIT";
         constexpr const char* kCopyPatch                    = "COPY";
         constexpr const char* kPastePatch                   = "PASTE";

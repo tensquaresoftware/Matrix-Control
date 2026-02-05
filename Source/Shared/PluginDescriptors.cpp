@@ -2190,6 +2190,10 @@ const std::vector<StandaloneWidgetDescriptor> kBankUtilityWidgets = {
     }
 };
 
+// ============================================================================
+// Patch Manager | Standalone Widgets
+// ============================================================================
+
 // Internal Patches Module
 const std::vector<StandaloneWidgetDescriptor> kInternalPatchesWidgets = {
     {

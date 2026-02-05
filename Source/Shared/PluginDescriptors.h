@@ -27,6 +27,15 @@ constexpr const char* kNoParentId = "";
 // Used for modulation bus parameters that don't have a SysEx ID
 constexpr int kNoSysExId = -1;
 
+// Matrix-1000 Hardware Limits
+namespace Matrix1000Limits
+{
+    constexpr int kMinBankNumber = 0;
+    constexpr int kMaxBankNumber = 9;
+    constexpr int kMinPatchNumber = 0;
+    constexpr int kMaxPatchNumber = 99;
+}
+
 // ============================================================================
 // APVTS Group Descriptors
 // ============================================================================
