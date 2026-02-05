@@ -30,10 +30,37 @@ InternalPatchesPanel::InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widge
     setupPastePatchButton(skin, widgetFactory);
     setupStorePatchButton(skin, widgetFactory);
 
+    apvts_.state.addListener(this);
+    
     setSize(getWidth(), getHeight());
 }
 
-InternalPatchesPanel::~InternalPatchesPanel() = default;
+InternalPatchesPanel::~InternalPatchesPanel()
+{
+    apvts_.state.removeListener(this);
+}
+
+void InternalPatchesPanel::valueTreePropertyChanged(
+    juce::ValueTree& treeWhosePropertyHasChanged,
+    const juce::Identifier& property)
+{
+    const auto propertyName = property.toString();
+    
+    // Mise à jour du NumberBox depuis le Core (via Property)
+    if (propertyName == PluginDescriptors::StandaloneWidgetIds::kCurrentBankNumber)
+    {
+        const int bankNumber = treeWhosePropertyHasChanged.getProperty(property);
+        if (auto* numberBox = currentBankNumber.get())
+            numberBox->setValue(bankNumber);
+    }
+    
+    if (propertyName == PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber)
+    {
+        const int patchNumber = treeWhosePropertyHasChanged.getProperty(property);
+        if (auto* numberBox = currentPatchNumber.get())
+            numberBox->setValue(patchNumber);
+    }
+}
 
 void InternalPatchesPanel::resized()
 {
@@ -155,9 +182,11 @@ void InternalPatchesPanel::setupLoadNextPatchButton(tss::Skin& skin, WidgetFacto
 void InternalPatchesPanel::setupCurrentBankNumberBox(tss::Skin& skin)
 {
     currentBankNumber = std::make_unique<tss::NumberBox>(
-        skin, 
-        PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber, 
-        false);
+        skin,
+        PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerBankNumber,
+        false,
+        PluginDescriptors::Matrix1000Limits::kMinBankNumber,
+        PluginDescriptors::Matrix1000Limits::kMaxBankNumber);
     currentBankNumber->setShowDot(true);
     addAndMakeVisible(*currentBankNumber);
 }
@@ -165,9 +194,27 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(tss::Skin& skin)
 void InternalPatchesPanel::setupCurrentPatchNumberBox(tss::Skin& skin)
 {
     currentPatchNumber = std::make_unique<tss::NumberBox>(
-        skin, 
-        PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber, 
-        true);
+        skin,
+        PluginDimensions::Widgets::Widths::NumberBox::kPatchManagerPatchNumber,
+        true,
+        PluginDescriptors::Matrix1000Limits::kMinPatchNumber,
+        PluginDescriptors::Matrix1000Limits::kMaxPatchNumber);
+    
+    // Callback pour envoyer la valeur via Property (comme les boutons)
+    currentPatchNumber->setOnValueChanged([this](int newValue)
+    {
+        // Éviter la boucle : ne pas setProperty si la valeur vient déjà du ValueTree
+        const auto currentPropertyValue = apvts_.state.getProperty(
+            PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber, -1);
+        
+        if (static_cast<int>(currentPropertyValue) != newValue)
+        {
+            apvts_.state.setProperty(PluginDescriptors::StandaloneWidgetIds::kCurrentPatchNumber,
+                                    newValue,
+                                    nullptr);
+        }
+    });
+    
     addAndMakeVisible(*currentPatchNumber);
 }
 

@@ -18,7 +18,8 @@ namespace tss
 
 class WidgetFactory;
 
-class InternalPatchesPanel : public juce::Component
+class InternalPatchesPanel : public juce::Component,
+                             public juce::ValueTree::Listener
 {
 public:
     InternalPatchesPanel(tss::Skin& skin, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts);
@@ -26,6 +27,15 @@ public:
 
     void resized() override;
     void setSkin(tss::Skin& skin);
+    
+    // juce::ValueTree::Listener
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                 const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override {}
 
     static int getWidth() { return PluginDimensions::Panels::PatchManagerPanel::InternalPatchesPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchManagerPanel::InternalPatchesPanel::kHeight; }
