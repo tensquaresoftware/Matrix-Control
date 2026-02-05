@@ -716,6 +716,13 @@ Lorsque je crée des fichiers Markdown lors de plans de refactorisation, optimis
 
 `Documentation/Development/Refactorisation/`
 
+**⚠️ Procédure importante :**
+- Si Cursor génère automatiquement un plan dans `~/.cursor/plans/*.plan.md`, je dois **immédiatement** le copier dans `Documentation/Development/Refactorisation/` avec la convention de nommage ci-dessous
+- Cette copie doit être incluse dans les TODOs du plan et marquée comme terminée dès que c'est fait
+- **Dès que tous les TODOs du plan sont marqués `completed`**, je dois **copier** le fichier `.plan.md` final de `~/.cursor/plans/` vers `Documentation/Development/Refactorisation/` avec le bon nom (écrasant la copie initiale si nécessaire)
+- Garder les fichiers originaux dans `~/.cursor/plans/` pour ne pas perturber Cursor
+- Toujours avoir une version finale archivée dans le projet avec tous les TODOs à jour
+
 ### 9.2 Convention de nommage
 
 - **Date** au début : `YYYY-MM-DD-`
