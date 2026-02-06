@@ -31,7 +31,8 @@ public:
 private:
     inline constexpr static int kHeight_ = 30;
     inline constexpr static int kSpacing_ = 5;
-    inline constexpr static int kLabelWidth_ = 35;
+    inline constexpr static int kSkinLabelWidth_ = 30;
+    inline constexpr static int kZoomLabelWidth_ = 35;
     inline constexpr static int kComboBoxWidth_ = 50;
     inline constexpr static int kControlHeight_ = 20;
 

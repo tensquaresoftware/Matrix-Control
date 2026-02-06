@@ -6,9 +6,9 @@
 
 HeaderPanel::HeaderPanel(tss::Skin& skin)
     : skin_(&skin)
-    , skinLabel_(skin, kLabelWidth_, kControlHeight_, "SKIN :")
+    , skinLabel_(skin, kSkinLabelWidth_, kControlHeight_, "SKIN :")
     , skinComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
-    , zoomLabel_(skin, kLabelWidth_, kControlHeight_, "ZOOM :")
+    , zoomLabel_(skin, kZoomLabelWidth_, kControlHeight_, "ZOOM :")
     , zoomComboBox_(skin, kComboBoxWidth_, kControlHeight_, tss::ComboBox::Style::ButtonLike)
 {
     setOpaque(true);
@@ -44,15 +44,15 @@ void HeaderPanel::resized()
     const auto spacing = getSpacing();
     const auto controlY = (getHeight() - kControlHeight_) / 2;
     
-    int currentX = spacing;
+    int currentX = 15; //spacing;
     
     skinLabel_.setBounds(
         bounds.getX() + currentX,
         bounds.getY() + controlY,
-        kLabelWidth_,
+        kSkinLabelWidth_,
         kControlHeight_
     );
-    currentX += kLabelWidth_ + spacing;
+    currentX += kSkinLabelWidth_ + spacing;
     
     skinComboBox_.setBounds(
         bounds.getX() + currentX,
@@ -65,10 +65,10 @@ void HeaderPanel::resized()
     zoomLabel_.setBounds(
         bounds.getX() + currentX,
         bounds.getY() + controlY,
-        kLabelWidth_,
+        kZoomLabelWidth_,
         kControlHeight_
     );
-    currentX += kLabelWidth_ + spacing;
+    currentX += kZoomLabelWidth_ + spacing;
     
     zoomComboBox_.setBounds(
         bounds.getX() + currentX,

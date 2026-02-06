@@ -21,7 +21,7 @@ PatchEditPanel::PatchEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, ju
         PluginDimensions::Widgets::Heights::kSectionHeader,
         PluginDescriptors::getSectionDisplayName(PluginDescriptors::SectionIds::kPatchEdit)))
     , topPanel_(std::make_unique<TopPanel>(skin, widgetFactory, apvts))
-    , middlePanel_(std::make_unique<MiddlePanel>(skin))
+    , middlePanel_(std::make_unique<MiddlePanel>(skin, apvts))
     , bottomPanel_(std::make_unique<BottomPanel>(skin, widgetFactory, apvts))
 {
     setOpaque(false);
