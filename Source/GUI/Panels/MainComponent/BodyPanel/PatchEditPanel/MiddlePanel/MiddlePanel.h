@@ -22,6 +22,8 @@ public:
 
     void resized() override;
     void setSkin(tss::Skin& skin);
+    
+    tss::TrackGeneratorDisplay& getTrackGeneratorDisplay() { return trackGeneratorDisplay_; }
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;

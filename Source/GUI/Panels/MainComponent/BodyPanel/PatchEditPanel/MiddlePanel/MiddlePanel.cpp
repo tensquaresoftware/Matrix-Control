@@ -25,29 +25,6 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
     apvts_->state.addListener(this);
     syncTrackGeneratorDisplayFromApvts();
 
-    trackGeneratorDisplay_.setOnValueChanged([this](int pointIndex, int newValue)
-    {
-        if (apvts_ == nullptr)
-            return;
-
-        const char* parameterIds[] = {
-            PluginDescriptors::ParameterIds::kTrackPoint1,
-            PluginDescriptors::ParameterIds::kTrackPoint2,
-            PluginDescriptors::ParameterIds::kTrackPoint3,
-            PluginDescriptors::ParameterIds::kTrackPoint4,
-            PluginDescriptors::ParameterIds::kTrackPoint5
-        };
-
-        if (pointIndex < 0 || pointIndex >= 5)
-            return;
-
-        if (auto* param = apvts_->getParameter(parameterIds[pointIndex]))
-        {
-            const float normalised = static_cast<float>(newValue) / kTrackPointMax;
-            param->setValueNotifyingHost(normalised);
-        }
-    });
-
     addAndMakeVisible(envelope1Display_);
     addAndMakeVisible(envelope2Display_);
     addAndMakeVisible(envelope3Display_);
@@ -84,27 +61,27 @@ void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHas
     const juce::String paramId = idVar.toString();
     if (paramId == PluginDescriptors::ParameterIds::kTrackPoint1)
     {
-        trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(paramId));
+        trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(paramId), false);
         return;
     }
     if (paramId == PluginDescriptors::ParameterIds::kTrackPoint2)
     {
-        trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(paramId));
+        trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(paramId), false);
         return;
     }
     if (paramId == PluginDescriptors::ParameterIds::kTrackPoint3)
     {
-        trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(paramId));
+        trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(paramId), false);
         return;
     }
     if (paramId == PluginDescriptors::ParameterIds::kTrackPoint4)
     {
-        trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(paramId));
+        trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(paramId), false);
         return;
     }
     if (paramId == PluginDescriptors::ParameterIds::kTrackPoint5)
     {
-        trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(paramId));
+        trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(paramId), false);
     }
 }
 
@@ -113,11 +90,11 @@ void MiddlePanel::syncTrackGeneratorDisplayFromApvts()
     if (apvts_ == nullptr)
         return;
 
-    trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint1));
-    trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint2));
-    trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint3));
-    trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint4));
-    trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint5));
+    trackGeneratorDisplay_.setTrackPoint1(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint1), false);
+    trackGeneratorDisplay_.setTrackPoint2(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint2), false);
+    trackGeneratorDisplay_.setTrackPoint3(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint3), false);
+    trackGeneratorDisplay_.setTrackPoint4(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint4), false);
+    trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(PluginDescriptors::ParameterIds::kTrackPoint5), false);
 }
 
 int MiddlePanel::getTrackPointValueFromApvts(const juce::String& parameterId) const

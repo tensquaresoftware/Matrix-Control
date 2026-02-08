@@ -80,16 +80,29 @@ namespace tss
     
     void TrackGeneratorDisplay::setTrackPoint1(int value)
     {
+        setTrackPoint1(value, true);
+    }
+    
+    void TrackGeneratorDisplay::setTrackPoint1(int value, bool notify)
+    {
         const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
         
         if (pointValues_[0] != clampedValue)
         {
             pointValues_[0] = clampedValue;
             invalidateCache();
+            
+            if (notify && onValueChanged_)
+                onValueChanged_(0, clampedValue);
         }
     }
     
     void TrackGeneratorDisplay::setTrackPoint2(int value)
+    {
+        setTrackPoint2(value, true);
+    }
+    
+    void TrackGeneratorDisplay::setTrackPoint2(int value, bool notify)
     {
         const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
         
@@ -97,10 +110,18 @@ namespace tss
         {
             pointValues_[1] = clampedValue;
             invalidateCache();
+            
+            if (notify && onValueChanged_)
+                onValueChanged_(1, clampedValue);
         }
     }
     
     void TrackGeneratorDisplay::setTrackPoint3(int value)
+    {
+        setTrackPoint3(value, true);
+    }
+    
+    void TrackGeneratorDisplay::setTrackPoint3(int value, bool notify)
     {
         const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
         
@@ -108,10 +129,18 @@ namespace tss
         {
             pointValues_[2] = clampedValue;
             invalidateCache();
+            
+            if (notify && onValueChanged_)
+                onValueChanged_(2, clampedValue);
         }
     }
     
     void TrackGeneratorDisplay::setTrackPoint4(int value)
+    {
+        setTrackPoint4(value, true);
+    }
+    
+    void TrackGeneratorDisplay::setTrackPoint4(int value, bool notify)
     {
         const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
         
@@ -119,10 +148,18 @@ namespace tss
         {
             pointValues_[3] = clampedValue;
             invalidateCache();
+            
+            if (notify && onValueChanged_)
+                onValueChanged_(3, clampedValue);
         }
     }
     
     void TrackGeneratorDisplay::setTrackPoint5(int value)
+    {
+        setTrackPoint5(value, true);
+    }
+    
+    void TrackGeneratorDisplay::setTrackPoint5(int value, bool notify)
     {
         const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
         
@@ -130,6 +167,9 @@ namespace tss
         {
             pointValues_[4] = clampedValue;
             invalidateCache();
+            
+            if (notify && onValueChanged_)
+                onValueChanged_(4, clampedValue);
         }
     }
     

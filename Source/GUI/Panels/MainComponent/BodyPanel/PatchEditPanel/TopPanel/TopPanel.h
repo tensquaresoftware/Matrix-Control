@@ -27,6 +27,8 @@ public:
 
     void resized() override;
     void setSkin(tss::Skin& skin);
+    
+    FmTrackPanel* getFmTrackPanel() { return fmTrackPanel_.get(); }
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::TopPanel::kHeight; }

@@ -87,3 +87,11 @@ void BaseModulePanel::setSkin(tss::Skin& skin)
         if (paramPanel != nullptr)
             paramPanel->setSkin(skin);
 }
+
+ParameterPanel* BaseModulePanel::getParameterPanelAt(size_t index)
+{
+    if (index >= parameterPanels_.size())
+        return nullptr;
+    
+    return parameterPanels_[index].get();
+}

@@ -25,6 +25,12 @@ namespace tss
         void setTrackPoint4(int value);
         void setTrackPoint5(int value);
         
+        void setTrackPoint1(int value, bool notify);
+        void setTrackPoint2(int value, bool notify);
+        void setTrackPoint3(int value, bool notify);
+        void setTrackPoint4(int value, bool notify);
+        void setTrackPoint5(int value, bool notify);
+        
         int getTrackPoint1() const { return pointValues_[0]; }
         int getTrackPoint2() const { return pointValues_[1]; }
         int getTrackPoint3() const { return pointValues_[2]; }
@@ -48,9 +54,9 @@ namespace tss
         inline constexpr static float kTriangleBase_ = 10.0f;
         inline constexpr static int kPointCount_ = 5;
         inline constexpr static float kPadding_ = 8.0f;
-        inline constexpr static float kPointRadius_ = 3.0f;
+        inline constexpr static float kPointRadius_ = 2.5f;
         inline constexpr static float kHitZoneRadius_ = 10.0f;
-        inline constexpr static float kLineThickness_ = 1.5f;
+        inline constexpr static float kLineThickness_ = 1.0f;
         inline constexpr static int kMinValue_ = 0;
         inline constexpr static int kMaxValue_ = 63;
 

@@ -50,6 +50,8 @@ public:
 
     void resized() override;
     void setSkin(tss::Skin& skin);
+    
+    ParameterPanel* getParameterPanelAt(size_t index);
 
 protected:
     tss::Skin* skin_;
