@@ -59,7 +59,7 @@ namespace tss
         const auto bounds = juce::Rectangle<float>(0.0f, 0.0f, 
                                                     static_cast<float>(width), 
                                                     static_cast<float>(height));
-        const auto lineX = bounds.getCentreX() - kLineWidth_ * 0.5f;
+        const auto lineX = std::round(bounds.getCentreX() - kLineWidth_ * 0.5f);
         
         auto line = bounds;
         line.removeFromTop(kTopPadding_);

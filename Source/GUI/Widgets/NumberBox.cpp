@@ -182,7 +182,7 @@ namespace tss
         const auto textRight = bounds.getCentreX() + textWidth * 0.5f;
         const auto baselineY = bounds.getCentreY() + cachedFont_.getHeight() * 0.5f - cachedFont_.getDescent();
 
-        return { textRight + kDotXOffset_, baselineY - kDotRadius_ };
+        return { std::round(textRight + kDotXOffset_), std::round(baselineY - kDotRadius_) };
     }
 
     void NumberBox::showEditor()

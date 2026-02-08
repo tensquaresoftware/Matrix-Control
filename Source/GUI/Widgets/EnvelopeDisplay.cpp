@@ -60,13 +60,13 @@ namespace tss
     {
         const auto triangleColour = skin_->getEnvelopeDisplayBorderColour();
         const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
-        const auto centreX = bounds.getCentreX();
+        const auto centreX = std::round(bounds.getCentreX());
         const auto baseY = bounds.getBottom();
 
         juce::Path triangle;
-        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
-                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
-                             centreX, baseY + triangleHeight);
+        triangle.addTriangle(std::round(centreX - kWidgetTriangleBase_ * 0.5f), baseY,
+                             std::round(centreX + kWidgetTriangleBase_ * 0.5f), baseY,
+                             centreX, std::round(baseY + triangleHeight));
 
         g.setColour(triangleColour);
         g.fillPath(triangle);
@@ -248,25 +248,23 @@ namespace tss
         
         for (int i = 0; i < kCurvePointCount_; ++i)
         {
+            const auto circleX = envelopePoints.points[i].x - kCurvePointRadius_;
+            const auto circleY = envelopePoints.points[i].y - kCurvePointRadius_;
+            const auto circleDiameter = kCurvePointRadius_ * 2.0f;
+            
             if (i == 1 || i == 2 || i == 3 || i == 5)
             {
                 g.setColour(hollowPointFillColour);
-                g.fillEllipse(envelopePoints.points[i].x - kCurvePointRadius_,
-                             envelopePoints.points[i].y - kCurvePointRadius_,
-                             kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f);
+                g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
                 
                 g.setColour(cachedCurveColour_);
-                g.drawEllipse(envelopePoints.points[i].x - kCurvePointRadius_,
-                             envelopePoints.points[i].y - kCurvePointRadius_,
-                             kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f,
-                             kCurveLineThickness_);
+                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, kCurveLineThickness_);
             }
             else
             {
                 g.setColour(cachedCurveColour_);
-                g.fillEllipse(envelopePoints.points[i].x - kCurvePointRadius_,
-                             envelopePoints.points[i].y - kCurvePointRadius_,
-                             kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f);
+                g.fillEllipse(circleX, circleY, circleDiameter, circleDiameter);
+                g.drawEllipse(circleX, circleY, circleDiameter, circleDiameter, kCurveLineThickness_);
             }
         }
     }

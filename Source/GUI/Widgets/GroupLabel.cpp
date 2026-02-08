@@ -131,9 +131,10 @@ namespace tss
         if (lineWidth > 0.0f)
         {
             const auto lineThicknessHalf = kLineThickness_ * 0.5f;
+            const auto lineY = std::round(centreY - lineThicknessHalf);
             const auto line = juce::Rectangle<float>(
                 area.getX(),
-                centreY - lineThicknessHalf,
+                lineY,
                 lineWidth,
                 kLineThickness_
             );
@@ -149,9 +150,10 @@ namespace tss
         if (lineWidth > 0.0f)
         {
             const auto lineThicknessHalf = kLineThickness_ * 0.5f;
+            const auto lineY = std::round(centreY - lineThicknessHalf);
             const auto line = juce::Rectangle<float>(
                 lineStartX,
-                centreY - lineThicknessHalf,
+                lineY,
                 lineWidth,
                 kLineThickness_
             );

@@ -124,7 +124,7 @@ namespace PluginDimensions
             namespace BankUtilityPanel
             {
                 inline constexpr int kWidth = 275;
-                inline constexpr int kHeight = 100;
+                inline constexpr int kHeight = 92; //100;
             }
             
             namespace InternalPatchesPanel

@@ -70,13 +70,13 @@ namespace tss
     {
         const auto triangleColour = skin_->getTrackGeneratorDisplayBorderColour();
         const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
-        const auto centreX = bounds.getCentreX();
+        const auto centreX = std::round(bounds.getCentreX());
         const auto baseY = bounds.getY();
 
         juce::Path triangle;
-        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
-                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
-                             centreX, baseY - triangleHeight);
+        triangle.addTriangle(std::round(centreX - kWidgetTriangleBase_ * 0.5f), baseY,
+                             std::round(centreX + kWidgetTriangleBase_ * 0.5f), baseY,
+                             centreX, std::round(baseY - triangleHeight));
 
         g.setColour(triangleColour);
         g.fillPath(triangle);
