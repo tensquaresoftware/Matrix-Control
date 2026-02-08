@@ -37,6 +37,8 @@ public:
 private:
     inline constexpr static int kTrackPointSliderStartIndex_ = 3;
     inline constexpr static int kTrackPointSliderCount_ = 5;
+    inline constexpr static int kEnvParamCount_ = 5;
+    inline constexpr static int kEnvCount_ = 3;
     
     tss::Skin* skin_;
 
@@ -46,8 +48,15 @@ private:
     std::unique_ptr<BottomPanel> bottomPanel_;
     
     std::array<juce::Slider*, kTrackPointSliderCount_> trackPointSliders_ {nullptr, nullptr, nullptr, nullptr, nullptr};
+    std::array<std::array<juce::Slider*, kEnvParamCount_>, kEnvCount_> envSliders_ 
+    {
+        std::array<juce::Slider*, kEnvParamCount_> {nullptr, nullptr, nullptr, nullptr, nullptr},
+        std::array<juce::Slider*, kEnvParamCount_> {nullptr, nullptr, nullptr, nullptr, nullptr},
+        std::array<juce::Slider*, kEnvParamCount_> {nullptr, nullptr, nullptr, nullptr, nullptr}
+    };
     
     void setupTrackPointSliderConnections();
+    void setupEnvelopeSliderConnections();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchEditPanel)
 };

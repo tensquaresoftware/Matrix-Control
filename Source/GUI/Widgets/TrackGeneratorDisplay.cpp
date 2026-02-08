@@ -2,6 +2,7 @@
 
 #include "GUI/Themes/Skin.h"
 #include "GUI/Themes/ColourChart.h"
+#include "GUI/Themes/ColourChart.h"
 
 namespace tss
 {
@@ -68,13 +69,13 @@ namespace tss
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
     {
         const auto triangleColour = skin_->getTrackGeneratorDisplayBorderColour();
-        const auto triangleHeight = kTriangleBase_ * std::sqrt(3.0f) * 0.5f;
+        const auto triangleHeight = kWidgetTriangleBase_ * std::sqrt(3.0f) * 0.5f;
         const auto centreX = bounds.getCentreX();
         const auto baseY = bounds.getY();
 
         juce::Path triangle;
-        triangle.addTriangle(centreX - kTriangleBase_ * 0.5f, baseY,
-                             centreX + kTriangleBase_ * 0.5f, baseY,
+        triangle.addTriangle(centreX - kWidgetTriangleBase_ * 0.5f, baseY,
+                             centreX + kWidgetTriangleBase_ * 0.5f, baseY,
                              centreX, baseY - triangleHeight);
 
         g.setColour(triangleColour);
@@ -264,9 +265,22 @@ namespace tss
                 const auto p2 = calculatePointPosition(i + 1, centerBounds);
                 g.drawLine(p.x, p.y, p2.x, p2.y, kCurveLineThickness_);
             }
+        }
+        
+        const auto hollowPointFillColour = juce::Colour(ColourChart::kGreen1);
+        
+        for (int i = 0; i < kCurvePointCount_; ++i)
+        {
+            const auto p = calculatePointPosition(i, centerBounds);
             
+            g.setColour(hollowPointFillColour);
             g.fillEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
                          kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f);
+            
+            g.setColour(cachedCurveColour_);
+            g.drawEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
+                         kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f,
+                         kCurveLineThickness_);
         }
     }
     

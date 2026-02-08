@@ -24,6 +24,9 @@ public:
     void setSkin(tss::Skin& skin);
     
     tss::TrackGeneratorDisplay& getTrackGeneratorDisplay() { return trackGeneratorDisplay_; }
+    tss::EnvelopeDisplay& getEnvelope1Display() { return envelope1Display_; }
+    tss::EnvelopeDisplay& getEnvelope2Display() { return envelope2Display_; }
+    tss::EnvelopeDisplay& getEnvelope3Display() { return envelope3Display_; }
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
@@ -39,6 +42,7 @@ public:
 private:
     inline constexpr static int kSpacing = 15;
     inline constexpr static int kTrackPointMax = 63;
+    inline constexpr static int kEnvParameterMax = 63;
 
     tss::Skin* skin_;
     juce::AudioProcessorValueTreeState* apvts_ = nullptr;
@@ -50,7 +54,9 @@ private:
     tss::PatchNameDisplay patchNameDisplay_;
 
     void syncTrackGeneratorDisplayFromApvts();
+    void syncEnvelopeDisplaysFromApvts();
     int getTrackPointValueFromApvts(const juce::String& parameterId) const;
+    int getEnvParameterFromApvts(const juce::String& parameterId) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MiddlePanel)
 };

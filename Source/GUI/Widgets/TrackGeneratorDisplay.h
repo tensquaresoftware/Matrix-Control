@@ -52,13 +52,14 @@ namespace tss
     private:
         inline constexpr static int kWidgetBorderThickness_ = 2;
         inline constexpr static int kWidgetVerticalPadding_ = 15;
-        inline constexpr static float kTriangleBase_ = 10.0f;
+        inline constexpr static float kWidgetTriangleBase_ = 10.0f;
         
         inline constexpr static int kPointMinValue_ = 0;
         inline constexpr static int kPointMaxValue_ = 63;
+        
         inline constexpr static int kCurvePointCount_ = 5;
         inline constexpr static float kCurvePadding_ = 5.0f;
-        inline constexpr static float kCurvePointRadius_ = 2.5f;
+        inline constexpr static float kCurvePointRadius_ = 3.0f;
         inline constexpr static float kCurveLineThickness_ = 1.0f;
         inline constexpr static float kPointHitZoneRadius_ = 10.0f;
         

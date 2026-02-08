@@ -24,6 +24,7 @@ MiddlePanel::MiddlePanel(tss::Skin& skin, juce::AudioProcessorValueTreeState& ap
 
     apvts_->state.addListener(this);
     syncTrackGeneratorDisplayFromApvts();
+    syncEnvelopeDisplaysFromApvts();
 
     addAndMakeVisible(envelope1Display_);
     addAndMakeVisible(envelope2Display_);
@@ -82,6 +83,84 @@ void MiddlePanel::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHas
     if (paramId == PluginDescriptors::ParameterIds::kTrackPoint5)
     {
         trackGeneratorDisplay_.setTrackPoint5(getTrackPointValueFromApvts(paramId), false);
+        return;
+    }
+    
+    if (paramId == PluginDescriptors::ParameterIds::kEnv1Delay)
+    {
+        envelope1Display_.setDelay(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv1Attack)
+    {
+        envelope1Display_.setAttack(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv1Decay)
+    {
+        envelope1Display_.setDecay(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv1Sustain)
+    {
+        envelope1Display_.setSustain(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv1Release)
+    {
+        envelope1Display_.setRelease(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    
+    if (paramId == PluginDescriptors::ParameterIds::kEnv2Delay)
+    {
+        envelope2Display_.setDelay(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv2Attack)
+    {
+        envelope2Display_.setAttack(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv2Decay)
+    {
+        envelope2Display_.setDecay(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv2Sustain)
+    {
+        envelope2Display_.setSustain(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv2Release)
+    {
+        envelope2Display_.setRelease(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    
+    if (paramId == PluginDescriptors::ParameterIds::kEnv3Delay)
+    {
+        envelope3Display_.setDelay(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv3Attack)
+    {
+        envelope3Display_.setAttack(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv3Decay)
+    {
+        envelope3Display_.setDecay(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv3Sustain)
+    {
+        envelope3Display_.setSustain(getEnvParameterFromApvts(paramId), false);
+        return;
+    }
+    if (paramId == PluginDescriptors::ParameterIds::kEnv3Release)
+    {
+        envelope3Display_.setRelease(getEnvParameterFromApvts(paramId), false);
     }
 }
 
@@ -108,6 +187,44 @@ int MiddlePanel::getTrackPointValueFromApvts(const juce::String& parameterId) co
         return juce::jlimit(0, kTrackPointMax, juce::roundToInt(normalised * static_cast<float>(kTrackPointMax)));
     }
 
+    return 0;
+}
+
+void MiddlePanel::syncEnvelopeDisplaysFromApvts()
+{
+    if (apvts_ == nullptr)
+        return;
+    
+    envelope1Display_.setDelay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Delay), false);
+    envelope1Display_.setAttack(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Attack), false);
+    envelope1Display_.setDecay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Decay), false);
+    envelope1Display_.setSustain(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Sustain), false);
+    envelope1Display_.setRelease(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv1Release), false);
+    
+    envelope2Display_.setDelay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Delay), false);
+    envelope2Display_.setAttack(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Attack), false);
+    envelope2Display_.setDecay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Decay), false);
+    envelope2Display_.setSustain(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Sustain), false);
+    envelope2Display_.setRelease(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv2Release), false);
+    
+    envelope3Display_.setDelay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Delay), false);
+    envelope3Display_.setAttack(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Attack), false);
+    envelope3Display_.setDecay(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Decay), false);
+    envelope3Display_.setSustain(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Sustain), false);
+    envelope3Display_.setRelease(getEnvParameterFromApvts(PluginDescriptors::ParameterIds::kEnv3Release), false);
+}
+
+int MiddlePanel::getEnvParameterFromApvts(const juce::String& parameterId) const
+{
+    if (apvts_ == nullptr)
+        return 0;
+    
+    if (auto* param = apvts_->getParameter(parameterId))
+    {
+        const float normalised = param->getValue();
+        return juce::jlimit(0, kEnvParameterMax, juce::roundToInt(normalised * static_cast<float>(kEnvParameterMax)));
+    }
+    
     return 0;
 }
 

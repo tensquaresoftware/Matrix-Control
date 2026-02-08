@@ -4,6 +4,9 @@
 #include "TopPanel/Modules/FmTrackPanel.h"
 #include "MiddlePanel/MiddlePanel.h"
 #include "BottomPanel/BottomPanel.h"
+#include "BottomPanel/Modules/Env1Panel.h"
+#include "BottomPanel/Modules/Env2Panel.h"
+#include "BottomPanel/Modules/Env3Panel.h"
 
 #include "GUI/Themes/Skin.h"
 #include "GUI/Widgets/SectionHeader.h"
@@ -21,6 +24,15 @@ PatchEditPanel::~PatchEditPanel()
     {
         if (slider != nullptr)
             slider->removeListener(this);
+    }
+    
+    for (auto& envSliderArray : envSliders_)
+    {
+        for (auto* slider : envSliderArray)
+        {
+            if (slider != nullptr)
+                slider->removeListener(this);
+        }
     }
 }
 
@@ -42,6 +54,7 @@ PatchEditPanel::PatchEditPanel(tss::Skin& skin, WidgetFactory& widgetFactory, ju
     addAndMakeVisible(*bottomPanel_);
 
     setupTrackPointSliderConnections();
+    setupEnvelopeSliderConnections();
 
     setSize(getWidth(), getHeight());
 }
@@ -133,6 +146,63 @@ void PatchEditPanel::setupTrackPointSliderConnections()
     });
 }
 
+void PatchEditPanel::setupEnvelopeSliderConnections()
+{
+    if (bottomPanel_ == nullptr || middlePanel_ == nullptr)
+        return;
+    
+    auto* env1Panel = bottomPanel_->getEnv1Panel();
+    auto* env2Panel = bottomPanel_->getEnv2Panel();
+    auto* env3Panel = bottomPanel_->getEnv3Panel();
+    
+    if (env1Panel == nullptr || env2Panel == nullptr || env3Panel == nullptr)
+        return;
+    
+    BaseModulePanel* envPanels[kEnvCount_] = {env1Panel, env2Panel, env3Panel};
+    
+    for (int envIndex = 0; envIndex < kEnvCount_; ++envIndex)
+    {
+        for (int paramIndex = 0; paramIndex < kEnvParamCount_; ++paramIndex)
+        {
+            if (auto* paramPanel = envPanels[envIndex]->getParameterPanelAt(static_cast<size_t>(paramIndex)))
+            {
+                if (auto* slider = paramPanel->getSlider())
+                {
+                    envSliders_[static_cast<size_t>(envIndex)][static_cast<size_t>(paramIndex)] = slider;
+                    slider->addListener(this);
+                }
+            }
+        }
+    }
+    
+    middlePanel_->getEnvelope1Display().setOnValueChanged([this](int paramIndex, int newValue)
+    {
+        if (paramIndex < 0 || paramIndex >= kEnvParamCount_)
+            return;
+        
+        if (auto* slider = envSliders_[0][static_cast<size_t>(paramIndex)])
+            slider->setValue(static_cast<double>(newValue), juce::sendNotificationSync);
+    });
+    
+    middlePanel_->getEnvelope2Display().setOnValueChanged([this](int paramIndex, int newValue)
+    {
+        if (paramIndex < 0 || paramIndex >= kEnvParamCount_)
+            return;
+        
+        if (auto* slider = envSliders_[1][static_cast<size_t>(paramIndex)])
+            slider->setValue(static_cast<double>(newValue), juce::sendNotificationSync);
+    });
+    
+    middlePanel_->getEnvelope3Display().setOnValueChanged([this](int paramIndex, int newValue)
+    {
+        if (paramIndex < 0 || paramIndex >= kEnvParamCount_)
+            return;
+        
+        if (auto* slider = envSliders_[2][static_cast<size_t>(paramIndex)])
+            slider->setValue(static_cast<double>(newValue), juce::sendNotificationSync);
+    });
+}
+
 void PatchEditPanel::sliderValueChanged(juce::Slider* slider)
 {
     if (middlePanel_ == nullptr)
@@ -155,7 +225,41 @@ void PatchEditPanel::sliderValueChanged(juce::Slider* slider)
                 default: break;
             }
             
-            break;
+            return;
+        }
+    }
+    
+    for (size_t envIndex = 0; envIndex < envSliders_.size(); ++envIndex)
+    {
+        for (size_t paramIndex = 0; paramIndex < envSliders_[envIndex].size(); ++paramIndex)
+        {
+            if (envSliders_[envIndex][paramIndex] == slider)
+            {
+                const int value = static_cast<int>(slider->getValue());
+                
+                tss::EnvelopeDisplay* display = nullptr;
+                if (envIndex == 0)
+                    display = &middlePanel_->getEnvelope1Display();
+                else if (envIndex == 1)
+                    display = &middlePanel_->getEnvelope2Display();
+                else if (envIndex == 2)
+                    display = &middlePanel_->getEnvelope3Display();
+                
+                if (display == nullptr)
+                    return;
+                
+                switch (static_cast<int>(paramIndex))
+                {
+                    case 0: display->setDelay(value, false); break;
+                    case 1: display->setAttack(value, false); break;
+                    case 2: display->setDecay(value, false); break;
+                    case 3: display->setSustain(value, false); break;
+                    case 4: display->setRelease(value, false); break;
+                    default: break;
+                }
+                
+                return;
+            }
         }
     }
 }

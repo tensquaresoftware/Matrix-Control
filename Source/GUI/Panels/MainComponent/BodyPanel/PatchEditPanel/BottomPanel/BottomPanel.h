@@ -27,6 +27,10 @@ public:
 
     void resized() override;
     void setSkin(tss::Skin& skin);
+    
+    Env1Panel* getEnv1Panel() { return env1Panel_.get(); }
+    Env2Panel* getEnv2Panel() { return env2Panel_.get(); }
+    Env3Panel* getEnv3Panel() { return env3Panel_.get(); }
 
     static int getWidth() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::kWidth; }
     static int getHeight() { return PluginDimensions::Panels::PatchEditPanel::BottomPanel::kHeight; }
