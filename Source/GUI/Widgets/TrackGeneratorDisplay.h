@@ -40,7 +40,8 @@ namespace tss
         void setOnValueChanged(ValueChangedCallback callback);
         
         void paint(juce::Graphics& g) override;
-        
+        void resized() override;
+
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
         void mouseUp(const juce::MouseEvent& e) override;
@@ -49,27 +50,29 @@ namespace tss
         int getHeight() const { return height_; }
 
     private:
-        inline constexpr static int kBorderThickness_ = 2;
-        inline constexpr static int kVerticalPadding_ = 15;
+        inline constexpr static int kWidgetBorderThickness_ = 2;
+        inline constexpr static int kWidgetVerticalPadding_ = 15;
         inline constexpr static float kTriangleBase_ = 10.0f;
-        inline constexpr static int kPointCount_ = 5;
-        inline constexpr static float kPadding_ = 8.0f;
-        inline constexpr static float kPointRadius_ = 2.5f;
-        inline constexpr static float kHitZoneRadius_ = 10.0f;
-        inline constexpr static float kLineThickness_ = 1.0f;
-        inline constexpr static int kMinValue_ = 0;
-        inline constexpr static int kMaxValue_ = 63;
+        
+        inline constexpr static int kPointMinValue_ = 0;
+        inline constexpr static int kPointMaxValue_ = 63;
+        inline constexpr static int kCurvePointCount_ = 5;
+        inline constexpr static float kCurvePadding_ = 5.0f;
+        inline constexpr static float kCurvePointRadius_ = 2.5f;
+        inline constexpr static float kCurveLineThickness_ = 1.0f;
+        inline constexpr static float kPointHitZoneRadius_ = 10.0f;
+        
 
         Skin* skin_ = nullptr;
         int width_;
         int height_;
         
-        std::array<int, kPointCount_> pointValues_ {0, 15, 31, 47, 63};
+        std::array<int, kCurvePointCount_> pointValues_ {0, 15, 31, 47, 63};
         int draggedPointIndex_ = -1;
         
         juce::Image cachedImage_;
         bool cacheValid_ = false;
-        std::array<int, kPointCount_> cachedPointValues_;
+        std::array<int, kCurvePointCount_> cachedPointValues_;
         
         juce::Colour cachedCurveColour_;
         
@@ -84,10 +87,12 @@ namespace tss
         void updateSkinCache();
         float getPixelScale() const;
         
-        void drawCurve(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        juce::Point<float> calculatePointPosition(int pointIndex, const juce::Rectangle<float>& bounds) const;
-        
-        int findPointAtPosition(const juce::Point<float>& position, const juce::Rectangle<float>& bounds) const;
+        juce::Rectangle<float> getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const;
+        void drawCurve(juce::Graphics& g, const juce::Rectangle<float>& innerBounds);
+        float computePointX(int pointIndex, const juce::Rectangle<float>& centerBounds) const;
+        juce::Point<float> calculatePointPosition(int pointIndex, const juce::Rectangle<float>& centerBounds) const;
+
+        int findPointAtPosition(const juce::Point<float>& position, const juce::Rectangle<float>& innerBounds) const;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackGeneratorDisplay)
     };

@@ -29,7 +29,7 @@ namespace tss
             return;
 
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kVerticalPadding_));
+        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -37,9 +37,17 @@ namespace tss
         
         if (!cacheValid_)
             regenerateCache();
-        
-        const auto destRect = contentBounds.toFloat();
-        g.drawImage(cachedImage_, destRect, juce::RectanglePlacement::fillDestination);
+
+        if (cachedImage_.isValid())
+        {
+            const auto destRect = contentBounds.toFloat();
+            g.drawImage(cachedImage_, destRect, juce::RectanglePlacement::fillDestination);
+        }
+    }
+
+    void TrackGeneratorDisplay::resized()
+    {
+        invalidateCache();
     }
 
 
@@ -54,7 +62,7 @@ namespace tss
     {
         const auto borderColour = skin_->getTrackGeneratorDisplayBorderColour();
         g.setColour(borderColour);
-        g.drawRect(bounds, static_cast<float>(kBorderThickness_));
+        g.drawRect(bounds, static_cast<float>(kWidgetBorderThickness_));
     }
 
     void TrackGeneratorDisplay::drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds)
@@ -85,7 +93,7 @@ namespace tss
     
     void TrackGeneratorDisplay::setTrackPoint1(int value, bool notify)
     {
-        const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
+        const int clampedValue = juce::jlimit(kPointMinValue_, kPointMaxValue_, value);
         
         if (pointValues_[0] != clampedValue)
         {
@@ -104,7 +112,7 @@ namespace tss
     
     void TrackGeneratorDisplay::setTrackPoint2(int value, bool notify)
     {
-        const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
+        const int clampedValue = juce::jlimit(kPointMinValue_, kPointMaxValue_, value);
         
         if (pointValues_[1] != clampedValue)
         {
@@ -123,7 +131,7 @@ namespace tss
     
     void TrackGeneratorDisplay::setTrackPoint3(int value, bool notify)
     {
-        const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
+        const int clampedValue = juce::jlimit(kPointMinValue_, kPointMaxValue_, value);
         
         if (pointValues_[2] != clampedValue)
         {
@@ -142,7 +150,7 @@ namespace tss
     
     void TrackGeneratorDisplay::setTrackPoint4(int value, bool notify)
     {
-        const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
+        const int clampedValue = juce::jlimit(kPointMinValue_, kPointMaxValue_, value);
         
         if (pointValues_[3] != clampedValue)
         {
@@ -161,7 +169,7 @@ namespace tss
     
     void TrackGeneratorDisplay::setTrackPoint5(int value, bool notify)
     {
-        const int clampedValue = juce::jlimit(kMinValue_, kMaxValue_, value);
+        const int clampedValue = juce::jlimit(kPointMinValue_, kPointMaxValue_, value);
         
         if (pointValues_[4] != clampedValue)
         {
@@ -184,9 +192,16 @@ namespace tss
     {
         if (skin_ == nullptr)
             return;
-        
+
+        const auto localBounds = getLocalBounds();
+        const int contentWidth = localBounds.getWidth();
+        const int contentHeight = localBounds.getHeight() - kWidgetVerticalPadding_ * 2;
+
+        if (contentWidth <= 0 || contentHeight <= 0)
+            return;
+
         bool valuesChanged = false;
-        for (size_t i = 0; i < kPointCount_; ++i)
+        for (size_t i = 0; i < kCurvePointCount_; ++i)
         {
             if (cachedPointValues_[i] != pointValues_[i])
             {
@@ -194,25 +209,25 @@ namespace tss
                 break;
             }
         }
-        
+
         if (!valuesChanged && cacheValid_)
             return;
-        
+
         const float scale = getPixelScale();
-        const int cacheWidth = juce::roundToInt(static_cast<float>(width_) * scale);
-        const int cacheHeight = juce::roundToInt(static_cast<float>(height_ - kVerticalPadding_ * 2) * scale);
-        
+        const int cacheWidth = juce::roundToInt(static_cast<float>(contentWidth) * scale);
+        const int cacheHeight = juce::roundToInt(static_cast<float>(contentHeight) * scale);
+
         cachedImage_ = juce::Image(juce::Image::ARGB, cacheWidth, cacheHeight, true);
-        
+
         juce::Graphics g(cachedImage_);
         g.addTransform(juce::AffineTransform::scale(scale));
-        
-        const auto bounds = juce::Rectangle<float>(0.0f, 0.0f,
-                                                    static_cast<float>(width_),
-                                                    static_cast<float>(height_ - kVerticalPadding_ * 2));
-        
-        drawCurve(g, bounds);
-        
+
+        const auto innerBounds = juce::Rectangle<float>(0.0f, 0.0f,
+                                                        static_cast<float>(contentWidth),
+                                                        static_cast<float>(contentHeight));
+
+        drawCurve(g, innerBounds);
+
         cachedPointValues_ = pointValues_;
         cacheValid_ = true;
     }
@@ -231,58 +246,66 @@ namespace tss
         cachedCurveColour_ = juce::Colour(ColourChart::kGreen4);
     }
     
-    void TrackGeneratorDisplay::drawCurve(juce::Graphics& g, const juce::Rectangle<float>& bounds)
+    void TrackGeneratorDisplay::drawCurve(juce::Graphics& g, const juce::Rectangle<float>& innerBounds)
     {
-        const auto drawArea = bounds.reduced(kPadding_);
-        
-        if (drawArea.getWidth() <= 0.0f || drawArea.getHeight() <= 0.0f)
+        const auto centerBounds = getCurveCenterBounds(innerBounds);
+
+        if (centerBounds.getWidth() <= 0.0f || centerBounds.getHeight() <= 0.0f)
             return;
-        
+
         g.setColour(cachedCurveColour_);
-        
-        const float halfPixel = 0.5f;
-        
-        for (int i = 0; i < kPointCount_; ++i)
+
+        for (int i = 0; i < kCurvePointCount_; ++i)
         {
-            const auto p = calculatePointPosition(i, drawArea);
-            const float cx = std::round(p.x) + halfPixel;
-            const float cy = std::round(p.y) + halfPixel;
+            const auto p = calculatePointPosition(i, centerBounds);
             
-            if (i < kPointCount_ - 1)
+            if (i < kCurvePointCount_ - 1)
             {
-                const auto p2 = calculatePointPosition(i + 1, drawArea);
-                const float cx2 = std::round(p2.x) + halfPixel;
-                const float cy2 = std::round(p2.y) + halfPixel;
-                g.drawLine(cx, cy, cx2, cy2, kLineThickness_);
+                const auto p2 = calculatePointPosition(i + 1, centerBounds);
+                g.drawLine(p.x, p.y, p2.x, p2.y, kCurveLineThickness_);
             }
             
-            g.fillEllipse(cx - kPointRadius_, cy - kPointRadius_,
-                         kPointRadius_ * 2.0f, kPointRadius_ * 2.0f);
+            g.fillEllipse(p.x - kCurvePointRadius_, p.y - kCurvePointRadius_,
+                         kCurvePointRadius_ * 2.0f, kCurvePointRadius_ * 2.0f);
         }
     }
     
-    juce::Point<float> TrackGeneratorDisplay::calculatePointPosition(int pointIndex, 
-                                                                      const juce::Rectangle<float>& bounds) const
+    juce::Rectangle<float> TrackGeneratorDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
-        const float xPosition = bounds.getX() + (bounds.getWidth() * pointIndex) / (kPointCount_ - 1);
-        
-        const float normalizedValue = static_cast<float>(pointValues_[static_cast<size_t>(pointIndex)]) / kMaxValue_;
-        const float yPosition = bounds.getBottom() - (bounds.getHeight() * normalizedValue);
-        
+        const float totalPadding = kCurvePadding_ + static_cast<float>(kWidgetBorderThickness_);
+        return innerBounds.reduced(totalPadding);
+    }
+
+    juce::Point<float> TrackGeneratorDisplay::calculatePointPosition(int pointIndex,
+                                                                      const juce::Rectangle<float>& centerBounds) const
+    {
+        const float xPosition = computePointX(pointIndex, centerBounds);
+        const float normalizedValue = static_cast<float>(pointValues_[static_cast<size_t>(pointIndex)]) / kPointMaxValue_;
+        const float yPosition = centerBounds.getBottom() - (centerBounds.getHeight() * normalizedValue);
+
         return juce::Point<float>(xPosition, yPosition);
     }
-    
-    int TrackGeneratorDisplay::findPointAtPosition(const juce::Point<float>& position, 
-                                                    const juce::Rectangle<float>& bounds) const
+
+    float TrackGeneratorDisplay::computePointX(int pointIndex, const juce::Rectangle<float>& centerBounds) const
     {
-        const auto drawArea = bounds.reduced(kPadding_);
-        
-        for (int i = 0; i < kPointCount_; ++i)
+        if (pointIndex == 0)
+            return centerBounds.getX();
+        if (pointIndex == kCurvePointCount_ - 1)
+            return centerBounds.getRight();
+        return centerBounds.getX() + (centerBounds.getWidth() * pointIndex) / (kCurvePointCount_ - 1);
+    }
+    
+    int TrackGeneratorDisplay::findPointAtPosition(const juce::Point<float>& position,
+                                                    const juce::Rectangle<float>& innerBounds) const
+    {
+        const auto centerBounds = getCurveCenterBounds(innerBounds);
+
+        for (int i = 0; i < kCurvePointCount_; ++i)
         {
-            const auto pointPos = calculatePointPosition(i, drawArea);
+            const auto pointPos = calculatePointPosition(i, centerBounds);
             const float distance = position.getDistanceFrom(pointPos);
             
-            if (distance <= kHitZoneRadius_)
+            if (distance <= kPointHitZoneRadius_)
                 return i;
         }
         
@@ -292,9 +315,9 @@ namespace tss
     void TrackGeneratorDisplay::mouseDown(const juce::MouseEvent& e)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kVerticalPadding_));
-        
-        draggedPointIndex_ = findPointAtPosition(e.position, contentBounds);
+        const auto innerBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+
+        draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
     }
     
     void TrackGeneratorDisplay::mouseDrag(const juce::MouseEvent& e)
@@ -303,14 +326,14 @@ namespace tss
             return;
         
         const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.reduced(0.0f, static_cast<float>(kVerticalPadding_));
-        const auto drawArea = contentBounds.reduced(kPadding_);
+        const auto innerBounds = bounds.reduced(0.0f, static_cast<float>(kWidgetVerticalPadding_));
+        const auto centerBounds = getCurveCenterBounds(innerBounds);
+
+        const float relativeY = e.position.y - centerBounds.getY();
+        const float normalizedValue = 1.0f - (relativeY / centerBounds.getHeight());
         
-        const float relativeY = e.position.y - drawArea.getY();
-        const float normalizedValue = 1.0f - (relativeY / drawArea.getHeight());
-        
-        const int newValue = juce::jlimit(kMinValue_, kMaxValue_, 
-                                          static_cast<int>(normalizedValue * kMaxValue_ + 0.5f));
+        const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_, 
+                                          static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
         
         const auto index = static_cast<size_t>(draggedPointIndex_);
         if (pointValues_[index] != newValue)
