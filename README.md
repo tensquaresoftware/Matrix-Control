@@ -41,7 +41,7 @@ Over time, users of the Max for Live editor requested features that were difficu
 
 ## Project goals
 
-Matrix-Control is not just a plugin — it is also an attempt to demonstrate what a well-architected, thoroughly documented JUCE project can look like in practice.
+Matrix-Control is not just a plugin — it is also an attempt to provide a well-architected, thoroughly documented JUCE project can look like in practice.
 
 Concretely, this means:
 
@@ -65,13 +65,11 @@ The project is actively under development. As of early 2026:
 - 🔜 Linux support
 - 🔜 User guide and full technical documentation
 
-A detailed roadmap and TODO list are maintained in [`TODO.md`](TODO.md).
-
 ---
 
 ## Supporting the project
 
-Matrix-Control is developed in my free time, alongside a day job as an instructional designer at FASTLANE, an [Ableton-certified training center](https://fastlane.fr) in Montpellier, France. The main tool powering my development workflow is [Cursor AI](https://cursor.com), which has been instrumental in accelerating progress on this project — especially during the large-scale refactoring phases.
+Matrix-Control is developed in my free time, alongside a day job as an instructional designer for an [Ableton-certified training center](https://fastlane.fr) in Montpellier, France. The main tool powering my development workflow is [Cursor AI](https://cursor.com), which has been instrumental in accelerating progress on this project — especially during the large-scale refactoring phases.
 
 If you enjoy the Matrix-1000 Editor or are looking forward to Matrix-Control, sponsoring the project on [GitHub Sponsors](https://github.com/sponsors/tensquaresoftware) is the most direct way to help keep the development going. Every contribution, no matter the size, is genuinely appreciated.
 
