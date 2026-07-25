@@ -37,7 +37,7 @@ so that invalid pastes are prevented (FR-35, addendum § Clipboard).
 2. **And** module compatibility matches the addendum matrix:
    - **ENV 1 ↔ ENV 2 ↔ ENV 3** — full parameter interchange (all int + choice descriptors for the source module copied to target).
    - **DCO 1 ↔ DCO 2** — partial interchange per D-060 (detailed rules below).
-   - **LFO 1 ↔ LFO 2** — partial interchange per D-060 (detailed rules below).
+   - **LFO 1 ↔ LFO 2** — partial interchange per D-060 (**amended 2026-07-25**: skip Pressure/Keyboard and Ramp1/Ramp2 mod sources on cross-paste; no remapping).
    - Incompatible module pairs (e.g. DCO → ENV) → `canPasteModule(target)` returns `false`; `pasteModule` is a no-op returning `false`.
 3. **And** full-patch snapshot captures the entire 134-byte `PatchModel` buffer (`SysExConstants::kPatchPackedDataSize`); matrix-modulation snapshot captures **only** bytes **104–133** (30 bytes = 10 buses × 3 bytes source/amount/destination).
 4. **And** `pasteMatrixModulation` writes snapshot bytes into the target model's bytes 104–133 only — patch name (bytes 0–7) and all other PATCH parameters remain unchanged.
@@ -57,7 +57,7 @@ so that invalid pastes are prevented (FR-35, addendum § Clipboard).
   - [x] `canPasteModule` — static compatibility table (ENV triangle, DCO pair, LFO pair; else false)
   - [x] `copyModule` / `pasteModule` — descriptor-driven via `PluginDescriptors::PatchEditSection::*Module::kIntParameters` / `kChoiceParameters`
   - [x] DCO partial paste helper — skip rules per parameter ID (see Dev Notes table)
-  - [x] LFO partial paste helper — map `kSpeedModByPressure` ↔ `kSpeedModByKeyboard`, `kAmplitudeModByRamp1` ↔ `kAmplitudeModByRamp2`; copy remaining params when names/roles align
+  - [x] LFO partial paste helper — **skip** `kSpeedModByPressure` / `kSpeedModByKeyboard` and `kAmplitudeModByRamp1` / `kAmplitudeModByRamp2` on cross-paste (leave target unchanged; amended 2026-07-25 — was remap); copy remaining params when names/roles align
   - [x] ENV paste — copy all descriptors from source module tables onto target module tables (values read/written through `PatchModel` descriptor API)
   - [x] `copyMatrixModulation` / `pasteMatrixModulation` — raw byte slice 104–133 via `PatchModel::data()` + `PackedFieldCodec::safeOffset`
 
@@ -158,12 +158,14 @@ Parameter IDs: `PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::*` / 
 
 ### LFO partial paste rules (D-060)
 
+> **Amended 2026-07-25 (Quick Dev):** cross-LFO paste **skips** module-specific mod sources (leave target unchanged). Do **not** remap Pressure↔Keyboard or Ramp1↔Ramp2. Historical map wording below is superseded by addendum + D-060 amendment.
+
 | Source param | Target param | Notes |
 |---|---|---|
-| LFO1 `kSpeedModByPressure` (offset 102) | LFO2 `kSpeedModByKeyboard` (offset 103) | Cross-map on LFO1↔LFO2 paste |
-| LFO2 `kSpeedModByKeyboard` | LFO1 `kSpeedModByPressure` | Reverse mapping |
-| LFO1 `kAmplitudeModByRamp1` (offset 97) | LFO2 `kAmplitudeModByRamp2` (offset 98) | Cross-map |
-| LFO2 `kAmplitudeModByRamp2` | LFO1 `kAmplitudeModByRamp1` | Reverse mapping |
+| LFO1 `kSpeedModByPressure` (offset 102) | LFO2 `kSpeedModByKeyboard` (offset 103) | **Skip** on LFO1↔LFO2 paste (no cross-map) |
+| LFO2 `kSpeedModByKeyboard` | LFO1 `kSpeedModByPressure` | **Skip** (reverse) |
+| LFO1 `kAmplitudeModByRamp1` (offset 97) | LFO2 `kAmplitudeModByRamp2` (offset 98) | **Skip** |
+| LFO2 `kAmplitudeModByRamp2` | LFO1 `kAmplitudeModByRamp1` | **Skip** |
 | All other int/choice params with matching semantic role | Direct copy | Speed, retrigger, amplitude, waveform, trigger mode, lag, sample input |
 
 Same-module paste (LFO1→LFO1): all params copy normally.

@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: quick-dev spec-clipboard-lfo-skip-incompatible-mods (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-lfo-skip-incompatible-mods.md`
+  summary: No footer / UX cue when LFO (or DCO) cross-paste intentionally leaves module-specific params unchanged.
+  evidence: Blind Hunter; D-060 already specifies implicit UX — user manual EN/FR still to mention skip-vs-map for LFO mods.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-lfo-skip-incompatible-mods.md`
+  summary: Cross-LFO unit tests cover Speed + Amplitude shared params, not the full shared choice/int set (waveform, lag, etc.).
+  evidence: Blind Hunter; sufficient for this rule change; broaden only if displayName drift becomes a regression risk.
+
 ## Deferred from: quick-dev spec-v1-polish-controls-footer (2026-07-25)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-v1-polish-controls-footer.md`

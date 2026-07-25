@@ -137,30 +137,30 @@ namespace
         return std::nullopt;
     }
 
-    juce::String resolveLfoSourceIntParamId(PatchModuleKind source,
-                                            PatchModuleKind target,
-                                            const juce::String& targetParamId)
+    bool shouldSkipLfoIntParam(PatchModuleKind source, PatchModuleKind target, const juce::String& paramId)
     {
         using namespace PluginIDs::PatchEditSection;
 
-        if (source == PatchModuleKind::Lfo1 && target == PatchModuleKind::Lfo2)
-        {
-            if (targetParamId == Lfo2Module::ParameterWidgets::kSpeedModByKeyboard)
-                return Lfo1Module::ParameterWidgets::kSpeedModByPressure;
+        if (source == target)
+            return false;
 
-            if (targetParamId == Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2)
-                return Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1;
-        }
-        else if (source == PatchModuleKind::Lfo2 && target == PatchModuleKind::Lfo1)
+        // Cross-LFO: leave module-specific mod sources untouched (no Pressure↔Keyboard
+        // or Ramp1↔Ramp2 remapping — same spirit as DCO Sync/Detune skip).
+        // Defense in depth: displayNames already differ, so name matching alone would
+        // also skip; explicit IDs pin the product rule if labels ever change.
+        if (target == PatchModuleKind::Lfo1)
         {
-            if (targetParamId == Lfo1Module::ParameterWidgets::kSpeedModByPressure)
-                return Lfo2Module::ParameterWidgets::kSpeedModByKeyboard;
-
-            if (targetParamId == Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1)
-                return Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2;
+            return paramId == Lfo1Module::ParameterWidgets::kSpeedModByPressure
+                || paramId == Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1;
         }
 
-        return targetParamId;
+        if (target == PatchModuleKind::Lfo2)
+        {
+            return paramId == Lfo2Module::ParameterWidgets::kSpeedModByKeyboard
+                || paramId == Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2;
+        }
+
+        return false;
     }
 
 } // namespace
@@ -430,23 +430,17 @@ void ClipboardService::pasteLfoModule(PatchModuleKind source, PatchModuleKind ta
 
     for (const auto& targetDescriptor : targetViews.intParams)
     {
-        const auto sourceParamId = resolveLfoSourceIntParamId(
-            source,
-            target,
-            targetDescriptor.parameterId);
+        if (shouldSkipLfoIntParam(source, target, targetDescriptor.parameterId))
+            continue;
 
-        auto it = moduleSnapshot_.intValues.find(sourceParamId);
+        const auto* sourceDescriptor = findIntByDisplayName(
+            sourceViews.intParams,
+            targetDescriptor.displayName);
 
-        if (it == moduleSnapshot_.intValues.end() && source != target)
-        {
-            const auto* sourceDescriptor = findIntByDisplayName(
-                sourceViews.intParams,
-                targetDescriptor.displayName);
+        if (sourceDescriptor == nullptr)
+            continue;
 
-            if (sourceDescriptor != nullptr)
-                it = moduleSnapshot_.intValues.find(sourceDescriptor->parameterId);
-        }
-
+        const auto it = moduleSnapshot_.intValues.find(sourceDescriptor->parameterId);
         if (it != moduleSnapshot_.intValues.end())
             model.setValue(targetDescriptor, it->second);
     }

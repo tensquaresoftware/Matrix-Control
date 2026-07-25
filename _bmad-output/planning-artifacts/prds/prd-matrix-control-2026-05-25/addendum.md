@@ -141,7 +141,7 @@ Keep SRP split: `MidiInputPort`, `MidiOutputPort`, `MidiSender`, `MidiReceiver`,
 |---|---|
 | ENV 1 ↔ 2 ↔ 3 | Full parameter copy |
 | DCO 1 ↔ 2 | Partial: skip SYNC/DETUNE cross-mapping; WAVE SELECT only OFF/PULSE/WAVE/BOTH; KEYBD/PORTA only KEYBD and PORTA (not OFF from DCO2→DCO1) |
-| LFO 1 ↔ 2 | Partial: SPEED<PRESSURE ↔ SPEED<KEYBD; AMP<RAMP1 ↔ AMP<RAMP2; remaining compatible params copy normally |
+| LFO 1 ↔ 2 | Partial: skip SPEED<PRESSURE / SPEED<KEYBD and AMP<RAMP1 / AMP<RAMP2 on cross-paste (leave target unchanged); remaining compatible params copy normally |
 
 ### Matrix Modulation (section-level)
 

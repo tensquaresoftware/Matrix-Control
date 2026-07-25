@@ -22,8 +22,9 @@ public:
         testDco1ToDco2SkipsSyncAndDetune();
         testDco2ToDco1SkipsNoiseAndOff();
         testDco2ToDco1PreservesSync();
-        testLfo1ToLfo2MapsPressureToKeyboard();
-        testLfo2ToLfo1MapsKeyboardToPressure();
+        testLfo1ToLfo2SkipsIncompatibleModSources();
+        testLfo2ToLfo1SkipsIncompatibleModSources();
+        testLfoSameModuleStillCopiesModSources();
         testMatrixModSnapshotIsolation();
         testFullPatchCaptures134Bytes();
         testModeReplacementModuleAfterFullPatch();
@@ -239,50 +240,88 @@ private:
         expectEquals(target.getValue(dco1Int(PatchEdit::Dco1Module::ParameterWidgets::kFrequency)), 63);
     }
 
-    void testLfo1ToLfo2MapsPressureToKeyboard()
+    void testLfo1ToLfo2SkipsIncompatibleModSources()
     {
-        beginTest("lfo1ToLfo2 — speed + amplitude mod cross-mapping");
+        beginTest("lfo1ToLfo2 — skip Pressure/Ramp1 mods; copy shared params");
 
         Core::PatchModel source;
         source.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure), 17);
         source.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1), -25);
         source.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeed), 42);
+        source.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitude), 33);
 
         Core::PatchModel target;
-        target.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard), 0);
-        target.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2), 0);
+        target.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard), 9);
+        target.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2), 11);
         target.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeed), 0);
+        target.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitude), 0);
 
         Core::ClipboardService clipboard;
         clipboard.copyModule(Core::PatchModuleKind::Lfo1, source);
         expect(clipboard.pasteModule(Core::PatchModuleKind::Lfo2, target));
 
-        expectEquals(target.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard)), 17);
-        expectEquals(target.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2)), -25);
+        expectEquals(target.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard)), 9);
+        expectEquals(target.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2)), 11);
         expectEquals(target.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeed)), 42);
+        expectEquals(target.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitude)), 33);
     }
 
-    void testLfo2ToLfo1MapsKeyboardToPressure()
+    void testLfo2ToLfo1SkipsIncompatibleModSources()
     {
-        beginTest("lfo2ToLfo1 — speed + amplitude mod reverse cross-mapping");
+        beginTest("lfo2ToLfo1 — skip Keyboard/Ramp2 mods; copy shared params");
 
         Core::PatchModel source;
         source.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard), 17);
         source.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2), -25);
         source.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeed), 42);
+        source.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitude), 33);
 
         Core::PatchModel target;
-        target.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure), 0);
-        target.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1), 0);
+        target.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure), 9);
+        target.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1), 11);
         target.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeed), 0);
+        target.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitude), 0);
 
         Core::ClipboardService clipboard;
         clipboard.copyModule(Core::PatchModuleKind::Lfo2, source);
         expect(clipboard.pasteModule(Core::PatchModuleKind::Lfo1, target));
 
-        expectEquals(target.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure)), 17);
-        expectEquals(target.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1)), -25);
+        expectEquals(target.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure)), 9);
+        expectEquals(target.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1)), 11);
         expectEquals(target.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeed)), 42);
+        expectEquals(target.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitude)), 33);
+    }
+
+    void testLfoSameModuleStillCopiesModSources()
+    {
+        beginTest("lfo same-module — Pressure/Ramp1 and Keyboard/Ramp2 still copy");
+
+        Core::PatchModel sourceLfo1;
+        sourceLfo1.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure), 17);
+        sourceLfo1.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1), -25);
+
+        Core::PatchModel targetLfo1;
+        targetLfo1.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure), 0);
+        targetLfo1.setValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1), 0);
+
+        Core::ClipboardService clipboard;
+        clipboard.copyModule(Core::PatchModuleKind::Lfo1, sourceLfo1);
+        expect(clipboard.pasteModule(Core::PatchModuleKind::Lfo1, targetLfo1));
+        expectEquals(targetLfo1.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kSpeedModByPressure)), 17);
+        expectEquals(targetLfo1.getValue(lfo1Int(PatchEdit::Lfo1Module::ParameterWidgets::kAmplitudeModByRamp1)), -25);
+
+        Core::PatchModel sourceLfo2;
+        sourceLfo2.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard), 19);
+        sourceLfo2.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2), -27);
+
+        Core::PatchModel targetLfo2;
+        targetLfo2.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard), 0);
+        targetLfo2.setValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2), 0);
+
+        clipboard.copyModule(Core::PatchModuleKind::Lfo2, sourceLfo2);
+        expect(clipboard.pasteModule(Core::PatchModuleKind::Lfo2, targetLfo2));
+        expectEquals(targetLfo2.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard)), 19);
+        expectEquals(targetLfo2.getValue(lfo2Int(PatchEdit::Lfo2Module::ParameterWidgets::kAmplitudeModByRamp2)), -27);
     }
 
     void testMatrixModSnapshotIsolation()
