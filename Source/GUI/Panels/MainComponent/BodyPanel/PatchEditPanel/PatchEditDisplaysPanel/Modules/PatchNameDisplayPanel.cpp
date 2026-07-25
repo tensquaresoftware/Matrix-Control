@@ -1,9 +1,11 @@
 #include "PatchNameDisplayPanel.h"
 
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
+#include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -11,6 +13,11 @@ namespace
 {
     using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
     using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kDefaultPatchName;
+    using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kCompareSecondaryLabel;
+    using PluginDisplayNames::PatchEditSection::PatchNameModule::Messages::kInvalidCharacterFooter;
+
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
 }
 
 PatchNameDisplayPanel::PatchNameDisplayPanel(TSS::ISkin& skin,
@@ -41,6 +48,27 @@ PatchNameDisplayPanel::PatchNameDisplayPanel(TSS::ISkin& skin,
     addAndMakeVisible(*moduleHeader_);
     addAndMakeVisible(*patchNameDisplay_);
 
+    patchNameDisplay_->onCommit([this](juce::String newName)
+    {
+        if (renameCommitHandler_)
+            renameCommitHandler_(newName);
+    });
+
+    patchNameDisplay_->onIllegalCharacter([this]()
+    {
+        TSS::GrayedControlHelper::setFooterErrorMessage(apvts_, kInvalidCharacterFooter);
+    });
+
+    patchNameDisplay_->onIllegalCharacterCleared([this]()
+    {
+        clearInvalidCharacterFooterIfPresent();
+    });
+
+    patchNameDisplay_->onEditEnded([this]()
+    {
+        clearInvalidCharacterFooterIfPresent();
+    });
+
     apvts_.state.addListener(this);
     syncFromApvtsState();
 }
@@ -53,6 +81,17 @@ PatchNameDisplayPanel::~PatchNameDisplayPanel()
 TSS::PatchNameDisplay& PatchNameDisplayPanel::getPatchNameDisplay()
 {
     return *patchNameDisplay_;
+}
+
+void PatchNameDisplayPanel::setCanEditProvider(CanEditProvider provider)
+{
+    canEditProvider_ = std::move(provider);
+    syncFromApvtsState();
+}
+
+void PatchNameDisplayPanel::setRenameCommitHandler(RenameCommitHandler handler)
+{
+    renameCommitHandler_ = std::move(handler);
 }
 
 void PatchNameDisplayPanel::resized()
@@ -101,18 +140,68 @@ void PatchNameDisplayPanel::setUiScale(float uiScale)
     repaint();
 }
 
+bool PatchNameDisplayPanel::isTrackedProperty(const juce::String& propertyName)
+{
+    return propertyName == kPatchName
+        || propertyName == MutatorState::kCompareActive
+        || propertyName == MutatorState::kHistoryMutateList
+        || propertyName == MutatorState::kSelectedMutateRootIndex
+        || propertyName == MutatorState::kSelectedRetryIndex
+        || propertyName == InternalPatches::kCurrentBankNumber
+        || propertyName == InternalPatches::kCurrentPatchNumber;
+}
+
 void PatchNameDisplayPanel::valueTreePropertyChanged(juce::ValueTree&,
                                                      const juce::Identifier& property)
 {
-    if (property.toString() != kPatchName)
+    if (! isTrackedProperty(property.toString()))
         return;
+
+    // Any of these properties changing while the caret editor is open is an interrupt
+    // (Mutate/Retry/Compare/patch nav/load) — abandon the edit before refreshing the display.
+    if (patchNameDisplay_ != nullptr && patchNameDisplay_->isEditing())
+        patchNameDisplay_->cancelEdit();
 
     syncFromApvtsState();
 }
 
 void PatchNameDisplayPanel::valueTreeRedirected(juce::ValueTree&)
 {
+    if (patchNameDisplay_ != nullptr && patchNameDisplay_->isEditing())
+        patchNameDisplay_->cancelEdit();
+
     syncFromApvtsState();
+}
+
+juce::String PatchNameDisplayPanel::computeSecondaryLabel() const
+{
+    const bool compareActive = static_cast<bool>(
+        apvts_.state.getProperty(MutatorState::kCompareActive, false));
+
+    if (compareActive)
+        return kCompareSecondaryLabel;
+
+    const bool historyListEmpty =
+        apvts_.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty();
+    const int selectedRootIndex = static_cast<int>(
+        apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
+
+    if (historyListEmpty || selectedRootIndex < 0)
+        return {};
+
+    const int selectedRetryIndex = static_cast<int>(apvts_.state.getProperty(
+        MutatorState::kSelectedRetryIndex, MutatorState::kSelectedRetryRootOnly));
+
+    return Core::MutationNaming::formatPatchName(selectedRootIndex, selectedRetryIndex);
+}
+
+void PatchNameDisplayPanel::clearInvalidCharacterFooterIfPresent()
+{
+    if (apvts_.state.getProperty("uiMessageText").toString() != juce::String(kInvalidCharacterFooter))
+        return;
+
+    apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
+    apvts_.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
 }
 
 void PatchNameDisplayPanel::syncFromApvtsState()
@@ -125,4 +214,6 @@ void PatchNameDisplayPanel::syncFromApvtsState()
         name = kDefaultPatchName;
 
     patchNameDisplay_->setPatchName(name);
+    patchNameDisplay_->setSecondaryLabel(computeSecondaryLabel());
+    patchNameDisplay_->setEditable(canEditProvider_ ? canEditProvider_() : false);
 }

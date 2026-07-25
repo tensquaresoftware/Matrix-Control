@@ -11,6 +11,7 @@ namespace TSS::GrayedControlHelper
 
     void setFooterInfoMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message);
     void setFooterWarningMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message);
+    void setFooterErrorMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message);
 
     void setGrayedClickHandler(juce::Component& component,
                                bool grayed,

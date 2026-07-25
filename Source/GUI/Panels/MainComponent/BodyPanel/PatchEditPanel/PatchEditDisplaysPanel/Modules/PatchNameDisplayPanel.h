@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -32,12 +33,23 @@ public:
 
     TSS::PatchNameDisplay& getPatchNameDisplay();
 
+    // True when the current origin/bank allows the inline rename (ROM banks are not editable).
+    using CanEditProvider = std::function<bool()>;
+    void setCanEditProvider(CanEditProvider provider);
+
+    // Applies a committed rename (model + APVTS + dirty + live MIDI push) — owned by PluginProcessor.
+    using RenameCommitHandler = std::function<void(const juce::String& newName)>;
+    void setRenameCommitHandler(RenameCommitHandler handler);
+
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
     void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
 
 private:
     void syncFromApvtsState();
+    juce::String computeSecondaryLabel() const;
+    void clearInvalidCharacterFooterIfPresent();
+    static bool isTrackedProperty(const juce::String& propertyName);
 
     int width_;
     int height_;
@@ -46,6 +58,8 @@ private:
     float uiScale_ = 1.0f;
 
     juce::AudioProcessorValueTreeState& apvts_;
+    CanEditProvider canEditProvider_;
+    RenameCommitHandler renameCommitHandler_;
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
     std::unique_ptr<TSS::PatchNameDisplay> patchNameDisplay_;

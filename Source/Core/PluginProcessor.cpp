@@ -2024,6 +2024,53 @@ int PluginProcessor::getCurrentPatchNumberForMutator() const
     return static_cast<int>(apvts.state.getProperty(InternalPatches::kCurrentPatchNumber, 0));
 }
 
+bool PluginProcessor::canEditPatchName() const
+{
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
+    if (static_cast<bool>(apvts.state.getProperty(MutatorState::kCompareActive, false)))
+        return false;
+
+    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kComputerFile)
+        return true;
+
+    namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const int bank = static_cast<int>(
+        apvts.state.getProperty(InternalPatches::kCurrentBankNumber, limits.minBankNumber()));
+
+    // Spec gate is ROM vs writable — use isRomBank directly (not PASTE/STORE helpers).
+    return ! limits.isRomBank(bank);
+}
+
+void PluginProcessor::commitPatchNameRename(const juce::String& newName)
+{
+    if (patchModel_ == nullptr || patchNameSyncer_ == nullptr)
+        return;
+
+    if (! canEditPatchName())
+        return;
+
+    if (newName.trim().isEmpty())
+        return;
+
+    patchModel_->setName(newName);
+    patchNameSyncer_->bufferToApvts();
+
+    if (patchMutatorEngine_ != nullptr)
+        patchMutatorEngine_->refreshFrozenExportBasename(patchModel_->getName());
+
+    if (midiManager == nullptr)
+        return;
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const juce::uint8 patchNumber = static_cast<juce::uint8>(
+        juce::jlimit(0, 255, getCurrentPatchNumberForMutator()));
+
+    midiManager->sendFullPatchForAudition(patchModel_->data(), patchNumber, limits.hasBankConcept());
+}
+
 void PluginProcessor::initializeMutatorActionEnabledMirrorsForEmptyHistory()
 {
     if (patchMutatorEngine_ != nullptr)

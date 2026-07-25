@@ -2,6 +2,7 @@
 
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
@@ -132,18 +133,28 @@ namespace Core
 
     PatchFileExportResult PatchFileService::writeInitialSnapshot(const juce::File& folder,
                                                                  const MutationHistoryStore& store,
-                                                                 SysExEncoder& encoder)
+                                                                 SysExEncoder& encoder,
+                                                                 const juce::String& userPatchName)
     {
         const auto initialFile = folder.getChildFile("Initial.syx");
-        return writeExportPatchFile(initialFile, store.getInitialSnapshot().data(), encoder);
+        return writeExportPatchFile(initialFile, store.getInitialSnapshot().data(), encoder, userPatchName);
     }
 
     PatchFileExportResult PatchFileService::writeExportPatchFile(const juce::File& file,
                                                                  const juce::uint8* packedData,
-                                                                 SysExEncoder& encoder)
+                                                                 SysExEncoder& encoder,
+                                                                 const juce::String& userPatchName)
     {
+        PatchModel stamped;
+        stamped.loadFrom(packedData);
+
+        // Keep the buffer's existing name when the live user name is blank — never wipe
+        // bytes 0–7 to spaces just because the stamp argument was empty.
+        if (userPatchName.trim().isNotEmpty())
+            stamped.setName(userPatchName);
+
         PatchFileExportResult result;
-        const auto save = savePatchSysExFile(file, packedData, encoder);
+        const auto save = savePatchSysExFile(file, stamped.data(), encoder);
 
         if (! save.success)
         {
@@ -159,7 +170,8 @@ namespace Core
     PatchFileExportResult PatchFileService::writeRootEntry(const juce::File& rootDir,
                                                            int rootIndex,
                                                            const MutationHistoryStore& store,
-                                                           SysExEncoder& encoder)
+                                                           SysExEncoder& encoder,
+                                                           const juce::String& userPatchName)
     {
         PatchFileExportResult result;
         result.success = true;
@@ -169,7 +181,7 @@ namespace Core
             const auto rootLabel = MutationNaming::formatRootLabel(rootIndex);
             const auto rootFile = rootDir.getChildFile(
                 PatchFileNameSanitizer::ensureSyxExtension(rootLabel));
-            return writeExportPatchFile(rootFile, rootEntry->result.data(), encoder);
+            return writeExportPatchFile(rootFile, rootEntry->result.data(), encoder, userPatchName);
         }
 
         return result;
@@ -178,7 +190,8 @@ namespace Core
     PatchFileExportResult PatchFileService::writeRetryEntries(const juce::File& rootDir,
                                                               int rootIndex,
                                                               const MutationHistoryStore& store,
-                                                              SysExEncoder& encoder)
+                                                              SysExEncoder& encoder,
+                                                              const juce::String& userPatchName)
     {
         PatchFileExportResult result;
         result.success = true;
@@ -190,7 +203,7 @@ namespace Core
                 const auto stem = MutationNaming::formatExportStem(rootIndex, retryIndex);
                 const auto retryFile = rootDir.getChildFile(
                     PatchFileNameSanitizer::ensureSyxExtension(stem));
-                const auto write = writeExportPatchFile(retryFile, retryEntry->result.data(), encoder);
+                const auto write = writeExportPatchFile(retryFile, retryEntry->result.data(), encoder, userPatchName);
 
                 if (! write.success)
                     return write;
@@ -205,7 +218,8 @@ namespace Core
     PatchFileExportResult PatchFileService::writeRootFolder(const juce::File& folder,
                                                             int rootIndex,
                                                             const MutationHistoryStore& store,
-                                                            SysExEncoder& encoder)
+                                                            SysExEncoder& encoder,
+                                                            const juce::String& userPatchName)
     {
         PatchFileExportResult result;
         const auto rootDir = folder.getChildFile(MutationNaming::formatRootLabel(rootIndex));
@@ -216,13 +230,13 @@ namespace Core
             return result;
         }
 
-        const auto rootWrite = writeRootEntry(rootDir, rootIndex, store, encoder);
+        const auto rootWrite = writeRootEntry(rootDir, rootIndex, store, encoder, userPatchName);
         if (! rootWrite.success)
             return rootWrite;
 
         result.filesWritten += rootWrite.filesWritten;
 
-        const auto retryWrite = writeRetryEntries(rootDir, rootIndex, store, encoder);
+        const auto retryWrite = writeRetryEntries(rootDir, rootIndex, store, encoder, userPatchName);
         if (! retryWrite.success)
             return retryWrite;
 
@@ -233,13 +247,14 @@ namespace Core
 
     PatchFileExportResult PatchFileService::writeAllRootFolders(const juce::File& folder,
                                                                 const MutationHistoryStore& store,
-                                                                SysExEncoder& encoder)
+                                                                SysExEncoder& encoder,
+                                                                const juce::String& userPatchName)
     {
         PatchFileExportResult result;
 
         for (const auto rootIndex : store.getSortedRootIndices())
         {
-            const auto rootWrite = writeRootFolder(folder, rootIndex, store, encoder);
+            const auto rootWrite = writeRootFolder(folder, rootIndex, store, encoder, userPatchName);
 
             if (! rootWrite.success)
                 return rootWrite;
@@ -253,20 +268,21 @@ namespace Core
 
     PatchFileExportResult PatchFileService::writeHistoryLayout(const juce::File& folder,
                                                                const MutationHistoryStore& store,
-                                                               SysExEncoder& encoder)
+                                                               SysExEncoder& encoder,
+                                                               const juce::String& userPatchName)
     {
         PatchFileExportResult result;
 
         if (store.hasInitialSnapshot())
         {
-            const auto initialWrite = writeInitialSnapshot(folder, store, encoder);
+            const auto initialWrite = writeInitialSnapshot(folder, store, encoder, userPatchName);
             if (! initialWrite.success)
                 return initialWrite;
 
             result.filesWritten += initialWrite.filesWritten;
         }
 
-        const auto rootsWrite = writeAllRootFolders(folder, store, encoder);
+        const auto rootsWrite = writeAllRootFolders(folder, store, encoder, userPatchName);
         if (! rootsWrite.success)
             return rootsWrite;
 
@@ -277,13 +293,14 @@ namespace Core
 
     PatchFileExportResult PatchFileService::exportMutatorHistory(const juce::File& folder,
                                                                  const MutationHistoryStore& store,
-                                                                 SysExEncoder& encoder)
+                                                                 SysExEncoder& encoder,
+                                                                 const juce::String& userPatchName)
     {
         const auto validation = validateMutatorExport(folder, store);
         if (! validation.success)
             return validation;
 
-        return writeHistoryLayout(folder, store, encoder);
+        return writeHistoryLayout(folder, store, encoder, userPatchName);
     }
 
     juce::File PatchFileService::resolveKeepSessionFolder(const juce::File& parentFolder,
@@ -301,7 +318,8 @@ namespace Core
     PatchFileExportResult PatchFileService::exportMutatorHistorySession(const juce::File& sessionFolder,
                                                                         const MutationHistoryStore& store,
                                                                         SysExEncoder& encoder,
-                                                                        bool clearExisting)
+                                                                        bool clearExisting,
+                                                                        const juce::String& userPatchName)
     {
         PatchFileExportResult result;
 
@@ -323,7 +341,7 @@ namespace Core
             return result;
         }
 
-        return writeHistoryLayout(sessionFolder, store, encoder);
+        return writeHistoryLayout(sessionFolder, store, encoder, userPatchName);
     }
 
     PatchFileLoadResult PatchFileService::loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut)

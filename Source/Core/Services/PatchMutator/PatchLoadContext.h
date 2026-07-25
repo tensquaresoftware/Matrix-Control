@@ -28,12 +28,13 @@ namespace Core
 
         // Export session folder basename:
         //   Device / INIT / PASTE : `{Name} @ B{b}P{pp:02d}` or `B{b}P{pp:02d}` when name empty
-        //   Computer file         : `{Stem} @ SyxFile`
+        //   Computer file         : `{Name} @ SyxFile` when the sanitized current patch name
+        //                           is non-empty, else `{Stem} @ SyxFile` as a fallback.
         juce::String computeExportBasename(const juce::String& patchName) const;
 
     private:
         juce::String computeDeviceBasename(const juce::String& patchName) const;
-        juce::String computeComputerBasename() const;
+        juce::String computeComputerBasename(const juce::String& patchName) const;
     };
 
 } // namespace Core

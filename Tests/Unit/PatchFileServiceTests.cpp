@@ -59,7 +59,7 @@ public:
         exportMutatorHistory_writesRetries();
         exportMutatorHistory_gapIndices();
         exportMutatorHistory_nameBytesMatch();
-        exportMutatorHistory_initialKeepsOriginalName();
+        exportMutatorHistory_initialAlsoStampedWithUserName();
         exportMutatorHistory_nonWritableFolder_fails();
         exportMutatorHistory_roundTripValidates();
 
@@ -377,7 +377,7 @@ private:
         const auto tempDir = createTempScanDir();
         Core::MutationHistoryStore store;
 
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
 
         expect(! result.success);
         expect(result.errorMessage.isNotEmpty());
@@ -398,7 +398,7 @@ private:
         expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 302),
                                 makeParentBuffer(302)));
 
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "MY PATCH");
 
         expect(result.success);
         expect(result.filesWritten >= 2);
@@ -421,7 +421,7 @@ private:
         expect(store.insertRetry(0, 0, namedResult(0, 0, 311), makeParentBuffer(311)));
         expect(store.insertRetry(0, 1, namedResult(0, 1, 312), makeParentBuffer(312)));
 
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
 
         expect(result.success);
         expect(tempDir.getChildFile("M00").getChildFile("M00-R00.syx").existsAsFile());
@@ -444,7 +444,7 @@ private:
         expect(store.insertRoot(99, namedResult(99, Core::MutationHistoryStore::kRootOnly, 399),
                                 makeParentBuffer(399)));
 
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
 
         expect(result.success);
         expect(tempDir.getChildFile("M00").isDirectory());
@@ -463,38 +463,42 @@ private:
         const auto tempDir = createTempScanDir();
         Core::MutationHistoryStore store;
 
+        // Fixture buffers carry Mxx/Mxx-Ryy in bytes 0-7 (legacy naming), but export must
+        // stamp the live USER name over them — filenames/folders stay Mxx via format helpers.
         expect(store.insertRoot(5, namedResult(5, Core::MutationHistoryStore::kRootOnly, 335),
                                 makeParentBuffer(335)));
         expect(store.insertRetry(5, 2, namedResult(5, 2, 352), makeParentBuffer(352)));
 
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
         expect(result.success);
 
         expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05.syx")),
-                     Core::MutationNaming::formatPatchName(5));
+                     juce::String("WARMPAD"));
         expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05-R02.syx")),
-                     Core::MutationNaming::formatPatchName(5, 2));
+                     juce::String("WARMPAD"));
 
         tempDir.deleteRecursively();
     }
 
-    void exportMutatorHistory_initialKeepsOriginalName()
+    void exportMutatorHistory_initialAlsoStampedWithUserName()
     {
-        beginTest("exportMutatorHistory_initialKeepsOriginalName");
+        beginTest("exportMutatorHistory_initialAlsoStampedWithUserName");
 
         const auto tempDir = createTempScanDir();
         Core::MutationHistoryStore store;
 
+        // Initial.syx is the same patch identity as the mutation branches — export stamps
+        // it with the current live name too, so a rename after mutating is reflected there.
         auto initial = makeDistinctBuffer(340);
         initial.setName("MY PATCH");
         store.setInitialSnapshot(initial);
         expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 341),
                                 makeParentBuffer(341)));
 
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "COLDPAD");
         expect(result.success);
 
-        expectEquals(decodedPatchName(tempDir.getChildFile("Initial.syx")), juce::String("MY PATCH"));
+        expectEquals(decodedPatchName(tempDir.getChildFile("Initial.syx")), juce::String("COLDPAD"));
 
         tempDir.deleteRecursively();
     }
@@ -510,7 +514,7 @@ private:
         const auto missing = juce::File::getSpecialLocation(juce::File::tempDirectory)
                                  .getChildFile("MatrixControlMissingExportFolder");
 
-        const auto result = service_.exportMutatorHistory(missing, store, encoder_);
+        const auto result = service_.exportMutatorHistory(missing, store, encoder_, "WARMPAD");
 
         expect(! result.success);
         expect(result.errorMessage.isNotEmpty());
@@ -529,7 +533,7 @@ private:
                                 makeParentBuffer(402)));
 
         const auto sessionFolder = tempDir.getChildFile("OB-VOX @ B8P25");
-        const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, false);
+        const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, false, "OB-VOX");
 
         expect(result.success);
         expect(sessionFolder.getChildFile("Initial.syx").existsAsFile());
@@ -573,7 +577,7 @@ private:
         expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 410),
                                 makeParentBuffer(410)));
 
-        const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, true);
+        const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, true, "WARMPAD");
 
         expect(result.success);
         expect(! stale.existsAsFile());
@@ -596,7 +600,7 @@ private:
                                 makeParentBuffer(361)));
         expect(store.insertRetry(0, 0, namedResult(0, 0, 362), makeParentBuffer(362)));
 
-        const auto exportResult = service_.exportMutatorHistory(tempDir, store, encoder_);
+        const auto exportResult = service_.exportMutatorHistory(tempDir, store, encoder_, "INITNAME");
         expect(exportResult.success);
         expectEquals(exportResult.filesWritten, 3);
 

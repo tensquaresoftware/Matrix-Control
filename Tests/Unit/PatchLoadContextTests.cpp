@@ -13,7 +13,8 @@ public:
         deviceBlankName_locationOnly();
         deviceOsStrippedName_keepsSpaces();
         deviceUnsanitizableName_locationOnly();
-        computerFile_stemAtSyxFile();
+        computerFile_currentNameAtSyxFile();
+        computerFile_blankName_fallsBackToFileStem();
     }
 
 private:
@@ -51,18 +52,28 @@ private:
         expectEquals(context.computeExportBasename("*?:"), juce::String("B1P77"));
     }
 
-    void computerFile_stemAtSyxFile()
+    void computerFile_currentNameAtSyxFile()
     {
-        beginTest("computerFile_stemAtSyxFile");
+        beginTest("computerFile_currentNameAtSyxFile");
+
+        // Non-empty sanitized current patch name wins over the loaded file's stem.
+        const auto context = Core::PatchLoadContext::computerFile("WARM-PAD");
+        expectEquals(context.computeExportBasename("COLDPAD"), juce::String("COLDPAD @ SyxFile"));
+    }
+
+    void computerFile_blankName_fallsBackToFileStem()
+    {
+        beginTest("computerFile_blankName_fallsBackToFileStem");
 
         const auto context = Core::PatchLoadContext::computerFile("WARM-PAD");
-        expectEquals(context.computeExportBasename("IGNORED"), juce::String("WARM-PAD @ SyxFile"));
+        expectEquals(context.computeExportBasename(""), juce::String("WARM-PAD @ SyxFile"));
+        expectEquals(context.computeExportBasename("   "), juce::String("WARM-PAD @ SyxFile"));
 
         const auto fromExtension = Core::PatchLoadContext::computerFile("WARM-PAD.syx");
-        expectEquals(fromExtension.computeExportBasename("IGNORED"), juce::String("WARM-PAD @ SyxFile"));
+        expectEquals(fromExtension.computeExportBasename(""), juce::String("WARM-PAD @ SyxFile"));
 
         const auto blank = Core::PatchLoadContext::computerFile("***");
-        expectEquals(blank.computeExportBasename("IGNORED"), juce::String("PATCH @ SyxFile"));
+        expectEquals(blank.computeExportBasename(""), juce::String("PATCH @ SyxFile"));
     }
 };
 

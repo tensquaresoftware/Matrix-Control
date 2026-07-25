@@ -245,7 +245,6 @@ MutatorActionResult PatchMutatorEngine::mutate()
     }
 
     const int rootIndex = *rootIndexOpt;
-    MutationNaming::applyPatchName(working, rootIndex);
 
     if (! historyStore_.insertRoot(rootIndex, working, parentSnapshot))
     {
@@ -353,7 +352,6 @@ MutatorActionResult PatchMutatorEngine::retry()
     }
 
     const int retryIndex = *retryIndexOpt;
-    MutationNaming::applyPatchName(working, rootIndex, retryIndex);
 
     if (! historyStore_.insertRetry(rootIndex, retryIndex, working, parentSnapshot))
     {
@@ -392,7 +390,7 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
         applySelectionFromApvts();
 
         const PatchModel auditionModel = resolveAuditionBuffer();
-        if (std::memcmp(auditionModel.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
+        if (candidateDiffersFromLive(auditionModel))
             pushResultToEditorAndSynth(auditionModel);
 
         clearCompareLockedFooterIfPresent(apvts_);
@@ -424,7 +422,7 @@ MutatorActionResult PatchMutatorEngine::toggleCompare()
     state.setProperty(MutatorState::kCompareActive, true, nullptr);
 
     const PatchModel initialSnapshot = historyStore_.getInitialSnapshot();
-    if (std::memcmp(initialSnapshot.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
+    if (candidateDiffersFromLive(initialSnapshot))
         pushResultToEditorAndSynth(initialSnapshot);
 
     MutatorActionResult result;
@@ -542,7 +540,7 @@ MutatorActionResult PatchMutatorEngine::exportHistory(const juce::File& destinat
 
     if (! historyStore_.hasFrozenExportBasename())
         return makeExportHistoryResult(patchFileService_->exportMutatorHistory(
-            destinationFolder, historyStore_, *sysExEncoder_));
+            destinationFolder, historyStore_, *sysExEncoder_, patchModel_->getName()));
 
     const auto sessionFolder = destinationFolder.getChildFile(historyStore_.getFrozenExportBasename());
     if (sessionFolder.exists())
@@ -586,7 +584,7 @@ MutatorActionResult PatchMutatorEngine::exportHistoryResolved(const juce::File& 
 MutatorActionResult PatchMutatorEngine::runSessionExport(const juce::File& sessionFolder, bool clearExisting)
 {
     return makeExportHistoryResult(patchFileService_->exportMutatorHistorySession(
-        sessionFolder, historyStore_, *sysExEncoder_, clearExisting));
+        sessionFolder, historyStore_, *sysExEncoder_, clearExisting, patchModel_->getName()));
 }
 
 void PatchMutatorEngine::freezeExportBasename(const PatchModel& snapshot)
@@ -601,6 +599,18 @@ void PatchMutatorEngine::freezeExportBasename(const PatchModel& snapshot)
 void PatchMutatorEngine::setPatchLoadContextProvider(std::function<PatchLoadContext()> provider)
 {
     patchLoadContextProvider_ = std::move(provider);
+}
+
+void PatchMutatorEngine::refreshFrozenExportBasename(const juce::String& newPatchName)
+{
+    if (! historyStore_.hasFrozenExportBasename())
+        return;
+
+    if (! patchLoadContextProvider_)
+        return;
+
+    const auto context = patchLoadContextProvider_();
+    historyStore_.setFrozenExportBasename(context.computeExportBasename(newPatchName));
 }
 
 MutatorActionResult PatchMutatorEngine::defragHistory()
@@ -712,7 +722,7 @@ void PatchMutatorEngine::auditionSelectedHistoryEntry()
 
     const PatchModel auditionModel = resolveAuditionBuffer();
 
-    if (std::memcmp(auditionModel.data(), patchModel_->data(), PatchModel::kBufferSize) == 0)
+    if (! candidateDiffersFromLive(auditionModel))
         return;
 
     pushResultToEditorAndSynth(auditionModel);
@@ -891,7 +901,7 @@ void PatchMutatorEngine::auditionAfterHistoryMutation()
     else
         buffer = *patchModel_;
 
-    if (std::memcmp(buffer.data(), patchModel_->data(), PatchModel::kBufferSize) != 0)
+    if (candidateDiffersFromLive(buffer))
         pushResultToEditorAndSynth(buffer);
 }
 
@@ -1022,9 +1032,24 @@ std::optional<MutationEntry> PatchMutatorEngine::resolveSelectedEntryForRetry(in
     return historyStore_.getEntry(rootIndex, MutationHistoryStore::kRootOnly);
 }
 
+bool PatchMutatorEngine::candidateDiffersFromLive(const PatchModel& candidate) const
+{
+    PatchModel stampedCandidate;
+    stampedCandidate.loadFrom(candidate.data());
+    stampedCandidate.setName(patchModel_->getName());
+
+    return std::memcmp(stampedCandidate.data(), patchModel_->data(), PatchModel::kBufferSize) != 0;
+}
+
 void PatchMutatorEngine::pushResultToEditorAndSynth(const PatchModel& mutatedModel)
 {
-    std::memcpy(patchModel_->data(), mutatedModel.data(), PatchModel::kBufferSize);
+    // The live model + APVTS are the name SSOT — stamp it onto the pushed buffer so
+    // History audition / Compare cannot resurrect a stale or Mxx name after a rename.
+    PatchModel stampedModel;
+    stampedModel.loadFrom(mutatedModel.data());
+    stampedModel.setName(patchModel_->getName());
+
+    std::memcpy(patchModel_->data(), stampedModel.data(), PatchModel::kBufferSize);
     pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
 
     if (midiManager_ == nullptr || ! getDeviceMemoryLimits_)

@@ -928,3 +928,17 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: Dirty snapshot after ROM factory name inject may disagree with a later hardware re-dump that still has blank name bytes.
   evidence: Blind Hunter; by design for editor UX until hardware UAT proves RAM name retention.
 
+
+## Deferred from: quick-dev spec-patch-name-inline-edit-and-mutator-dual-line (2026-07-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-inline-edit-and-mutator-dual-line.md`
+  summary: No automated GUI/unit tests for PatchNameDisplay caret editor, dual-line panel wiring, or interrupt-cancel property allowlist.
+  evidence: Blind Hunter; only PatchNameEditRules empty-commit helper is unit-tested; rest covered by manual checklist.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-inline-edit-and-mutator-dual-line.md`
+  summary: Loading a different patch that keeps the same displayed name may not fire tracked APVTS properties, so an in-progress rename might not auto-cancel.
+  evidence: Blind Hunter / Edge Case Hunter; rare same-name reload with empty history; focus-loss still cancels on click-away.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-inline-edit-and-mutator-dual-line.md`
+  summary: Device-type change mid-edit is not in the interrupt property allowlist.
+  evidence: Edge Case Hunter; uncommon during a caret session; bank/patch/history/compare changes still cancel.

@@ -110,6 +110,16 @@ public:
     Core::PatchNameSyncer& getPatchNameSyncer() noexcept { return *patchNameSyncer_; }
     const Core::PatchNameSyncer& getPatchNameSyncer() const noexcept { return *patchNameSyncer_; }
 
+    // Patch Name inline rename gate: computer-file origin is always editable; device origin
+    // follows the same ROM gate as PASTE/STORE (DeviceMemoryLimits::isPasteStoreAllowed).
+    bool canEditPatchName() const;
+
+    // Applies a committed rename from the Patch Name inline editor: model + APVTS + dirty
+    // (buffer memcmp) + frozen export basename refresh + live full-patch MIDI push (0x0D).
+    // Empty / all-spaces name is a no-op (belt-and-suspenders — the widget already keeps
+    // the previous name on an empty commit).
+    void commitPatchNameRename(const juce::String& newName);
+
     bool setMidiInputPort(const juce::String& deviceId);
     bool setMidiOutputPort(const juce::String& deviceId);
     bool setKeyboardFromPort(const juce::String& deviceId);

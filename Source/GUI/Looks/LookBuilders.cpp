@@ -151,11 +151,18 @@ namespace TSS
 
     PatchNameDisplayLook patchNameDisplayLookFromSkin(const ISkin& skin)
     {
+        // Secondary line reuses the primary red at ~75% opacity (no separate skin token yet)
+        // and ~70% of the Patch Name font height, per the dual-line display spec.
+        constexpr float kSecondaryTextAlpha = 0.75f;
+        constexpr float kSecondaryFontHeightRatio = 0.7f;
+
         PatchNameDisplayLook look;
         look.background = skin.getColour(SkinColourId::kPatchNameDisplayBackground);
         look.border = skin.getColour(SkinColourId::kPatchNameDisplayBorder);
         look.text = skin.getColour(SkinColourId::kPatchNameDisplayText);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kPatchName);
+        look.secondaryText = look.text.withAlpha(kSecondaryTextAlpha);
+        look.secondaryFont = look.font.withHeight(look.font.getHeight() * kSecondaryFontHeightRatio);
         return look;
     }
 

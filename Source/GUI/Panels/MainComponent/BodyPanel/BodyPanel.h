@@ -45,6 +45,8 @@ public:
 
     void setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
+    PatchEditPanel& getPatchEditPanel() noexcept { return *patchEditPanel_; }
+
 private:
     BodyPanelDimensions dims_;
     TSS::ISkin* skin_;

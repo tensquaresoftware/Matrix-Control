@@ -10,6 +10,9 @@
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/Modules/PatchNameDisplayPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "GUI/About/AboutWindow.h"
@@ -379,6 +382,22 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         {
             pluginProcessor.swapMatrixModBusContents(fromBus, toBus);
         });
+
+    {
+        auto& patchNameDisplayPanel = mainComponent_->getBodyPanel()
+            .getPatchEditPanel()
+            .getPatchEditDisplaysPanel()
+            .getPatchNameDisplayPanel();
+
+        patchNameDisplayPanel.setCanEditProvider(
+            [this]() { return pluginProcessor.canEditPatchName(); });
+
+        patchNameDisplayPanel.setRenameCommitHandler(
+            [this](const juce::String& newName)
+            {
+                pluginProcessor.commitPatchNameRename(newName);
+            });
+    }
 
     mainComponent_->setMasterInitConfirmationGate(
         [this](const juce::String& /*initPropertyId*/,

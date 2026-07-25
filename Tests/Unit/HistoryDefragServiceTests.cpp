@@ -19,7 +19,7 @@ public:
         defrag_rootsCompactInListOrder();
         defrag_retriesCompactPerRoot();
         defrag_preservesBufferPayload();
-        defrag_updatesPatchNames();
+        defrag_doesNotRewritePatchNames();
         defrag_keepsInitialSnapshot();
         defrag_retryGapAt99_unblocksPeek();
         defrag_remapsSelectedRoot();
@@ -149,10 +149,13 @@ private:
         expectEquals(static_cast<int>(entry->parentSnapshot[13]), static_cast<int>(0xBE));
     }
 
-    void defrag_updatesPatchNames()
+    void defrag_doesNotRewritePatchNames()
     {
-        beginTest("defrag_updatesPatchNames");
+        beginTest("defrag_doesNotRewritePatchNames");
 
+        // Bytes 0-7 hold the musical patch name (SSOT = live model / APVTS), never the
+        // Mxx/Mxx-Ryy history label — defrag renumbers indices only and must leave the
+        // packed name bytes exactly as they were before remapping.
         Core::MutationHistoryStore store;
         expect(store.insertRoot(99, namedResult(99, Core::MutationHistoryStore::kRootOnly, 99), makeParentBuffer(99)));
         expect(store.insertRoot(5, namedResult(5, Core::MutationHistoryStore::kRootOnly, 5), makeParentBuffer(5)));
@@ -160,17 +163,19 @@ private:
 
         expect(Core::HistoryDefragService::defrag(store, { 5, 3 }).success);
 
+        // Root 5 remaps to 0, but its buffer keeps the name it was created with (M05).
         const auto rootEntry = store.getEntry(0);
         expect(rootEntry.has_value());
-        expectEquals(bufferToModel(rootEntry->result).getName(), juce::String("M00"));
+        expectEquals(bufferToModel(rootEntry->result).getName(), juce::String("M05"));
 
         const auto retryEntry = store.getEntry(0, 0);
         expect(retryEntry.has_value());
-        expectEquals(bufferToModel(retryEntry->result).getName(), juce::String("M00-R00"));
+        expectEquals(bufferToModel(retryEntry->result).getName(), juce::String("M05-R03"));
 
+        // Root 99 remaps to 1, keeping its original M99 name.
         const auto rootAtOne = store.getEntry(1);
         expect(rootAtOne.has_value());
-        expectEquals(bufferToModel(rootAtOne->result).getName(), juce::String("M01"));
+        expectEquals(bufferToModel(rootAtOne->result).getName(), juce::String("M99"));
     }
 
     void defrag_keepsInitialSnapshot()
