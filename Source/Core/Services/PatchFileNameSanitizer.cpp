@@ -3,7 +3,7 @@
 namespace Core
 {
 
-    juce::String PatchFileNameSanitizer::sanitizeFileStem(juce::String input)
+    juce::String PatchFileNameSanitizer::stripPathAndSyxExtension(juce::String input)
     {
         if (input.containsChar('/') || input.containsChar('\\'))
         {
@@ -14,7 +14,33 @@ namespace Core
         if (input.endsWithIgnoreCase(".syx"))
             input = input.upToLastOccurrenceOf(".", false, false);
 
-        return sanitizeToMatrixName(stripOsForbiddenChars(input.trim()));
+        return input.trim();
+    }
+
+    juce::String PatchFileNameSanitizer::sanitizeFileStem(juce::String input)
+    {
+        return sanitizeToMatrixName(stripOsForbiddenChars(stripPathAndSyxExtension(std::move(input))));
+    }
+
+    juce::String PatchFileNameSanitizer::sanitizeOsFileStem(juce::String input)
+    {
+        const auto filtered = sanitizeOsPathSegmentOrEmpty(stripPathAndSyxExtension(std::move(input)));
+
+        if (filtered.isEmpty())
+            return kEmptyNameFallback;
+
+        return filtered;
+    }
+
+    juce::String PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty(juce::String input)
+    {
+        input = stripOsForbiddenChars(input.trim()).toUpperCase().trim();
+
+        while (input.endsWithChar('.') || input.endsWithChar(' '))
+            input = input.dropLastCharacters(1).trimEnd();
+
+        constexpr int kMaxOsPathSegmentLength = 64;
+        return input.substring(0, kMaxOsPathSegmentLength).trimEnd();
     }
 
     juce::String PatchFileNameSanitizer::sanitizeToMatrixName(juce::String stem)

@@ -14,6 +14,8 @@ public:
         sanitize_lowercaseFoldsToUpper();
         sanitize_emptyFallback();
         sanitizeFileStem_stripsPathAndExtension();
+        sanitizeOsPathSegment_keepsSpacesStripsStar();
+        sanitizeOsFileStem_fallbackWhenEmpty();
     }
 
 private:
@@ -59,6 +61,28 @@ private:
 
         const auto result = Core::PatchFileNameSanitizer::sanitizeFileStem("/tmp/folder/MY-PATCH.syx");
         expect(result == "MY-PATCH");
+    }
+
+    void sanitizeOsPathSegment_keepsSpacesStripsStar()
+    {
+        beginTest("sanitizeOsPathSegment_keepsSpacesStripsStar");
+
+        expectEquals(Core::PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty("FLUTE."),
+                     juce::String("FLUTE"));
+        expectEquals(Core::PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty("BS ETAK*"),
+                     juce::String("BS ETAK"));
+        expectEquals(Core::PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty("*'CANOPY"),
+                     juce::String("'CANOPY"));
+    }
+
+    void sanitizeOsFileStem_fallbackWhenEmpty()
+    {
+        beginTest("sanitizeOsFileStem_fallbackWhenEmpty");
+
+        expectEquals(Core::PatchFileNameSanitizer::sanitizeOsFileStem("***"),
+                     juce::String(Core::PatchFileNameSanitizer::kEmptyNameFallback));
+        expectEquals(Core::PatchFileNameSanitizer::sanitizeOsFileStem("WARM PAD.syx"),
+                     juce::String("WARM PAD"));
     }
 };
 
