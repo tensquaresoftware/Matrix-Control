@@ -10,8 +10,6 @@
 #include "SharedPanel/SharedPanel.h"
 #include "GUI/Factories/WidgetFactory.h"
 
-using TSS::SkinColourId;
-
 BodyPanel::BodyPanel(TSS::ISkin& skin,
                      const GuiLayoutDimensions& layoutDimensions,
                      WidgetFactory& widgetFactory,
@@ -20,7 +18,7 @@ BodyPanel::BodyPanel(TSS::ISkin& skin,
     : dims_(layoutDimensions.body)
     , skin_(&skin)
 {
-    setOpaque(true);
+    setOpaque(false);
     patchEditPanel_ = std::make_unique<PatchEditPanel>(
         skin, dims_.patchEdit, layoutDimensions.patchEditParameterCell, layoutDimensions.patchEditModuleHeader, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel_);
@@ -38,10 +36,8 @@ BodyPanel::BodyPanel(TSS::ISkin& skin,
 
 BodyPanel::~BodyPanel() = default;
 
-void BodyPanel::paint(juce::Graphics& g)
+void BodyPanel::paint(juce::Graphics&)
 {
-    if (skin_ != nullptr)
-        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
 }
 
 void BodyPanel::resized()

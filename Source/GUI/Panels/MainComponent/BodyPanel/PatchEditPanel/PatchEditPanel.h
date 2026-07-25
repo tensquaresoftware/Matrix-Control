@@ -31,6 +31,7 @@ public:
     ~PatchEditPanel() override;
 
     void resized() override;
+    void paint(juce::Graphics& g) override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 

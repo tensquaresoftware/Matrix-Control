@@ -2,10 +2,14 @@
 
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Helpers/CompareLockBinder.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/MatrixModulationPanel/MatrixModulationPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.h"
+
+using TSS::SkinColourId;
 
 SharedPanel::SharedPanel(TSS::ISkin& skin,
                          const SharedPanelDimensions& dims,
@@ -13,7 +17,10 @@ SharedPanel::SharedPanel(TSS::ISkin& skin,
                          juce::AudioProcessorValueTreeState& apvts,
                          const Core::PatchFileService& patchFileService)
     : dims_(dims)
+    , skin_(&skin)
 {
+    setOpaque(true);
+
     matrixModulationPanel_ = std::make_unique<MatrixModulationPanel>(
         skin,
         dims_.matrixModulation,
@@ -42,6 +49,12 @@ void SharedPanel::setBusReorderHandler(BusReorderHandler handler)
         matrixModulationPanel_->setBusReorderHandler(std::move(handler));
 }
 
+void SharedPanel::paint(juce::Graphics& g)
+{
+    if (skin_ != nullptr)
+        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
+}
+
 void SharedPanel::resized()
 {
     auto area = getLocalBounds();
@@ -66,7 +79,9 @@ void SharedPanel::resized()
 
 void SharedPanel::setSkin(TSS::ISkin& skin)
 {
+    skin_ = &skin;
     TSS::propagateSkin(skin, matrixModulationPanel_.get(), patchManagerPanel_.get());
+    repaint();
 }
 
 void SharedPanel::setUiScale(float uiScale)

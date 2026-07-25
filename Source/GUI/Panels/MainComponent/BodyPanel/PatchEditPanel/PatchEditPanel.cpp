@@ -8,11 +8,13 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 
+using TSS::SkinColourId;
 
 PatchEditPanel::~PatchEditPanel() = default;
 
@@ -35,13 +37,19 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
     , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(
         skin, dims_.bottomModules, dims_.sectionHeaderWidth, dims_.bottomHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
 {
-    setOpaque(false);
+    setOpaque(true);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*patchEditTopModulesPanel_);
     addAndMakeVisible(*patchEditDisplaysPanel_);
     addAndMakeVisible(*patchEditBottomModulesPanel_);
 
     setSize(dims_.width, dims_.height);
+}
+
+void PatchEditPanel::paint(juce::Graphics& g)
+{
+    if (skin_ != nullptr)
+        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
 }
 
 void PatchEditPanel::resized()
@@ -71,6 +79,7 @@ void PatchEditPanel::setSkin(TSS::ISkin& skin)
         patchEditTopModulesPanel_.get(),
         patchEditDisplaysPanel_.get(),
         patchEditBottomModulesPanel_.get());
+    repaint();
 }
 
 void PatchEditPanel::setUiScale(float uiScale)

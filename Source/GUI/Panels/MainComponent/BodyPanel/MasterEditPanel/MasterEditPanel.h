@@ -27,6 +27,7 @@ public:
     ~MasterEditPanel() override;
 
     void resized() override;
+    void paint(juce::Graphics& g) override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
     void mouseDown(const juce::MouseEvent& event) override;

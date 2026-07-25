@@ -530,7 +530,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
 void PluginEditor::paint(juce::Graphics& g)
 {
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
+    g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
 }
 
 void PluginEditor::resized()

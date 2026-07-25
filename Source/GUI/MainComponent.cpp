@@ -28,7 +28,7 @@ MainComponent::MainComponent(TSS::Skin& skin,
 void MainComponent::paint(juce::Graphics& g)
 {
     if (skin_ != nullptr)
-        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
+        g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
 }
 
 void MainComponent::resized()

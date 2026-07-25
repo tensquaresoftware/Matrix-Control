@@ -12,6 +12,7 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
+#include "GUI/Skins/SkinValues.h"
 #include "GUI/Widgets/SectionHeader.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -58,7 +59,7 @@ MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensio
     , vibratoPanel_(std::make_unique<VibratoPanel>(skin, dims_.childModuleWidth, dims_.vibratoPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
     , miscPanel_(std::make_unique<MiscPanel>(skin, dims_.childModuleWidth, dims_.miscPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
 {
-    setOpaque(false);
+    setOpaque(true);
     addAndMakeVisible(*sectionHeader_);
     addAndMakeVisible(*midiPanel_);
     addAndMakeVisible(*vibratoPanel_);
@@ -154,6 +155,12 @@ void MasterEditPanel::mouseDown(const juce::MouseEvent& event)
     showMatrix6PatchOnlyFooterMessage();
 }
 
+void MasterEditPanel::paint(juce::Graphics& g)
+{
+    if (skin_ != nullptr)
+        g.fillAll(skin_->getColour(TSS::SkinColourId::kBodyPanelBackground));
+}
+
 void MasterEditPanel::resized()
 {
     auto area = getLocalBounds();
@@ -190,6 +197,8 @@ void MasterEditPanel::setSkin(TSS::ISkin& skin)
 
     if (masterEditGrayed_)
         setMasterEditGrayed(true);
+
+    repaint();
 }
 
 void MasterEditPanel::setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate)

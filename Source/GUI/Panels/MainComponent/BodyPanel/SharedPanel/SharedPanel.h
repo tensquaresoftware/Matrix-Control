@@ -34,6 +34,7 @@ public:
     ~SharedPanel() override;
 
     void resized() override;
+    void paint(juce::Graphics& g) override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
@@ -43,6 +44,7 @@ public:
 
 private:
     SharedPanelDimensions dims_;
+    TSS::ISkin* skin_ = nullptr;
     float uiScale_ = 1.0f;
 
     std::unique_ptr<MatrixModulationPanel> matrixModulationPanel_;
