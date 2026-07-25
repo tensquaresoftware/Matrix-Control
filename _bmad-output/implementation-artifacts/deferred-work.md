@@ -906,3 +906,14 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: English user manual still absent while FR shortcut docs were extended.
   evidence: Blind Hunter; pre-existing gap (user-manual.md à venir).
 
+
+## Deferred from: quick-dev spec-system-style-confirmation-modals (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-style-confirmation-modals.md`
+  summary: Sync confirmation gates still use nested modal loops on the message thread (re-entrancy risk with APVTS/ValueTree during the dialog).
+  evidence: Blind Hunter; pre-existing pattern kept by spec; native OS modals do not remove nested-loop risk.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-system-style-confirmation-modals.md`
+  summary: macOS sync native alerts use runModal and do not sheet-attach via withAssociatedComponent (sheet parenting is async-only in JUCE).
+  evidence: Blind Hunter; framework limit; association still passed for Windows HWND parenting where available.
+

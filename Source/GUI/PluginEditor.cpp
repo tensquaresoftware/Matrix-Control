@@ -23,6 +23,39 @@
 
 using TSS::SkinColourId;
 
+namespace
+{
+bool isMessageThread()
+{
+    if (auto* mm = juce::MessageManager::getInstanceWithoutCreating())
+        return mm->isThisTheMessageThread();
+
+    return false;
+}
+
+/** AlertWindow-compatible result codes: button i → ((i + 1) % N), cancel → 0.
+    Uses NativeMessageBox plain indices when native alerts are enabled so that
+    out-of-range dismiss codes (e.g. Windows IDCANCEL on a 2-button TaskDialog)
+    map to cancel instead of accidentally confirming. */
+int showMappedAlert(const juce::MessageBoxOptions& options)
+{
+    const int numButtons = options.getNumButtons();
+    jassert(numButtons > 0);
+
+    if (juce::LookAndFeel::getDefaultLookAndFeel().isUsingNativeAlertWindows())
+    {
+        const int raw = juce::NativeMessageBox::show(options);
+
+        if (raw < 0 || raw >= numButtons)
+            return 0;
+
+        return (raw + 1) % numButtons;
+    }
+
+    return juce::AlertWindow::show(options);
+}
+} // namespace
+
 class PluginEditor::HeaderRefreshTimer : private juce::Timer
 {
 public:
@@ -124,6 +157,10 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
     , pluginProcessor(p)
 {
+    // Prefer OS-native alerts where LookAndFeel reports them (macOS/Windows).
+    // On Linux, JUCE forces isUsingNativeAlertWindows() false and draws AlertWindow.
+    juce::LookAndFeel::getDefaultLookAndFeel().setUsingNativeAlertWindows(true);
+
     pluginProcessor.setPatchFolderPicker([safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> juce::File
     {
         if (safeThis == nullptr)
@@ -174,36 +211,50 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         });
 
     pluginProcessor.setMutatorDefragLimitModalGate(
-        [](std::function<void()> onConfirmed)
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](std::function<void()> onConfirmed)
         {
+            if (! isMessageThread() || safeThis == nullptr)
+                return;
+
             namespace Dialog = PluginDisplayNames::Dialogs::MutatorHistoryDefrag;
 
-            juce::AlertWindow alert(Dialog::kTitle, Dialog::kBody, juce::AlertWindow::QuestionIcon);
-            alert.addButton(Dialog::kConfirm, 1);
-            alert.addButton(Dialog::kCancel, 0);
+            const int result = showMappedAlert(
+                juce::MessageBoxOptions()
+                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                    .withTitle(Dialog::kTitle)
+                    .withMessage(Dialog::kBody)
+                    .withButton(Dialog::kConfirm)
+                    .withButton(Dialog::kCancel)
+                    .withAssociatedComponent(safeThis.getComponent()));
 
-            if (alert.runModalLoop() == 1 && onConfirmed)
+            if (result == 1 && onConfirmed)
                 onConfirmed();
         });
 
     pluginProcessor.setMutatorExportCollisionModalGate(
-        [](std::function<void(Core::ExportCollisionResolution)> onResolved)
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
+            std::function<void(Core::ExportCollisionResolution)> onResolved)
         {
-            jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
-
-            namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
-
-            juce::AlertWindow alert(Msg::kExportCollisionTitle,
-                                    Msg::kExportCollisionMessage,
-                                    juce::AlertWindow::QuestionIcon);
-            alert.addButton(Msg::kExportCollisionOverwrite, 1);
-            alert.addButton(Msg::kExportCollisionKeep, 2);
-            alert.addButton(Msg::kExportCollisionCancel, 0);
-
             if (! onResolved)
                 return;
 
-            switch (alert.runModalLoop())
+            if (! isMessageThread() || safeThis == nullptr)
+            {
+                onResolved(Core::ExportCollisionResolution::kCancel);
+                return;
+            }
+
+            namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+
+            switch (showMappedAlert(
+                juce::MessageBoxOptions()
+                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                    .withTitle(Msg::kExportCollisionTitle)
+                    .withMessage(Msg::kExportCollisionMessage)
+                    .withButton(Msg::kExportCollisionOverwrite)
+                    .withButton(Msg::kExportCollisionKeep)
+                    .withButton(Msg::kExportCollisionCancel)
+                    .withAssociatedComponent(safeThis.getComponent())))
             {
                 case 1: onResolved(Core::ExportCollisionResolution::kOverwrite); break;
                 case 2: onResolved(Core::ExportCollisionResolution::kKeep); break;
@@ -212,20 +263,22 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         });
 
     pluginProcessor.setMutatorHistoryGateModalGate(
-        []() -> Core::MutatorHistoryGateChoice
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> Core::MutatorHistoryGateChoice
         {
-            jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+            if (! isMessageThread() || safeThis == nullptr)
+                return Core::MutatorHistoryGateChoice::kCancel;
 
             namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
-            juce::AlertWindow alert(Msg::kHistoryGateTitle,
-                                    Msg::kHistoryGateMessage,
-                                    juce::AlertWindow::QuestionIcon);
-            alert.addButton(Msg::kHistoryGateExport, 1);
-            alert.addButton(Msg::kHistoryGateDiscard, 2);
-            alert.addButton(Msg::kHistoryGateCancel, 0);
-
-            switch (alert.runModalLoop())
+            switch (showMappedAlert(
+                juce::MessageBoxOptions()
+                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                    .withTitle(Msg::kHistoryGateTitle)
+                    .withMessage(Msg::kHistoryGateMessage)
+                    .withButton(Msg::kHistoryGateExport)
+                    .withButton(Msg::kHistoryGateDiscard)
+                    .withButton(Msg::kHistoryGateCancel)
+                    .withAssociatedComponent(safeThis.getComponent())))
             {
                 case 1: return Core::MutatorHistoryGateChoice::kExport;
                 case 2: return Core::MutatorHistoryGateChoice::kDiscard;
@@ -234,19 +287,22 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         });
 
     pluginProcessor.setUnsavedEditConfirmModalGate(
-        []() -> bool
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> bool
         {
-            jassert(juce::MessageManager::getInstance()->isThisTheMessageThread());
+            if (! isMessageThread() || safeThis == nullptr)
+                return false;
 
             namespace Dialog = PluginDisplayNames::Dialogs::UnsavedEditConfirm;
 
-            juce::AlertWindow alert(Dialog::kTitle,
-                                    Dialog::kBody,
-                                    juce::AlertWindow::WarningIcon);
-            alert.addButton(Dialog::kContinue, 1);
-            alert.addButton(Dialog::kCancel, 0);
-
-            return alert.runModalLoop() == 1;
+            return showMappedAlert(
+                       juce::MessageBoxOptions()
+                           .withIconType(juce::MessageBoxIconType::WarningIcon)
+                           .withTitle(Dialog::kTitle)
+                           .withMessage(Dialog::kBody)
+                           .withButton(Dialog::kContinue)
+                           .withButton(Dialog::kCancel)
+                           .withAssociatedComponent(safeThis.getComponent()))
+                   == 1;
         });
 
     pluginProcessor.setPatchSaveFilePicker(
@@ -274,7 +330,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             juce::String internalSanitized, juce::String fileSanitized)
             -> std::optional<Core::NameReconciliationChoice>
         {
-            if (safeThis == nullptr)
+            if (! isMessageThread() || safeThis == nullptr)
                 return std::nullopt;
 
             namespace Dialog = PluginDisplayNames::Dialogs::PatchNameReconciliation;
@@ -282,12 +338,15 @@ PluginEditor::PluginEditor(PluginProcessor& p)
                                   .replace("{INTERNAL}", internalSanitized)
                                   .replace("{FILENAME}", fileSanitized);
 
-            juce::AlertWindow alert(Dialog::kTitle, body, juce::AlertWindow::QuestionIcon);
-            alert.addButton(Dialog::kInternal, 1);
-            alert.addButton(Dialog::kFilename, 2);
-            alert.addButton(Dialog::kCancel, 0);
-
-            switch (alert.runModalLoop())
+            switch (showMappedAlert(
+                juce::MessageBoxOptions()
+                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                    .withTitle(Dialog::kTitle)
+                    .withMessage(body)
+                    .withButton(Dialog::kInternal)
+                    .withButton(Dialog::kFilename)
+                    .withButton(Dialog::kCancel)
+                    .withAssociatedComponent(safeThis.getComponent())))
             {
                 case 1: return Core::NameReconciliationChoice::kInternal;
                 case 2: return Core::NameReconciliationChoice::kFilename;
@@ -785,6 +844,12 @@ void PluginEditor::layoutUiElementsTestComponent()
 
 PluginEditor::~PluginEditor()
 {
+    pluginProcessor.setMutatorDefragLimitModalGate({});
+    pluginProcessor.setMutatorExportCollisionModalGate({});
+    pluginProcessor.setMutatorHistoryGateModalGate({});
+    pluginProcessor.setUnsavedEditConfirmModalGate({});
+    pluginProcessor.setPatchNameReconciliationPicker({});
+
     pluginProcessor.getApvts().state.removeListener(this);
     detachStandaloneAudioDeviceListener();
     closeSettingsWindow();
