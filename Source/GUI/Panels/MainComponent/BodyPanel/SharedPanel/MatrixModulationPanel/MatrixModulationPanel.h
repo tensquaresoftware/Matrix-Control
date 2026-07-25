@@ -18,6 +18,7 @@ namespace TSS
     class SectionHeader;
     class ModulationBusHeader;
     class Button;
+    class ClipboardFeedbackButtonBinding;
 }
 
 class WidgetFactory;
@@ -79,6 +80,8 @@ private:
     std::unique_ptr<TSS::Button> copyButton_;
     std::unique_ptr<TSS::Button> pasteButton_;
     std::unique_ptr<PasteEnabledPropertyListener> pasteEnabledListener_;
+    std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
+    std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
     std::vector<std::unique_ptr<ModulationBusCell>> modulationBuses_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MatrixModulationPanel)

@@ -216,6 +216,16 @@ void ClipboardService::copyMatrixModulation(const PatchModel& model)
     std::memcpy(matrixModSnapshot_.data(), model.data() + offset, kMatrixModSnapshotSize);
 }
 
+void ClipboardService::clear() noexcept
+{
+    mode_ = ClipboardMode::Empty;
+    sourceModuleKind_ = PatchModuleKind::Dco1;
+    moduleSnapshot_.intValues.clear();
+    moduleSnapshot_.choiceIndices.clear();
+    fullPatchSnapshot_.fill(0);
+    matrixModSnapshot_.fill(0);
+}
+
 bool ClipboardService::canPasteModule(PatchModuleKind target) const noexcept
 {
     if (mode_ != ClipboardMode::Module)

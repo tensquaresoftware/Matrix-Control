@@ -4,6 +4,7 @@
 
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -66,6 +67,23 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatch
     setupCopyPatchButton(skin, widgetFactory);
     setupPastePatchButton(skin, widgetFactory);
     setupStorePatchButton(skin, widgetFactory);
+
+    if (copyPatchButton_ != nullptr)
+    {
+        copyFeedbackBinding_ = std::make_unique<TSS::ClipboardFeedbackButtonBinding>(
+            apvts_,
+            *copyPatchButton_,
+            PluginIDs::ClipboardFeedback::kInternalPatchesCopy,
+            true);
+    }
+    if (pastePatchButton_ != nullptr)
+    {
+        pasteFeedbackBinding_ = std::make_unique<TSS::ClipboardFeedbackButtonBinding>(
+            apvts_,
+            *pastePatchButton_,
+            PluginIDs::ClipboardFeedback::kInternalPatchesPaste,
+            false);
+    }
 
     apvts_.state.addListener(this);
     clipboardPasteEnabled_ = static_cast<bool>(apvts_.state.getProperty(
@@ -350,6 +368,9 @@ void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimit
         storePatchButton_.get(),
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
         ! compareActive);
+
+    if (pasteFeedbackBinding_ != nullptr)
+        pasteFeedbackBinding_->refresh();
 
     if (wasBlocked && ! romPasteStoreBlocked_)
         clearRomBlockedFooterIfPresent(apvts_);

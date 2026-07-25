@@ -1,5 +1,19 @@
 # Deferred Work
 
+## Deferred from: quick-dev spec-clipboard-compatible-blink-feedback (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-compatible-blink-feedback.md`
+  summary: No PluginProcessor integration tests for arm/disarm, Escape clear, or cross-patch unlock via onPatchLoaded.
+  evidence: Blind Hunter; resolver unit tests cover blink roles; processor lifecycle verified manually / by wiring.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-compatible-blink-feedback.md`
+  summary: Escape may not reach PluginEditor when a child component keeps keyboard focus (text fields / host focus policy).
+  evidence: Edge Case Hunter; mitigated by grabKeyboardFocus on mouse down; JucePlugin_EditorRequiresKeyboardFocus is still 0 for hosts.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-compatible-blink-feedback.md`
+  summary: Compare lock parent alpha can fight per-button blink alpha on C/P during Compare.
+  evidence: Blind Hunter; Compare and clipboard feedback are rare simultaneous; revisit only if UX conflict appears.
+
 ## Deferred from: quick-dev spec-clipboard-lfo-skip-incompatible-mods (2026-07-25)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-lfo-skip-incompatible-mods.md`

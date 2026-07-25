@@ -153,6 +153,7 @@ set(PLUGIN_SOURCES
     Source/Core/Models/PackedFieldCodec.cpp
     Source/Core/Models/PatchModel.cpp
     Source/Core/Services/ClipboardService.cpp
+    Source/Core/Services/ClipboardFeedbackResolver.cpp
     Source/Core/Services/DirtyPatchTracker.cpp
     Source/Core/Services/SessionPersistencePolicy.cpp
     Source/Core/Services/PatchMutator/MutationHistoryStore.cpp
@@ -190,6 +191,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Helpers/GrayedControlHelper.cpp
     Source/GUI/Helpers/CompareLockBinder.cpp
+    Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
     Source/GUI/Layout/WidgetDimensionRegistry.cpp
     
@@ -348,6 +350,7 @@ if(MATRIX_BUILD_TESTS)
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
         Tests/Unit/ClipboardServiceTests.cpp
+        Tests/Unit/ClipboardFeedbackResolverTests.cpp
         Tests/Unit/DirtyPatchTrackerTests.cpp
         Tests/Unit/MutationHistoryStoreTests.cpp
         Tests/Unit/MutationNamingTests.cpp
@@ -420,6 +423,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/MasterModel.cpp
         Source/Core/Models/PatchModel.cpp
         Source/Core/Services/ClipboardService.cpp
+        Source/Core/Services/ClipboardFeedbackResolver.cpp
         Source/Core/Services/DirtyPatchTracker.cpp
         Source/Core/Services/SessionPersistencePolicy.cpp
         Source/Core/Services/PatchMutator/MutationHistoryStore.cpp

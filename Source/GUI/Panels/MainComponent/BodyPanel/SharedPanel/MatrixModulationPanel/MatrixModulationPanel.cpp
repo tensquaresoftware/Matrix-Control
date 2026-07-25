@@ -1,5 +1,6 @@
 #include "MatrixModulationPanel.h"
 
+#include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
@@ -343,6 +344,17 @@ void MatrixModulationPanel::createSectionActionButtons(TSS::ISkin& skin)
         skin,
         dims_.buttonHeight);
     addAndMakeVisible(*pasteButton_);
+
+    copyFeedbackBinding_ = std::make_unique<TSS::ClipboardFeedbackButtonBinding>(
+        apvts_,
+        *copyButton_,
+        PluginIDs::ClipboardFeedback::kMatrixModulationCopy,
+        true);
+    pasteFeedbackBinding_ = std::make_unique<TSS::ClipboardFeedbackButtonBinding>(
+        apvts_,
+        *pasteButton_,
+        PluginIDs::ClipboardFeedback::kMatrixModulationPaste,
+        false);
 
     attachPasteEnabledListener();
 }

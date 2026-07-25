@@ -36,6 +36,7 @@ public:
 
 private:
     class HeaderRefreshTimer;
+    class ClipboardFeedbackPhaseTimer;
 
     void refreshAudioFromCombo(HeaderPanel* headerOverride = nullptr);
     void attachStandaloneAudioDeviceListener();
@@ -84,6 +85,7 @@ private:
     std::unique_ptr<MasterInitConfirmDialog> masterInitConfirmDialog_;
     float appliedUiScale_ = 1.0f;
     std::unique_ptr<HeaderRefreshTimer> headerRefreshTimer_;
+    std::unique_ptr<ClipboardFeedbackPhaseTimer> clipboardFeedbackPhaseTimer_;
 
     void updateSkin();
     void applyUiScale(float uiScale);

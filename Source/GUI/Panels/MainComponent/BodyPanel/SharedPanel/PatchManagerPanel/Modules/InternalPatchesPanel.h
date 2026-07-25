@@ -15,6 +15,7 @@ namespace TSS
     class GroupLabel;
     class Button;
     class NumberBox;
+    class ClipboardFeedbackButtonBinding;
 }
 
 class WidgetFactory;
@@ -62,6 +63,8 @@ private:
     std::unique_ptr<TSS::Button> copyPatchButton_;
     std::unique_ptr<TSS::Button> pastePatchButton_;
     std::unique_ptr<TSS::Button> storePatchButton_;
+    std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
+    std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
 
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupBrowserGroupLabel(TSS::ISkin& skin);

@@ -29,6 +29,8 @@ namespace Core
         std::function<bool()> isDeviceDumpAvailable;
         using DeviceDumpCallback = std::function<void(std::vector<juce::uint8>)>;
         std::function<void(juce::uint8 patchNumber, DeviceDumpCallback onResult)> requestDeviceDump;
+        // Stops Copy/Paste blink feedback after a successful paste (clipboard content kept).
+        std::function<void()> disarmClipboardFeedback;
     };
 
 } // namespace Core

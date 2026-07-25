@@ -69,6 +69,56 @@ private:
     int audioFromRefreshAttempts_ = 0;
 };
 
+class PluginEditor::ClipboardFeedbackPhaseTimer : private juce::Timer,
+                                                  private juce::ValueTree::Listener
+{
+public:
+    explicit ClipboardFeedbackPhaseTimer(juce::AudioProcessorValueTreeState& apvts)
+        : state_(apvts.state)
+    {
+        state_.addListener(this);
+        syncTimerFromState();
+    }
+
+    ~ClipboardFeedbackPhaseTimer() override
+    {
+        state_.removeListener(this);
+        stopTimer();
+    }
+
+private:
+    void timerCallback() override
+    {
+        const bool copyLit = static_cast<bool>(
+            state_.getProperty(PluginIDs::ClipboardFeedback::kCopyLit, true));
+        state_.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, ! copyLit, nullptr);
+    }
+
+    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override
+    {
+        if (property.toString() == PluginIDs::ClipboardFeedback::kActive)
+            syncTimerFromState();
+    }
+
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+    void valueTreeRedirected(juce::ValueTree&) override { syncTimerFromState(); }
+
+    void syncTimerFromState()
+    {
+        const bool active = static_cast<bool>(
+            state_.getProperty(PluginIDs::ClipboardFeedback::kActive, false));
+        if (active)
+            startTimerHz(2);
+        else
+            stopTimer();
+    }
+
+    juce::ValueTree state_;
+};
+
 
 PluginEditor::PluginEditor(PluginProcessor& p)
     : AudioProcessorEditor(&p)
@@ -407,9 +457,11 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     };
 
     headerRefreshTimer_ = std::make_unique<HeaderRefreshTimer>(pluginProcessor, headerPanel, *this);
+    clipboardFeedbackPhaseTimer_ = std::make_unique<ClipboardFeedbackPhaseTimer>(pluginProcessor.getApvts());
     attachStandaloneAudioDeviceListener();
     pluginProcessor.getApvts().state.addListener(this);
 
+    setWantsKeyboardFocus(true);
     syncUiScaleFromEditor();
 #if JUCE_DEBUG
     layoutUiElementsTestComponent();
@@ -629,10 +681,26 @@ void PluginEditor::mouseDown(const juce::MouseEvent& event)
 #endif
 
     unfocusAllComponents();
+    grabKeyboardFocus();
 }
 
 bool PluginEditor::keyPressed(const juce::KeyPress& key)
 {
+    if (key == juce::KeyPress::escapeKey)
+    {
+        if (settingsWindow_ != nullptr && settingsWindow_->isVisible())
+            return false;
+        if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
+            return false;
+        if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
+            return false;
+
+        if (! pluginProcessor.clearClipboardFeedbackFromEscape())
+            return false;
+
+        return true;
+    }
+
 #if JUCE_DEBUG
     if (uiElementsTestVisible_
         && testComponent_ != nullptr

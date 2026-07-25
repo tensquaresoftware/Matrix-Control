@@ -15,6 +15,7 @@ namespace TSS
 {
     class ISkin;
     class Button;
+    class ClipboardFeedbackButtonBinding;
 
     class ModuleHeader : public juce::Component
     {
@@ -122,6 +123,8 @@ namespace TSS
         std::unique_ptr<Button> copyButton_;
         std::unique_ptr<Button> pasteButton_;
         std::unique_ptr<PasteEnabledPropertyListener> pasteEnabledListener_;
+        std::unique_ptr<ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
+        std::unique_ptr<ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);

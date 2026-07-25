@@ -29,6 +29,7 @@ public:
         testFullPatchCaptures134Bytes();
         testModeReplacementModuleAfterFullPatch();
         testDco1ToEnv1Rejected();
+        testClearReturnsToEmpty();
     }
 
 private:
@@ -417,6 +418,26 @@ private:
         expect(!clipboard.canPasteModule(Core::PatchModuleKind::Env1));
         expect(!clipboard.pasteModule(Core::PatchModuleKind::Env1, target));
         expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kDelay)), 5);
+    }
+
+    void testClearReturnsToEmpty()
+    {
+        beginTest("clear — returns Empty and rejects paste");
+
+        Core::PatchModel source;
+        source.setValue(dco1Int(PatchEdit::Dco1Module::ParameterWidgets::kFrequency), 40);
+
+        Core::ClipboardService clipboard;
+        clipboard.copyModule(Core::PatchModuleKind::Dco1, source);
+        expect(clipboard.hasContent());
+
+        clipboard.clear();
+        expect(!clipboard.hasContent());
+        expect(clipboard.getMode() == Core::ClipboardMode::Empty);
+        expect(!clipboard.getSourceModuleKind().has_value());
+        expect(!clipboard.canPasteModule(Core::PatchModuleKind::Dco2));
+        expect(!clipboard.canPasteFullPatch());
+        expect(!clipboard.canPasteMatrixModulation());
     }
 };
 

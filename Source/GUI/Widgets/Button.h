@@ -15,6 +15,7 @@ namespace TSS
         void setLook(const ButtonLook& look);
         void setUiScale(float uiScale);
         void setInactiveAppearance(bool inactive);
+        bool isInactiveAppearance() const noexcept { return inactiveAppearance_; }
 
         void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 

@@ -197,6 +197,9 @@ namespace Core
                     matrixModBusParameterSysExDispatcher_->dispatchBus(bus);
             }
 
+            if (hooks_.disarmClipboardFeedback)
+                hooks_.disarmClipboardFeedback();
+
             return true;
         }
 
@@ -212,6 +215,9 @@ namespace Core
 
         if (!clipboardService_->pasteModule(*moduleKind, *patchModel_))
             return true;
+
+        if (hooks_.disarmClipboardFeedback)
+            hooks_.disarmClipboardFeedback();
 
         const auto moduleGroupId = PatchModuleInitService::moduleGroupIdFromPatchModuleKind(*moduleKind);
         if (moduleGroupId.isEmpty())

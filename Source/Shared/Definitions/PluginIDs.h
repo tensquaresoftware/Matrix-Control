@@ -645,4 +645,31 @@ namespace PluginIDs
             }
         }
     }
+
+    // Ephemeral GUI mirrors for type-aware Copy/Paste blink (not persisted).
+    namespace ClipboardFeedback
+    {
+        constexpr const char* kActive  = "clipboardFeedbackActive";
+        constexpr const char* kCopyLit = "clipboardFeedbackCopyLit";
+
+        constexpr const char* kDco1Copy = "dco1CopyFeedback";
+        constexpr const char* kDco2Copy = "dco2CopyFeedback";
+        constexpr const char* kEnv1Copy = "env1CopyFeedback";
+        constexpr const char* kEnv2Copy = "env2CopyFeedback";
+        constexpr const char* kEnv3Copy = "env3CopyFeedback";
+        constexpr const char* kLfo1Copy = "lfo1CopyFeedback";
+        constexpr const char* kLfo2Copy = "lfo2CopyFeedback";
+        constexpr const char* kMatrixModulationCopy = "matrixModulationCopyFeedback";
+        constexpr const char* kInternalPatchesCopy  = "internalPatchesCopyFeedback";
+
+        constexpr const char* kDco1Paste = "dco1PasteFeedback";
+        constexpr const char* kDco2Paste = "dco2PasteFeedback";
+        constexpr const char* kEnv1Paste = "env1PasteFeedback";
+        constexpr const char* kEnv2Paste = "env2PasteFeedback";
+        constexpr const char* kEnv3Paste = "env3PasteFeedback";
+        constexpr const char* kLfo1Paste = "lfo1PasteFeedback";
+        constexpr const char* kLfo2Paste = "lfo2PasteFeedback";
+        constexpr const char* kMatrixModulationPaste = "matrixModulationPasteFeedback";
+        constexpr const char* kInternalPatchesPaste  = "internalPatchesPasteFeedback";
+    }
 }

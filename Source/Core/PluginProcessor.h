@@ -132,6 +132,10 @@ public:
 
     void swapMatrixModBusContents(int fromBus, int toBus);
 
+    // Escape: empty clipboard and stop Copy/Paste blink feedback.
+    // Returns false when there was nothing to cancel (so Escape can propagate).
+    bool clearClipboardFeedbackFromEscape();
+
     Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() noexcept { return *audioPassthroughProcessor_; }
     const Core::AudioPassthroughProcessor& getAudioPassthroughProcessor() const noexcept { return *audioPassthroughProcessor_; }
 
@@ -295,6 +299,11 @@ private:
     bool runMutatorExportForGate();
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
+    void initializeClipboardFeedbackProperties();
+    void refreshClipboardFeedbackProperties();
+    void armClipboardFeedbackSession();
+    void disarmClipboardFeedbackSession();
+    void notifyClipboardCrossPatchReadyFromPatchLoad();
     void initializeMutatorRecipeState();
     void stripEphemeralMutatorStateForPersistence(juce::ValueTree& state);
     void resetEphemeralMutatorStateAfterSessionLoad();
@@ -337,6 +346,10 @@ private:
     std::unique_ptr<Core::PatchInitService> patchInitService_;
     std::unique_ptr<Core::PatchSelectionMidiSync> patchSelectionMidiSync_;
     std::unique_ptr<Core::ClipboardService> clipboardService_;
+    bool clipboardFeedbackActive_ = false;
+    bool clipboardFeedbackCrossPatchReady_ = false;
+    Core::PatchLoadContext clipboardFeedbackOriginContext_;
+
     std::unique_ptr<Core::DirtyPatchTracker> dirtyPatchTracker_;
     std::unique_ptr<Core::PatchFileService> patchFileService_;
     std::unique_ptr<Core::PatchMutatorEngine> patchMutatorEngine_;

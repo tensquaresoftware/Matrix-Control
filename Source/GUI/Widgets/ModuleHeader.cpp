@@ -1,6 +1,7 @@
 #include "ModuleHeader.h"
 
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Layout/ScaledLayout.h"
@@ -295,6 +296,17 @@ namespace TSS
             spec.skin,
             dimensions_.buttonHeight);
         addAndMakeVisible(*pasteButton_);
+
+        copyFeedbackBinding_ = std::make_unique<ClipboardFeedbackButtonBinding>(
+            spec.apvts,
+            *copyButton_,
+            spec.copyWidgetId + "Feedback",
+            true);
+        pasteFeedbackBinding_ = std::make_unique<ClipboardFeedbackButtonBinding>(
+            spec.apvts,
+            *pasteButton_,
+            spec.pasteWidgetId + "Feedback",
+            false);
     }
 
     void ModuleHeader::layoutInitOnlyButtons()

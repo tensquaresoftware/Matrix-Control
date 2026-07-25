@@ -329,6 +329,9 @@ namespace Core
         apvtsPatchMapper_->apvtsToBuffer();
         clipboardService_->pasteFullPatch(*patchModel_);
 
+        if (hooks_.disarmClipboardFeedback)
+            hooks_.disarmClipboardFeedback();
+
         if (hooks_.setPatchLoadContext)
             hooks_.setPatchLoadContext(
                 PatchLoadContext::deviceMemory(currentBank, getCurrentPatch(limits)));

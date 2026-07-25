@@ -44,6 +44,7 @@ namespace Core
         void copyModule(PatchModuleKind source, const PatchModel& model);
         void copyFullPatch(const PatchModel& model);
         void copyMatrixModulation(const PatchModel& model);
+        void clear() noexcept;
 
         bool canPasteModule(PatchModuleKind target) const noexcept;
         bool canPasteFullPatch() const noexcept;

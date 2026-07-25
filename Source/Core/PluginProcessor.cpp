@@ -41,6 +41,7 @@
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "Core/Services/ClipboardFeedbackResolver.h"
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
@@ -270,7 +271,10 @@ PluginProcessor::PluginProcessor()
     {
         if (patchMutatorEngine_ != nullptr)
             patchMutatorEngine_->resetSessionForPatchLoad();
+        notifyClipboardCrossPatchReadyFromPatchLoad();
     };
+
+    actionHooks.disarmClipboardFeedback = [this]() { disarmClipboardFeedbackSession(); };
 
     actionHooks.confirmPatchContextChange = [this](bool includeUnsavedEditWarning) {
         return confirmPatchContextChangeGate(includeUnsavedEditWarning);
@@ -286,7 +290,11 @@ PluginProcessor::PluginProcessor()
         patchModuleInitService_.get(),
         patchParameterSysExDispatcher_.get(),
         matrixModBusParameterSysExDispatcher_.get(),
-        [this]() { refreshClipboardPasteEnabledProperties(); },
+        [this]()
+        {
+            refreshClipboardPasteEnabledProperties();
+            armClipboardFeedbackSession();
+        },
         actionHooks);
 
     patchManagerActionHandler_ = std::make_unique<Core::PatchManagerActionHandler>(
@@ -363,6 +371,7 @@ PluginProcessor::PluginProcessor()
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
+    initializeClipboardFeedbackProperties();
     initializeMutatorRecipeState();
     resetEphemeralMutatorStateAfterSessionLoad();
     initializeMutatorActionEnabledMirrorsForEmptyHistory();
@@ -370,6 +379,7 @@ PluginProcessor::PluginProcessor()
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
     startMidiThread();
     refreshClipboardPasteEnabledProperties();
+    refreshClipboardFeedbackProperties();
     resetInternalPatchCoordinatesToDefaults();
 
     // FR-51: establish a clean baseline from factory APVTS defaults so edits before the
@@ -623,6 +633,33 @@ void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
     stripEphemeralMutatorStateForPersistence(state);
+
+    namespace Feedback = PluginIDs::ClipboardFeedback;
+    const char* feedbackIds[] = {
+        Feedback::kActive,
+        Feedback::kCopyLit,
+        Feedback::kDco1Copy,
+        Feedback::kDco2Copy,
+        Feedback::kEnv1Copy,
+        Feedback::kEnv2Copy,
+        Feedback::kEnv3Copy,
+        Feedback::kLfo1Copy,
+        Feedback::kLfo2Copy,
+        Feedback::kMatrixModulationCopy,
+        Feedback::kInternalPatchesCopy,
+        Feedback::kDco1Paste,
+        Feedback::kDco2Paste,
+        Feedback::kEnv1Paste,
+        Feedback::kEnv2Paste,
+        Feedback::kEnv3Paste,
+        Feedback::kLfo1Paste,
+        Feedback::kLfo2Paste,
+        Feedback::kMatrixModulationPaste,
+        Feedback::kInternalPatchesPaste
+    };
+    for (const auto* id : feedbackIds)
+        state.removeProperty(id, nullptr);
+
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
 }
@@ -1998,6 +2035,134 @@ void PluginProcessor::refreshClipboardPasteEnabledProperties()
     apvts.state.setProperty(MatrixMod::kMatrixModulationPasteEnabled, state.matrixModulation, nullptr);
 }
 
+void PluginProcessor::initializeClipboardFeedbackProperties()
+{
+    namespace Feedback = PluginIDs::ClipboardFeedback;
+
+    const char* feedbackIds[] = {
+        Feedback::kActive,
+        Feedback::kCopyLit,
+        Feedback::kDco1Copy,
+        Feedback::kDco2Copy,
+        Feedback::kEnv1Copy,
+        Feedback::kEnv2Copy,
+        Feedback::kEnv3Copy,
+        Feedback::kLfo1Copy,
+        Feedback::kLfo2Copy,
+        Feedback::kMatrixModulationCopy,
+        Feedback::kInternalPatchesCopy,
+        Feedback::kDco1Paste,
+        Feedback::kDco2Paste,
+        Feedback::kEnv1Paste,
+        Feedback::kEnv2Paste,
+        Feedback::kEnv3Paste,
+        Feedback::kLfo1Paste,
+        Feedback::kLfo2Paste,
+        Feedback::kMatrixModulationPaste,
+        Feedback::kInternalPatchesPaste
+    };
+
+    for (const auto* propertyId : feedbackIds)
+    {
+        if (! apvts.state.hasProperty(propertyId))
+        {
+            const bool defaultValue = juce::String(propertyId) == Feedback::kCopyLit;
+            apvts.state.setProperty(propertyId, defaultValue, nullptr);
+        }
+    }
+}
+
+void PluginProcessor::refreshClipboardFeedbackProperties()
+{
+    if (clipboardService_ == nullptr)
+        return;
+
+    namespace Feedback = PluginIDs::ClipboardFeedback;
+
+    const auto state = Core::resolveClipboardFeedback(*clipboardService_,
+                                                      clipboardFeedbackActive_,
+                                                      clipboardFeedbackCrossPatchReady_);
+
+    apvts.state.setProperty(Feedback::kActive, state.active, nullptr);
+    apvts.state.setProperty(Feedback::kDco1Copy, state.dco1Copy, nullptr);
+    apvts.state.setProperty(Feedback::kDco2Copy, state.dco2Copy, nullptr);
+    apvts.state.setProperty(Feedback::kEnv1Copy, state.env1Copy, nullptr);
+    apvts.state.setProperty(Feedback::kEnv2Copy, state.env2Copy, nullptr);
+    apvts.state.setProperty(Feedback::kEnv3Copy, state.env3Copy, nullptr);
+    apvts.state.setProperty(Feedback::kLfo1Copy, state.lfo1Copy, nullptr);
+    apvts.state.setProperty(Feedback::kLfo2Copy, state.lfo2Copy, nullptr);
+    apvts.state.setProperty(Feedback::kMatrixModulationCopy, state.matrixModulationCopy, nullptr);
+    apvts.state.setProperty(Feedback::kInternalPatchesCopy, state.internalPatchesCopy, nullptr);
+    apvts.state.setProperty(Feedback::kDco1Paste, state.dco1Paste, nullptr);
+    apvts.state.setProperty(Feedback::kDco2Paste, state.dco2Paste, nullptr);
+    apvts.state.setProperty(Feedback::kEnv1Paste, state.env1Paste, nullptr);
+    apvts.state.setProperty(Feedback::kEnv2Paste, state.env2Paste, nullptr);
+    apvts.state.setProperty(Feedback::kEnv3Paste, state.env3Paste, nullptr);
+    apvts.state.setProperty(Feedback::kLfo1Paste, state.lfo1Paste, nullptr);
+    apvts.state.setProperty(Feedback::kLfo2Paste, state.lfo2Paste, nullptr);
+    apvts.state.setProperty(Feedback::kMatrixModulationPaste, state.matrixModulationPaste, nullptr);
+    apvts.state.setProperty(Feedback::kInternalPatchesPaste, state.internalPatchesPaste, nullptr);
+}
+
+void PluginProcessor::armClipboardFeedbackSession()
+{
+    clipboardFeedbackActive_ = true;
+    clipboardFeedbackCrossPatchReady_ = false;
+    clipboardFeedbackOriginContext_ = patchLoadContext_;
+    apvts.state.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, true, nullptr);
+    refreshClipboardFeedbackProperties();
+}
+
+void PluginProcessor::disarmClipboardFeedbackSession()
+{
+    clipboardFeedbackActive_ = false;
+    clipboardFeedbackCrossPatchReady_ = false;
+    apvts.state.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, true, nullptr);
+    refreshClipboardFeedbackProperties();
+}
+
+void PluginProcessor::notifyClipboardCrossPatchReadyFromPatchLoad()
+{
+    if (! clipboardFeedbackActive_ || clipboardService_ == nullptr)
+        return;
+
+    const auto mode = clipboardService_->getMode();
+    if (mode != Core::ClipboardMode::FullPatch
+        && mode != Core::ClipboardMode::MatrixModulation)
+    {
+        return;
+    }
+
+    // Spec: unlock Paste blink only after a *different* patch is loaded (not Init on same slot).
+    const auto& current = patchLoadContext_;
+    const auto& origin = clipboardFeedbackOriginContext_;
+    const bool sameOrigin = (current.origin == origin.origin)
+        && (current.origin == Core::PatchLoadContext::Origin::kComputerFile
+                ? current.fileStem == origin.fileStem
+                : (current.bank == origin.bank && current.patch == origin.patch));
+
+    if (sameOrigin)
+        return;
+
+    clipboardFeedbackCrossPatchReady_ = true;
+    refreshClipboardFeedbackProperties();
+}
+
+bool PluginProcessor::clearClipboardFeedbackFromEscape()
+{
+    const bool hadFeedback = clipboardFeedbackActive_;
+    const bool hadContent = clipboardService_ != nullptr && clipboardService_->hasContent();
+    if (! hadFeedback && ! hadContent)
+        return false;
+
+    if (clipboardService_ != nullptr)
+        clipboardService_->clear();
+
+    disarmClipboardFeedbackSession();
+    refreshClipboardPasteEnabledProperties();
+    return true;
+}
+
 void PluginProcessor::valueTreeChildAdded(juce::ValueTree& parentTree,
                                          juce::ValueTree& childWhichHasBeenAdded)
 {
@@ -2046,6 +2211,7 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
     patchNameSyncer_->apvtsToBuffer();
     syncAudioRuntimeFromState();
     refreshClipboardPasteEnabledProperties();
+    disarmClipboardFeedbackSession();
     applyPreferredStandaloneAudioFromForDeviceType();
 }
 
