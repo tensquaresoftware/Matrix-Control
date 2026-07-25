@@ -218,3 +218,4 @@ development_status:
   epic-v1: in-progress
   v1-1-unsaved-navigation-consistency: done
   v1-2-device-connection-and-ports: done
+  v1-3-release-hygiene-and-hardening: done

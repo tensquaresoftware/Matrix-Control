@@ -21,9 +21,9 @@
 
 ## Deferred from: code review of u-10-release-gate-prod-audit-sign-off-and-d-062-d-063 (2026-07-24)
 
-- No CI / Release-workflow regression check that fails if `TestComponent` / `Source/GUI/Tests` re-enter Release artefacts — AC2 only required a local nm/strings (or equivalent) proof; consider a workflow hygiene step later.
+- ~~No CI / Release-workflow regression check that fails if `TestComponent` / `Source/GUI/Tests` re-enter Release artefacts — AC2 only required a local nm/strings (or equivalent) proof; consider a workflow hygiene step later.~~ **Resolved 2026-07-25 (v1-3)**: `Scripts/release/check_release_hygiene.py` scans Release artefacts for `TestComponent`; wired in `.github/workflows/release.yml` after build/tests and before codesign/pack.
 - No compile-time sync between `JUCE_DEBUG` and CMake `$<CONFIG:Debug>` for sandbox sources — mismatched custom configs could theoretically link-fail; local Debug+Release presets already proven green.
-- `CONVENTIONS.md` E2E/GUI testing row still cites Standalone / `TestComponent` without a Debug-only qualifier — AC3 updated `project-context.md` only; align conventions SSOT in a later docs pass.
+- ~~`CONVENTIONS.md` E2E/GUI testing row still cites Standalone / `TestComponent` without a Debug-only qualifier — AC3 updated `project-context.md` only; align conventions SSOT in a later docs pass.~~ **Resolved 2026-07-25 (v1-3)**: E2E/GUI row states Debug-only harness excluded from Release (D-063).
 
 ## Accepted by U-10 aggregate UAT (2026-07-24)
 
@@ -135,7 +135,7 @@ Original review bullets below remain for history; status for U-10-owned residual
   evidence: Blind Hunter; pre-existing property order, surfaced by 8.4 listeners.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
-  summary: `MidiManager::sendMaster` still gates only on editor outbound (`deviceDetected`), not `isMasterEditAllowed`; defense-in-depth hardening if new call sites appear.
+  summary: ~~`MidiManager::sendMaster` still gates only on editor outbound (`deviceDetected`), not `isMasterEditAllowed`; defense-in-depth hardening if new call sites appear.~~ **Resolved 2026-07-25 (v1-3)**: `sendMaster` fail-closes via `isMasterEditOutboundAllowed` / `MasterEditGate`; unit coverage for Matrix-6 / Unknown / undetected.
   evidence: Blind Hunter; current INIT/parameter paths already gated upstream.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
@@ -784,7 +784,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of 8-2-device-inquiry-and-footer-identity (2026-07-18)
 
 - source_spec: `_bmad-output/implementation-artifacts/8-2-device-inquiry-and-footer-identity.md`
-  summary: Timer::callAfterDelay / MessageManager::callAsync lambdas capture raw MidiManager `this` without SafePointer; destructor bumps async token but cannot stop a callback that already started on a destroyed object.
+  summary: ~~Timer::callAfterDelay / MessageManager::callAsync lambdas capture raw MidiManager `this` without SafePointer; destructor bumps async token but cannot stop a callback that already started on a destroyed object.~~ **Resolved 2026-07-25 (v1-3)**: `JUCE_DECLARE_WEAK_REFERENCEABLE(MidiManager)` + WeakReference guards on Device Inquiry and `requestSinglePatchAsync` deferred closures; `asyncRequestToken_` retained for living-object cancel.
   evidence: Blind Hunter + Edge Case Hunter; same pattern already used by requestSinglePatchAsync / armAsyncSinglePatchCapture.
 
 - source_spec: `_bmad-output/implementation-artifacts/8-2-device-inquiry-and-footer-identity.md`
@@ -826,12 +826,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: quick-dev review of spec-8-4-virtual-instrument-registration-and-bus-layout (2026-07-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
-  summary: Master SysEx fail-closed is not centralized in MidiManager::sendMaster — only PluginProcessor dispatch and ModuleActionHandler INIT are gated.
+  summary: ~~Master SysEx fail-closed is not centralized in MidiManager::sendMaster — only PluginProcessor dispatch and ModuleActionHandler INIT are gated.~~ **Resolved 2026-07-25 (v1-3)**: centralized fail-closed in `MidiManager::sendMaster` (upstream gates retained).
   evidence: Blind Hunter; future callers of MasterParameterSysExDispatcher could bypass FR-46.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
-  summary: When master edit becomes allowed after detection, stored master APVTS is not flushed to hardware until the next parameter edit.
+  summary: ~~When master edit becomes allowed after detection, stored master APVTS is not flushed to hardware until the next parameter edit.~~ **Resolved-by-doc 2026-07-25 (v1-3)**: product rule is **next edit only** — no auto-flush of MASTER APVTS on unlock (explicit V1.3 AC5; not open feature debt unless reopened).
   evidence: Edge Case Hunter; no AC requires auto-sync on unlock for MASTER.
+
+## Deferred from: code review of v1-3-release-hygiene-and-hardening (2026-07-25)
+
+- Hygiene pytest fixtures only synthesize Linux VST3/Standalone trees; macOS `.app`/`.component` and Windows `.exe` layouts from `discover_artefact_paths` are untested in `test_check_release_hygiene.py` (scan logic still covered; Release matrix legs exercise real layouts).
+- `processOutboundQueue` still admits SysEx via `maySendEditorSysEx` only — no FR-46/`isMasterEditAllowed` re-check. A MASTER blob already on the queue (TOCTOU on device type, or a future enqueue site) can still ship on Matrix-6/6R. V1.3 AC4 scoped fail-closed at `sendMaster` only.
 
 ## Deferred from: code review of 10-3-trackgeneratordisplay-direct-apvts-editing (2026-07-20)
 

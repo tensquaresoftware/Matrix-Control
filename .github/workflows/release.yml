@@ -163,6 +163,14 @@ jobs:
           test -f "${{ matrix.test_binary }}"
           "${{ matrix.test_binary }}"
 
+      # V1.3 / D-063: fail before codesign/pack if Debug-only sandbox re-enters Release artefacts.
+      - name: Check Release artefact hygiene
+        shell: bash
+        run: |
+          python3 Scripts/release/check_release_hygiene.py \
+            "${{ matrix.platform }}" \
+            --artefacts-root "${{ matrix.artefacts_root }}"
+
       - name: Require macOS signing secrets
         if: matrix.platform == 'macos'
         shell: bash

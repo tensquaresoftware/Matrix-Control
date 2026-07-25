@@ -4,6 +4,7 @@
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/DeviceInquiryTrigger.h"
 #include "Core/MIDI/EditorOutboundGate.h"
+#include "Core/MIDI/MasterEditGate.h"
 #include "Core/MIDI/MidiPortOpenFeedback.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/MIDI/Queue/MidiRequestTiming.h"
@@ -107,6 +108,10 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
 
 MidiManager::~MidiManager()
 {
+    // Queue outlives MidiManager briefly during PluginProcessor teardown — drop the wake
+    // callback so a late enqueue cannot call into a destroyed consumer.
+    outboundQueue_.setWakeConsumerCallback(nullptr);
+
     cancelPendingSysExRequest();
     stopThread(5000);
     stopMidiInputCallbacks();
@@ -318,6 +323,10 @@ void MidiManager::sendMaster(juce::uint8 version, const juce::uint8* packedData)
     if (! isEditorOutboundAllowed())
         return;
 
+    // FR-46 defense-in-depth: editor outbound alone is not enough for MASTER SysEx.
+    if (! isMasterEditOutboundAllowed())
+        return;
+
     if (packedData == nullptr)
     {
         updateErrorState("Invalid master data", "SysEx");
@@ -508,25 +517,29 @@ void MidiManager::armAsyncSinglePatchCapture(std::uint64_t token)
         return;
     }
 
+    juce::WeakReference<MidiManager> weakThis(this);
     midiReceiver->armOneShotSysExCapture(
-        [this, token](const juce::MemoryBlock& response)
+        [weakThis, token](const juce::MemoryBlock& response)
         {
             // MIDI input thread: marshal decode + callback to the message thread.
             juce::MessageManager::callAsync(
-                [this, token, response]
+                [weakThis, token, response]
                 {
-                    if (token != asyncRequestToken_.load(std::memory_order_acquire))
-                        return;
-
-                    auto packed = tryDecodeAsyncPatchResponse(response);
-                    if (! packed.empty())
+                    if (auto* self = weakThis.get())
                     {
-                        finishAsyncPackedPatch(token, std::move(packed));
-                        return;
-                    }
+                        if (token != self->asyncRequestToken_.load(std::memory_order_acquire))
+                            return;
 
-                    // Parasitic / non-patch SysEx consumed the one-shot — keep listening.
-                    armAsyncSinglePatchCapture(token);
+                        auto packed = self->tryDecodeAsyncPatchResponse(response);
+                        if (! packed.empty())
+                        {
+                            self->finishAsyncPackedPatch(token, std::move(packed));
+                            return;
+                        }
+
+                        // Parasitic / non-patch SysEx consumed the one-shot — keep listening.
+                        self->armAsyncSinglePatchCapture(token);
+                    }
                 });
         });
 }
@@ -556,18 +569,22 @@ void MidiManager::sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint
         armAsyncSinglePatchCapture(token);
         sendSysExWithDelay(requestMessage, "single patch request");
 
+        juce::WeakReference<MidiManager> weakThis(this);
         juce::Timer::callAfterDelay(
             SysExConstants::kDefaultTimeoutMs,
-            [this, token]
+            [weakThis, token]
             {
-                if (token != asyncRequestToken_.load(std::memory_order_acquire))
-                    return;
+                if (auto* self = weakThis.get())
+                {
+                    if (token != self->asyncRequestToken_.load(std::memory_order_acquire))
+                        return;
 
-                MidiLogger::getInstance().logWarning(
-                    "Timeout waiting for SysEx response ("
-                    + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
-                updateErrorState("Timeout waiting for single patch response", "Timeout");
-                finishAsyncPackedPatch(token, {});
+                    MidiLogger::getInstance().logWarning(
+                        "Timeout waiting for SysEx response ("
+                        + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+                    self->updateErrorState("Timeout waiting for single patch response", "Timeout");
+                    self->finishAsyncPackedPatch(token, {});
+                }
             });
     }
     catch (const MidiConnectionException& e)
@@ -619,6 +636,8 @@ void MidiManager::pollOutboundIdleThenRequest(juce::uint8 patchNumber,
     const bool isIdle = outboundQueue_.isEmpty()
                         && ! hasPendingSysEx_.load(std::memory_order_acquire);
 
+    juce::WeakReference<MidiManager> weakThis(this);
+
     if (isIdle)
     {
         if (settleMs <= 0)
@@ -628,9 +647,10 @@ void MidiManager::pollOutboundIdleThenRequest(juce::uint8 patchNumber,
         }
 
         juce::Timer::callAfterDelay(settleMs,
-                                    [this, patchNumber, token]
+                                    [weakThis, patchNumber, token]
                                     {
-                                        sendArmedSinglePatchRequest(patchNumber, token);
+                                        if (auto* self = weakThis.get())
+                                            self->sendArmedSinglePatchRequest(patchNumber, token);
                                     });
         return;
     }
@@ -646,13 +666,16 @@ void MidiManager::pollOutboundIdleThenRequest(juce::uint8 patchNumber,
 
     wakeConsumer();
     juce::Timer::callAfterDelay(1,
-                                [this, patchNumber, token, settleMs, idleStartMs, outboundIdleTimeoutMs]
+                                [weakThis, patchNumber, token, settleMs, idleStartMs, outboundIdleTimeoutMs]
                                 {
-                                    pollOutboundIdleThenRequest(patchNumber,
-                                                                token,
-                                                                settleMs,
-                                                                idleStartMs,
-                                                                outboundIdleTimeoutMs);
+                                    if (auto* self = weakThis.get())
+                                    {
+                                        self->pollOutboundIdleThenRequest(patchNumber,
+                                                                          token,
+                                                                          settleMs,
+                                                                          idleStartMs,
+                                                                          outboundIdleTimeoutMs);
+                                    }
                                 });
 }
 
@@ -677,6 +700,14 @@ bool MidiManager::isEditorOutboundAllowed() const
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     return Core::isEditorOutboundAllowed(deviceDetected, deviceType);
+}
+
+bool MidiManager::isMasterEditOutboundAllowed() const
+{
+    const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    return Core::isMasterEditAllowed(deviceDetected, deviceType);
 }
 
 bool MidiManager::waitUntilOutboundQueueIdle(int timeoutMs)
@@ -764,49 +795,53 @@ bool MidiManager::armAsyncDeviceInquiryCapture(std::uint64_t token)
         return false;
     }
 
+    juce::WeakReference<MidiManager> weakThis(this);
     midiReceiver->armOneShotSysExCapture(
-        [this, token](const juce::MemoryBlock& response)
+        [weakThis, token](const juce::MemoryBlock& response)
         {
             juce::MessageManager::callAsync(
-                [this, token, response]
+                [weakThis, token, response]
                 {
-                    if (token != asyncRequestToken_.load(std::memory_order_acquire))
-                        return;
-
-                    if (sysExParser == nullptr)
+                    if (auto* self = weakThis.get())
                     {
-                        finishAsyncDeviceInquiryFailure(token, "SysEx parser unavailable", "SysEx");
-                        return;
+                        if (token != self->asyncRequestToken_.load(std::memory_order_acquire))
+                            return;
+
+                        if (self->sysExParser == nullptr)
+                        {
+                            self->finishAsyncDeviceInquiryFailure(token, "SysEx parser unavailable", "SysEx");
+                            return;
+                        }
+
+                        const auto validation = self->sysExParser->validateSysEx(response);
+                        if (! validation.isValid
+                            || validation.messageType != SysExParser::MessageType::kDeviceId)
+                        {
+                            self->armAsyncDeviceInquiryCapture(token);
+                            return;
+                        }
+
+                        if (self->sysExDecoder == nullptr)
+                        {
+                            self->finishAsyncDeviceInquiryFailure(token, "SysEx decoder unavailable", "SysEx");
+                            return;
+                        }
+
+                        MidiLogger::getInstance().logSysExReceived(response, "Device ID response");
+                        const DeviceIdInfo deviceInfo = self->sysExDecoder->decodeDeviceId(response);
+
+                        if (deviceInfo.isValid)
+                        {
+                            const auto deviceType = Core::DeviceTypeRegistry::fromDeviceInquiry(deviceInfo);
+                            self->finishAsyncDeviceInquirySuccess(token, deviceInfo, deviceType);
+                            return;
+                        }
+
+                        self->finishAsyncDeviceInquiryFailure(
+                            token,
+                            "Connected device is not a supported Oberheim Matrix synth",
+                            "Device");
                     }
-
-                    const auto validation = sysExParser->validateSysEx(response);
-                    if (! validation.isValid
-                        || validation.messageType != SysExParser::MessageType::kDeviceId)
-                    {
-                        armAsyncDeviceInquiryCapture(token);
-                        return;
-                    }
-
-                    if (sysExDecoder == nullptr)
-                    {
-                        finishAsyncDeviceInquiryFailure(token, "SysEx decoder unavailable", "SysEx");
-                        return;
-                    }
-
-                    MidiLogger::getInstance().logSysExReceived(response, "Device ID response");
-                    const DeviceIdInfo deviceInfo = sysExDecoder->decodeDeviceId(response);
-
-                    if (deviceInfo.isValid)
-                    {
-                        const auto deviceType = Core::DeviceTypeRegistry::fromDeviceInquiry(deviceInfo);
-                        finishAsyncDeviceInquirySuccess(token, deviceInfo, deviceType);
-                        return;
-                    }
-
-                    finishAsyncDeviceInquiryFailure(
-                        token,
-                        "Connected device is not a supported Oberheim Matrix synth",
-                        "Device");
                 });
         });
 
@@ -864,19 +899,23 @@ void MidiManager::sendArmedDeviceInquiry(std::uint64_t token)
 
         sendSysExWithDelay(inquiryMessage, "Device Inquiry");
 
+        juce::WeakReference<MidiManager> weakThis(this);
         juce::Timer::callAfterDelay(
             SysExConstants::kDefaultTimeoutMs,
-            [this, token]
+            [weakThis, token]
             {
-                if (token != asyncRequestToken_.load(std::memory_order_acquire))
-                    return;
+                if (auto* self = weakThis.get())
+                {
+                    if (token != self->asyncRequestToken_.load(std::memory_order_acquire))
+                        return;
 
-                MidiLogger::getInstance().logWarning(
-                    "Timeout waiting for SysEx response ("
-                    + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
-                finishAsyncDeviceInquiryFailure(token,
-                                                "Timeout waiting for Device ID response",
-                                                "Timeout");
+                    MidiLogger::getInstance().logWarning(
+                        "Timeout waiting for SysEx response ("
+                        + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+                    self->finishAsyncDeviceInquiryFailure(token,
+                                                          "Timeout waiting for Device ID response",
+                                                          "Timeout");
+                }
             });
     }
     catch (const MidiConnectionException& e)
@@ -900,6 +939,8 @@ void MidiManager::pollOutboundIdleThenDeviceInquiry(std::uint64_t token,
     const bool isIdle = outboundQueue_.isEmpty()
                         && ! hasPendingSysEx_.load(std::memory_order_acquire);
 
+    juce::WeakReference<MidiManager> weakThis(this);
+
     if (isIdle)
     {
         if (settleMs <= 0)
@@ -909,9 +950,10 @@ void MidiManager::pollOutboundIdleThenDeviceInquiry(std::uint64_t token,
         }
 
         juce::Timer::callAfterDelay(settleMs,
-                                    [this, token]
+                                    [weakThis, token]
                                     {
-                                        sendArmedDeviceInquiry(token);
+                                        if (auto* self = weakThis.get())
+                                            self->sendArmedDeviceInquiry(token);
                                     });
         return;
     }
@@ -928,12 +970,15 @@ void MidiManager::pollOutboundIdleThenDeviceInquiry(std::uint64_t token,
 
     wakeConsumer();
     juce::Timer::callAfterDelay(1,
-                                [this, token, settleMs, idleStartMs, outboundIdleTimeoutMs]
+                                [weakThis, token, settleMs, idleStartMs, outboundIdleTimeoutMs]
                                 {
-                                    pollOutboundIdleThenDeviceInquiry(token,
-                                                                      settleMs,
-                                                                      idleStartMs,
-                                                                      outboundIdleTimeoutMs);
+                                    if (auto* self = weakThis.get())
+                                    {
+                                        self->pollOutboundIdleThenDeviceInquiry(token,
+                                                                                settleMs,
+                                                                                idleStartMs,
+                                                                                outboundIdleTimeoutMs);
+                                    }
                                 });
 }
 

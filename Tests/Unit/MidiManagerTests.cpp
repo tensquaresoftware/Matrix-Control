@@ -1,9 +1,11 @@
+#include <array>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace
@@ -99,6 +101,8 @@ public:
         testEditorOutboundGateBlocksProgramChangeWhenUndetected();
         testEditorOutboundGateBlocksSysExWhenUndetected();
         testEditorOutboundGateAllowsSendWhenDetected();
+        testSendMasterFailClosedForNonMatrix1000();
+        testWeakReferenceClearsAfterMidiManagerDestroy();
         testRequestSinglePatchAsyncIdleTimeoutFailsVisibly();
     }
 
@@ -216,6 +220,87 @@ private:
 
         expect(! queue.isEmpty(), "Editor outbound must enqueue once unlocked");
         manager.stopThread(2000);
+    }
+
+    void testSendMasterFailClosedForNonMatrix1000()
+    {
+        beginTest("FR-46 — sendMaster is a no-op for Matrix-6 / Matrix-6R / Unknown / undetected");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        std::array<juce::uint8, SysExConstants::kMasterPackedDataSize> packed{};
+        packed.fill(0);
+
+        manager.startThread();
+
+        // Undetected — editor outbound already false.
+        proc.apvts.state.setProperty("deviceDetected", false, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+        manager.sendMaster(0x03, packed.data());
+        juce::Thread::sleep(50);
+        expect(queue.isEmpty(), "sendMaster must not enqueue while undetected");
+
+        // Detected Matrix-6 — editor outbound allowed, MASTER still blocked.
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6Id,
+                                      nullptr);
+        expect(manager.isEditorOutboundAllowed());
+        manager.sendMaster(0x03, packed.data());
+        juce::Thread::sleep(50);
+        expect(queue.isEmpty(), "sendMaster must not enqueue for Matrix-6");
+
+        // Detected Matrix-6R — same FR-46 fail-closed peer as Matrix-6.
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix6RId,
+                                      nullptr);
+        expect(manager.isEditorOutboundAllowed());
+        manager.sendMaster(0x03, packed.data());
+        juce::Thread::sleep(50);
+        expect(queue.isEmpty(), "sendMaster must not enqueue for Matrix-6R");
+
+        // Detected Unknown — locked for editor and MASTER.
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kUnknown),
+                                      nullptr);
+        manager.sendMaster(0x03, packed.data());
+        juce::Thread::sleep(50);
+        expect(queue.isEmpty(), "sendMaster must not enqueue for Unknown");
+
+        // Matrix-1000 — MASTER SysEx may enqueue (defense-in-depth allows).
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+        expect(manager.isEditorOutboundAllowed());
+        manager.sendMaster(0x03, packed.data());
+        juce::Thread::sleep(50);
+        expect(! queue.isEmpty(), "sendMaster must enqueue for detected Matrix-1000");
+
+        manager.stopThread(2000);
+    }
+
+    void testWeakReferenceClearsAfterMidiManagerDestroy()
+    {
+        beginTest("WeakReference — deferred MidiManager capture clears after destroy");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        juce::WeakReference<MidiManager> weak;
+
+        {
+            MidiManager manager(proc.apvts, queue, tracker);
+            weak = &manager;
+            expect(weak.get() != nullptr, "WeakReference must resolve while MidiManager is alive");
+        }
+
+        expect(weak.get() == nullptr,
+               "WeakReference must clear after MidiManager destruction (UAF guard primitive)");
     }
 
     void testRealtimeRetainedWithoutOutput()

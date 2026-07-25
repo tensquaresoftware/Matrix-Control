@@ -124,7 +124,10 @@ private:
                             const juce::String& version = {},
                             MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown);
     void handleIncomingSysEx(const juce::MemoryBlock& sysEx);
-    
+
+    // FR-46: MASTER SysEx only for detected Matrix-1000 (mirrors isEditorOutboundAllowed).
+    bool isMasterEditOutboundAllowed() const;
+
     void stopMidiInputCallbacks();
     void wakeConsumer() noexcept;
     bool processOutboundQueue();
@@ -173,6 +176,7 @@ private:
                                          const juce::String& errorMessage,
                                          const juce::String& errorType);
 
+    JUCE_DECLARE_WEAK_REFERENCEABLE(MidiManager)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)
 };
 
