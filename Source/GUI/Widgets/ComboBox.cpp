@@ -123,8 +123,7 @@ namespace TSS
         {
             if (safePointer != nullptr && safePointer->canShowPopup())
             {
-                safePointer->notifyPopupOpened();
-
+                // Open notify happens inside ::show after empty/null guards (Hierarchical order).
                 if (useScrollableMode)
                     ScrollablePopupMenu::show(*safePointer);
                 else

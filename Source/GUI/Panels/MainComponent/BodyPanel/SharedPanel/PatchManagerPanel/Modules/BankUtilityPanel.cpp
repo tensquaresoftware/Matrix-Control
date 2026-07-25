@@ -2,6 +2,7 @@
 
 #include "../PatchManagerEqualWidthStrip.h"
 
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
@@ -14,9 +15,36 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
+
+namespace
+{
+    void setSubtreeKeyboardInteractionEnabled(juce::Component& root, bool enabled)
+    {
+        root.setWantsKeyboardFocus(enabled);
+        root.setMouseClickGrabsKeyboardFocus(enabled);
+
+        for (int i = 0; i < root.getNumChildComponents(); ++i)
+        {
+            if (auto* child = root.getChildComponent(i))
+                setSubtreeKeyboardInteractionEnabled(*child, enabled);
+        }
+    }
+
+    void applyGrayedToChild(juce::Component* child, bool grayed)
+    {
+        if (child == nullptr)
+            return;
+
+        TSS::GrayedControlHelper::applyGrayedAppearance(*child, grayed);
+        child->setInterceptsMouseClicks(! grayed, ! grayed);
+        setSubtreeKeyboardInteractionEnabled(*child, ! grayed);
+    }
+}
 
 
 BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
@@ -47,7 +75,8 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
 {
     const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
-        || propertyName == "deviceDetected")
+        || propertyName == "deviceDetected"
+        || propertyName == PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive)
     {
         refreshDeviceGating();
     }
@@ -69,37 +98,49 @@ void BankUtilityPanel::refreshDeviceGating()
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
+    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
+        false));
 
-    const bool shouldGray = deviceDetected && !limits.hasBankConcept();
+    // Root Compare/device lock already dims this panel via CompareLockBinder — skip child gray
+    // so we do not fight panel-level alpha/intercepts or stack to ~0.25 alpha.
+    const bool rootLocked = Core::isSectionLocked(deviceDetected, deviceType, compareActive);
+    const bool shouldGray = ! rootLocked
+        && deviceDetected
+        && ! limits.hasBankConcept();
     setBankUtilityGrayed(shouldGray);
 }
 
 void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 {
+    const bool wasGrayed = bankUtilityGrayed_;
     bankUtilityGrayed_ = grayed;
 
-    styleBankButton(unlockBankButton_.get(), grayed);
-    styleBankButton(selectBank0Button_.get(), grayed);
-    styleBankButton(selectBank1Button_.get(), grayed);
-    styleBankButton(selectBank2Button_.get(), grayed);
-    styleBankButton(selectBank3Button_.get(), grayed);
-    styleBankButton(selectBank4Button_.get(), grayed);
-    styleBankButton(selectBank5Button_.get(), grayed);
-    styleBankButton(selectBank6Button_.get(), grayed);
-    styleBankButton(selectBank7Button_.get(), grayed);
-    styleBankButton(selectBank8Button_.get(), grayed);
-    styleBankButton(selectBank9Button_.get(), grayed);
+    // Child-level lock (Master Edit pattern). Do not touch this panel's alpha/intercepts —
+    // CompareLockBinder owns those for device/Compare section lock.
+    applyGrayedToChild(bankUtilityModuleHeader_.get(), grayed);
+    applyGrayedToChild(bankSelectorLabel_.get(), grayed);
+    applyGrayedToChild(unlockBankButton_.get(), grayed);
+    applyGrayedToChild(selectBank0Button_.get(), grayed);
+    applyGrayedToChild(selectBank1Button_.get(), grayed);
+    applyGrayedToChild(selectBank2Button_.get(), grayed);
+    applyGrayedToChild(selectBank3Button_.get(), grayed);
+    applyGrayedToChild(selectBank4Button_.get(), grayed);
+    applyGrayedToChild(selectBank5Button_.get(), grayed);
+    applyGrayedToChild(selectBank6Button_.get(), grayed);
+    applyGrayedToChild(selectBank7Button_.get(), grayed);
+    applyGrayedToChild(selectBank8Button_.get(), grayed);
+    applyGrayedToChild(selectBank9Button_.get(), grayed);
 
-    if (bankSelectorLabel_)
-    {
-        TSS::GrayedControlHelper::applyGrayedAppearance(*bankSelectorLabel_, grayed);
-        bankSelectorLabel_->setInterceptsMouseClicks(! grayed, ! grayed);
-    }
+    if (grayed)
+        giveAwayKeyboardFocus();
 
-    if (bankUtilityModuleHeader_)
+    if (wasGrayed != grayed)
     {
-        TSS::GrayedControlHelper::applyGrayedAppearance(*bankUtilityModuleHeader_, grayed);
-        bankUtilityModuleHeader_->setInterceptsMouseClicks(! grayed, ! grayed);
+        if (grayed)
+            showMatrix1000OnlyFooterMessage();
+        else
+            clearMatrix1000OnlyFooterIfPresent();
     }
 
     refreshSelectedBankHighlight();
@@ -145,15 +186,6 @@ void BankUtilityPanel::refreshSelectedBankHighlight()
     }
 }
 
-void BankUtilityPanel::styleBankButton(TSS::Button* button, bool grayed)
-{
-    if (button == nullptr)
-        return;
-
-    button->setEnabled(true);
-    TSS::GrayedControlHelper::applyGrayedAppearance(*button, grayed);
-}
-
 void BankUtilityPanel::showMatrix1000OnlyFooterMessage()
 {
     TSS::GrayedControlHelper::setFooterInfoMessage(
@@ -161,15 +193,16 @@ void BankUtilityPanel::showMatrix1000OnlyFooterMessage()
         PluginDisplayNames::PatchManagerSection::BankUtilityModule::kMatrix1000OnlyFooterMessage);
 }
 
-void BankUtilityPanel::mouseDown(const juce::MouseEvent& event)
+void BankUtilityPanel::clearMatrix1000OnlyFooterIfPresent()
 {
-    if (!bankUtilityGrayed_)
+    if (apvts_.state.getProperty("uiMessageText").toString()
+        != juce::String(PluginDisplayNames::PatchManagerSection::BankUtilityModule::kMatrix1000OnlyFooterMessage))
     {
-        juce::Component::mouseDown(event);
         return;
     }
 
-    showMatrix1000OnlyFooterMessage();
+    apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
+    apvts_.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
 }
 
 void BankUtilityPanel::resized()
@@ -310,10 +343,7 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
         return [this, propertyId]
         {
             if (bankUtilityGrayed_)
-            {
-                showMatrix1000OnlyFooterMessage();
                 return;
-            }
 
             apvts_.state.setProperty(propertyId,
                                     juce::Time::getCurrentTime().toMilliseconds(),
@@ -374,10 +404,7 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
     unlockBankButton_->onClick = [this]
     {
         if (bankUtilityGrayed_)
-        {
-            showMatrix1000OnlyFooterMessage();
             return;
-        }
 
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,

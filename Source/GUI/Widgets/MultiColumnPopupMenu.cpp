@@ -335,16 +335,14 @@ namespace TSS
 
     void MultiColumnPopupMenu::show(ComboBox& comboBox)
     {
-        if (comboBox.getNumItems() == 0)
-        {
+        if (! comboBox.canShowPopup())
             return;
-        }
 
         auto* topLevelComponent = comboBox.getTopLevelComponent();
         if (topLevelComponent == nullptr)
-        {
             return;
-        }
+
+        comboBox.notifyPopupOpened();
 
         auto popupMenu = std::make_unique<MultiColumnPopupMenu>(comboBox);
         auto* rawPtr = popupMenu.get();

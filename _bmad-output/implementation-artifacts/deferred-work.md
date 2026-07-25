@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: quick-dev spec-v1-polish-controls-footer (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-v1-polish-controls-footer.md`
+  summary: No automated unit/GUI regression tests for ComboBox open-flag fail path, ROM footer clear/hover, or Bank Utility Matrix-6 lock.
+  evidence: Review Blind Hunter; verification remains Standalone + Matrix-Simulator manual and existing PatchManager ROM handler tests.
+
 ## Deferred from: code review of v1-2-device-connection-and-ports (2026-07-25)
 
 - `DeviceMemoryLimits::resolve(kUnknown)` still returns Matrix-1000 limits — known Project Map warning; V1.2 locks Unknown via CompareLockBinder / outbound gate instead of neutral limits.
@@ -85,7 +91,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 ## Deferred from: code review of u-13-combobox-popup-infrastructure-dedup (2026-07-21)
 
-- ComboBox can leave `isPopupOpen_` stuck true if `ScrollablePopupMenu::show` / `MultiColumnPopupMenu::show` early-returns after `notifyPopupOpened` (null top-level, or empty items race). Same open-before-show order existed before U-13; not introduced by the host extract.
+- ~~ComboBox can leave `isPopupOpen_` stuck true if `ScrollablePopupMenu::show` / `MultiColumnPopupMenu::show` early-returns after `notifyPopupOpened` (null top-level, or empty items race).~~ **Resolved 2026-07-25 (v1 polish controls/footer)**: open notify moved after empty/null guards inside both `::show` (Hierarchical order); `ComboBox::showPopupAsynchronously` no longer notifies before `show`.
   evidence: Blind Hunter + Edge Case Hunter; `ComboBox.cpp` `showPopupAsynchronously`.
 
 ## Deferred from: code review of 9-2-unsaved-edit-confirmation-dialog (2026-07-20)
@@ -268,8 +274,8 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 ## Deferred from: code review of 7-6-internal-patches-panel-wiring (2026-07-14)
 
-- **Footer ROM persiste après retour banque RAM** (`InternalPatchesPanel.cpp:316`) — pas de clear `uiMessageText`/`uiMessageSeverity` quand `romPasteStoreBlocked_` repasse à false ; polish UX mineur.
-- **Hover footer absent si curseur déjà sur bouton au blocage ROM** (`InternalPatchesPanel.cpp:134`) — `mouseEnter` ne fire pas sans mouvement souris lors du passage banque→ROM.
+- ~~**Footer ROM persiste après retour banque RAM**~~ **Resolved 2026-07-25 (v1 polish controls/footer)**: exact-string clear of ROM footer when `romPasteStoreBlocked_` goes true→false.
+- ~~**Hover footer absent si curseur déjà sur bouton au blocage ROM**~~ **Resolved 2026-07-25 (v1 polish controls/footer)**: after rewire while blocked, show ROM footer if Init/Paste/Store already `isMouseOver()`.
 - **Smoke manuel Standalone non documenté (AC9 partiel)** — UAT reporté à Guillaume par politique projet ; pas de preuve dans le diff de revue.
 
 ## Deferred from: code review of 7-11-internal-patches-init-sysex-device-rules (2026-07-14)
@@ -477,7 +483,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 ## Deferred from: Story 5.2 smoke test — Button disabled paint fix (2026-06-18)
 
-- **`BankUtilityPanel` alpha graying vs `Button` disabled colours** (`BankUtilityPanel.cpp:69-107`) — Story 8.5 introduced `setBankUtilityGrayed`: buttons stay **`setEnabled(true)`** + `setAlpha(0.5f)` so clicks still reach `onClick` and show the Matrix-1000-only footer (8-5 review: « Footer unreachable on grayed bank buttons »). Story 5.2 fixed `TSS::Button` to paint skin `*Disabled` colours when `setEnabled(false)` — Paste graying now uses that path. **Follow-up:** replace alpha hack with a shared « visually disabled but clickable » API on `Button` (or apply disabled look without disabling hit-testing); align `GroupLabel` / `ModuleHeader` alpha in the same panel. **Candidate story:** bundle into `u-8-patch-manager-panels-layout-audit` or a small Epic U hygiene story after 5.2 review.
+- ~~**`BankUtilityPanel` alpha graying vs `Button` disabled colours**~~ **Resolved 2026-07-25 (v1 polish controls/footer)**: superseded prior “clickable while gray” intent — Bank Utility now uses body-style module lock (dim + `setInterceptsMouseClicks(false,false)`) on Matrix-6/6R, with Matrix-1000-only footer published/cleared on gray enter/leave (not on click).
 
 ## Deferred from: code review of 5-1-clipboardservice-compatibility-matrix (2026-06-18)
 

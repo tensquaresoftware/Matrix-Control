@@ -29,6 +29,18 @@ namespace
         apvts.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
     }
 
+    void clearRomBlockedFooterIfPresent(juce::AudioProcessorValueTreeState& apvts)
+    {
+        if (apvts.state.getProperty("uiMessageText").toString()
+            != juce::String(PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage))
+        {
+            return;
+        }
+
+        apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
+        apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
+    }
+
     void dispatchTimestampAction(juce::AudioProcessorValueTreeState& apvts, const juce::Identifier& propertyId)
     {
         apvts.state.setProperty(propertyId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -320,6 +332,7 @@ void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits&
 
 void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank)
 {
+    const bool wasBlocked = romPasteStoreBlocked_;
     romPasteStoreBlocked_ = ! limits.isPasteStoreAllowed(currentBank);
     const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
@@ -337,6 +350,20 @@ void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimit
         storePatchButton_.get(),
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
         ! compareActive);
+
+    if (wasBlocked && ! romPasteStoreBlocked_)
+        clearRomBlockedFooterIfPresent(apvts_);
+
+    if (romPasteStoreBlocked_)
+    {
+        const bool mouseAlreadyOverGatedButton =
+            (initPatchButton_ != nullptr && initPatchButton_->isMouseOver())
+            || (pastePatchButton_ != nullptr && pastePatchButton_->isMouseOver())
+            || (storePatchButton_ != nullptr && storePatchButton_->isMouseOver());
+
+        if (mouseAlreadyOverGatedButton)
+            showRomBlockedFooterMessage();
+    }
 }
 
 void InternalPatchesPanel::wirePasteStoreButton(TSS::Button* button,

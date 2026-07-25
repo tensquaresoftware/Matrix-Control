@@ -282,12 +282,14 @@ namespace TSS
 
     void ScrollablePopupMenu::show(ComboBox& comboBox)
     {
-        if (comboBox.getNumItems() == 0)
+        if (! comboBox.canShowPopup())
             return;
 
         auto* topLevelComponent = comboBox.getTopLevelComponent();
         if (topLevelComponent == nullptr)
             return;
+
+        comboBox.notifyPopupOpened();
 
         auto popupMenu = std::make_unique<ScrollablePopupMenu>(comboBox);
         auto* rawPtr = popupMenu.get();

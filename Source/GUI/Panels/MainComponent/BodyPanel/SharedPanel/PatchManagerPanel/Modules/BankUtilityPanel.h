@@ -29,8 +29,6 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
-    void mouseDown(const juce::MouseEvent& event) override;
-
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                  const juce::Identifier& property) override;
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
@@ -69,7 +67,7 @@ private:
     void refreshSelectedBankHighlight();
     void setBankUtilityGrayed(bool grayed);
     void showMatrix1000OnlyFooterMessage();
-    void styleBankButton(TSS::Button* button, bool grayed);
+    void clearMatrix1000OnlyFooterIfPresent();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankUtilityPanel)
 };
