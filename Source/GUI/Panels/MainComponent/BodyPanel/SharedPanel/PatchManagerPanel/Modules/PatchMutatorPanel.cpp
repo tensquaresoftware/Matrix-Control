@@ -561,7 +561,11 @@ void PatchMutatorPanel::timerCallback()
 {
     compareBlinkVisible_ = ! compareBlinkVisible_;
     if (compareButton_ != nullptr)
-        compareButton_->setAlpha(compareBlinkVisible_ ? 1.0f : 0.35f);
+    {
+        // Lit = red On text; dim = normal Off text. Keep alpha at 1 so the border never greys out.
+        compareButton_->setToggleState(compareBlinkVisible_, juce::dontSendNotification);
+        compareButton_->setAlpha(1.0f);
+    }
 }
 
 void PatchMutatorPanel::refreshCompareUiState()
@@ -578,7 +582,9 @@ void PatchMutatorPanel::refreshCompareUiState()
     if (compareButton_ != nullptr)
     {
         compareButton_->setEnabled(compareActive || ! historyEmpty);
-        compareButton_->setToggleState(compareActive, juce::dontSendNotification);
+        compareButton_->setAlpha(1.0f);
+        if (! compareActive)
+            compareButton_->setToggleState(false, juce::dontSendNotification);
     }
 
     if (historyComboBox_ != nullptr)
@@ -594,13 +600,18 @@ void PatchMutatorPanel::refreshCompareUiState()
     if (compareActive)
     {
         compareBlinkVisible_ = true;
+        if (compareButton_ != nullptr)
+            compareButton_->setToggleState(true, juce::dontSendNotification);
         startTimerHz(2);
     }
     else
     {
         stopTimer();
         if (compareButton_ != nullptr)
+        {
+            compareButton_->setToggleState(false, juce::dontSendNotification);
             compareButton_->setAlpha(1.0f);
+        }
     }
 }
 

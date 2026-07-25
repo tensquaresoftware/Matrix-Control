@@ -7,9 +7,11 @@ namespace TSS
 {
     class Button;
 
-    // Drives Compare-style red blink on one Copy or Paste button from APVTS feedback mirrors.
-    // Source role: bright when clipboardFeedbackCopyLit is true.
-    // Target role: bright on the opposite phase. Disabled Paste targets never blink.
+    // Drives Compare-style blink on one Copy or Paste button from APVTS feedback mirrors.
+    // Source role: lit when clipboardFeedbackCopyLit is true.
+    // Target role: lit on the opposite phase.
+    // Lit = red On text; dim = normal Off text. Alpha stays 1 so borders never grey out.
+    // Disabled Paste targets never blink.
     class ClipboardFeedbackButtonBinding : private juce::ValueTree::Listener
     {
     public:

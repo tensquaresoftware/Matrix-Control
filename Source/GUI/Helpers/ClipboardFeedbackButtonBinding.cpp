@@ -65,8 +65,9 @@ void ClipboardFeedbackButtonBinding::apply()
     }
 
     const bool lit = isSourceRole_ ? copyLit : ! copyLit;
-    button_.setToggleState(true, juce::dontSendNotification);
-    button_.setAlpha(lit ? 1.0f : 0.35f);
+    // Lit = red On text; dim = base Off text. Keep full alpha so border stays normal.
+    button_.setToggleState(lit, juce::dontSendNotification);
+    button_.setAlpha(1.0f);
 }
 
 } // namespace TSS
