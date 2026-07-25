@@ -36,7 +36,6 @@ class TestSectionHeaders;
 class TestSliders;
 class TestToggles;
 class TestTrackGeneratorDisplays;
-class TestVerticalSeparators;
 
 class TestComponent : public juce::Component
 {
@@ -69,8 +68,8 @@ public:
         TrackGeneratorDisplay,
         PatchNameDisplay,
         HorizontalSeparator,
-        VerticalSeparator,
-        ActivityLed,
+        // Gap preserves persisted kTestWidget IDs after VerticalSeparator removal.
+        ActivityLed = 16,
         PeakIndicator,
         ParameterCell,
         ModulationBusCell,
@@ -127,7 +126,6 @@ private:
     std::unique_ptr<TestTrackGeneratorDisplays> testTrackGeneratorDisplays_;
     std::unique_ptr<TestPatchNameDisplays> testPatchNameDisplays_;
     std::unique_ptr<TestHorizontalSeparators> testHorizontalSeparators_;
-    std::unique_ptr<TestVerticalSeparators> testVerticalSeparators_;
     std::unique_ptr<TestActivityLeds> testActivityLeds_;
     std::unique_ptr<TestPeakIndicators> testPeakIndicators_;
     std::unique_ptr<TestParameterCells> testParameterCells_;

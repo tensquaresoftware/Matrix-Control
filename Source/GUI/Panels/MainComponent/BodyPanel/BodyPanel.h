@@ -16,7 +16,6 @@ namespace Core
 namespace TSS
 {
     class ISkin;
-    class VerticalSeparator;
     class CompareLockBinder;
 }
 
@@ -52,9 +51,7 @@ private:
     float uiScale_ = 1.0f;
 
     std::unique_ptr<PatchEditPanel> patchEditPanel_;
-    std::unique_ptr<TSS::VerticalSeparator> verticalSeparator1_;
     std::unique_ptr<SharedPanel> sharedPanel_;
-    std::unique_ptr<TSS::VerticalSeparator> verticalSeparator2_;
     std::unique_ptr<MasterEditPanel> masterEditPanel_;
     std::unique_ptr<TSS::CompareLockBinder> compareLockBinder_;
 

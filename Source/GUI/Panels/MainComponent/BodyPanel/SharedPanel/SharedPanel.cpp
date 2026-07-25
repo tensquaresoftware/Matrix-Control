@@ -46,7 +46,11 @@ void SharedPanel::resized()
 {
     auto area = getLocalBounds();
     const float sf = uiScale_;
-    const int w = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.width), sf);
+
+    const int padding = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.padding), sf);
+    area.reduce(padding, padding);
+
+    const int w = area.getWidth();
     const int matrixH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.matrixModulationHeight), sf);
     const int stackGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.verticalStackGap), sf);
     const int patchManagerH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchManagerHeight), sf);

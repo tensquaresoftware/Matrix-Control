@@ -1,10 +1,8 @@
 #include "BodyPanel.h"
 
 #include "GUI/Layout/ScaledLayout.h"
-#include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
-#include "GUI/Widgets/VerticalSeparator.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Helpers/CompareLockBinder.h"
 #include "PatchEditPanel/PatchEditPanel.h"
@@ -13,8 +11,6 @@
 #include "GUI/Factories/WidgetFactory.h"
 
 using TSS::SkinColourId;
-
-using ::TSS::VerticalSeparator;
 
 BodyPanel::BodyPanel(TSS::ISkin& skin,
                      const GuiLayoutDimensions& layoutDimensions,
@@ -29,22 +25,8 @@ BodyPanel::BodyPanel(TSS::ISkin& skin,
         skin, dims_.patchEdit, layoutDimensions.patchEditParameterCell, layoutDimensions.patchEditModuleHeader, widgetFactory, apvts);
     addAndMakeVisible(*patchEditPanel_);
 
-    verticalSeparator1_ = std::make_unique<VerticalSeparator>(
-        dims_.separators.verticalStandardWidth,
-        dims_.separators.verticalStandardHeight,
-        TSS::verticalSeparatorLookFromSkin(skin),
-        dims_.separators);
-    addAndMakeVisible(*verticalSeparator1_);
-
     sharedPanel_ = std::make_unique<SharedPanel>(skin, dims_.shared, widgetFactory, apvts, patchFileService);
     addAndMakeVisible(*sharedPanel_);
-
-    verticalSeparator2_ = std::make_unique<VerticalSeparator>(
-        dims_.separators.verticalStandardWidth,
-        dims_.separators.verticalStandardHeight,
-        TSS::verticalSeparatorLookFromSkin(skin),
-        dims_.separators);
-    addAndMakeVisible(*verticalSeparator2_);
 
     masterEditPanel_ = std::make_unique<MasterEditPanel>(skin, dims_.masterEdit, widgetFactory, apvts);
     addAndMakeVisible(*masterEditPanel_);
@@ -58,8 +40,21 @@ BodyPanel::~BodyPanel() = default;
 
 void BodyPanel::paint(juce::Graphics& g)
 {
-    if (skin_ != nullptr)
-        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
+    if (skin_ == nullptr)
+        return;
+
+    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
+
+    // Inter-column gaps match former VerticalSeparator line (Header/Footer chrome), not Body fill.
+    const float sf = uiScale_;
+    const int patchEditW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchEditWidth), sf);
+    const int sharedW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnWidth), sf);
+    const int gap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.interColumnGap), sf);
+    const auto chrome = skin_->getColour(SkinColourId::kHeaderPanelBackground);
+
+    g.setColour(chrome);
+    g.fillRect(patchEditW, 0, gap, getHeight());
+    g.fillRect(patchEditW + gap + sharedW, 0, gap, getHeight());
 }
 
 void BodyPanel::resized()
@@ -67,43 +62,31 @@ void BodyPanel::resized()
     auto area = getLocalBounds();
     const float sf = uiScale_;
 
-    const int padding              = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.padding), sf);
     const int patchEditPanelWidth  = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchEditWidth), sf);
     const int patchEditPanelHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchEditHeight), sf);
     const int sharedColumnW        = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnWidth), sf);
     const int masterEditW          = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.masterEditWidth), sf);
     const int masterEditH          = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.masterEditHeight), sf);
-    const int separatorW           = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.separators.verticalStandardWidth), sf);
-    const int separatorH           = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.separators.verticalStandardHeight), sf);
     const int sharedColumnHeight   = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnHeight), sf);
-
-    area.removeFromLeft(padding);
-    area.removeFromRight(padding);
-
-    const int topY = padding;
+    const int interColumnGap       = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.interColumnGap), sf);
 
     const auto patchEditBounds = area.removeFromLeft(patchEditPanelWidth);
-    patchEditPanel_->setBounds(patchEditBounds.getX(), topY, patchEditBounds.getWidth(), patchEditPanelHeight);
+    patchEditPanel_->setBounds(patchEditBounds.getX(), 0, patchEditBounds.getWidth(), patchEditPanelHeight);
 
-    // Full Body height (not content band): joins Header/Footer thick borders through padding gutters.
-    const auto separator1Bounds = area.removeFromLeft(separatorW);
-    verticalSeparator1_->setBounds(separator1Bounds.getX(), 0, separator1Bounds.getWidth(), separatorH);
+    area.removeFromLeft(interColumnGap);
 
     const auto sharedBounds = area.removeFromLeft(sharedColumnW);
-    sharedPanel_->setBounds(sharedBounds.getX(), topY, sharedBounds.getWidth(), sharedColumnHeight);
+    sharedPanel_->setBounds(sharedBounds.getX(), 0, sharedBounds.getWidth(), sharedColumnHeight);
 
-    const auto separator2Bounds = area.removeFromLeft(separatorW);
-    verticalSeparator2_->setBounds(separator2Bounds.getX(), 0, separator2Bounds.getWidth(), separatorH);
+    area.removeFromLeft(interColumnGap);
 
     const auto masterEditBounds = area.removeFromLeft(masterEditW);
-    masterEditPanel_->setBounds(masterEditBounds.getX(), topY, masterEditBounds.getWidth(), masterEditH);
+    masterEditPanel_->setBounds(masterEditBounds.getX(), 0, masterEditBounds.getWidth(), masterEditH);
 }
 
 void BodyPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
-    verticalSeparator1_->setLook(TSS::verticalSeparatorLookFromSkin(skin));
-    verticalSeparator2_->setLook(TSS::verticalSeparatorLookFromSkin(skin));
     TSS::propagateSkin(skin,
         patchEditPanel_.get(),
         sharedPanel_.get(),
@@ -117,10 +100,6 @@ void BodyPanel::setUiScale(float uiScale)
     
     uiScale_ = uiScale;
     
-    if (verticalSeparator1_)
-        verticalSeparator1_->setUiScale(uiScale_);
-    if (verticalSeparator2_)
-        verticalSeparator2_->setUiScale(uiScale_);
     if (patchEditPanel_)
         patchEditPanel_->setUiScale(uiScale_);
     if (sharedPanel_)

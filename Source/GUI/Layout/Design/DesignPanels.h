@@ -12,13 +12,15 @@ namespace TSS::Design
     {
         namespace Body
         {
-            inline constexpr int kPadding = Spacing::kLarge;
-            inline constexpr int kVerticalSeparatorCount = 2;
-            inline constexpr int kPaddingSideCount = 2;
+            // Column panel inset (former Body edge padding) — not applied on Body itself.
+            inline constexpr int kColumnPadding = Spacing::kLarge;
+            inline constexpr int kInterColumnGap = Spacing::kStandard;
+            inline constexpr int kInterColumnGapCount = 2;
 
             namespace MasterEditSection
             {
                 inline constexpr int kWidth = Recipes::ParameterCell::kWidth;
+                inline constexpr int kPanelWidth = kWidth + 2 * Body::kColumnPadding;
                 inline constexpr int kInterModuleGap = Spacing::kLarge;
                 inline constexpr int kChildModuleCount = 3;
                 inline constexpr int kInterModuleGapCount = kChildModuleCount - 1;
@@ -51,11 +53,13 @@ namespace TSS::Design
 
                 inline constexpr int kHeight = Atoms::Heights::kSectionHeader + MidiModule::kHeight
                     + VibratoModule::kHeight + MiscModule::kHeight + kInterModuleGapCount * kInterModuleGap;
+                inline constexpr int kPanelHeight = kHeight + 2 * Body::kColumnPadding;
             }
 
             namespace SharedColumn
             {
                 inline constexpr int kWidth = Recipes::ModulationBusCell::kWidth;
+                inline constexpr int kPanelWidth = kWidth + 2 * Body::kColumnPadding;
                 inline constexpr int kVerticalStackGap = Spacing::kLarge; // Matrix Modulation ↔ Patch Manager gap (figma-mockup.md)
             }
 
@@ -67,6 +71,7 @@ namespace TSS::Design
                 inline constexpr int kInterModuleGapCountPerRow = kModuleCountPerRow - 1;
                 inline constexpr int kTopBottomBandCount = 2;
                 inline constexpr int kWidth = kModuleCountPerRow * kModuleWidth + kInterModuleGapCountPerRow * kInterModuleGap;
+                inline constexpr int kPanelWidth = kWidth + 2 * Body::kColumnPadding;
                 inline constexpr int kPatchEditModuleHeight = Recipes::PatchEditModule::kHeight;
                 inline constexpr int kTopBottomPanelHeight = kPatchEditModuleHeight;
 
@@ -116,6 +121,7 @@ namespace TSS::Design
 
                 inline constexpr int kHeight = Atoms::Heights::kSectionHeader + kTopBottomBandCount * kTopBottomPanelHeight
                     + MiddleModules::kHeight;
+                inline constexpr int kPanelHeight = kHeight + 2 * Body::kColumnPadding;
             }
 
             namespace MatrixModulationSection
@@ -164,6 +170,8 @@ namespace TSS::Design
                 inline constexpr int kSharedPanelHeight = MatrixModulationSection::kHeight + kVerticalStackGap
                     + PatchManagerSection::kHeight;
                 inline constexpr int kHeight = kSharedPanelHeight;
+                // Outer panel matches Patch/Master column height; 4 px slack remains below content stack.
+                inline constexpr int kPanelHeight = PatchEditSection::kPanelHeight;
             }
 
             inline constexpr int kEffectiveHeight = PatchEditSection::kHeight;
@@ -206,13 +214,11 @@ namespace TSS::Design
 
     namespace GUI
     {
-        inline constexpr int kBodyInnerWidth = Panels::Body::PatchEditSection::kWidth
-            + Panels::Body::kVerticalSeparatorCount * Atoms::Widths::VerticalSeparator::kStandard
-            + Panels::Body::SharedColumn::kWidth + Panels::Body::MasterEditSection::kWidth;
-
-        inline constexpr int kPadding = Panels::Body::kPadding;
-        inline constexpr int kWidth = kBodyInnerWidth + Panels::Body::kPaddingSideCount * kPadding;
-        inline constexpr int kBodyHeight = Panels::Body::kEffectiveHeight + Panels::Body::kPaddingSideCount * kPadding;
+        inline constexpr int kWidth = Panels::Body::PatchEditSection::kPanelWidth
+            + Panels::Body::kInterColumnGapCount * Panels::Body::kInterColumnGap
+            + Panels::Body::SharedColumn::kPanelWidth
+            + Panels::Body::MasterEditSection::kPanelWidth;
+        inline constexpr int kBodyHeight = Panels::Body::PatchEditSection::kPanelHeight;
         inline constexpr int kHeight = Panels::Header::kHeight + kBodyHeight + Panels::Footer::kHeight;
     }
 
@@ -267,10 +273,5 @@ namespace TSS::Design
             }
         }
 
-        namespace Heights
-        {
-            // Full Body height so separators join Header/Footer panel-edge borders.
-            inline constexpr int kVerticalSeparator = Panels::Body::kHeight;
-        }
     }
 }

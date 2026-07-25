@@ -296,7 +296,6 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/SectionHeader.cpp
     Source/GUI/Widgets/Slider.cpp
     Source/GUI/Widgets/TrackGeneratorDisplay.cpp
-    Source/GUI/Widgets/VerticalSeparator.cpp
     
     # Shared
     Source/Shared/ProjectPaths.cpp
@@ -330,7 +329,6 @@ set(TEST_SANDBOX_SOURCES
     Source/GUI/Tests/TestSliders.cpp
     Source/GUI/Tests/TestToggles.cpp
     Source/GUI/Tests/TestTrackGeneratorDisplays.cpp
-    Source/GUI/Tests/TestVerticalSeparators.cpp
     Source/GUI/Tests/TestVisualDebug.cpp
 )
 

@@ -30,10 +30,10 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
     , patchEditTopModulesPanel_(std::make_unique<PatchEditTopModulesPanel>(
-        skin, dims_.topModules, dims_.width, dims_.topHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
+        skin, dims_.topModules, dims_.sectionHeaderWidth, dims_.topHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
     , patchEditDisplaysPanel_(std::make_unique<PatchEditDisplaysPanel>(skin, dims_.displays, apvts))
     , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(
-        skin, dims_.bottomModules, dims_.width, dims_.bottomHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
+        skin, dims_.bottomModules, dims_.sectionHeaderWidth, dims_.bottomHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
 {
     setOpaque(false);
     addAndMakeVisible(*sectionHeader_);
@@ -48,6 +48,9 @@ void PatchEditPanel::resized()
 {
     auto area = getLocalBounds();
     const float sf = uiScale_;
+
+    const int padding = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.padding), sf);
+    area.reduce(padding, padding);
 
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sectionHeaderHeight), sf);
     const int topHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.topHeight), sf);

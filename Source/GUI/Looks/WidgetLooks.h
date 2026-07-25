@@ -120,11 +120,6 @@ namespace TSS
         juce::Font font{juce::FontOptions{}};
     };
 
-    struct VerticalSeparatorLook
-    {
-        juce::Colour line{};
-    };
-
     struct ToggleLook
     {
         juce::Colour border{};

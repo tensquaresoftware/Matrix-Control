@@ -8,7 +8,6 @@
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/SectionHeader.h"
-#include "GUI/Widgets/VerticalSeparator.h"
 
 struct TestVisualDebugSettings
 {
@@ -47,7 +46,6 @@ namespace TestVisualDebugPainter
         return dynamic_cast<const TSS::Label*>(&child) != nullptr
             || dynamic_cast<const TSS::GroupLabel*>(&child) != nullptr
             || dynamic_cast<const TSS::HorizontalSeparator*>(&child) != nullptr
-            || dynamic_cast<const TSS::VerticalSeparator*>(&child) != nullptr
             || dynamic_cast<const TSS::ModuleHeader*>(&child) != nullptr
             || dynamic_cast<const TSS::SectionHeader*>(&child) != nullptr;
     }

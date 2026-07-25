@@ -72,15 +72,6 @@ namespace TSS::SkinColours
             };
         }
 
-        namespace VerticalSeparator
-        {
-            inline constexpr ColourElement kLine = {
-                "VerticalSeparatorLine",
-                ColourChart::kDarkGrey1,
-                ColourChart::kDarkGrey1
-            };
-        }
-
         namespace HorizontalSeparator
         {
             inline constexpr ColourElement kLine = {

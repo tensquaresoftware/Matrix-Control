@@ -168,13 +168,6 @@ namespace TSS
         return look;
     }
 
-    VerticalSeparatorLook verticalSeparatorLookFromSkin(const ISkin& skin)
-    {
-        VerticalSeparatorLook look;
-        look.line = skin.getColour(SkinColourId::kVerticalSeparatorLine);
-        return look;
-    }
-
     ToggleLook toggleLookFromSkin(const ISkin& skin)
     {
         ToggleLook look;

@@ -213,7 +213,6 @@ namespace TSS
 
         colours_[SkinColourId::kLabelText] = juce::Colour(accessColour(Widgets::Label::kText));
 
-        colours_[SkinColourId::kVerticalSeparatorLine] = juce::Colour(accessColour(Widgets::VerticalSeparator::kLine));
         colours_[SkinColourId::kHorizontalSeparatorLine] = juce::Colour(accessColour(Widgets::HorizontalSeparator::kLine));
     }
     

@@ -30,7 +30,6 @@
 #include "GUI/Tests/TestScaleColumns.h"
 #include "GUI/Tests/TestVisualDebug.h"
 #include "GUI/Tests/TestTrackGeneratorDisplays.h"
-#include "GUI/Tests/TestVerticalSeparators.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -149,8 +148,6 @@ void TestComponent::setSkin(TSS::ISkin& skin)
         testPatchNameDisplays_->setSkin(skin);
     if (testHorizontalSeparators_ != nullptr)
         testHorizontalSeparators_->setSkin(skin);
-    if (testVerticalSeparators_ != nullptr)
-        testVerticalSeparators_->setSkin(skin);
     if (testActivityLeds_ != nullptr)
         testActivityLeds_->setSkin(skin);
     if (testPeakIndicators_ != nullptr)
@@ -482,9 +479,6 @@ void TestComponent::createTestPages(juce::AudioProcessorValueTreeState& apvts)
         layoutDimensions_.patchEditParameterCell.horizontalSeparatorHeight);
     testContentHost_->addAndMakeVisible(*testHorizontalSeparators_);
 
-    testVerticalSeparators_ = std::make_unique<TestVerticalSeparators>(*skin_, body.separators);
-    testContentHost_->addAndMakeVisible(*testVerticalSeparators_);
-
     testActivityLeds_ = std::make_unique<TestActivityLeds>(*skin_, layoutDimensions_.activityLed.size);
     testContentHost_->addAndMakeVisible(*testActivityLeds_);
 
@@ -540,7 +534,6 @@ void TestComponent::populateWidgetSelector()
     widgetSelector_.addItem("TrackGeneratorDisplay", static_cast<int>(TestWidgetType::TrackGeneratorDisplay));
     widgetSelector_.addItem("PatchNameDisplay", static_cast<int>(TestWidgetType::PatchNameDisplay));
     widgetSelector_.addItem("HorizontalSeparator", static_cast<int>(TestWidgetType::HorizontalSeparator));
-    widgetSelector_.addItem("VerticalSeparator", static_cast<int>(TestWidgetType::VerticalSeparator));
     widgetSelector_.addItem("Led", static_cast<int>(TestWidgetType::ActivityLed));
     widgetSelector_.addItem("PeakIndicator", static_cast<int>(TestWidgetType::PeakIndicator));
     widgetSelector_.addItem("ParameterCell", static_cast<int>(TestWidgetType::ParameterCell));
@@ -556,6 +549,8 @@ void TestComponent::restorePersistedWidgetSelection()
     const int boundedSelectionId = juce::jlimit(kFirstComboItemId_, kLastComboItemId_, savedSelectionId);
 
     widgetSelector_.setSelectedId(boundedSelectionId, juce::dontSendNotification);
+    if (widgetSelector_.getSelectedId() == 0)
+        widgetSelector_.setSelectedId(defaultSelectionId, juce::dontSendNotification);
 }
 
 void TestComponent::persistWidgetSelection(int selectedId)
@@ -590,7 +585,6 @@ void TestComponent::updateVisibleTests()
     setVisibleForType(TestWidgetType::TrackGeneratorDisplay, testTrackGeneratorDisplays_.get());
     setVisibleForType(TestWidgetType::PatchNameDisplay, testPatchNameDisplays_.get());
     setVisibleForType(TestWidgetType::HorizontalSeparator, testHorizontalSeparators_.get());
-    setVisibleForType(TestWidgetType::VerticalSeparator, testVerticalSeparators_.get());
     setVisibleForType(TestWidgetType::ActivityLed, testActivityLeds_.get());
     setVisibleForType(TestWidgetType::PeakIndicator, testPeakIndicators_.get());
     setVisibleForType(TestWidgetType::ParameterCell, testParameterCells_.get());
@@ -651,9 +645,6 @@ void TestComponent::layoutTestContentHost()
         { TestWidgetType::HorizontalSeparator, testHorizontalSeparators_.get(),
           [this] { return testHorizontalSeparators_ != nullptr ? testHorizontalSeparators_->getPreferredWidth() : 0; },
           [this] { return testHorizontalSeparators_ != nullptr ? testHorizontalSeparators_->getPreferredHeight() : 0; } },
-        { TestWidgetType::VerticalSeparator, testVerticalSeparators_.get(),
-          [this] { return testVerticalSeparators_ != nullptr ? testVerticalSeparators_->getPreferredWidth() : 0; },
-          [this] { return testVerticalSeparators_ != nullptr ? testVerticalSeparators_->getPreferredHeight() : 0; } },
         { TestWidgetType::ActivityLed, testActivityLeds_.get(),
           [this] { return testActivityLeds_ != nullptr ? testActivityLeds_->getPreferredWidth() : 0; },
           [this] { return testActivityLeds_ != nullptr ? testActivityLeds_->getPreferredHeight() : 0; } },

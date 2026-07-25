@@ -161,12 +161,6 @@ namespace TSS::Design
                 inline constexpr int kLineThickness = 4;
             }
 
-            namespace VerticalSeparator
-            {
-                inline constexpr int kStandard = 24;
-                inline constexpr int kLineWidth = 4;
-            }
-
             namespace Indicator
             {
                 inline constexpr int kLedSize = 12;

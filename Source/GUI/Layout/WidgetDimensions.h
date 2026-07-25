@@ -115,14 +115,6 @@ struct ModulationBusCellDimensions
     int reorderDragThreshold;
 };
 
-struct SeparatorDimensions
-{
-    int verticalStandardWidth;
-    int verticalStandardHeight;
-    int horizontalHeight;
-    int verticalLineWidth;
-};
-
 struct DisplayBandDimensions
 {
     int width;

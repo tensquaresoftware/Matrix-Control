@@ -18,7 +18,6 @@ namespace TSS
     TrackGeneratorDisplayLook trackGeneratorDisplayLookFromSkin(const ISkin& skin);
     PatchNameDisplayLook patchNameDisplayLookFromSkin(const ISkin& skin);
     GroupLabelLook groupLabelLookFromSkin(const ISkin& skin);
-    VerticalSeparatorLook verticalSeparatorLookFromSkin(const ISkin& skin);
     ToggleLook toggleLookFromSkin(const ISkin& skin);
     NumberBoxLook numberBoxLookFromSkin(const ISkin& skin);
     SectionHeaderLook sectionHeaderLookFromSkin(const ISkin& skin);

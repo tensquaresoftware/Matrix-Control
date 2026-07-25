@@ -7,7 +7,7 @@
 
 namespace TSS::Design
 {
-    static_assert(GUI::kWidth == 1300, "MainComponent width");
+    static_assert(GUI::kWidth == 1308, "MainComponent width");
     static_assert(GUI::kHeight == 800, "MainComponent height");
     static_assert(Panels::Header::kHeight == 40, "HeaderPanel height");
     static_assert(Panels::Header::kLogoWidth % 4 == 0, "Header logo width must be on the design ÷4 grid");
@@ -44,12 +44,20 @@ namespace TSS::Design
     static_assert(Panels::Body::PatchManagerSection::kHeight == 384, "Patch manager section height");
     static_assert(Panels::Body::MatrixModulationSection::kHeight == 304, "Matrix modulation section height");
 
-    static_assert(Panels::Body::PatchEditSection::kWidth == 808, "PatchEditPanel width");
-    static_assert(Panels::Body::PatchEditSection::kHeight == 704, "PatchEditPanel height");
-    static_assert(Panels::Body::MasterEditSection::kWidth == 152, "MasterEditPanel width");
-    static_assert(Panels::Body::MasterEditSection::kHeight == 704, "MasterEditPanel height");
-    static_assert(Panels::Body::SharedColumn::kWidth == 268, "SharedPanel width");
-    static_assert(Panels::Body::SharedColumn::kSharedPanelHeight == 700, "SharedPanel height");
+    static_assert(Panels::Body::kColumnPadding == 12, "Column panel padding");
+    static_assert(Panels::Body::kInterColumnGap == 4, "Body inter-column gap");
+    static_assert(Panels::Body::PatchEditSection::kWidth == 808, "PatchEdit content width");
+    static_assert(Panels::Body::PatchEditSection::kHeight == 704, "PatchEdit content height");
+    static_assert(Panels::Body::PatchEditSection::kPanelWidth == 832, "PatchEditPanel outer width");
+    static_assert(Panels::Body::PatchEditSection::kPanelHeight == 728, "PatchEditPanel outer height");
+    static_assert(Panels::Body::MasterEditSection::kWidth == 152, "MasterEdit content width");
+    static_assert(Panels::Body::MasterEditSection::kHeight == 704, "MasterEdit content height");
+    static_assert(Panels::Body::MasterEditSection::kPanelWidth == 176, "MasterEditPanel outer width");
+    static_assert(Panels::Body::MasterEditSection::kPanelHeight == 728, "MasterEditPanel outer height");
+    static_assert(Panels::Body::SharedColumn::kWidth == 268, "Shared content width");
+    static_assert(Panels::Body::SharedColumn::kSharedPanelHeight == 700, "Shared content stack height");
+    static_assert(Panels::Body::SharedColumn::kPanelWidth == 292, "SharedPanel outer width");
+    static_assert(Panels::Body::SharedColumn::kPanelHeight == 728, "SharedPanel outer height");
 
     static_assert(Panels::Body::PatchEditSection::TopModules::kHeight == 272, "PatchEditTopModulesPanel height");
     static_assert(Panels::Body::PatchEditSection::MiddleModules::kHeight == 128, "PatchEditDisplaysPanel height");
@@ -115,16 +123,21 @@ namespace TSS::Design
         "Shared column stack height");
 
     static_assert(Panels::Body::kEffectiveHeight - Panels::Body::SharedColumn::kSharedPanelHeight == 4,
-        "Shared panel 4 px shorter than patch/master (Mutator omits trailing separator)");
+        "Shared content stack 4 px shorter than patch/master (Mutator omits trailing separator)");
 
     static_assert(
-        GUI::kBodyInnerWidth
-            == Panels::Body::PatchEditSection::kWidth
-                + Panels::Body::kVerticalSeparatorCount * Atoms::Widths::VerticalSeparator::kStandard
-                + Panels::Body::SharedColumn::kWidth + Panels::Body::MasterEditSection::kWidth,
-        "Body inner width");
+        GUI::kWidth
+            == Panels::Body::PatchEditSection::kPanelWidth
+                + Panels::Body::kInterColumnGapCount * Panels::Body::kInterColumnGap
+                + Panels::Body::SharedColumn::kPanelWidth
+                + Panels::Body::MasterEditSection::kPanelWidth,
+        "GUI width from column outer sizes and gaps");
 
-    static_assert(GUI::kWidth == GUI::kBodyInnerWidth + Panels::Body::kPaddingSideCount * GUI::kPadding, "GUI width");
+    static_assert(GUI::kBodyHeight == Panels::Body::PatchEditSection::kPanelHeight, "Body height equals column outer height");
+    static_assert(
+        Panels::Body::SharedColumn::kPanelHeight == Panels::Body::PatchEditSection::kPanelHeight
+            && Panels::Body::MasterEditSection::kPanelHeight == Panels::Body::PatchEditSection::kPanelHeight,
+        "Three Body columns share outer height");
 
     static_assert(
         Atoms::Heights::kSectionHeader + Panels::Body::PatchManagerSection::kModulesStackHeight
@@ -132,7 +145,4 @@ namespace TSS::Design
         "Patch manager modules stack height");
 
     static_assert(GUI::kHeight == Panels::Header::kHeight + GUI::kBodyHeight + Panels::Footer::kHeight, "GUI height stack");
-
-    static_assert(PanelWidgets::Heights::kVerticalSeparator == Panels::Body::kHeight,
-        "Vertical separators span full Body height to join Header/Footer borders");
 }

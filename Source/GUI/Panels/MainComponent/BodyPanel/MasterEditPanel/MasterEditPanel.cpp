@@ -159,6 +159,9 @@ void MasterEditPanel::resized()
     auto area = getLocalBounds();
     const float sf = uiScale_;
 
+    const int padding = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.padding), sf);
+    area.reduce(padding, padding);
+
     const int sectionHeaderHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.sectionHeaderHeight), sf);
     const int childWidth = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.childModuleWidth), sf);

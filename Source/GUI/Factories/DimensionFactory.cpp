@@ -267,7 +267,6 @@ PluginEditorDimensions DimensionFactory::buildPluginEditorDimensions()
         .headerHeight = Panels::Header::kHeight,
         .bodyHeight = Panels::Body::kHeight,
         .footerHeight = Panels::Footer::kHeight,
-        .bodyPadding = Panels::Body::kPadding,
     };
 }
 
@@ -330,8 +329,9 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
     };
 
     SharedPanelDimensions shared {
-        .width = Panels::Body::SharedColumn::kWidth,
-        .height = Panels::Body::SharedColumn::kSharedPanelHeight,
+        .width = Panels::Body::SharedColumn::kPanelWidth,
+        .height = Panels::Body::SharedColumn::kPanelHeight,
+        .padding = Panels::Body::kColumnPadding,
         .verticalStackGap = Panels::Body::SharedColumn::kVerticalStackGap,
         .matrixModulationHeight = MMS::kHeight,
         .patchManagerHeight = PMS::kHeight,
@@ -364,8 +364,9 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
     };
 
     PatchEditPanelDimensions patchEdit {
-        .width = PES::kWidth,
-        .height = PES::kHeight,
+        .width = PES::kPanelWidth,
+        .height = PES::kPanelHeight,
+        .padding = Panels::Body::kColumnPadding,
         .topHeight = PES::TopModules::kHeight,
         .middleHeight = PES::MiddleModules::kHeight,
         .bottomHeight = PES::BottomModules::kHeight,
@@ -377,8 +378,9 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
     };
 
     MasterEditPanelDimensions masterEdit {
-        .width = MES::kWidth,
-        .height = MES::kHeight,
+        .width = MES::kPanelWidth,
+        .height = MES::kPanelHeight,
+        .padding = Panels::Body::kColumnPadding,
         .childModuleWidth = MES::ChildModules::kWidth,
         .interModuleGap = MES::kInterModuleGap,
         .midiPanelHeight = MES::MidiModule::kHeight,
@@ -393,19 +395,13 @@ GuiLayoutDimensions DimensionFactory::buildGuiLayoutDimensions()
     BodyPanelDimensions body {
         .width = Panels::Body::kWidth,
         .height = Panels::Body::kHeight,
-        .padding = Panels::Body::kPadding,
-        .patchEditWidth = PES::kWidth,
-        .patchEditHeight = PES::kHeight,
-        .masterEditWidth = MES::kWidth,
-        .masterEditHeight = MES::kHeight,
-        .sharedColumnWidth = Panels::Body::SharedColumn::kWidth,
-        .sharedColumnHeight = Panels::Body::SharedColumn::kSharedPanelHeight,
-        .separators = {
-            .verticalStandardWidth = Atoms::Widths::VerticalSeparator::kStandard,
-            .verticalStandardHeight = PanelWidgets::Heights::kVerticalSeparator,
-            .horizontalHeight = Atoms::Heights::kHorizontalSeparator,
-            .verticalLineWidth = Atoms::Widths::VerticalSeparator::kLineWidth,
-        },
+        .interColumnGap = Panels::Body::kInterColumnGap,
+        .patchEditWidth = PES::kPanelWidth,
+        .patchEditHeight = PES::kPanelHeight,
+        .masterEditWidth = MES::kPanelWidth,
+        .masterEditHeight = MES::kPanelHeight,
+        .sharedColumnWidth = Panels::Body::SharedColumn::kPanelWidth,
+        .sharedColumnHeight = Panels::Body::SharedColumn::kPanelHeight,
         .patchEdit = std::move(patchEdit),
         .shared = std::move(shared),
         .masterEdit = std::move(masterEdit),

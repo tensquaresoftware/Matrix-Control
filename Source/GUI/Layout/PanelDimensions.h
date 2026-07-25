@@ -9,7 +9,6 @@ struct PluginEditorDimensions
     int headerHeight;
     int bodyHeight;
     int footerHeight;
-    int bodyPadding;
 };
 
 struct HeaderPanelDimensions
@@ -68,6 +67,7 @@ struct PatchEditPanelDimensions
 {
     int width;
     int height;
+    int padding;
     int topHeight;
     int middleHeight;
     int bottomHeight;
@@ -161,6 +161,7 @@ struct SharedPanelDimensions
 {
     int width;
     int height;
+    int padding;
     int verticalStackGap;
     int matrixModulationHeight;
     int patchManagerHeight;
@@ -172,6 +173,7 @@ struct MasterEditPanelDimensions
 {
     int width;
     int height;
+    int padding;
     int childModuleWidth;
     int interModuleGap;
     int midiPanelHeight;
@@ -187,14 +189,13 @@ struct BodyPanelDimensions
 {
     int width;
     int height;
-    int padding;
+    int interColumnGap;
     int patchEditWidth;
     int patchEditHeight;
     int masterEditWidth;
     int masterEditHeight;
     int sharedColumnWidth;
     int sharedColumnHeight;
-    SeparatorDimensions separators;
     PatchEditPanelDimensions patchEdit;
     SharedPanelDimensions shared;
     MasterEditPanelDimensions masterEdit;

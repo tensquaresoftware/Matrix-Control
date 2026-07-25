@@ -34,7 +34,6 @@ namespace TSS
         kLabelText,
         
         // Separator colours
-        kVerticalSeparatorLine,
         kHorizontalSeparatorLine,
         
         // Button colours
