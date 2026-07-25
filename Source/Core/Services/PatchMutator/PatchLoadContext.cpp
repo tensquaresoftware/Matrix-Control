@@ -6,11 +6,11 @@ namespace Core
 {
     namespace
     {
-        constexpr const char* kComputerBasenamePrefix = "Syx-";
+        constexpr const char* kSyxFileLocationLabel = "SyxFile";
 
         juce::String formatBankPatch(int bank, int patch)
         {
-            return juce::String::formatted("B%02d-P%02d", bank, patch);
+            return juce::String::formatted("B%dP%02d", bank, patch);
         }
     } // namespace
 
@@ -41,24 +41,19 @@ namespace Core
 
     juce::String PatchLoadContext::computeDeviceBasename(const juce::String& patchName) const
     {
-        const auto base = formatBankPatch(bank, patch);
-        const auto name = PatchFileNameSanitizer::sanitizeToMatrixNameOrEmpty(patchName.trim());
+        const auto location = formatBankPatch(bank, patch);
+        const auto name = PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty(patchName);
 
         if (name.isEmpty())
-            return base;
+            return location;
 
-        return base + "-" + name;
+        return name + " @ " + location;
     }
 
     juce::String PatchLoadContext::computeComputerBasename() const
     {
-        const auto stem = PatchFileNameSanitizer::sanitizeToMatrixNameOrEmpty(
-            PatchFileNameSanitizer::sanitizeFileStem(fileStem));
-
-        if (stem.isEmpty())
-            return juce::String(kComputerBasenamePrefix) + PatchFileNameSanitizer::kEmptyNameFallback;
-
-        return kComputerBasenamePrefix + stem;
+        const auto stem = PatchFileNameSanitizer::sanitizeOsFileStem(fileStem);
+        return stem + " @ " + juce::String(kSyxFileLocationLabel);
     }
 
 } // namespace Core

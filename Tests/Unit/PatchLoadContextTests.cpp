@@ -9,51 +9,60 @@ public:
 
     void runTest() override
     {
-        deviceNamed_buildsBankPatchName();
-        deviceBlankName_omitsNameSegment();
-        deviceUnsanitizableName_omitsNameSegment();
-        computerFile_prefixesSyx();
+        deviceNamed_buildsNameAtLocation();
+        deviceBlankName_locationOnly();
+        deviceOsStrippedName_keepsSpaces();
+        deviceUnsanitizableName_locationOnly();
+        computerFile_stemAtSyxFile();
     }
 
 private:
-    void deviceNamed_buildsBankPatchName()
+    void deviceNamed_buildsNameAtLocation()
     {
-        beginTest("deviceNamed_buildsBankPatchName");
+        beginTest("deviceNamed_buildsNameAtLocation");
 
         const auto context = Core::PatchLoadContext::deviceMemory(8, 25);
-        expectEquals(context.computeExportBasename("OB-VOX"), juce::String("B08-P25-OB-VOX"));
+        expectEquals(context.computeExportBasename("OB-VOX"), juce::String("OB-VOX @ B8P25"));
     }
 
-    void deviceBlankName_omitsNameSegment()
+    void deviceBlankName_locationOnly()
     {
-        beginTest("deviceBlankName_omitsNameSegment");
+        beginTest("deviceBlankName_locationOnly");
 
         const auto context = Core::PatchLoadContext::deviceMemory(0, 0);
-        expectEquals(context.computeExportBasename("   "), juce::String("B00-P00"));
-        expectEquals(context.computeExportBasename(""), juce::String("B00-P00"));
+        expectEquals(context.computeExportBasename("   "), juce::String("B0P00"));
+        expectEquals(context.computeExportBasename(""), juce::String("B0P00"));
     }
 
-    void deviceUnsanitizableName_omitsNameSegment()
+    void deviceOsStrippedName_keepsSpaces()
     {
-        beginTest("deviceUnsanitizableName_omitsNameSegment");
+        beginTest("deviceOsStrippedName_keepsSpaces");
+
+        const auto context = Core::PatchLoadContext::deviceMemory(2, 52);
+        expectEquals(context.computeExportBasename("BS ETAK*"), juce::String("BS ETAK @ B2P52"));
+    }
+
+    void deviceUnsanitizableName_locationOnly()
+    {
+        beginTest("deviceUnsanitizableName_locationOnly");
 
         const auto context = Core::PatchLoadContext::deviceMemory(1, 77);
-        // '!' and '@' are stripped by the Matrix name filter, leaving nothing.
-        expectEquals(context.computeExportBasename("!@"), juce::String("B01-P77"));
+        // '*' '?' '"' ':' are OS-forbidden and strip to empty.
+        expectEquals(context.computeExportBasename("*?:"), juce::String("B1P77"));
     }
 
-    void computerFile_prefixesSyx()
+    void computerFile_stemAtSyxFile()
     {
-        beginTest("computerFile_prefixesSyx");
+        beginTest("computerFile_stemAtSyxFile");
 
         const auto context = Core::PatchLoadContext::computerFile("WARM-PAD");
-        expectEquals(context.computeExportBasename("IGNORED"), juce::String("Syx-WARM-PAD"));
+        expectEquals(context.computeExportBasename("IGNORED"), juce::String("WARM-PAD @ SyxFile"));
 
         const auto fromExtension = Core::PatchLoadContext::computerFile("WARM-PAD.syx");
-        expectEquals(fromExtension.computeExportBasename("IGNORED"), juce::String("Syx-WARM-PAD"));
+        expectEquals(fromExtension.computeExportBasename("IGNORED"), juce::String("WARM-PAD @ SyxFile"));
 
         const auto blank = Core::PatchLoadContext::computerFile("***");
-        expectEquals(blank.computeExportBasename("IGNORED"), juce::String("Syx-PATCH"));
+        expectEquals(blank.computeExportBasename("IGNORED"), juce::String("PATCH @ SyxFile"));
     }
 };
 

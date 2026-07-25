@@ -26,9 +26,9 @@ namespace Core
         static PatchLoadContext deviceMemory(int bank, int patch);
         static PatchLoadContext computerFile(const juce::String& fileStem);
 
-        // Export session folder basename per spec:
-        //   Device / INIT / PASTE : B{bb:02d}-P{pp:02d}[-NAME]  (NAME omitted when it sanitizes empty)
-        //   Computer file         : Syx-{sanitizedFileStem}
+        // Export session folder basename:
+        //   Device / INIT / PASTE : `{Name} @ B{b}P{pp:02d}` or `B{b}P{pp:02d}` when name empty
+        //   Computer file         : `{Stem} @ SyxFile`
         juce::String computeExportBasename(const juce::String& patchName) const;
 
     private:
