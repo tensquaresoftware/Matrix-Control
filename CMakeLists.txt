@@ -168,6 +168,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/DeviceTypeRegistry.cpp
     Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
+    Source/Core/Services/Matrix1000FactoryPatchNames.cpp
     Source/Core/Services/PatchFileNameReconciler.cpp
     Source/Core/Actions/ActionDispatcher.cpp
     Source/Core/Actions/ActionPropertyRegistry.cpp
@@ -358,6 +359,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutationAlgorithmTests.cpp
         Tests/Unit/PatchMutatorEngineTests.cpp
         Tests/Unit/PatchLoadContextTests.cpp
+        Tests/Unit/Matrix1000FactoryPatchNamesTests.cpp
         Tests/Unit/MutatorRecipePersistenceTests.cpp
         Tests/Unit/SessionPersistencePolicyTests.cpp
         Tests/Unit/ComboboxPatchSendDebouncerTests.cpp
@@ -443,6 +445,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/DeviceTypeRegistry.cpp
         Source/Core/Services/PatchFileService.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
+        Source/Core/Services/Matrix1000FactoryPatchNames.cpp
         Source/Core/Services/PatchFileNameReconciler.cpp
         Source/Core/Actions/ActionDispatcher.cpp
         Source/Core/Actions/ActionPropertyRegistry.cpp
