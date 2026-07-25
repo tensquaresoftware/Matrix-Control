@@ -4,7 +4,6 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
 
@@ -35,47 +34,67 @@ void FooterPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
 
-    // Preserve brownfield scale/round order: padding/icon use roundToInt;
-    // identity min-width uses ScaledLayout::scaledInt (same as pre-U-4).
     const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.padding) * uiScale_));
     const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.iconSize) * uiScale_));
-    const int identityMinWidth = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.identityMinWidth),
-        uiScale_);
+    const int bandHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.bandHeight), uiScale_);
+    const int bandVerticalInset = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.bandVerticalInset), uiScale_);
+    const int patchEditW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.patchEditPanelWidth), uiScale_);
+    const int sharedW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.sharedPanelWidth), uiScale_);
+    const int masterEditW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.masterEditPanelWidth), uiScale_);
+    const int gap = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.interColumnGap), uiScale_);
 
-    auto bounds = getLocalBounds().reduced(padding);
-    const auto identityText = buildDeviceIdentityText();
+    const auto area = getLocalBounds();
+    const int bandY = area.getY() + bandVerticalInset;
 
-    if (identityText.isNotEmpty())
+    const juce::Rectangle<int> leftBand { area.getX(), bandY, patchEditW, bandHeight };
+    const juce::Rectangle<int> centreBand { leftBand.getRight() + gap, bandY, sharedW, bandHeight };
+    const juce::Rectangle<int> rightBand { centreBand.getRight() + gap, bandY, masterEditW, bandHeight };
+
+    g.setColour(skin_->getColour(SkinColourId::kBodyPanelBackground));
+    g.fillRect(leftBand);
+    g.fillRect(centreBand);
+    g.fillRect(rightBand);
+
+    const auto font = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+
+    if (! currentMessage.isEmpty() && currentSeverity != MessageSeverity::None)
     {
-        const auto identityBounds = bounds.removeFromRight(juce::jmin(identityMinWidth, bounds.getWidth() / 2));
-        g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-        g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
-        g.drawFittedText(identityText,
-                         identityBounds,
-                         juce::Justification::centredRight,
+        auto messageBounds = leftBand.reduced(padding, 0);
+        g.setColour(getSeverityColour(currentSeverity));
+        g.setFont(font);
+
+        const juce::String icon = getSeverityIcon(currentSeverity);
+        const int iconSlotWidth = iconSize + padding;
+        if (icon.isNotEmpty() && messageBounds.getWidth() > iconSlotWidth)
+        {
+            const auto iconBounds = messageBounds.removeFromLeft(iconSlotWidth);
+            g.drawText(icon, iconBounds, juce::Justification::centredLeft);
+        }
+
+        g.drawFittedText(currentMessage,
+                         messageBounds,
+                         juce::Justification::centredLeft,
                          1,
                          1.0f);
     }
 
-    if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
-        return;
-
-    g.setColour(getSeverityColour(currentSeverity));
-    g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
-
-    const juce::String icon = getSeverityIcon(currentSeverity);
-    if (icon.isNotEmpty())
+    const auto identityText = buildDeviceIdentityText();
+    if (identityText.isNotEmpty())
     {
-        const auto iconBounds = bounds.removeFromLeft(iconSize + padding);
-        g.drawText(icon, iconBounds, juce::Justification::centredLeft);
+        g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
+        g.setFont(font);
+        g.drawFittedText(identityText,
+                         rightBand,
+                         juce::Justification::centred,
+                         1,
+                         1.0f);
     }
-
-    g.drawFittedText(currentMessage,
-                     bounds,
-                     juce::Justification::centredLeft,
-                     1,
-                     1.0f);
 }
 
 void FooterPanel::resized()
@@ -173,11 +192,8 @@ juce::String FooterPanel::getSeverityIcon(MessageSeverity severity) const
 
 juce::String FooterPanel::buildDeviceIdentityText() const
 {
-    if (! deviceDetected_)
-        return PluginDisplayNames::FooterPanel::kNoDevice;
-
-    if (deviceType_.isEmpty())
-        return PluginDisplayNames::FooterPanel::kNoDevice;
+    if (! deviceDetected_ || deviceType_.isEmpty())
+        return {};
 
     juce::String identity = MatrixDeviceTypes::toDisplayString(
         MatrixDeviceTypes::fromApvtsString(deviceType_));

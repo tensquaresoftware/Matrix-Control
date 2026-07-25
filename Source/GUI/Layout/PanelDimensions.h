@@ -42,7 +42,12 @@ struct FooterPanelDimensions
     int height;
     int padding;
     int iconSize;
-    int identityMinWidth;
+    int bandHeight;
+    int bandVerticalInset;
+    int patchEditPanelWidth;
+    int sharedPanelWidth;
+    int masterEditPanelWidth;
+    int interColumnGap;
 };
 
 struct PatchEditModulesRowDimensions

@@ -16,11 +16,14 @@ namespace TSS::Design
     static_assert(Panels::Header::kLogoGapAfter % 4 == 0, "Header logo gap must be on the design ÷4 grid");
     static_assert(Panels::Body::kHeight == 728, "BodyPanel height");
     static_assert(Panels::Footer::kHeight == 32, "FooterPanel height");
+    static_assert(Panels::Footer::kBandHeight == 24, "Footer column band height");
+    static_assert(Panels::Footer::kBandHeight % 4 == 0, "Footer band height must be on the design ÷4 grid");
+    static_assert(Panels::Footer::kBandVerticalInset == 4, "Footer band vertical inset");
+    static_assert(Panels::Footer::kBandVerticalInset * 2 + Panels::Footer::kBandHeight
+                      == Panels::Footer::kHeight,
+                  "Footer height = band + vertical insets");
     static_assert(Panels::Footer::kPadding == 8, "Footer padding");
     static_assert(Panels::Footer::kPadding % 4 == 0, "Footer padding must be on the design ÷4 grid");
-    static_assert(Panels::Footer::kIdentityMinWidth == 160, "Footer identity min width");
-    static_assert(Panels::Footer::kIdentityMinWidth % 4 == 0,
-                  "Footer identity min width must be on the design ÷4 grid");
     static_assert(Panels::Footer::kIconSize == 14,
                   "Footer icon size intentional ÷4 exception (do not snap to 12/16)");
 

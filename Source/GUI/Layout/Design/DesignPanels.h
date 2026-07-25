@@ -205,7 +205,8 @@ namespace TSS::Design
         namespace Footer
         {
             inline constexpr int kHeight = 32;
-            inline constexpr int kIdentityMinWidth = 160;
+            inline constexpr int kBandHeight = 24;
+            inline constexpr int kBandVerticalInset = (kHeight - kBandHeight) / 2; // 4 px above/below
             inline constexpr int kPadding = Spacing::kMedium;
             // Intentional ÷4 exception: severity icon slot stays 14 (do not snap to 12/16).
             inline constexpr int kIconSize = 14;
