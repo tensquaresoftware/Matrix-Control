@@ -1,18 +1,12 @@
 ---
 organization: Ten Square Software
-project: Matrix-Control
-title: Matrix Control / Factory Patch Names
 author: Guillaume DUPONT
+project: Matrix-Control
+title: Matrix-1000 Factory Patch Names
 date: 2025-07-25
 ---
 
-# Matrix Control / Factory Patch Names
-
----
-
-- **Author:** Guillaume DUPONT
-- **Organization:** Ten Square Software
-- **Revision date:** 2025-07-25
+# Matrix-1000 Factory Patch Names
 
 ---
 
@@ -20,16 +14,16 @@ date: 2025-07-25
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 0   | TOTOHORN   | 25  | WATRLNG    | 50  | DOU CIEL   | 75  | SYNLUTH    |
-| 1   | 1000STRG   | 26  | BEELS      | 51  | WA CLAV    | 76  | CHAMBER    |
-| 2   | MOOOG\_B   | 27  | LIKETHIS   | 52  | DREAMER    | 77  | SPATBRS    |
-| 3   | EZYBRASS   | 28  | NTHENEWS   | 53  | XA STR     | 78  | ETHEREE    |
-| 4   | SYNTH      | 29  | SOFT MIX   | 54  | CHURCH     | 79  | TBRAZZ     |
-| 5   | MIBES      | 30  | OBXA\-A7   | 55  | KIDDING?   | 80  | NOBLE      |
-| 6   | CHUNK      | 31  | BREATH     | 56  | THUNDER    | 81  | FLEXTONE   |
-| 7   | MINDSEAR   | 32  | MUTRONO    | 57  | ECHOWURL   | 82  | GREEZY2    |
-| 8   | CASTILLO   | 33  | SLOWATER   | 58  | BLABINET   | 83  | ARPPEGT    |
-| 9   | DESTROY\+  | 34  | HAUNTING   | 59  | STRUNGS    | 84  | JUMP IES   |
+| 00  | TOTOHORN   | 25  | WATRLNG    | 50  | DOU CIEL   | 75  | SYNLUTH    |
+| 01  | 1000STRG   | 26  | BEELS      | 51  | WA CLAV    | 76  | CHAMBER    |
+| 02  | MOOOG\_B   | 27  | LIKETHIS   | 52  | DREAMER    | 77  | SPATBRS    |
+| 03  | EZYBRASS   | 28  | NTHENEWS   | 53  | XA STR     | 78  | ETHEREE    |
+| 04  | SYNTH      | 29  | SOFT MIX   | 54  | CHURCH     | 79  | TBRAZZ     |
+| 05  | MIBES      | 30  | OBXA\-A7   | 55  | KIDDING?   | 80  | NOBLE      |
+| 06  | CHUNK      | 31  | BREATH     | 56  | THUNDER    | 81  | FLEXTONE   |
+| 07  | MINDSEAR   | 32  | MUTRONO    | 57  | ECHOWURL   | 82  | GREEZY2    |
+| 08  | CASTILLO   | 33  | SLOWATER   | 58  | BLABINET   | 83  | ARPPEGT    |
+| 09  | DESTROY\+  | 34  | HAUNTING   | 59  | STRUNGS    | 84  | JUMP IES   |
 | 10  | BIG PIK    | 35  | FLANGED    | 60  | AFRICAN    | 85  | HARDVARK   |
 | 11  | M\-CHOIR   | 36  | TENSION    | 61  | B3\+LSLIE  | 86  | SWEETSKY   |
 | 12  | STRINGME   | 37  | ECHOTRON   | 62  | CHIMES     | 87  | SHIMRING   |
@@ -50,271 +44,271 @@ date: 2025-07-25
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 100 | PAPANO 4   | 125 | DEJAVUE'   | 150 | CARIPSO    | 175 | VELSYNC\*  |
-| 101 | WURLY 2    | 126 | WET BAZ    | 151 | FAZ BASS   | 176 | RAINECHO   |
-| 102 | TOTOHORN   | 127 | PIPE       | 152 | ORGAN\-2   | 177 | ORGAN 9    |
-| 103 | AGRESORN   | 128 | OCTAVIA    | 153 | PHASEPAD   | 178 | BRAZZ      |
-| 104 | STRING S   | 129 | OB\-STRGS  | 154 | STRING 2   | 179 | ACCORD     |
-| 105 | ODX 7      | 130 | KAWHY      | 155 | BATA       | 180 | DIGPIANO   |
-| 106 | JUMP IES   | 131 | JOCKO      | 156 | BASS SYN   | 181 | TENOR      |
-| 107 | PROFIT     | 132 | FLUTES     | 157 | SYNCAGE\*  | 182 | STORTGAN   |
-| 108 | VOICES     | 133 | ATYPICAL   | 158 | DIGIHORN   | 183 | VIOGITAR   |
-| 109 | SAGAN'Z    | 134 | BOW VIOL   | 159 | CELLO      | 184 | STRUNGET   |
-| 110 | PA ANO 5   | 135 | VERTABRA   | 160 | GLASSVOX   | 185 | BIRDLAND   |
-| 111 | MONSTER    | 136 | SLAP 1     | 161 | FRET NOT   | 186 | METAL\-1   |
-| 112 | GENVIV     | 137 | P\.ORGAN5  | 162 | ORGANISM   | 187 | METAL\-8   |
-| 113 | CLAVINET   | 138 | OCTAHORN   | 163 | LIMUIDZ    | 188 | FUNK ART   |
-| 114 | STRINGER   | 139 | LUSHNESS   | 164 | STRANGER   | 189 | METAL\-13  |
-| 115 | SIMONISK   | 140 | 12"GITAR   | 165 | PAPANO 7   | 190 | VIBES      |
-| 116 | HOTBODOM   | 141 | STAND UP   | 166 | WOW BASS   | 191 | STRING 6   |
-| 117 | XTASY      | 142 | BERT'S B   | 167 | P\.ORGAN4  | 192 | STRNGREZ   |
-| 118 | \)LIQUID\( | 143 | BRASS\-11  | 168 | MELOHORN   | 193 | SINGS      |
-| 119 | BED TRAK   | 144 | STRINGME   | 169 | LEED\-1    | 194 | TIMBOWS    |
-| 120 | ROADS      | 145 | LEED\-2    | 170 | TINYPIAN   | 195 | WHISTLE    |
-| 121 | ECHOWURL   | 146 | OW BASS    | 171 | SLAP 2     | 196 | OBERHORN   |
-| 122 | POLYPHON   | 147 | ORGAN\-1   | 172 | FORESTS    | 197 | TOOTS ?    |
-| 123 | DREAMER    | 148 | HORNISK    | 173 | HONOCLAB   | 198 | FIREBALL   |
-| 124 | HISTRUNG   | 149 | STRING\-1  | 174 | STRING 7   | 199 | SMPLTHIS   |
+| 00  | PAPANO 4   | 25  | DEJAVUE'   | 50  | CARIPSO    | 75  | VELSYNC\*  |
+| 01  | WURLY 2    | 26  | WET BAZ    | 51  | FAZ BASS   | 76  | RAINECHO   |
+| 02  | TOTOHORN   | 27  | PIPE       | 52  | ORGAN\-2   | 77  | ORGAN 9    |
+| 03  | AGRESORN   | 28  | OCTAVIA    | 53  | PHASEPAD   | 78  | BRAZZ      |
+| 04  | STRING S   | 29  | OB\-STRGS  | 54  | STRING 2   | 79  | ACCORD     |
+| 05  | ODX 7      | 30  | KAWHY      | 55  | BATA       | 80  | DIGPIANO   |
+| 06  | JUMP IES   | 31  | JOCKO      | 56  | BASS SYN   | 81  | TENOR      |
+| 07  | PROFIT     | 32  | FLUTES     | 57  | SYNCAGE\*  | 82  | STORTGAN   |
+| 08  | VOICES     | 33  | ATYPICAL   | 58  | DIGIHORN   | 83  | VIOGITAR   |
+| 09  | SAGAN'Z    | 34  | BOW VIOL   | 59  | CELLO      | 84  | STRUNGET   |
+| 10  | PA ANO 5   | 35  | VERTABRA   | 60  | GLASSVOX   | 85  | BIRDLAND   |
+| 11  | MONSTER    | 36  | SLAP 1     | 61  | FRET NOT   | 86  | METAL\-1   |
+| 12  | GENVIV     | 37  | P\.ORGAN5  | 62  | ORGANISM   | 87  | METAL\-8   |
+| 13  | CLAVINET   | 38  | OCTAHORN   | 63  | LIMUIDZ    | 88  | FUNK ART   |
+| 14  | STRINGER   | 39  | LUSHNESS   | 64  | STRANGER   | 89  | METAL\-13  |
+| 15  | SIMONISK   | 40  | 12"GITAR   | 65  | PAPANO 7   | 90  | VIBES      |
+| 16  | HOTBODOM   | 41  | STAND UP   | 66  | WOW BASS   | 91  | STRING 6   |
+| 17  | XTASY      | 42  | BERT'S B   | 67  | P\.ORGAN4  | 92  | STRNGREZ   |
+| 18  | \)LIQUID\( | 43  | BRASS\-11  | 68  | MELOHORN   | 93  | SINGS      |
+| 19  | BED TRAK   | 44  | STRINGME   | 69  | LEED\-1    | 94  | TIMBOWS    |
+| 20  | ROADS      | 45  | LEED\-2    | 70  | TINYPIAN   | 95  | WHISTLE    |
+| 21  | ECHOWURL   | 46  | OW BASS    | 71  | SLAP 2     | 96  | OBERHORN   |
+| 22  | POLYPHON   | 47  | ORGAN\-1   | 72  | FORESTS    | 97  | TOOTS ?    |
+| 23  | DREAMER    | 48  | HORNISK    | 73  | HONOCLAB   | 98  | FIREBALL   |
+| 24  | HISTRUNG   | 49  | STRING\-1  | 74  | STRING 7   | 99  | SMPLTHIS   |
 
 ## BANK 2 : SYNTHS #1
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 200 | OBXA\-11   | 225 | 80MS DDL   | 250 | BRILLANT   | 275 | EGYPT      |
-| 201 | OBXA\-12   | 226 | SYNTH      | 251 | BROADWAY   | 276 | EP SWEP\*  |
-| 202 | OBXA\-A2   | 227 | AERIAL     | 252 | BS ETAK\*  | 277 | EPCH\+BRZ  |
-| 203 | OBXA\-A7   | 228 | ALIENSWP   | 253 | BURNHOUS   | 278 | EPDSTRT\*  |
-| 204 | OBXA\-B7   | 229 | AMBIANCE   | 254 | CAMERA 1   | 279 | ESQ\-1     |
-| 205 | OBXA\-B8   | 230 | ANAFTST\*  | 255 | CHIME 1    | 280 | ETHEREE    |
-| 206 | OBXA\-C2   | 231 | ANAHARP    | 256 | CHIME 2    | 281 | FAKE DDL   |
-| 207 | OBXA\-C4   | 232 | ANALOG B   | 257 | CHUNK      | 282 | FIFTHS     |
-| 208 | OBXA\-C6   | 233 | ANAXYLO\*  | 258 | CMI HIGH   | 283 | FLOATONG   |
-| 209 | OBXA\-C7   | 234 | ANGELS     | 259 | COEAUR 1   | 284 | FLPFLOP\*  |
-| 210 | OBXA\-C8   | 235 | APOLLO     | 260 | COLONY 9   | 285 | FLY TO     |
-| 211 | OBXA\-D2   | 236 | ARCANGEL   | 261 | CRYSLAKE   | 286 | FM BASS    |
-| 212 | OBXA\-D3   | 237 | ARGEX\-1   | 262 | CS\-80     | 287 | FUNDO      |
-| 213 | OBXA\-D4   | 238 | ARGON7     | 263 | DEACON     | 288 | \*FUNK ART |
-| 214 | OBXA\-D5   | 239 | ATYPICAL   | 264 | DEJAVUE'   | 289 | FUNKAY     |
-| 215 | OBXA\-D6   | 240 | AW WHY ?   | 265 | DIDIER     | 290 | FURYO      |
-| 216 | OBXA\-D7   | 241 | BENSHIMR   | 266 | DISTANCE   | 291 | FWEEP      |
-| 217 | OBXA\-D8   | 242 | BEOWCOMP   | 267 | DMACHINE   | 292 | S\.1       |
-| 218 | OBXA\-9"   | 243 | BILLY      | 268 | DREAMER    | 293 | GALACTIC   |
-| 219 | OBCA\-RE   | 244 | BLASZZ     | 269 | DREEMER    | 294 | GALLOP \*  |
-| 220 | OBXJMP     | 245 | BLOCKOUT   | 270 | DUCKTIME   | 295 | GENIVEEV   |
-| 221 | \*'ANGEL   | 246 | BOEPTYN\*  | 271 | DUNK IT    | 296 | GENVIV     |
-| 222 | \+ ZETA \+ | 247 | BOTTLES    | 272 | ENO1       | 297 | GENVIV\*   |
-| 223 | 1984SWP6   | 248 | BOUNCE\*   | 273 | ECHOSYN    | 298 | GIRLSWEP   |
-| 224 | WAVES      | 249 | BRASSVOX   | 274 | ECHOTRON   | 299 | GOOD BED   |
+| 00  | OBXA\-11   | 25  | 80MS DDL   | 50  | BRILLANT   | 75  | EGYPT      |
+| 01  | OBXA\-12   | 26  | SYNTH      | 51  | BROADWAY   | 76  | EP SWEP\*  |
+| 02  | OBXA\-A2   | 27  | AERIAL     | 52  | BS ETAK\*  | 77  | EPCH\+BRZ  |
+| 03  | OBXA\-A7   | 28  | ALIENSWP   | 53  | BURNHOUS   | 78  | EPDSTRT\*  |
+| 04  | OBXA\-B7   | 29  | AMBIANCE   | 54  | CAMERA 1   | 79  | ESQ\-1     |
+| 05  | OBXA\-B8   | 30  | ANAFTST\*  | 55  | CHIME 1    | 80  | ETHEREE    |
+| 06  | OBXA\-C2   | 31  | ANAHARP    | 56  | CHIME 2    | 81  | FAKE DDL   |
+| 07  | OBXA\-C4   | 32  | ANALOG B   | 57  | CHUNK      | 82  | FIFTHS     |
+| 08  | OBXA\-C6   | 33  | ANAXYLO\*  | 58  | CMI HIGH   | 83  | FLOATONG   |
+| 09  | OBXA\-C7   | 34  | ANGELS     | 59  | COEAUR 1   | 84  | FLPFLOP\*  |
+| 10  | OBXA\-C8   | 35  | APOLLO     | 60  | COLONY 9   | 85  | FLY TO     |
+| 11  | OBXA\-D2   | 36  | ARCANGEL   | 61  | CRYSLAKE   | 86  | FM BASS    |
+| 12  | OBXA\-D3   | 37  | ARGEX\-1   | 62  | CS\-80     | 87  | FUNDO      |
+| 13  | OBXA\-D4   | 38  | ARGON7     | 63  | DEACON     | 88  | \*FUNK ART |
+| 14  | OBXA\-D5   | 39  | ATYPICAL   | 64  | DEJAVUE'   | 89  | FUNKAY     |
+| 15  | OBXA\-D6   | 40  | AW WHY ?   | 65  | DIDIER     | 90  | FURYO      |
+| 16  | OBXA\-D7   | 41  | BENSHIMR   | 66  | DISTANCE   | 91  | FWEEP      |
+| 17  | OBXA\-D8   | 42  | BEOWCOMP   | 67  | DMACHINE   | 92  | S\.1       |
+| 18  | OBXA\-9"   | 43  | BILLY      | 68  | DREAMER    | 93  | GALACTIC   |
+| 19  | OBCA\-RE   | 44  | BLASZZ     | 69  | DREEMER    | 94  | GALLOP \*  |
+| 20  | OBXJMP     | 45  | BLOCKOUT   | 70  | DUCKTIME   | 95  | GENIVEEV   |
+| 21  | \*'ANGEL   | 46  | BOEPTYN\*  | 71  | DUNK IT    | 96  | GENVIV     |
+| 22  | \+ ZETA \+ | 47  | BOTTLES    | 72  | ENO1       | 97  | GENVIV\*   |
+| 23  | 1984SWP6   | 48  | BOUNCE\*   | 73  | ECHOSYN    | 98  | GIRLSWEP   |
+| 24  | WAVES      | 49  | BRASSVOX   | 74  | ECHOTRON   | 99  | GOOD BED   |
 
 ## BANK 3 : SYNTHS #2
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 300 | GOODTIME   | 325 | MATRIX 1   | 350 | PHASECHO   | 375 | SKTSOKY\*  |
-| 301 | GROTTO     | 326 | MATRIX 2   | 351 | PICKY      | 376 | SKY HIGH   |
-| 302 | HACKETT    | 327 | METABOAD   | 352 | PIPESTR    | 377 | SKYVOICE   |
-| 303 | HALO       | 328 | METABRD    | 353 | PN/FMSWP   | 378 | SLAPBACH   |
-| 304 | HARMOVOX   | 329 | MINDSEAR   | 354 | POLCHOIR   | 379 | SLIDSTG    |
-| 305 | HARPOON    | 330 | MONSTER    | 355 | POWER      | 380 | SLOW CRY   |
-| 306 | HELI\-IN   | 331 | MR KYRIE   | 356 | PROPHET1   | 381 | SLOWATER   |
-| 307 | HOMETOWN   | 332 | MUSICBOX   | 357 | PROPHET5   | 382 | SMTHSQ2\*  |
-| 308 | INTERSTL   | 333 | NAUTILUS   | 358 | PROPHETV   | 383 | SOFT MIX   |
-| 309 | ITSONICE   | 334 | NEW VOX    | 359 | PSYLITIS   | 384 | SOUNDPAD   |
-| 310 | JAZZQUIT   | 335 | NEWSOUND   | 360 | REZ\*PULS  | 385 | SOUNDTR\[  |
-| 311 | JM JARRE   | 336 | NIGHTPAD   | 361 | REZTFUL    | 386 | SPACE      |
-| 312 | JOHN B'S   | 337 | OB SWEEP   | 362 | SAMPLE     | 387 | SPACE/CO   |
-| 313 | KCEPMAX\*  | 338 | OB VOX\*   | 363 | SATURN     | 388 | SPARKLES   |
-| 314 | KCEPSAW\*  | 339 | OB\-INTRO  | 364 | SCIENCE    | 389 | SPLASH 1   |
-| 315 | KCHSYNC\*  | 340 | OBXA\-B2   | 365 | SCRITTI\+  | 390 | STELLAR\*  |
-| 316 | KIRKLAND   | 341 | OBXA\-B4   | 366 | SECRETS    | 391 | STUGROWL   |
-| 317 | LDSUBHRM   | 342 | OCTAVIA    | 367 | SENSIT 2   | 392 | STYX       |
-| 318 | LIKETHIS   | 343 | OPEN AIR   | 368 | SENSITIV   | 393 | SUBMARIN   |
-| 319 | LSTLAUGH   | 344 | ORDINARY   | 369 | SEQUINOX   | 394 | SUNDAY     |
-| 320 | LUN'AIR    | 345 | P CHORD    | 370 | SHANKAR    | 395 | SUSSUDIO   |
-| 321 | M\-CHOIR   | 346 | P\-PLUCK   | 371 | SHIMMER    | 396 | SWEPCORD   |
-| 322 | MAGICAL    | 347 | PAD        | 372 | SHIMRING   | 397 | SWRLEKO\*  |
-| 323 | MARIN      | 348 | PERC S     | 373 | SHIVERS    | 398 | SYN BOX\*  |
-| 324 | MATMODUL   | 349 | PHASE 5    | 374 | SKRCHTN\*  | 399 | SYNCAGE\*  |
+| 00  | GOODTIME   | 25  | MATRIX 1   | 50  | PHASECHO   | 75  | SKTSOKY\*  |
+| 01  | GROTTO     | 26  | MATRIX 2   | 51  | PICKY      | 76  | SKY HIGH   |
+| 02  | HACKETT    | 27  | METABOAD   | 52  | PIPESTR    | 77  | SKYVOICE   |
+| 03  | HALO       | 28  | METABRD    | 53  | PN/FMSWP   | 78  | SLAPBACH   |
+| 04  | HARMOVOX   | 29  | MINDSEAR   | 54  | POLCHOIR   | 79  | SLIDSTG    |
+| 05  | HARPOON    | 30  | MONSTER    | 55  | POWER      | 80  | SLOW CRY   |
+| 06  | HELI\-IN   | 31  | MR KYRIE   | 56  | PROPHET1   | 81  | SLOWATER   |
+| 07  | HOMETOWN   | 32  | MUSICBOX   | 57  | PROPHET5   | 82  | SMTHSQ2\*  |
+| 08  | INTERSTL   | 33  | NAUTILUS   | 58  | PROPHETV   | 83  | SOFT MIX   |
+| 09  | ITSONICE   | 34  | NEW VOX    | 59  | PSYLITIS   | 84  | SOUNDPAD   |
+| 10  | JAZZQUIT   | 35  | NEWSOUND   | 60  | REZ\*PULS  | 85  | SOUNDTR\[  |
+| 11  | JM JARRE   | 36  | NIGHTPAD   | 61  | REZTFUL    | 86  | SPACE      |
+| 12  | JOHN B'S   | 37  | OB SWEEP   | 62  | SAMPLE     | 87  | SPACE/CO   |
+| 13  | KCEPMAX\*  | 38  | OB VOX\*   | 63  | SATURN     | 88  | SPARKLES   |
+| 14  | KCEPSAW\*  | 39  | OB\-INTRO  | 64  | SCIENCE    | 89  | SPLASH 1   |
+| 15  | KCHSYNC\*  | 40  | OBXA\-B2   | 65  | SCRITTI\+  | 90  | STELLAR\*  |
+| 16  | KIRKLAND   | 41  | OBXA\-B4   | 66  | SECRETS    | 91  | STUGROWL   |
+| 17  | LDSUBHRM   | 42  | OCTAVIA    | 67  | SENSIT 2   | 92  | STYX       |
+| 18  | LIKETHIS   | 43  | OPEN AIR   | 68  | SENSITIV   | 93  | SUBMARIN   |
+| 19  | LSTLAUGH   | 44  | ORDINARY   | 69  | SEQUINOX   | 94  | SUNDAY     |
+| 20  | LUN'AIR    | 45  | P CHORD    | 70  | SHANKAR    | 95  | SUSSUDIO   |
+| 21  | M\-CHOIR   | 46  | P\-PLUCK   | 71  | SHIMMER    | 96  | SWEPCORD   |
+| 22  | MAGICAL    | 47  | PAD        | 72  | SHIMRING   | 97  | SWRLEKO\*  |
+| 23  | MARIN      | 48  | PERC S     | 73  | SHIVERS    | 98  | SYN BOX\*  |
+| 24  | MATMODUL   | 49  | PHASE 5    | 74  | SKRCHTN\*  | 99  | SYNCAGE\*  |
 
 ## BANK 4 : WOODWINDS & HORNS
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 400 | TOTOHORN   | 425 | BRECHER    | 450 | FLUTE TR   | 475 | JUBILEE    |
-| 401 | OBXA\-13   | 426 | BRTH FLT   | 451 | FLUTE\.    | 476 | KLARYNET   |
-| 402 | OBXA\-A1   | 427 | BRUTUS     | 452 | FLUTES     | 477 | KORGHORN   |
-| 403 | OBXA\-B1   | 428 | BRZIVIV\*  | 453 | FLUTEY     | 478 | LYRICON    |
-| 404 | OBXA\-C1   | 429 | BUCHANN\*  | 454 | FLUX       | 479 | MATRONE    |
-| 405 | OBXA\-D1   | 430 | BUZREED    | 455 | FM BRAZ    | 480 | MELFAZE\*  |
-| 406 | 6R BRASS   | 431 | CHROMA\-S  | 456 | FM DELAY   | 481 | MELOHORN   |
-| 407 | AGRESORN   | 432 | CLARINET   | 457 | FR\.HORN   | 482 | METHENY5   |
-| 408 | ALASKA     | 433 | CRAZHORN   | 458 | FNRCHRN\*  | 483 | MUTETRPT   |
-| 409 | ANA HIT\*  | 434 | CS\-80     | 459 | FTHWEEL\*  | 484 | OB BRASS   |
-| 410 | ANASUTL\*  | 435 | CUIVRE\(\( | 460 | FUE\.JAPN  | 485 | OB\-8      |
-| 411 | B'ARI/S2   | 436 | DBLREED\*  | 461 | FUSION     | 486 | OBERHORN   |
-| 412 | B/D\-ANA\* | 437 | EASTREED   | 462 | FWEEP      | 487 | OBOE       |
-| 413 | BAGPIPES   | 438 | EDGY       | 463 | GABRIEL    | 488 | OCT\.BRS   |
-| 414 | BARISAX    | 439 | ENSEMBL\*  | 464 | GO BED     | 489 | OCTAFLUT   |
-| 415 | BASCLRNT   | 440 | EUROPE     | 465 | GOLIATH    | 490 | OCTAHORN   |
-| 416 | BASSCLAR   | 441 | EWF HORN   | 466 | HORN'EM    | 491 | ORIENT     |
-| 417 | BASSOON    | 442 | EZYBRASS   | 467 | HORN\-1    | 492 | PEDSWP\*   |
-| 418 | BENDHORN   | 443 | FACTORY    | 468 | HORNENS    | 493 | PEG\-BRS   |
-| 419 | BIGBRA\$\$ | 444 | FIFTHS     | 469 | HORNFALL   | 494 | PYRMFLT\*  |
-| 420 | BONES      | 445 | FLGLHORN   | 470 | HORNSAS    | 495 | RAHOOOL\*  |
-| 421 | BRASRAMP   | 446 | FLOOT      | 471 | HORNY      | 496 | RECORDER   |
-| 422 | BTRASSVOX  | 447 | FLUGELHN   | 472 | HRNSHAKE   | 497 | RELVELHO   |
-| 423 | BRASSY     | 448 | FLUGLE     | 473 | J HAMMER   | 498 | RICHCORD   |
-| 424 | BRAZEN     | 449 | FLUTE      | 474 | JTULLFLT   | 499 | ROMAN      |
+| 00  | TOTOHORN   | 25  | BRECHER    | 50  | FLUTE TR   | 75  | JUBILEE    |
+| 01  | OBXA\-13   | 26  | BRTH FLT   | 51  | FLUTE\.    | 76  | KLARYNET   |
+| 02  | OBXA\-A1   | 27  | BRUTUS     | 52  | FLUTES     | 77  | KORGHORN   |
+| 03  | OBXA\-B1   | 28  | BRZIVIV\*  | 53  | FLUTEY     | 78  | LYRICON    |
+| 04  | OBXA\-C1   | 29  | BUCHANN\*  | 54  | FLUX       | 79  | MATRONE    |
+| 05  | OBXA\-D1   | 30  | BUZREED    | 55  | FM BRAZ    | 80  | MELFAZE\*  |
+| 06  | 6R BRASS   | 31  | CHROMA\-S  | 56  | FM DELAY   | 81  | MELOHORN   |
+| 07  | AGRESORN   | 32  | CLARINET   | 57  | FR\.HORN   | 82  | METHENY5   |
+| 08  | ALASKA     | 33  | CRAZHORN   | 58  | FNRCHRN\*  | 83  | MUTETRPT   |
+| 09  | ANA HIT\*  | 34  | CS\-80     | 59  | FTHWEEL\*  | 84  | OB BRASS   |
+| 10  | ANASUTL\*  | 35  | CUIVRE\(\( | 60  | FUE\.JAPN  | 85  | OB\-8      |
+| 11  | B'ARI/S2   | 36  | DBLREED\*  | 61  | FUSION     | 86  | OBERHORN   |
+| 12  | B/D\-ANA\* | 37  | EASTREED   | 62  | FWEEP      | 87  | OBOE       |
+| 13  | BAGPIPES   | 38  | EDGY       | 63  | GABRIEL    | 88  | OCT\.BRS   |
+| 14  | BARISAX    | 39  | ENSEMBL\*  | 64  | GO BED     | 89  | OCTAFLUT   |
+| 15  | BASCLRNT   | 40  | EUROPE     | 65  | GOLIATH    | 90  | OCTAHORN   |
+| 16  | BASSCLAR   | 41  | EWF HORN   | 66  | HORN'EM    | 91  | ORIENT     |
+| 17  | BASSOON    | 42  | EZYBRASS   | 67  | HORN\-1    | 92  | PEDSWP\*   |
+| 18  | BENDHORN   | 43  | FACTORY    | 68  | HORNENS    | 93  | PEG\-BRS   |
+| 19  | BIGBRA\$\$ | 44  | FIFTHS     | 69  | HORNFALL   | 94  | PYRMFLT\*  |
+| 20  | BONES      | 45  | FLGLHORN   | 70  | HORNSAS    | 95  | RAHOOOL\*  |
+| 21  | BRASRAMP   | 46  | FLOOT      | 71  | HORNY      | 96  | RECORDER   |
+| 22  | BTRASSVOX  | 47  | FLUGELHN   | 72  | HRNSHAKE   | 97  | RELVELHO   |
+| 23  | BRASSY     | 48  | FLUGLE     | 73  | J HAMMER   | 98  | RICHCORD   |
+| 24  | BRAZEN     | 49  | FLUTE      | 74  | JTULLFLT   | 99  | ROMAN      |
 
 ## BANK 5 : HORNS & LEADS
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 500 | SEXAFOAM   | 525 | TUBA 2     | 550 | JIMY'SRG   | 575 | REZLEAD\*  |
-| 501 | SLO HRN    | 526 | OBXA\-A8   | 551 | KC LEAD\*  | 576 | SAWLEAD\*  |
-| 502 | SOPIPES    | 527 | ELEAD\*    | 552 | KIDDING?   | 577 | SITAR      |
-| 503 | SPATBRS\*  | 528 | BDTH\-2    | 553 | LEAD\+PRT  | 578 | SMOOTH     |
-| 504 | SQUARDOU   | 529 | BIRDY      | 554 | LEAD\-1    | 579 | SMUTHSQ\*  |
-| 505 | STAB       | 530 | BRECKERL   | 555 | LEAD\-3    | 580 | SOLO       |
-| 506 | STAB\-BRS  | 531 | CASTILLO   | 556 | LEED\-1    | 581 | SOLODARM   |
-| 507 | STEPS 2\.  | 532 | CHICK      | 557 | LEED\-2    | 582 | SOLOPROF   |
-| 508 | STUFLUTE   | 533 | DESTROY\+  | 558 | LYLE 2     | 583 | SOLOSYNC   |
-| 509 | SWRLYBRD   | 534 | DIGRUNGE   | 559 | LYLE 3 M   | 584 | SOLOW\*    |
-| 510 | SYN SAX\*  | 535 | DRAGON\-3  | 560 | METHENEY   | 585 | SOPIPES    |
-| 511 | SYNBASS    | 536 | DXINDIAN   | 561 | METLSOLO   | 586 | SPITLEED   |
-| 512 | SYNBONE    | 537 | FEEDBAK6   | 562 | MILESCOM   | 587 | SQARELED   |
-| 513 | SYNBRSS\*  | 538 | FEEDBAK8   | 563 | MINIMOGG   | 588 | STUVIB     |
-| 514 | SYNHORN    | 539 | FEEDGIT    | 564 | MINIMOOG   | 589 | SUSGUIT    |
-| 515 | TBRAZZ     | 540 | FIFTH I%   | 565 | MONOSTRG   | 590 | SNTHE 5    |
-| 516 | TENOR      | 541 | FIFTHLIX   | 566 | NASTY      | 591 | UKSOLO     |
-| 517 | TOTOAL     | 542 | GLASLEED   | 567 | OB LEAD\*  | 592 | UNIBASS    |
-| 518 | TOUCH\+GO  | 543 | GROWLBRS   | 568 | OSC SYNC   | 593 | UNIWAVE    |
-| 519 | TRILLFLT   | 544 | H\-LEAD    | 569 | PANFLOET   | 594 | WAKEMANS   |
-| 520 | TRMBONE\*  | 545 | HILEED 6   | 570 | PINKLEAD   | 595 | WEIRDPRC   |
-| 521 | TROMBONE   | 546 | J HAMMER   | 571 | POWRSOLO   | 596 | WHISTLER   |
-| 522 | TRUMPETS   | 547 | JAKOLEED   | 572 | PRSSLIDE   | 597 | WINAND 1   |
-| 523 | TRUPT\-EU  | 548 | JAN LEAD   | 573 | QUINCY     | 598 | XA'SOLO    |
-| 524 | \* 99 \*   | 549 | JAZZ       | 574 | RECORDER   | 599 | ZAW'QART   |
+| 00  | SEXAFOAM   | 25  | TUBA 2     | 50  | JIMY'SRG   | 75  | REZLEAD\*  |
+| 01  | SLO HRN    | 26  | OBXA\-A8   | 51  | KC LEAD\*  | 76  | SAWLEAD\*  |
+| 02  | SOPIPES    | 27  | ELEAD\*    | 52  | KIDDING?   | 77  | SITAR      |
+| 03  | SPATBRS\*  | 28  | BDTH\-2    | 53  | LEAD\+PRT  | 78  | SMOOTH     |
+| 04  | SQUARDOU   | 29  | BIRDY      | 54  | LEAD\-1    | 79  | SMUTHSQ\*  |
+| 05  | STAB       | 30  | BRECKERL   | 55  | LEAD\-3    | 80  | SOLO       |
+| 06  | STAB\-BRS  | 31  | CASTILLO   | 56  | LEED\-1    | 81  | SOLODARM   |
+| 07  | STEPS 2\.  | 32  | CHICK      | 57  | LEED\-2    | 82  | SOLOPROF   |
+| 08  | STUFLUTE   | 33  | DESTROY\+  | 58  | LYLE 2     | 83  | SOLOSYNC   |
+| 09  | SWRLYBRD   | 34  | DIGRUNGE   | 59  | LYLE 3 M   | 84  | SOLOW\*    |
+| 10  | SYN SAX\*  | 35  | DRAGON\-3  | 60  | METHENEY   | 85  | SOPIPES    |
+| 11  | SYNBASS    | 36  | DXINDIAN   | 61  | METLSOLO   | 86  | SPITLEED   |
+| 12  | SYNBONE    | 37  | FEEDBAK6   | 62  | MILESCOM   | 87  | SQARELED   |
+| 13  | SYNBRSS\*  | 38  | FEEDBAK8   | 63  | MINIMOGG   | 88  | STUVIB     |
+| 14  | SYNHORN    | 39  | FEEDGIT    | 64  | MINIMOOG   | 89  | SUSGUIT    |
+| 15  | TBRAZZ     | 40  | FIFTH I%   | 65  | MONOSTRG   | 90  | SNTHE 5    |
+| 16  | TENOR      | 41  | FIFTHLIX   | 66  | NASTY      | 91  | UKSOLO     |
+| 17  | TOTOAL     | 42  | GLASLEED   | 67  | OB LEAD\*  | 92  | UNIBASS    |
+| 18  | TOUCH\+GO  | 43  | GROWLBRS   | 68  | OSC SYNC   | 93  | UNIWAVE    |
+| 19  | TRILLFLT   | 44  | H\-LEAD    | 69  | PANFLOET   | 94  | WAKEMANS   |
+| 20  | TRMBONE\*  | 45  | HILEED 6   | 70  | PINKLEAD   | 95  | WEIRDPRC   |
+| 21  | TROMBONE   | 46  | J HAMMER   | 71  | POWRSOLO   | 96  | WHISTLER   |
+| 22  | TRUMPETS   | 47  | JAKOLEED   | 72  | PRSSLIDE   | 97  | WINAND 1   |
+| 23  | TRUPT\-EU  | 48  | JAN LEAD   | 73  | QUINCY     | 98  | XA'SOLO    |
+| 24  | \* 99 \*   | 49  | JAZZ       | 74  | RECORDER   | 99  | ZAW'QART   |
 
 ## BANK 6 : STRINGS
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 600 | OBXA\-10   | 625 | DEEPCAVE   | 650 | NOISTGS    | 675 | SLIDSTG    |
-| 601 | OBXA\-14   | 626 | DEPTHS     | 651 | OB A3PD\*  | 676 | SLOW BOW   |
-| 602 | OBXA\-A3   | 627 | DLAYSTR\*  | 652 | OB\-STR1N  | 677 | SLOW CRY   |
-| 603 | OBXA\-B3   | 628 | DONSTRIG   | 653 | OB\-STRGS  | 678 | SMASH      |
-| 604 | OBXA\-B6   | 629 | DOU'CIEL   | 654 | OBSTRING   | 679 | SOLEMN     |
-| 605 | OBXA\-C3   | 630 | DUNGEON    | 655 | OBXA\-A6   | 680 | SOLEMNIS   |
-| 606 | OBXA       | 631 | DYNASTY    | 656 | OCARINA    | 681 | SOLO       |
-| 607 | OBXA\-6    | 632 | E\.VIOLIN  | 657 | OCHESTRY   | 682 | SOUNDTR    |
-| 608 | \(ARCO\)01 | 633 | FAMUS\*OB  | 658 | OPENSTRG   | 683 | SOUNDTRK   |
-| 609 | \*'CANOPY  | 634 | FORESTS    | 659 | ORCH\*     | 684 | SOUNDTR\[  |
-| 610 | 1000STRG   | 635 | GRANULES   | 660 | ORIENT     | 685 | SRTRONGS   |
-| 611 | TOP        | 636 | GREAT"OB   | 661 | PITZ STR   | 686 | STAND UP   |
-| 612 | 2000STRG   | 637 | HARMONIC   | 662 | PIZZ^\+P2  | 687 | STR END\*  |
-| 613 | AGITATO\*  | 638 | ICY\-CHRD  | 663 | PLANET P   | 688 | STR\-8VA   |
-| 614 | ALL LOVE   | 639 | INDNSTRG   | 664 | POLSTRG2   | 689 | STRANGER   |
-| 615 | ALT84TOP   | 640 | LOWSTRNG   | 665 | PROHET\-5  | 690 | STREENG    |
-| 616 | BED TRAK   | 641 | LOYAL      | 666 | PROPHET5   | 691 | STREENGS   |
-| 617 | BLACSEAM   | 642 | LUSHNESS   | 667 | RID ZEP    | 692 | STRING 2   |
-| 618 | BOW IT     | 643 | LYLE\-8VA  | 668 | ROYAL PH   | 693 | STRING 6   |
-| 619 | BOW VIOL   | 644 | MELLO=14   | 669 | RP STRG5   | 694 | STRING 7   |
-| 620 | CELLO      | 645 | MKSINGS    | 670 | SECRETS'   | 695 | STRING 8   |
-| 621 | CHAMBER    | 646 | MONEY \$\$ | 671 | SHARPBOW   | 696 | STRING S   |
-| 622 | CHILLO     | 647 | MUTEDSTR   | 672 | SHIFT      | 697 | STRING"8   |
-| 623 | CLASSIKA   | 648 | MZSTRING   | 673 | SHRTSTRG   | 698 | STRING\-1  |
-| 624 | CONCERT    | 649 | NOBLE      | 674 | SINGS      | 699 | STRINGER   |
+| 00  | OBXA\-10   | 25  | DEEPCAVE   | 50  | NOISTGS    | 75  | SLIDSTG    |
+| 01  | OBXA\-14   | 26  | DEPTHS     | 51  | OB A3PD\*  | 76  | SLOW BOW   |
+| 02  | OBXA\-A3   | 27  | DLAYSTR\*  | 52  | OB\-STR1N  | 77  | SLOW CRY   |
+| 03  | OBXA\-B3   | 28  | DONSTRIG   | 53  | OB\-STRGS  | 78  | SMASH      |
+| 04  | OBXA\-B6   | 29  | DOU'CIEL   | 54  | OBSTRING   | 79  | SOLEMN     |
+| 05  | OBXA\-C3   | 30  | DUNGEON    | 55  | OBXA\-A6   | 80  | SOLEMNIS   |
+| 06  | OBXA       | 31  | DYNASTY    | 56  | OCARINA    | 81  | SOLO       |
+| 07  | OBXA\-6    | 32  | E\.VIOLIN  | 57  | OCHESTRY   | 82  | SOUNDTR    |
+| 08  | \(ARCO\)01 | 33  | FAMUS\*OB  | 58  | OPENSTRG   | 83  | SOUNDTRK   |
+| 09  | \*'CANOPY  | 34  | FORESTS    | 59  | ORCH\*     | 84  | SOUNDTR\[  |
+| 10  | 1000STRG   | 35  | GRANULES   | 60  | ORIENT     | 85  | SRTRONGS   |
+| 11  | TOP        | 36  | GREAT"OB   | 61  | PITZ STR   | 86  | STAND UP   |
+| 12  | 2000STRG   | 37  | HARMONIC   | 62  | PIZZ^\+P2  | 87  | STR END\*  |
+| 13  | AGITATO\*  | 38  | ICY\-CHRD  | 63  | PLANET P   | 88  | STR\-8VA   |
+| 14  | ALL LOVE   | 39  | INDNSTRG   | 64  | POLSTRG2   | 89  | STRANGER   |
+| 15  | ALT84TOP   | 40  | LOWSTRNG   | 65  | PROHET\-5  | 90  | STREENG    |
+| 16  | BED TRAK   | 41  | LOYAL      | 66  | PROPHET5   | 91  | STREENGS   |
+| 17  | BLACSEAM   | 42  | LUSHNESS   | 67  | RID ZEP    | 92  | STRING 2   |
+| 18  | BOW IT     | 43  | LYLE\-8VA  | 68  | ROYAL PH   | 93  | STRING 6   |
+| 19  | BOW VIOL   | 44  | MELLO=14   | 69  | RP STRG5   | 94  | STRING 7   |
+| 20  | CELLO      | 45  | MKSINGS    | 70  | SECRETS'   | 95  | STRING 8   |
+| 21  | CHAMBER    | 46  | MONEY \$\$ | 71  | SHARPBOW   | 96  | STRING S   |
+| 22  | CHILLO     | 47  | MUTEDSTR   | 72  | SHIFT      | 97  | STRING"8   |
+| 23  | CLASSIKA   | 48  | MZSTRING   | 73  | SHRTSTRG   | 98  | STRING\-1  |
+| 24  | CONCERT    | 49  | NOBLE      | 74  | SINGS      | 99  | STRINGER   |
 
 ## BANK 7 : BASSES
 
 | \#  | Patch Name     | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | -------------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 700 | \*\*A\!A\!\*\* | 725 | BOWBASS    | 750 | MINIBASS   | 775 | SLOWBASS   |
-| 701 | 2600\-2        | 726 | BRAAS      | 751 | MONO BS\*  | 776 | SNTHBS1\*  |
-| 702 | AGREBASS       | 727 | BS/STRG\*  | 752 | MOOGER     | 777 | SOFTBASS   |
-| 703 | ANTEATER       | 728 | UNI BASS   | 753 | MOOOG\_B   | 778 | SPITBASS   |
-| 704 | ARP\-2600      | 729 | CLAVBASS   | 754 | MUFFEL     | 779 | SQUISBAZ   |
-| 705 | ATYPBASS       | 730 | BOUBLEBS   | 755 | NOISBASS   | 780 | STAND UP   |
-| 706 | AXXE           | 731 | DUCK 2     | 756 | OCTABASS   | 781 | STBASS     |
-| 707 | BARISAX        | 732 | DUCKBASS   | 757 | ORBASS     | 782 | STR\.BASS  |
-| 708 | BASS PAD       | 733 | EARTHESS   | 758 | OW BASS    | 783 | STRANGTK   |
-| 709 | BASS SYN       | 734 | ELC BASS   | 759 | PABASS\*   | 784 | STRIBASS   |
-| 710 | BASS ZZT       | 735 | ELEC BS\*  | 760 | PLUCK\-BS  | 785 | WET BAZ    |
-| 711 | BASS\-11       | 736 | FANKNBAZ   | 761 | POLBASS1   | 786 | STRINGBZ   |
-| 712 | BASSA          | 737 | FAZ BASS   | 762 | POLYBASS   | 787 | SUGITA"    |
-| 713 | BASSCLAR       | 738 | FLOORIT    | 763 | PUKBASS    | 788 | SUPPORT    |
-| 714 | TUBULAR        | 739 | FRET EKO   | 764 | R\+B       | 789 | SWELLBAZ   |
-| 715 | BASSE OA       | 740 | FRET NOT   | 765 | RAGABASS   | 790 | SWP\.BASS  |
-| 716 | BASSGTAR       | 741 | FUNK BAZ   | 766 | VELBASS    | 791 | SYBASS 2   |
-| 717 | BASSHIPO       | 742 | HARMBAS5   | 767 | RUBBER     | 792 | SYN BS2\*  |
-| 718 | BASSHORN       | 743 | HISBASS    | 768 | SEQUBASS   | 793 | SYN BS3\*  |
-| 719 | BASSVIOL       | 744 | HOTBODOM   | 769 | VELGROWL   | 794 | SYN BS4\*  |
-| 720 | BASSVOX        | 745 | JAN BASS   | 770 | SINCBASS   | 795 | SYNCBASS   |
-| 721 | BIG PIK        | 746 | JOCKO      | 771 | WAPBASS    | 796 | TAURUS     |
-| 722 | BIRDLAND       | 747 | JOCKO 2    | 772 | SLAP 1     | 797 | TENU'OB2   |
-| 723 | BOLUBASS       | 748 | LEEDBASS   | 773 | SLAP 2     | 798 | WIPBASS    |
-| 724 | BOTBASS        | 749 | LUMPBASS   | 774 | SLIDER     | 799 | TIKBASS    |
+| 00  | \*\*A\!A\!\*\* | 25  | BOWBASS    | 50  | MINIBASS   | 75  | SLOWBASS   |
+| 01  | 2600\-2        | 26  | BRAAS      | 51  | MONO BS\*  | 76  | SNTHBS1\*  |
+| 02  | AGREBASS       | 27  | BS/STRG\*  | 52  | MOOGER     | 77  | SOFTBASS   |
+| 03  | ANTEATER       | 28  | UNI BASS   | 53  | MOOOG\_B   | 78  | SPITBASS   |
+| 04  | ARP\-2600      | 29  | CLAVBASS   | 54  | MUFFEL     | 79  | SQUISBAZ   |
+| 05  | ATYPBASS       | 30  | BOUBLEBS   | 55  | NOISBASS   | 80  | STAND UP   |
+| 06  | AXXE           | 31  | DUCK 2     | 56  | OCTABASS   | 81  | STBASS     |
+| 07  | BARISAX        | 32  | DUCKBASS   | 57  | ORBASS     | 82  | STR\.BASS  |
+| 08  | BASS PAD       | 33  | EARTHESS   | 58  | OW BASS    | 83  | STRANGTK   |
+| 09  | BASS SYN       | 34  | ELC BASS   | 59  | PABASS\*   | 84  | STRIBASS   |
+| 10  | BASS ZZT       | 35  | ELEC BS\*  | 60  | PLUCK\-BS  | 85  | WET BAZ    |
+| 11  | BASS\-11       | 36  | FANKNBAZ   | 61  | POLBASS1   | 86  | STRINGBZ   |
+| 12  | BASSA          | 37  | FAZ BASS   | 62  | POLYBASS   | 87  | SUGITA"    |
+| 13  | BASSCLAR       | 38  | FLOORIT    | 63  | PUKBASS    | 88  | SUPPORT    |
+| 14  | TUBULAR        | 39  | FRET EKO   | 64  | R\+B       | 89  | SWELLBAZ   |
+| 15  | BASSE OA       | 40  | FRET NOT   | 65  | RAGABASS   | 90  | SWP\.BASS  |
+| 16  | BASSGTAR       | 41  | FUNK BAZ   | 66  | VELBASS    | 91  | SYBASS 2   |
+| 17  | BASSHIPO       | 42  | HARMBAS5   | 67  | RUBBER     | 92  | SYN BS2\*  |
+| 18  | BASSHORN       | 43  | HISBASS    | 68  | SEQUBASS   | 93  | SYN BS3\*  |
+| 19  | BASSVIOL       | 44  | HOTBODOM   | 69  | VELGROWL   | 94  | SYN BS4\*  |
+| 20  | BASSVOX        | 45  | JAN BASS   | 70  | SINCBASS   | 95  | SYNCBASS   |
+| 21  | BIG PIK        | 46  | JOCKO      | 71  | WAPBASS    | 96  | TAURUS     |
+| 22  | BIRDLAND       | 47  | JOCKO 2    | 72  | SLAP 1     | 97  | TENU'OB2   |
+| 23  | BOLUBASS       | 48  | LEEDBASS   | 73  | SLAP 2     | 98  | WIPBASS    |
+| 24  | BOTBASS        | 49  | LUMPBASS   | 74  | SLIDER     | 99  | TIKBASS    |
 
 ## BANK 8 : FX & PERC
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 800 | AK\-48     | 825 | DREAMING   | 850 | JETTZ 3    | 875 | NOIZGATE   |
-| 801 | APORT      | 826 | DRIFTER\*  | 851 | JUNKANOO   | 876 | NTHENEWS   |
-| 802 | BALLGAME   | 827 | DRUMPOP    | 852 | WETFEET    | 877 | NUKE EM'   |
-| 803 | BANJO      | 828 | DUNDERZ    | 853 | KINGONG    | 878 | OCIEAN     |
-| 804 | BASSDRUM   | 829 | DX\-PLUCK  | 854 | KONTAKTE   | 879 | OCEANWAV   |
-| 805 | BDTH\-1    | 830 | TURBO      | 855 | LCTRCUTE   | 880 | OOZES 3    |
-| 806 | BELL 1     | 831 | FALLCHYM   | 856 | WHIZZ      | 881 | PHASES\*   |
-| 807 | BELLIKE    | 832 | FIREBALL   | 857 | LFO ART    | 882 | PINWHEEL   |
-| 808 | BELLS      | 833 | FLAME ON   | 858 | LFOMALET   | 883 | PLUCK      |
-| 809 | BELLS\-GS  | 834 | FLEXTONE   | 859 | LIFTOFF    | 884 | POLBELS2   |
-| 810 | BI\-PLANE  | 835 | FMPLUKS    | 860 | LOOPBELL   | 885 | POLNOISE   |
-| 811 | BOTTLES    | 836 | FURYO 2    | 861 | LYLE 3 P   | 886 | PORTAL     |
-| 812 | BTMEHRDR   | 837 | G\.S\.2    | 862 | LYLES'     | 887 | PSYCHYM    |
-| 813 | BURST 1    | 838 | G\.S\.3    | 863 | THUNDRUS   | 888 | RAINECHO   |
-| 814 | CASCAD'4   | 839 | GLOCK      | 864 | MACHINSM   | 889 | \)RAPIST\( |
-| 815 | CHIMES     | 840 | WINDS      | 865 | MANIAC\*   | 890 | WATER      |
-| 816 | CHIMES\*   | 841 | HAUNTING   | 866 | MARIMA     | 891 | RUBRTOMS   |
-| 817 | CHOPPERZ   | 842 | HEART      | 867 | MOFO       | 892 | SATURDAY   |
-| 818 | COINOP 3   | 843 | ZAP        | 868 | MEMORIES   | 893 | SCRATCH    |
-| 819 | COPOLIPS   | 844 | HORRORS    | 869 | MOUNTAIN   | 894 | SEQEUNCE   |
-| 820 | CRAZYMAN   | 845 | HOWITZER   | 870 | MRIMBAH\*  | 895 | SGUSTING   |
-| 821 | CRICKET    | 846 | HVN\+HELL  | 871 | NASTEEZ    | 896 | SHRNKRAY   |
-| 822 | CROZTALK   | 847 | INDIAN     | 872 | WARNINGS   | 897 | SIMONISK   |
-| 823 | DB BELL    | 848 | TOP\-GUN\* | 873 | NOISE\-DN  | 898 | SMASH\*    |
-| 824 | DIDIER     | 849 | INSIDES    | 874 | NOISSWEP\* | 899 | SMPLTHIS   |
+| 00  | AK\-48     | 25  | DREAMING   | 50  | JETTZ 3    | 75  | NOIZGATE   |
+| 01  | APORT      | 26  | DRIFTER\*  | 51  | JUNKANOO   | 76  | NTHENEWS   |
+| 02  | BALLGAME   | 27  | DRUMPOP    | 52  | WETFEET    | 77  | NUKE EM'   |
+| 03  | BANJO      | 28  | DUNDERZ    | 53  | KINGONG    | 78  | OCIEAN     |
+| 04  | BASSDRUM   | 29  | DX\-PLUCK  | 54  | KONTAKTE   | 79  | OCEANWAV   |
+| 05  | BDTH\-1    | 30  | TURBO      | 55  | LCTRCUTE   | 80  | OOZES 3    |
+| 06  | BELL 1     | 31  | FALLCHYM   | 56  | WHIZZ      | 81  | PHASES\*   |
+| 07  | BELLIKE    | 32  | FIREBALL   | 57  | LFO ART    | 82  | PINWHEEL   |
+| 08  | BELLS      | 33  | FLAME ON   | 58  | LFOMALET   | 83  | PLUCK      |
+| 09  | BELLS\-GS  | 34  | FLEXTONE   | 59  | LIFTOFF    | 84  | POLBELS2   |
+| 10  | BI\-PLANE  | 35  | FMPLUKS    | 60  | LOOPBELL   | 85  | POLNOISE   |
+| 11  | BOTTLES    | 36  | FURYO 2    | 61  | LYLE 3 P   | 86  | PORTAL     |
+| 12  | BTMEHRDR   | 37  | G\.S\.2    | 62  | LYLES'     | 87  | PSYCHYM    |
+| 13  | BURST 1    | 38  | G\.S\.3    | 63  | THUNDRUS   | 88  | RAINECHO   |
+| 14  | CASCAD'4   | 39  | GLOCK      | 64  | MACHINSM   | 89  | \)RAPIST\( |
+| 15  | CHIMES     | 40  | WINDS      | 65  | MANIAC\*   | 90  | WATER      |
+| 16  | CHIMES\*   | 41  | HAUNTING   | 66  | MARIMA     | 91  | RUBRTOMS   |
+| 17  | CHOPPERZ   | 42  | HEART      | 67  | MOFO       | 92  | SATURDAY   |
+| 18  | COINOP 3   | 43  | ZAP        | 68  | MEMORIES   | 93  | SCRATCH    |
+| 19  | COPOLIPS   | 44  | HORRORS    | 69  | MOUNTAIN   | 94  | SEQEUNCE   |
+| 20  | CRAZYMAN   | 45  | HOWITZER   | 70  | MRIMBAH\*  | 95  | SGUSTING   |
+| 21  | CRICKET    | 46  | HVN\+HELL  | 71  | NASTEEZ    | 96  | SHRNKRAY   |
+| 22  | CROZTALK   | 47  | INDIAN     | 72  | WARNINGS   | 97  | SIMONISK   |
+| 23  | DB BELL    | 48  | TOP\-GUN\* | 73  | NOISE\-DN  | 98  | SMASH\*    |
+| 24  | DIDIER     | 49  | INSIDES    | 74  | NOISSWEP\* | 99  | SMPLTHIS   |
 
 ## BANK 9 : KEYBOARDS
 
 | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name | \#  | Patch Name |
 | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- |
-| 900 | PAPANO 4   | 925 | P\.ORGAN4  | 950 | PROPHET    | 975 | TONYPIAN   |
-| 901 | MIKPIANO   | 926 | P\.ORGAN5  | 951 | RESPIANO   | 976 | TOYPIANO   |
-| 902 | HONOCLAB   | 927 | PA ANO 5   | 952 | RMIPIANO   | 977 | TWINSTRG   |
-| 903 | MR\.ROGRS  | 928 | HARPO      | 953 | ROADS      | 978 | CHURCH     |
-| 904 | MTL PNO\*  | 929 | PAPANO 7   | 954 | SAL00N 5   | 979 | VIBECHOES  |
-| 905 | MUSETTE    | 930 | LULLABOX   | 955 | SALOON 3   | 980 | VIBES      |
-| 906 | MUTDCLV\*  | 931 | PERCCLAV   | 956 | B\-3\.2    | 981 | CLAV B6    |
-| 907 | MUTRONO    | 932 | PERCPNO    | 957 | SALOON 7   | 982 | CLAVI 2    |
-| 908 | NYLNPIK\*  | 933 | PIANITAR   | 958 | SAMPLORG   | 983 | WA CLAB\*  |
-| 909 | NYLNPK2\*  | 934 | PIANO      | 959 | SAMSGRND   | 984 | CLAVINET   |
-| 910 | NYLON 12   | 935 | PIANO BO   | 960 | SITAR I    | 985 | WHAANO     |
-| 911 | OB8 JUMP   | 936 | PIANOLA    | 961 | SMTHSQ2\*  | 986 | WHY FM     |
-| 912 | OBNOXVOX   | 937 | B\-3\.1    | 962 | SPANIEL    | 987 | CLICKORG   |
-| 913 | OBXA\-B5   | 938 | PINPIANO   | 963 | SPRPRTS\*  | 988 | WURLI8     |
-| 914 | ODX 7      | 939 | PIPEORG\.  | 964 | B\-3\.3    | 989 | CLUBS      |
-| 915 | OORGAN     | 940 | PIPEORG:   | 965 | B3\+LSLIE  | 990 | WURLY 2    |
-| 916 | LAZ HARP   | 941 | PIPES      | 966 | STRGTR2\*  | 991 | WURLY 3    |
-| 917 | ORGAN 9    | 942 | PIPSTRNG   | 967 | SYN CLAV   | 992 | X\-GRAND   |
-| 918 | ORGAN\-1   | 943 | PIRATES\!  | 968 | BELLS      | 993 | XA'ORGAN   |
-| 919 | ORGAN\-1P  | 944 | PNO\-ELEC  | 969 | SYNLUTH    | 994 | YOUREYES   |
-| 920 | ORGAN\-2   | 945 | POLPIANP   | 970 | BLABINET   | 995 | ZITHER     |
-| 921 | ORGANISM   | 946 | PRELUDE1   | 971 | SYNPIANO   | 996 | CORDINE1   |
-| 922 | AKOUSTIK   | 947 | PRESLEZ1   | 972 | CELESTE    | 997 | D'AMMOND   |
-| 923 | ORGNIZE\*  | 948 | PROFIT     | 973 | CHIMES     | 998 | GREEZY1    |
-| 924 | P\.ORGAN   | 949 | PROPH W    | 974 | TINEOUT    | 999 | GRNDR 6\*  |
+| 00  | PAPANO 4   | 25  | P\.ORGAN4  | 50  | PROPHET    | 75  | TONYPIAN   |
+| 01  | MIKPIANO   | 26  | P\.ORGAN5  | 51  | RESPIANO   | 76  | TOYPIANO   |
+| 02  | HONOCLAB   | 27  | PA ANO 5   | 52  | RMIPIANO   | 77  | TWINSTRG   |
+| 03  | MR\.ROGRS  | 28  | HARPO      | 53  | ROADS      | 78  | CHURCH     |
+| 04  | MTL PNO\*  | 29  | PAPANO 7   | 54  | SAL00N 5   | 79  | VIBECHOES  |
+| 05  | MUSETTE    | 30  | LULLABOX   | 55  | SALOON 3   | 80  | VIBES      |
+| 06  | MUTDCLV\*  | 31  | PERCCLAV   | 56  | B\-3\.2    | 81  | CLAV B6    |
+| 07  | MUTRONO    | 32  | PERCPNO    | 57  | SALOON 7   | 82  | CLAVI 2    |
+| 08  | NYLNPIK\*  | 33  | PIANITAR   | 58  | SAMPLORG   | 83  | WA CLAB\*  |
+| 09  | NYLNPK2\*  | 34  | PIANO      | 59  | SAMSGRND   | 84  | CLAVINET   |
+| 10  | NYLON 12   | 35  | PIANO BO   | 60  | SITAR I    | 85  | WHAANO     |
+| 11  | OB8 JUMP   | 36  | PIANOLA    | 61  | SMTHSQ2\*  | 86  | WHY FM     |
+| 12  | OBNOXVOX   | 37  | B\-3\.1    | 62  | SPANIEL    | 87  | CLICKORG   |
+| 13  | OBXA\-B5   | 38  | PINPIANO   | 63  | SPRPRTS\*  | 88  | WURLI8     |
+| 14  | ODX 7      | 39  | PIPEORG\.  | 64  | B\-3\.3    | 89  | CLUBS      |
+| 15  | OORGAN     | 40  | PIPEORG:   | 65  | B3\+LSLIE  | 90  | WURLY 2    |
+| 16  | LAZ HARP   | 41  | PIPES      | 66  | STRGTR2\*  | 91  | WURLY 3    |
+| 17  | ORGAN 9    | 42  | PIPSTRNG   | 67  | SYN CLAV   | 92  | X\-GRAND   |
+| 18  | ORGAN\-1   | 43  | PIRATES\!  | 68  | BELLS      | 93  | XA'ORGAN   |
+| 19  | ORGAN\-1P  | 44  | PNO\-ELEC  | 69  | SYNLUTH    | 94  | YOUREYES   |
+| 20  | ORGAN\-2   | 45  | POLPIANP   | 70  | BLABINET   | 95  | ZITHER     |
+| 21  | ORGANISM   | 46  | PRELUDE1   | 71  | SYNPIANO   | 96  | CORDINE1   |
+| 22  | AKOUSTIK   | 47  | PRESLEZ1   | 72  | CELESTE    | 97  | D'AMMOND   |
+| 23  | ORGNIZE\*  | 48  | PROFIT     | 73  | CHIMES     | 98  | GREEZY1    |
+| 24  | P\.ORGAN   | 49  | PROPH W    | 74  | TINEOUT    | 99  | GRNDR 6\*  |
 
 ---
 
