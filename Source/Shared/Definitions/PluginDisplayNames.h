@@ -918,6 +918,9 @@ namespace PluginDisplayNames
                 constexpr const char* kDeviceDumpFailedFooter =
                     "Could not read the patch from the synth. Keeping the current editor buffer. "
                     "Check that MIDI From is the synth MIDI OUT.";
+                constexpr const char* kDeviceDumpAbortedEditedFooter =
+                    "Synth patch load cancelled because the editor changed while waiting. "
+                    "Bank and patch numbers were restored; your edits were kept.";
             }
         }
     } 

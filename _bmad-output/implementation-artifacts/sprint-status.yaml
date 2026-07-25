@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-24
+# last_updated: 2026-07-25
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-05-29
-last_updated: 2026-07-24
+last_updated: 2026-07-25
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -213,3 +213,7 @@ development_status:
   11-2-cd-release-pipeline: done
   11-3-ci-build-time-optimizations: done
   epic-11-retrospective: optional
+
+  # Epic V1: Pre-release deferred-work hardening (post implementation sprint)
+  epic-v1: in-progress
+  v1-1-unsaved-navigation-consistency: done

@@ -144,8 +144,11 @@ namespace Core
             current.bank = getCurrentBank(limits);
             current.patch = getCurrentPatch(limits);
 
+            const auto priorCoordinates = captureInternalCoordinates(limits);
+
             // Display-only lock indicator (D-023a-R3); navigation must not read kBanksLocked.
             applyPatchCoordinates(limits.advancePatch(current, direction), limits);
+            beginPendingDeviceLoad(priorCoordinates);
             loadCurrentPatchFromDevice(limits);
             return;
         }
@@ -223,6 +226,7 @@ namespace Core
             if (! confirmPatchContextChange())
                 return;
 
+            const auto priorCoordinates = captureInternalCoordinates(limits);
             const int clampedBank = juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex);
             apvts_.state.setProperty(BankUtilityModule::StateProperties::kSelectedBank, clampedBank, nullptr);
             apvts_.state.setProperty(InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber, clampedBank, nullptr);
@@ -231,6 +235,7 @@ namespace Core
                 patchSelectionMidiSync_->syncSelection(clampedBank, getCurrentPatch(limits), limits, true);
 
             markBanksLockedInApvts();
+            beginPendingDeviceLoad(priorCoordinates);
             loadCurrentPatchFromDevice(limits);
             return;
         }
@@ -282,6 +287,8 @@ namespace Core
         if (! confirmPatchContextChange(false))
             return;
 
+        abandonPendingDeviceLoad();
+
         const auto result = patchInitService_->initFullPatch();
 
         if (hooks_.setPatchLoadContext)
@@ -323,6 +330,8 @@ namespace Core
 
         if (! confirmPatchContextChange(false))
             return;
+
+        abandonPendingDeviceLoad();
 
         apvtsPatchMapper_->apvtsToBuffer();
         clipboardService_->pasteFullPatch(*patchModel_);
@@ -382,6 +391,8 @@ namespace Core
         if (! folder.isDirectory())
             return;
 
+        seedCommittedComputerPatchesSelectionIfNeeded();
+
         const juce::String previousFolderPath = apvts_.state.getProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
             juce::String()).toString();
@@ -429,6 +440,11 @@ namespace Core
             0,
             nullptr);
         rememberComputerPatchesSelection(0);
+        lastStableComputerPatchesSelectedId_ = 0;
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
+            0,
+            nullptr);
 
         if (patchFileService_ != nullptr && patchFileService_->hasCachedScanResult())
             clearPublishedScanCache();
@@ -501,6 +517,14 @@ namespace Core
         }
 
         const int requestedId = readComputerPatchesSelectedId();
+
+        // Combo writes the new id before this runs — adopt UI cancel baseline when needed.
+        const int cancelBaseline = static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
+            0));
+        if (lastCommittedComputerPatchesSelectedId_ < 1 && cancelBaseline >= 1)
+            noteStableComputerPatchesSelection(cancelBaseline);
+
         if (! confirmPatchContextChange(true))
         {
             abortComputerPatchesNavigation();
@@ -515,6 +539,7 @@ namespace Core
         }
 
         pendingBrowserRestoreOnCancel_.reset();
+        abandonPendingDeviceLoad();
 
         if (hooks_.setPatchLoadContext)
             hooks_.setPatchLoadContext(
@@ -522,6 +547,10 @@ namespace Core
 
         applyLoadedPatchToApvtsAndSynth(limits);
         rememberComputerPatchesSelection(requestedId);
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
+            0,
+            nullptr);
         publishLoadFooters(resolution.file.getFileName(), *reconciliation);
     }
 
@@ -534,6 +563,10 @@ namespace Core
         const int count = patchFileService_->getLastScanResult().sortedValidFileNames.size();
         if (count < 1 || currentId > count)
             return std::nullopt;
+
+        // Bootstrap: lock the pre-navigation selection as the Cancel revert target when no
+        // successful load has committed an id yet.
+        seedCommittedComputerPatchesSelectionIfNeeded();
 
         const int nextId = isNext
             ? (currentId >= count ? 1 : currentId + 1)
@@ -662,6 +695,7 @@ namespace Core
             return std::nullopt;
         }
 
+        patchModel_->normalizeNameEncoding();
         return reconciliation;
     }
 
@@ -672,6 +706,9 @@ namespace Core
 
     void PatchManagerActionHandler::applyLoadedPatchToApvtsAndSynth(const DeviceMemoryLimits& limits)
     {
+        // Caller may already have abandoned a pending device dump; keep this idempotent.
+        abandonPendingDeviceLoad();
+
         syncLoadedPatchToApvts();
         captureCleanSnapshot();
 
@@ -704,14 +741,6 @@ namespace Core
         apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
     }
 
-    void PatchManagerActionHandler::publishDeviceDumpFailureFooter()
-    {
-        apvts_.state.setProperty("uiMessageText",
-                                 juce::String(MutatorMessages::kDeviceDumpFailedFooter),
-                                 nullptr);
-        apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
-    }
-
     bool PatchManagerActionHandler::confirmPatchContextChange(bool includeUnsavedEditWarning)
     {
         return ! hooks_.confirmPatchContextChange
@@ -729,7 +758,135 @@ namespace Core
         if (patchNameSyncer_ != nullptr)
             patchNameSyncer_->apvtsToBuffer();
 
+        patchModel_->normalizeNameEncoding();
         dirtyPatchTracker_->captureSnapshot(*patchModel_);
+    }
+
+    PatchManagerActionHandler::InternalCoordinatesSnapshot
+    PatchManagerActionHandler::captureInternalCoordinates(const DeviceMemoryLimits& limits) const
+    {
+        InternalCoordinatesSnapshot snapshot;
+        snapshot.bank = getCurrentBank(limits);
+        snapshot.patch = getCurrentPatch(limits);
+        snapshot.selectedBank = static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+            snapshot.bank));
+        snapshot.banksLocked = static_cast<bool>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+            false));
+        return snapshot;
+    }
+
+    void PatchManagerActionHandler::restoreInternalCoordinates(const InternalCoordinatesSnapshot& snapshot,
+                                                               const DeviceMemoryLimits& limits)
+    {
+        applyPatchCoordinates({ snapshot.bank, snapshot.patch }, limits);
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+            snapshot.selectedBank,
+            nullptr);
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+            snapshot.banksLocked,
+            nullptr);
+    }
+
+    void PatchManagerActionHandler::beginPendingDeviceLoad(const InternalCoordinatesSnapshot& priorCoordinates)
+    {
+        if (midiManager_ != nullptr)
+            midiManager_->cancelPendingSysExRequest();
+
+        PendingDeviceLoad pending;
+        pending.generation = ++deviceLoadGeneration_;
+        pending.priorCoordinates = priorCoordinates;
+
+        if (patchModel_ != nullptr)
+        {
+            if (apvtsPatchMapper_ != nullptr)
+                apvtsPatchMapper_->apvtsToBuffer();
+            if (patchNameSyncer_ != nullptr)
+                patchNameSyncer_->apvtsToBuffer();
+
+            std::memcpy(pending.bufferAtRequest.data(),
+                        patchModel_->data(),
+                        PatchModel::kBufferSize);
+        }
+
+        pendingDeviceLoad_ = pending;
+    }
+
+    void PatchManagerActionHandler::clearPendingDeviceLoad()
+    {
+        pendingDeviceLoad_.reset();
+    }
+
+    void PatchManagerActionHandler::abandonPendingDeviceLoad()
+    {
+        if (midiManager_ != nullptr)
+            midiManager_->cancelPendingSysExRequest();
+
+        clearPendingDeviceLoad();
+    }
+
+    void PatchManagerActionHandler::failPendingDeviceLoad(const DeviceMemoryLimits& limits,
+                                                          const juce::String& footerMessage)
+    {
+        if (pendingDeviceLoad_.has_value())
+            restoreInternalCoordinates(pendingDeviceLoad_->priorCoordinates, limits);
+
+        clearPendingDeviceLoad();
+        apvts_.state.setProperty("uiMessageText", footerMessage, nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
+    }
+
+    bool PatchManagerActionHandler::isDeviceDumpAvailable() const
+    {
+        if (hooks_.isDeviceDumpAvailable)
+            return hooks_.isDeviceDumpAvailable();
+
+        return midiManager_ != nullptr && midiManager_->isDeviceDumpAvailable();
+    }
+
+    void PatchManagerActionHandler::requestDeviceDump(juce::uint8 patchNumber,
+                                                      ActionExecutionHooks::DeviceDumpCallback onResult)
+    {
+        if (hooks_.requestDeviceDump)
+        {
+            hooks_.requestDeviceDump(patchNumber, std::move(onResult));
+            return;
+        }
+
+        if (midiManager_ == nullptr)
+        {
+            if (onResult)
+                onResult({});
+            return;
+        }
+
+        midiManager_->requestSinglePatchAsync(patchNumber,
+                                              std::move(onResult),
+                                              kDeviceSettleMs,
+                                              kOutboundIdleTimeoutMs);
+    }
+
+    void PatchManagerActionHandler::noteStableComputerPatchesSelection(int selectedId)
+    {
+        if (selectedId >= 1)
+            lastStableComputerPatchesSelectedId_ = selectedId;
+    }
+
+    int PatchManagerActionHandler::resolveComputerPatchesCancelRevertId() const
+    {
+        if (lastCommittedComputerPatchesSelectedId_ >= 1)
+            return lastCommittedComputerPatchesSelectedId_;
+
+        if (lastStableComputerPatchesSelectedId_ >= 1)
+            return lastStableComputerPatchesSelectedId_;
+
+        return static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
+            0));
     }
 
     void PatchManagerActionHandler::revertComputerPatchesSelectionIfNeeded(int previousSelectedId)
@@ -743,11 +900,26 @@ namespace Core
             previousSelectedId,
             nullptr);
         suppressComputerPatchesSelectLoad_ = false;
+        noteStableComputerPatchesSelection(previousSelectedId);
     }
 
     void PatchManagerActionHandler::rememberComputerPatchesSelection(int selectedId)
     {
         lastCommittedComputerPatchesSelectedId_ = selectedId;
+        noteStableComputerPatchesSelection(selectedId);
+    }
+
+    void PatchManagerActionHandler::seedCommittedComputerPatchesSelectionIfNeeded()
+    {
+        if (lastCommittedComputerPatchesSelectedId_ >= 1)
+            return;
+
+        const int currentId = readComputerPatchesSelectedId();
+        if (currentId >= 1)
+        {
+            lastCommittedComputerPatchesSelectedId_ = currentId;
+            noteStableComputerPatchesSelection(currentId);
+        }
     }
 
     void PatchManagerActionHandler::restoreComputerPatchesBrowser(const juce::String& folderPath,
@@ -771,6 +943,7 @@ namespace Core
             nullptr);
 
         suppressComputerPatchesSelectLoad_ = false;
+        noteStableComputerPatchesSelection(selectedId);
     }
 
     void PatchManagerActionHandler::abortComputerPatchesNavigation()
@@ -780,22 +953,53 @@ namespace Core
             const auto snapshot = *pendingBrowserRestoreOnCancel_;
             pendingBrowserRestoreOnCancel_.reset();
             restoreComputerPatchesBrowser(snapshot.folderPath, snapshot.selectedId);
+            noteStableComputerPatchesSelection(snapshot.selectedId);
+            apvts_.state.setProperty(
+                PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
+                0,
+                nullptr);
             return;
         }
 
-        revertComputerPatchesSelectionIfNeeded(lastCommittedComputerPatchesSelectedId_);
+        revertComputerPatchesSelectionIfNeeded(resolveComputerPatchesCancelRevertId());
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,
+            0,
+            nullptr);
+    }
+
+    void PatchManagerActionHandler::loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits,
+                                                               int priorBank,
+                                                               int priorPatch,
+                                                               int priorSelectedBank,
+                                                               bool priorBanksLocked)
+    {
+        InternalCoordinatesSnapshot prior;
+        prior.bank = priorBank;
+        prior.patch = priorPatch;
+        prior.selectedBank = priorSelectedBank;
+        prior.banksLocked = priorBanksLocked;
+        beginPendingDeviceLoad(prior);
+        loadCurrentPatchFromDevice(limits);
     }
 
     void PatchManagerActionHandler::loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits)
     {
-        if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr || midiManager_ == nullptr)
+        if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
 
-        // No synth connected: keep the old editor buffer and Mutator history; only warn.
+        // Callers that already advanced coordinates (NumberBox) must use the prior overload.
+        if (! pendingDeviceLoad_.has_value())
+            beginPendingDeviceLoad(captureInternalCoordinates(limits));
+
+        const auto generation = pendingDeviceLoad_->generation;
+        const auto failFooter = juce::String(MutatorMessages::kDeviceDumpFailedFooter);
+
+        // No synth connected: roll back UI coordinates, keep the editor buffer / dirty / history.
         // History clears only after a successful dump (real patch load), not on dump failure.
-        if (! midiManager_->isDeviceDumpAvailable())
+        if (! isDeviceDumpAvailable())
         {
-            publishDeviceDumpFailureFooter();
+            failPendingDeviceLoad(limits, failFooter);
             return;
         }
 
@@ -803,23 +1007,50 @@ namespace Core
         const int patch = getCurrentPatch(limits);
 
         // Fully async: never block the message thread (button release + NumberBox paint depend on it).
-        // Idle wait + settle + dump request run via timers inside MidiManager.
-        midiManager_->requestSinglePatchAsync(
+        requestDeviceDump(
             static_cast<juce::uint8>(patch),
-            [this, bank, patch](std::vector<juce::uint8> dump)
+            [this, bank, patch, generation, limits, failFooter](std::vector<juce::uint8> dump)
             {
+                if (! pendingDeviceLoad_.has_value()
+                    || pendingDeviceLoad_->generation != generation)
+                {
+                    return;
+                }
+
                 if (dump.size() != SysExConstants::kPatchPackedDataSize)
                 {
-                    publishDeviceDumpFailureFooter();
+                    failPendingDeviceLoad(limits, failFooter);
                     return;
                 }
 
                 if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
+                {
+                    failPendingDeviceLoad(limits, failFooter);
                     return;
+                }
+
+                // Mid-window edits after Continue: abort apply, restore coords, keep edits/dirty.
+                if (apvtsPatchMapper_ != nullptr)
+                    apvtsPatchMapper_->apvtsToBuffer();
+                if (patchNameSyncer_ != nullptr)
+                    patchNameSyncer_->apvtsToBuffer();
+
+                if (std::memcmp(patchModel_->data(),
+                                pendingDeviceLoad_->bufferAtRequest.data(),
+                                PatchModel::kBufferSize)
+                    != 0)
+                {
+                    failPendingDeviceLoad(
+                        limits,
+                        juce::String(MutatorMessages::kDeviceDumpAbortedEditedFooter));
+                    return;
+                }
 
                 patchModel_->loadFrom(dump.data());
+                patchModel_->normalizeNameEncoding();
                 pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
                 captureCleanSnapshot();
+                clearPendingDeviceLoad();
 
                 if (hooks_.setPatchLoadContext)
                     hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(bank, patch));
@@ -828,9 +1059,7 @@ namespace Core
                 // Do NOT sendPatch back.
                 if (hooks_.onPatchLoaded)
                     hooks_.onPatchLoaded();
-            },
-            kDeviceSettleMs,
-            kOutboundIdleTimeoutMs);
+            });
     }
 
     void PatchManagerActionHandler::saveCurrentPatchToFile(const juce::File& targetFile)

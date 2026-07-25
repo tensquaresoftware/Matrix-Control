@@ -1,5 +1,10 @@
 # Deferred Work
 
+## Deferred from: code review of v1-1-unsaved-navigation-consistency (2026-07-25)
+
+- Mid-window dump abort uses full-buffer `memcmp` after APVTS sync: host automation or parameter SysEx echo during the settle window can false-abort a good dump (keeps edits + dirty + footer). Accepted V1 strictness vs silent overwrite; revisit only if false aborts show up in real use.
+- `normalizeNameEncoding` is applied on dump/file load and `captureCleanSnapshot`, but PluginProcessor construction and DAW-restore still `captureSnapshot` without normalizing. Residual false-dirty risk outside the story’s dump/load navigation path.
+
 ## Deferred from: code review of u-10-release-gate-prod-audit-sign-off-and-d-062-d-063 (2026-07-24)
 
 - No CI / Release-workflow regression check that fails if `TestComponent` / `Source/GUI/Tests` re-enter Release artefacts — AC2 only required a local nm/strings (or equivalent) proof; consider a workflow hygiene step later.
@@ -78,11 +83,11 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of 9-2-unsaved-edit-confirmation-dialog (2026-07-20)
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
-  summary: After dirty Continue on internal navigation, `loadCurrentPatchFromDevice` can bail (`!isDeviceDumpAvailable` / failed dump) leaving advanced bank/patch coordinates with edits already accepted for discard.
+  summary: ~~After dirty Continue on internal navigation, `loadCurrentPatchFromDevice` can bail (`!isDeviceDumpAvailable` / failed dump) leaving advanced bank/patch coordinates with edits already accepted for discard.~~ **Resolved 2026-07-25 (v1-1)**: pending-load stash + coordinate rollback on dump unavailable / empty / wrong-size; dirty kept; no `onPatchLoaded`.
   evidence: Blind Hunter; pre-existing async dump pattern; FR-51 gate correctly runs before request.
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
-  summary: Edits made between dirty Continue and async dump completion are overwritten then `captureCleanSnapshot` marks clean with no second FR-51 warning.
+  summary: ~~Edits made between dirty Continue and async dump completion are overwritten then `captureCleanSnapshot` marks clean with no second FR-51 warning.~~ **Resolved 2026-07-25 (v1-1)**: pending-load generation + buffer-at-request compare; mid-window edits abort apply, restore coords, keep dirty, footer.
   evidence: Blind Hunter; pre-existing settle window on async dump callback.
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
@@ -90,20 +95,20 @@ Original review bullets below remain for history; status for U-10-owned residual
   evidence: Blind Hunter; pre-existing PASTE path; AC intentionally excludes FR-51 modal for PASTE.
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
-  summary: Name-reconciliation Cancel after user already Continued through dirty + Mutator history Discard cannot restore history — Cancel only reverts combo selection.
+  summary: ~~Name-reconciliation Cancel after user already Continued through dirty + Mutator history Discard cannot restore history — Cancel only reverts combo selection.~~ **Resolved 2026-07-25 (v1-1)**: Discard/Export no longer call `resetSessionForPatchLoad` in the gate; history clears only via `onPatchLoaded` after successful apply.
   evidence: Blind Hunter; pre-existing composition of sequential gates.
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
-  summary: `lastCommittedComputerPatchesSelectedId_` defaults to 0 until a successful load/reset path remembers an id; early Cancel revert target can be wrong.
+  summary: ~~`lastCommittedComputerPatchesSelectedId_` defaults to 0 until a successful load/reset path remembers an id; early Cancel revert target can be wrong.~~ **Resolved 2026-07-25 (v1-1)**: seed committed id from current non-sentinel selection before OPEN / Prev-Next navigation.
   evidence: Blind Hunter; bootstrap edge.
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
   summary: INIT always captures a clean snapshot after `initFullPatch`, including fallback/invalid template landing.
-  evidence: Blind Hunter; intentional for FR-51 smoke after INIT (completion notes).
+  evidence: Blind Hunter; intentional for FR-51 smoke after INIT (completion notes). Out of v1-1 scope.
 
 - source_spec: `_bmad-output/implementation-artifacts/9-2-unsaved-edit-confirmation-dialog.md`
   summary: Broader automated coverage still missing for OPEN Cancel folder+selection restore, NumberBox+chained dirty gate, and never-warn vs real modal (beyond handler-level Prev/Next Cancel regression test).
-  evidence: Blind Hunter; T5 left some paths as optional / smoke.
+  evidence: Blind Hunter; T5 left some paths as optional / smoke. OPEN Cancel covered in 9.2 / v1-1 handler tests; NumberBox+modal still manual/smoke.
 
 ## Deferred from: code review of spec-8-4-virtual-instrument-registration-and-bus-layout (2026-07-19)
 
@@ -126,7 +131,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of spec-9-1-dirtypatchtracker (2026-07-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-9-1-dirtypatchtracker.md`
-  summary: PatchModel name encode (`setName` 7-bit ASCII) vs decode (`getName` 6-bit Matrix) asymmetry can mark dirty after hardware dump capture then APVTS name round-trip with no user rename; Story 9.2 capture/sync paths should account for this.
+  summary: ~~PatchModel name encode (`setName` 7-bit ASCII) vs decode (`getName` 6-bit Matrix) asymmetry can mark dirty after hardware dump capture then APVTS name round-trip with no user rename; Story 9.2 capture/sync paths should account for this.~~ **Resolved 2026-07-25 (v1-1)**: `PatchModel::normalizeNameEncoding` on dump/file load and before `captureCleanSnapshot`; unit regression locks 6-bit → clean APVTS round-trip.
   evidence: Blind Hunter; `PatchModel.cpp` setName/getName; pre-existing, not introduced by DirtyPatchTracker.
 
 ## Deferred from: quick-dev review of spec-9-1-dirtypatchtracker (2026-07-19)

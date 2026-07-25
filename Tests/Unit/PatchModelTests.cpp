@@ -21,6 +21,7 @@ public:
     {
         runReferenceRoundTrip();
         runNameCodec();
+        runSixBitNameNormalization();
         runSignedFieldCodec();
         runSignedReferenceValidation();
         runChoiceField();
@@ -97,6 +98,33 @@ private:
 
         model.setName("Hi There!");
         expectEquals(model.getName(), juce::String("HI THERE"));
+    }
+
+    void runSixBitNameNormalization()
+    {
+        beginTest("6-bit wire name normalizes to setName storage");
+
+        Core::PatchModel model;
+        juce::uint8 packed[Core::PatchModel::kBufferSize] = {};
+
+        // Wire-style 6-bit codes for "ABCD" (0x01..0x04 → decode to 'A'..'D').
+        packed[0] = 0x01;
+        packed[1] = 0x02;
+        packed[2] = 0x03;
+        packed[3] = 0x04;
+        for (int i = 4; i < Core::PatchModel::kNameLength; ++i)
+            packed[static_cast<size_t>(i)] = 0x20; // space in either encoding
+
+        model.loadFrom(packed);
+        expectEquals(model.getName(), juce::String("ABCD"));
+        expect(model.data()[0] == 0x01);
+
+        model.normalizeNameEncoding();
+        expectEquals(model.getName(), juce::String("ABCD"));
+        expectEquals(static_cast<int>(model.data()[0]), static_cast<int>('A'));
+        expectEquals(static_cast<int>(model.data()[1]), static_cast<int>('B'));
+        expectEquals(static_cast<int>(model.data()[2]), static_cast<int>('C'));
+        expectEquals(static_cast<int>(model.data()[3]), static_cast<int>('D'));
     }
 
     void runSignedFieldCodec()

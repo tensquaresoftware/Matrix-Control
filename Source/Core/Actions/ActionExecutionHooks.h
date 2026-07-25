@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
+#include <vector>
 
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
 
@@ -23,6 +25,10 @@ namespace Core
         // false for in-place INIT/PASTE (Mutator history only — no FR-51 modal).
         // Returns true to proceed, false to abort. May be empty (proceed).
         std::function<bool(bool includeUnsavedEditWarning)> confirmPatchContextChange;
+        // Optional test seams for device dump (empty = MidiManager).
+        std::function<bool()> isDeviceDumpAvailable;
+        using DeviceDumpCallback = std::function<void(std::vector<juce::uint8>)>;
+        std::function<void(juce::uint8 patchNumber, DeviceDumpCallback onResult)> requestDeviceDump;
     };
 
 } // namespace Core

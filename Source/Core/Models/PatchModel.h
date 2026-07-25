@@ -27,6 +27,10 @@ namespace Core
         juce::uint8* data() noexcept { return buffer_.data(); }
         void loadFrom(const juce::uint8* packedData) noexcept;
 
+        // Rewrites bytes 0–7 from decoded display form into setName's 7-bit storage so a
+        // hardware-style 6-bit wire name does not false-dirty after an APVTS name round-trip.
+        void normalizeNameEncoding() noexcept;
+
         // Descriptor-driven parameter access. Offsets are sourced only from PluginDescriptors.
         int getValue(const PluginDescriptors::IntParameterDescriptor& descriptor) const;
         void setValue(const PluginDescriptors::IntParameterDescriptor& descriptor, int value);

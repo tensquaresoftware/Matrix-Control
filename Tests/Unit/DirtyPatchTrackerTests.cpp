@@ -69,6 +69,7 @@ public:
         testClearSnapshotResetsBaseline();
         testApvtsSyncPathMatchesPackedCompare();
         testApvtsNameEditIsDirtyViaSyncHelper();
+        testSixBitWireNameAfterNormalizeStaysClean();
         testMasterOnlyChangeDoesNotDirty();
         testUnsavedWarningPolicy_neverWarnSkipsPrompt();
         testUnsavedWarningPolicy_warnAlwaysWhenDirty();
@@ -223,6 +224,34 @@ private:
 
         expect(tracker.syncApvtsAndIsDirty(mapper, nameSyncer, model));
         expect(tracker.isDirty(model));
+    }
+
+    void testSixBitWireNameAfterNormalizeStaysClean()
+    {
+        beginTest("6-bit wire name → normalize/capture → APVTS round-trip stays clean");
+
+        TestDirtyPatchProcessor processor;
+        Core::PatchModel model;
+        Core::ApvtsPatchMapper mapper(processor.apvts, model);
+        Core::PatchNameSyncer nameSyncer(processor.apvts, model);
+        Core::DirtyPatchTracker tracker;
+
+        juce::uint8 packed[Core::PatchModel::kBufferSize] = {};
+        packed[0] = 0x01; // 'A' in 6-bit wire form
+        packed[1] = 0x02;
+        packed[2] = 0x03;
+        packed[3] = 0x04;
+        for (int i = 4; i < Core::PatchModel::kNameLength; ++i)
+            packed[static_cast<size_t>(i)] = 0x20;
+
+        model.loadFrom(packed);
+        model.normalizeNameEncoding();
+        mapper.bufferToApvts();
+        nameSyncer.bufferToApvts();
+        tracker.captureSnapshot(model);
+
+        expect(! tracker.syncApvtsAndIsDirty(mapper, nameSyncer, model));
+        expectEquals(model.getName(), juce::String("ABCD"));
     }
 
     void testMasterOnlyChangeDoesNotDirty()

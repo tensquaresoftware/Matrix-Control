@@ -24,6 +24,15 @@ namespace Core
         std::memcpy(buffer_.data(), packedData, kBufferSize);
     }
 
+    void PatchModel::normalizeNameEncoding() noexcept
+    {
+        for (int i = 0; i < kNameLength; ++i)
+        {
+            const auto character = decodeNameChar(buffer_[static_cast<size_t>(i)]);
+            buffer_[static_cast<size_t>(i)] = static_cast<juce::uint8>(character) & kSevenBitMask;
+        }
+    }
+
     int PatchModel::getValue(const PluginDescriptors::IntParameterDescriptor& descriptor) const
     {
         const size_t offset = PackedFieldCodec::safeOffset(descriptor.sysExOffset, kBufferSize);

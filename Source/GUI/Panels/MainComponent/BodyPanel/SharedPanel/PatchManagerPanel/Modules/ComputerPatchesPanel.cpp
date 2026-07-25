@@ -332,7 +332,19 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
             const int selectedId = comboBox->getSelectedId();
             if (selectedId >= 1)
             {
-                apvts_.state.setProperty(ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile,
+                using namespace PluginIDs::PatchManagerSection::ComputerPatchesModule;
+
+                const int previousId = static_cast<int>(apvts_.state.getProperty(
+                    StandaloneWidgets::kSelectPatchFile, 0));
+                if (previousId >= 1 && previousId != selectedId)
+                {
+                    apvts_.state.setProperty(
+                        StateProperties::kSelectPatchCancelBaseline,
+                        previousId,
+                        nullptr);
+                }
+
+                apvts_.state.setProperty(StandaloneWidgets::kSelectPatchFile,
                                         selectedId,
                                         nullptr);
             }

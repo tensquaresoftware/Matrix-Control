@@ -962,17 +962,16 @@ bool PluginProcessor::confirmPatchContextChangeGate(bool includeUnsavedEditWarni
             return false;
 
         case Core::MutatorHistoryGateChoice::kDiscard:
-            patchMutatorEngine_->resetSessionForPatchLoad();
+            // Defer history clear until load fully succeeds (onPatchLoaded). Cancel at
+            // name reconciliation must leave Mutator history intact.
             return true;
 
         case Core::MutatorHistoryGateChoice::kExport:
         {
-            // Only proceed when export completes; then clear history so a skipped dump cannot
-            // leave mutations hanging after the user already archived them.
+            // Only proceed when export completes; history clear still waits for onPatchLoaded.
             if (! runMutatorExportForGate())
                 return false;
 
-            patchMutatorEngine_->resetSessionForPatchLoad();
             return true;
         }
     }
@@ -1685,10 +1684,22 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
         return;
     }
 
+    const int priorPatchNumber = lastKnownPatchNumber_;
+    const int priorBank = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+        limits.minBankNumber()));
+    const int priorSelectedBank = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+        priorBank));
+    const bool priorBanksLocked = static_cast<bool>(apvts.state.getProperty(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+        false));
+
     lastKnownPatchNumber_ = clampedPatch;
     lastKnownPatchNumberInitialized_ = true;
 
-    updateDevicePatchLoadContext();
+    // Defer patchLoadContext_ until a successful dump (handler success hook). Updating it here
+    // would leave Mutator Export naming on the failed NumberBox target after dump rollback.
 
     if (patchSelectionMidiSync_ != nullptr)
     {
@@ -1711,8 +1722,12 @@ void PluginProcessor::handlePatchNumberChange(const juce::String& parameterId)
     }
 
     // Mirror the synth's edit buffer into the editor (clears Mutator history via onPatchLoaded).
+    // Pass the full pre-navigation snapshot so a failed dump restores NumberBox + Banks Locked.
     if (patchManagerActionHandler_ != nullptr)
-        patchManagerActionHandler_->loadCurrentPatchFromDevice(limits);
+    {
+        patchManagerActionHandler_->loadCurrentPatchFromDevice(
+            limits, priorBank, priorPatchNumber, priorSelectedBank, priorBanksLocked);
+    }
 }
 
 void PluginProcessor::updateDevicePatchLoadContext()

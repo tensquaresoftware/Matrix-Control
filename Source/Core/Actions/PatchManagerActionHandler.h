@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <functional>
 #include <optional>
 
@@ -7,6 +9,7 @@
 
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Actions/IActionHandler.h"
+#include "Core/Models/PatchModel.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 
@@ -21,7 +24,6 @@ namespace Core
     class DirtyPatchTracker;
     class PatchFileService;
     class PatchInitService;
-    class PatchModel;
     class PatchNameSyncer;
     class PatchSelectionMidiSync;
 
@@ -59,22 +61,55 @@ namespace Core
         void discardComputerPatchesScanCacheQuietly();
 
         // Requests the current patch from the synth (async dump) and mirrors it into the editor
-        // (PatchModel + APVTS) as a patch load. No-op when no device is available. Used after
-        // Bank/Internal navigation and after direct patch-number edits.
+        // (PatchModel + APVTS) as a patch load. Rolls back Internal coordinates on failure.
+        // Prefer the prior-coordinates overload when APVTS / lock state were already advanced
+        // (NumberBox) so failure can restore the true pre-navigation values.
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits);
+        void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits,
+                                        int priorBank,
+                                        int priorPatch,
+                                        int priorSelectedBank,
+                                        bool priorBanksLocked);
 
     private:
+        struct InternalCoordinatesSnapshot
+        {
+            int bank = 0;
+            int patch = 0;
+            int selectedBank = 0;
+            bool banksLocked = false;
+        };
+
+        struct PendingDeviceLoad
+        {
+            std::uint64_t generation = 0;
+            InternalCoordinatesSnapshot priorCoordinates;
+            std::array<juce::uint8, PatchModel::kBufferSize> bufferAtRequest {};
+        };
+
         // Returns true when the pending patch-context change may proceed.
         // `includeUnsavedEditWarning` selects FR-51 + history (navigation) vs history-only (INIT/PASTE).
         bool confirmPatchContextChange(bool includeUnsavedEditWarning = true);
         void captureCleanSnapshot();
         void revertComputerPatchesSelectionIfNeeded(int previousSelectedId);
         void rememberComputerPatchesSelection(int selectedId);
+        void seedCommittedComputerPatchesSelectionIfNeeded();
         void restoreComputerPatchesBrowser(const juce::String& folderPath, int selectedId);
         void abortComputerPatchesNavigation();
         // Returns the id written to APVTS, or nullopt when navigation was a no-op.
         std::optional<int> advanceComputerPatchesSelection(bool isNext);
         void applyPatchCoordinates(const PatchCoordinates& coordinates, const DeviceMemoryLimits& limits);
+        InternalCoordinatesSnapshot captureInternalCoordinates(const DeviceMemoryLimits& limits) const;
+        void restoreInternalCoordinates(const InternalCoordinatesSnapshot& snapshot,
+                                        const DeviceMemoryLimits& limits);
+        void beginPendingDeviceLoad(const InternalCoordinatesSnapshot& priorCoordinates);
+        void clearPendingDeviceLoad();
+        void abandonPendingDeviceLoad();
+        void failPendingDeviceLoad(const DeviceMemoryLimits& limits, const juce::String& footerMessage);
+        int resolveComputerPatchesCancelRevertId() const;
+        void noteStableComputerPatchesSelection(int selectedId);
+        bool isDeviceDumpAvailable() const;
+        void requestDeviceDump(juce::uint8 patchNumber, ActionExecutionHooks::DeviceDumpCallback onResult);
         void handleUnlockBank(const DeviceMemoryLimits& limits);
         void markBanksLockedInApvts();
         void handleInternalPatchInit();
@@ -112,7 +147,6 @@ namespace Core
         void publishLoadFooters(const juce::String& fileName,
                                   const PatchNameReconciliationResult& reconciliation);
         void publishLoadFailureFooter(const juce::String& message);
-        void publishDeviceDumpFailureFooter();
         void saveCurrentPatchToFile(const juce::File& targetFile);
         void completeSuccessfulSave(const juce::String& savedFileName);
         void rescanAndSelectSavedFile(const juce::String& savedFileName);
@@ -146,7 +180,10 @@ namespace Core
         PatchNameReconciliationPicker pickNameReconciliation_;
         ActionExecutionHooks hooks_;
         int lastCommittedComputerPatchesSelectedId_ = 0;
+        int lastStableComputerPatchesSelectedId_ = 0;
         bool suppressComputerPatchesSelectLoad_ = false;
+        std::uint64_t deviceLoadGeneration_ = 0;
+        std::optional<PendingDeviceLoad> pendingDeviceLoad_;
 
         // When OPEN replaces the browser then Cancel/fails the auto-load, restore this snapshot.
         struct ComputerPatchesBrowserSnapshot

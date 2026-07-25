@@ -577,6 +577,9 @@ namespace PluginIDs
             {
                 constexpr const char* kFolderPath   = "computerPatchesFolderPath";
                 constexpr const char* kScanRevision = "computerPatchesScanRevision";
+                // Written by the combo before changing kSelectPatchFile so Cancel can restore
+                // the prior browser selection when no successful load has committed an id yet.
+                constexpr const char* kSelectPatchCancelBaseline = "computerPatchesSelectCancelBaseline";
             }
 
             namespace StandaloneWidgets
