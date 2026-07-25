@@ -917,3 +917,14 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: macOS sync native alerts use runModal and do not sheet-attach via withAssociatedComponent (sheet parenting is async-only in JUCE).
   evidence: Blind Hunter; framework limit; association still passed for Windows HWND parenting where available.
 
+
+## Deferred from: quick-dev spec-rom-factory-names-export-folders (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-rom-factory-names-export-folders.md`
+  summary: No integration test that a successful ROM-bank device dump injects Matrix1000FactoryPatchNames into PatchModel/APVTS (MIDI dump path is hard to unit-mock).
+  evidence: Blind Hunter; lookup unit tests cover the table; inject wiring is thin and reviewed manually.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-rom-factory-names-export-folders.md`
+  summary: Dirty snapshot after ROM factory name inject may disagree with a later hardware re-dump that still has blank name bytes.
+  evidence: Blind Hunter; by design for editor UX until hardware UAT proves RAM name retention.
+
