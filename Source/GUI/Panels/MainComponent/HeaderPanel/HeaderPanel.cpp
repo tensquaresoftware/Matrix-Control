@@ -486,18 +486,19 @@ void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
     audioFromComboBox_.clear(juce::dontSendNotification);
     audioFromSourceIdentifiers_.clear();
 
+    audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
+
     const int count = juce::jmin(channelNames.size(), channelIds.size());
 
     for (int i = 0; i < count; ++i)
     {
-        const int itemId = i + 1;
+        const int itemId = i + kFirstDeviceItemId;
         audioFromComboBox_.addItem(channelNames[i], itemId);
         audioFromSourceIdentifiers_.push_back(channelIds[i]);
     }
 
     if (count == 0)
     {
-        audioFromComboBox_.addItem(PluginDisplayNames::HeaderPanel::kNoInputSentinel, kPortSentinelItemId);
         audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
         return;
     }
@@ -508,10 +509,10 @@ void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
 juce::String HeaderPanel::getSelectedAudioFromSourceId() const
 {
     const int itemId = audioFromComboBox_.getSelectedId();
-    if (itemId < 1)
+    if (itemId < kFirstDeviceItemId)
         return {};
 
-    const auto index = static_cast<size_t>(itemId - 1);
+    const auto index = static_cast<size_t>(itemId - kFirstDeviceItemId);
     if (index >= audioFromSourceIdentifiers_.size())
         return {};
 
@@ -530,11 +531,13 @@ void HeaderPanel::selectAudioFromSourceId(const juce::String& sourceId)
     {
         if (audioFromSourceIdentifiers_[i] == sourceId)
         {
-            audioFromComboBox_.setSelectedId(static_cast<int>(i + 1), juce::dontSendNotification);
+            audioFromComboBox_.setSelectedId(static_cast<int>(i) + kFirstDeviceItemId,
+                                             juce::dontSendNotification);
             return;
         }
     }
 
     // Missing id: do not fall back to catalog[0] (can flip mono/stereo kind).
+    // Keep sentinel selected so the UI does not pretend a different source is active.
     audioFromComboBox_.setSelectedId(kPortSentinelItemId, juce::dontSendNotification);
 }

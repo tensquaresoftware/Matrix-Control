@@ -989,9 +989,19 @@ void PluginEditor::refreshAudioFromCombo(HeaderPanel* headerOverride)
             const auto effectiveSourceId = header->getSelectedAudioFromSourceId();
 
             if (effectiveSourceId.isNotEmpty())
+            {
+                header->selectAudioFromSourceId(effectiveSourceId);
                 pluginProcessor.setAudioFromSourceId(effectiveSourceId);
+            }
             else if (! ids.isEmpty())
+            {
+                header->selectAudioFromSourceId(ids[0]);
                 pluginProcessor.setAudioFromSourceId(ids[0]);
+            }
+            else
+            {
+                header->selectAudioFromSourceId({});
+            }
         }
         else
         {

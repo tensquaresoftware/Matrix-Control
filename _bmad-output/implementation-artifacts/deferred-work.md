@@ -881,3 +881,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/u-9-master-edit-panel-layout-audit.md`
   summary: MasterEditPanelDimensions::sectionHeaderWidth is injected and used at construction, but resized() sizes the section header from the full parent strip width — latent coupling if header width ever diverges from panel width. **U-10 accepted delta (2026-07-24) — latent, not UAT-blocking.**
   evidence: Blind Hunter; pre-existing, unchanged by U-9 stack refactor.
+
+## Deferred from: code review of spec-standalone-audio-input-passthrough (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-audio-input-passthrough.md`
+  summary: Stereo source ids carry a start index (`stereo:N`) but AudioPassthroughProcessor stereo mode always reads bus channels 0/1 — selecting a second stereo pair on >2 active inputs is cosmetic only.
+  evidence: Blind Hunter; pre-existing routing limit; JUCE settings typically max two active inputs so rarely reachable.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-standalone-audio-input-passthrough.md`
+  summary: Compacted `mono:N` / `stereo:N` ids are stable only for a given active-channel bitmask — enabling a different subset can make the same string refer to a different physical input.
+  evidence: Blind Hunter; related to deferred Story 2.7 unstable numeric channel indices; hardware-name ids would be a larger hardening.

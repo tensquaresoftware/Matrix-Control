@@ -2,7 +2,6 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include "Core/Audio/StandaloneAudioInputRouter.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
 {
@@ -13,10 +12,12 @@ namespace
         return deviceName + " (" + juce::String(channelIndex0Based + 1) + ")";
     }
 
-    juce::String formatStereoDisplayName(const juce::String& deviceName, int firstChannelIndex0Based)
+    juce::String formatStereoDisplayName(const juce::String& deviceName,
+                                         int leftChannelIndex0Based,
+                                         int rightChannelIndex0Based)
     {
-        return deviceName + " (" + juce::String(firstChannelIndex0Based + 1) + "/"
-               + juce::String(firstChannelIndex0Based + 2) + ")";
+        return deviceName + " (" + juce::String(leftChannelIndex0Based + 1) + "/"
+               + juce::String(rightChannelIndex0Based + 1) + ")";
     }
 
     juce::String makeMonoSourceId(int channelIndex0Based)
@@ -47,7 +48,7 @@ namespace
         for (int firstChannel = 0; firstChannel + 1 < numInputChannels; firstChannel += 2)
         {
             AudioInputSourceEntry entry;
-            entry.displayName = formatStereoDisplayName(deviceName, firstChannel);
+            entry.displayName = formatStereoDisplayName(deviceName, firstChannel, firstChannel + 1);
             entry.sourceId = makeStereoSourceId(firstChannel);
             entries.push_back(std::move(entry));
         }
@@ -61,25 +62,41 @@ namespace
         if (deviceName.isEmpty() || numInputChannels <= 0)
             return;
 
+        // JUCE packs enabled hardware channels into a compacted bus (0..N-1).
+        // Source ids must use that compacted index; display names keep hardware numbers.
+        std::vector<int> activeHardwareChannels;
+
         for (int channel = 0; channel < numInputChannels; ++channel)
         {
             if (!activeInputChannels[channel])
                 continue;
 
+            activeHardwareChannels.push_back(channel);
+        }
+
+        for (int compacted = 0; compacted < static_cast<int>(activeHardwareChannels.size()); ++compacted)
+        {
             AudioInputSourceEntry entry;
-            entry.displayName = formatMonoDisplayName(deviceName, channel);
-            entry.sourceId = makeMonoSourceId(channel);
+            entry.displayName = formatMonoDisplayName(deviceName, activeHardwareChannels[static_cast<size_t>(compacted)]);
+            entry.sourceId = makeMonoSourceId(compacted);
             entries.push_back(std::move(entry));
         }
 
-        for (int firstChannel = 0; firstChannel + 1 < numInputChannels; ++firstChannel)
+        for (int hardwareChannel = 0; hardwareChannel + 1 < numInputChannels; hardwareChannel += 2)
         {
-            if (!activeInputChannels[firstChannel] || !activeInputChannels[firstChannel + 1])
+            if (!activeInputChannels[hardwareChannel] || !activeInputChannels[hardwareChannel + 1])
                 continue;
 
+            int compacted = 0;
+            for (int earlier = 0; earlier < hardwareChannel; ++earlier)
+            {
+                if (activeInputChannels[earlier])
+                    ++compacted;
+            }
+
             AudioInputSourceEntry entry;
-            entry.displayName = formatStereoDisplayName(deviceName, firstChannel);
-            entry.sourceId = makeStereoSourceId(firstChannel);
+            entry.displayName = formatStereoDisplayName(deviceName, hardwareChannel, hardwareChannel + 1);
+            entry.sourceId = makeStereoSourceId(compacted);
             entries.push_back(std::move(entry));
         }
     }

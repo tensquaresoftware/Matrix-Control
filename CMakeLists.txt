@@ -393,6 +393,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
+        Tests/Unit/AudioInputSourceCatalogTests.cpp
         Tests/Unit/HardwareLatencyTests.cpp
         Tests/Unit/InstrumentMidiForwarderTests.cpp
         Tests/Unit/KeyboardFromMidiInputTests.cpp
@@ -451,6 +452,9 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
         Source/Core/Audio/AudioPassthroughProcessor.cpp
+        Source/Core/Audio/AudioInputSourceCatalog.cpp
+        Source/Core/Audio/StandaloneAudioInputRouter.cpp
+        Source/Core/Audio/StandaloneAudioInputRouterStubs.cpp
         Source/Core/Audio/HardwareLatency.cpp
         Source/Core/Audio/InstrumentMidiForwarder.cpp
         Source/Core/MIDI/KeyboardFromMidiInput.cpp

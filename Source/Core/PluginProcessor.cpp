@@ -882,6 +882,14 @@ void PluginProcessor::syncAudioRuntimeFromState()
         const int channelMode = static_cast<int>(apvts.state.getProperty("audioFromChannelMode", 0));
         audioPassthroughProcessor_->setChannelMode(
             static_cast<Core::AudioFromChannelMode>(juce::jlimit(0, 2, channelMode)));
+
+        if (isStandaloneWrapper())
+        {
+            runSyncOnMessageThread([]
+            {
+                Core::StandaloneAudioInputRouter::disableInputMonitoring();
+            });
+        }
     }
 }
 
@@ -891,6 +899,20 @@ void PluginProcessor::syncAudioPassthroughFromSourceId(const juce::String& sourc
     audioPassthroughProcessor_->setChannelMode(static_cast<Core::AudioFromChannelMode>(channelMode));
     audioPassthroughProcessor_->setMonoSourceChannelIndex(
         Core::AudioInputSourceCatalog::monoChannelIndexForSourceId(sourceId));
+
+    if (! isStandaloneWrapper())
+        return;
+
+    // JUCE standalone mutes input by default (feedback protection). Toggle on the
+    // message thread — prepareToPlay / state restore may run off it.
+    const bool shouldMonitor = sourceId.isNotEmpty();
+    runSyncOnMessageThread([shouldMonitor]
+    {
+        if (shouldMonitor)
+            Core::StandaloneAudioInputRouter::enableInputMonitoring();
+        else
+            Core::StandaloneAudioInputRouter::disableInputMonitoring();
+    });
 }
 
 void PluginProcessor::setInputGainDb(float gainDb)
@@ -1345,9 +1367,6 @@ void PluginProcessor::setAudioFromSourceId(const juce::String& sourceId)
 
     const int channelMode = Core::AudioInputSourceCatalog::channelModeForSourceId(sourceId);
     apvts.state.setProperty("audioFromChannelMode", channelMode, nullptr);
-
-    if (isStandaloneWrapper())
-        Core::StandaloneAudioInputRouter::enableInputMonitoring();
 }
 
 juce::StringArray PluginProcessor::getAudioInputSourceNames() const

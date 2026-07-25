@@ -21,6 +21,7 @@ public:
         testDisabledInputBusClearsOutput();
         testZeroInputChannelsClearsOutput();
         testZeroLengthBlockIsSafe();
+        testOutOfRangeMonoIndexClearsOutputAndPeak();
     }
 
 private:
@@ -285,6 +286,29 @@ private:
         output.setSample(1, 0, 0.9f);
 
         processor.process(input, output, 2.0f);
+
+        expectEquals(output.getSample(0, 0), 0.0f);
+        expectEquals(output.getSample(1, 0), 0.0f);
+        expectEquals(processor.getPeakLevel(), 0.0f);
+    }
+
+    void testOutOfRangeMonoIndexClearsOutputAndPeak()
+    {
+        beginTest("Out-of-range mono source index clears output and peak");
+
+        Core::AudioPassthroughProcessor processor;
+        processor.prepare(2, 2, true, 44100.0);
+        processor.setChannelMode(Core::AudioFromChannelMode::kMonoLeft);
+        processor.setMonoSourceChannelIndex(2);
+
+        juce::AudioBuffer<float> input(2, 4);
+        juce::AudioBuffer<float> output(2, 4);
+        input.setSample(0, 0, 0.75f);
+        input.setSample(1, 0, 0.5f);
+        output.setSample(0, 0, 0.9f);
+        output.setSample(1, 0, 0.9f);
+
+        processor.process(input, output, 1.0f);
 
         expectEquals(output.getSample(0, 0), 0.0f);
         expectEquals(output.getSample(1, 0), 0.0f);
