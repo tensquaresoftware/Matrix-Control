@@ -85,8 +85,9 @@ namespace Core
         if (policy == kAskOncePerLoad)
             return reconcileAskOnce(model, internalSanitized, fileSanitized, picker);
 
-        model.setName(internalSanitized);
-        return makeMismatchResult(internalSanitized, false);
+        // Prefer-Internal: keep the decoded Matrix name bytes as-is (may include exotic factory
+        // characters). Do not re-filter through the Matrix filename charset.
+        return makeMismatchResult(model.getName(), false);
     }
 
 } // namespace Core

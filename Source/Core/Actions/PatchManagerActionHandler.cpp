@@ -12,6 +12,7 @@
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
 #include "Core/Services/PatchFileService.h"
+#include "Core/Services/Matrix1000FactoryPatchNames.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchFileServiceFooter.h"
@@ -336,7 +337,7 @@ namespace Core
             hooks_.setPatchLoadContext(
                 PatchLoadContext::deviceMemory(currentBank, getCurrentPatch(limits)));
 
-        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, nullptr);
+        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();
@@ -683,6 +684,7 @@ namespace Core
             return std::nullopt;
 
         patchModel_->loadFrom(packed);
+        patchModel_->normalizeNameEncoding();
 
         const auto reconciliation = reconcileLoadedPatchName(file);
         if (reconciliation.cancelled)
@@ -691,7 +693,6 @@ namespace Core
             return std::nullopt;
         }
 
-        patchModel_->normalizeNameEncoding();
         return reconciliation;
     }
 
@@ -1046,6 +1047,14 @@ namespace Core
 
                 patchModel_->loadFrom(dump.data());
                 patchModel_->normalizeNameEncoding();
+
+                if (limits.isRomBank(bank))
+                {
+                    const auto factoryName = Matrix1000FactoryPatchNames::nameFor(bank, patch);
+                    if (factoryName.isNotEmpty())
+                        patchModel_->setName(factoryName);
+                }
+
                 pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
                 captureCleanSnapshot();
                 clearPendingDeviceLoad();
@@ -1067,11 +1076,10 @@ namespace Core
             return;
 
         apvtsPatchMapper_->apvtsToBuffer();
+        if (patchNameSyncer_ != nullptr)
+            patchNameSyncer_->apvtsToBuffer();
 
-        const auto originalName = patchModel_->getName();
-        patchModel_->setName(PatchFileNameSanitizer::sanitizeFileStem(
-            targetFile.getFileNameWithoutExtension()));
-
+        // Preserve Matrix name bytes 0–7 — do not inject the sanitized filename into the payload.
         const auto result = patchFileService_->savePatchSysExFile(
             targetFile.withFileExtension(PatchFileService::kSyxExtension),
             patchModel_->data(),
@@ -1079,7 +1087,6 @@ namespace Core
 
         if (! result.success)
         {
-            patchModel_->setName(originalName);
             publishSaveFailureFooter(result.errorMessage);
             return;
         }
@@ -1109,10 +1116,12 @@ namespace Core
         const auto& names = patchFileService_->getLastScanResult().sortedValidFileNames;
         const int index = indexOfFileNameIgnoreCase(names, savedFileName);
 
+        suppressComputerPatchesSelectLoad_ = true;
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
             index >= 0 ? index + 1 : 0,
             nullptr);
+        suppressComputerPatchesSelectLoad_ = false;
         rememberComputerPatchesSelection(index >= 0 ? index + 1 : 0);
         bumpScanRevision();
     }
@@ -1148,8 +1157,7 @@ namespace Core
             PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
             juce::String()).toString();
 
-        const auto sanitized = PatchFileNameSanitizer::sanitizeToMatrixName(raw.trim());
-        return sanitized.isNotEmpty() ? sanitized : juce::String(PatchFileNameSanitizer::kEmptyNameFallback);
+        return PatchFileNameSanitizer::sanitizeOsFileStem(raw);
     }
 
     void PatchManagerActionHandler::publishSaveSuccessFooter(const juce::String& fileName)

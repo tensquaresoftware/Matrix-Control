@@ -201,7 +201,7 @@ public:
         testSaveAs_cancelledNoWrite();
         testSave_noSysEx();
         testSaveAs_noSysEx();
-        testSave_syncsPatchEditName();
+        testSave_preservesPatchEditName();
         testLoadSelected_enqueuesSysEx();
         testLoadSelected_matrix6_sendsPatchSlot();
         testLoadSelected_sentinelNoOp();
@@ -1868,9 +1868,9 @@ private:
         tempDir.deleteRecursively();
     }
 
-    void testSave_syncsPatchEditName()
+    void testSave_preservesPatchEditName()
     {
-        beginTest("save_syncsPatchEditName");
+        beginTest("save_preservesPatchEditName");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         const auto tempDir = createTempScanDir();
@@ -1882,13 +1882,24 @@ private:
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
 
+        harness.model.setName("*'CANOPY");
+        harness.proc.apvts.state.setProperty(PatchNameIds::kPatchName, "*'CANOPY", nullptr);
+
         harness.pickSaveFileCallback = [&tempDir](juce::File, juce::String) {
             return tempDir.getChildFile("MY-PATCH.syx");
         };
 
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
 
-        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "MY-PATCH");
+        expect(harness.model.getName() == "*'CANOPY");
+        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "*'CANOPY");
+
+        const auto savedFile = tempDir.getChildFile("MY-PATCH.syx");
+        expect(savedFile.existsAsFile());
+        juce::MemoryBlock savedSysEx;
+        expect(savedFile.loadFileAsData(savedSysEx));
+        expect(harness.decoder.validatePatchSysExMessage(savedSysEx));
+        expect(savedFile.getFileNameWithoutExtension() == "MY-PATCH");
 
         tempDir.deleteRecursively();
     }
@@ -1920,7 +1931,7 @@ private:
         expect(queued.editBufferPatch);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatReconciliationNotice("BNK2 71", false));
+               == FooterMessages::formatReconciliationNotice("BNK2: 71", false));
 
         tempDir.deleteRecursively();
     }
