@@ -30,7 +30,17 @@ namespace PluginDisplayNames
 
     namespace FooterPanel
     {
-        constexpr const char* kNoDevice = "No device";
+        constexpr const char* kDeviceLabel = "DEVICE";
+        constexpr const char* kDeviceNotConnectedDetail = "NOT CONNECTED";
+        constexpr const char* kDeviceUnknownDetail = "UNKNOWN";
+
+        // Deprecated alias — prefer kDeviceNotConnectedDetail for footer device status.
+        constexpr const char* kNoDevice = kDeviceNotConnectedDetail;
+
+        constexpr const char* kSeverityInfoPrefix = "INFO";
+        constexpr const char* kSeveritySuccessPrefix = "SUCCESS";
+        constexpr const char* kSeverityWarningPrefix = "WARNING";
+        constexpr const char* kSeverityErrorPrefix = "ERROR";
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
@@ -925,7 +935,7 @@ namespace PluginDisplayNames
 
                 constexpr const char* kDeviceDumpFailedFooter =
                     "Could not read the patch from the synth. Keeping the current editor buffer. "
-                    "Check that MIDI From is the synth MIDI OUT.";
+                    "Check that EDITOR MIDI FROM is the synth MIDI OUT.";
                 constexpr const char* kDeviceDumpAbortedEditedFooter =
                     "Synth patch load cancelled because the editor changed while waiting. "
                     "Bank and patch numbers were restored; your edits were kept.";

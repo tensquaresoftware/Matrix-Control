@@ -4,6 +4,7 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 using TSS::SkinColourId;
 
@@ -30,12 +31,55 @@ FooterPanel::~FooterPanel()
     apvts.state.removeListener(this);
 }
 
+void FooterPanel::paintBadgeAndDetail(juce::Graphics& g,
+                                      juce::Rectangle<int> bounds,
+                                      const juce::String& badgeLabel,
+                                      const juce::String& detailText,
+                                      juce::Colour badgeFill,
+                                      juce::Colour detailColour,
+                                      const juce::Font& font) const
+{
+    const int badgeHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.severityBadgeHeight), uiScale_);
+    const int badgePad = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.severityBadgeHorizontalPadding), uiScale_);
+    const int badgeGap = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.severityBadgeToMessageGap), uiScale_);
+    const auto badgeFont = skin_->getBaseFontBold().withHeight(font.getHeight());
+
+    g.setFont(badgeFont);
+
+    const int labelWidth = juce::roundToInt(juce::GlyphArrangement::getStringWidth(badgeFont, badgeLabel));
+    const int badgeWidth = juce::jmin(bounds.getWidth(), labelWidth + 2 * badgePad);
+    const int badgeY = bounds.getCentreY() - badgeHeight / 2;
+    const juce::Rectangle<int> badgeBounds {
+        bounds.getX(),
+        badgeY,
+        badgeWidth,
+        badgeHeight
+    };
+
+    g.setColour(badgeFill);
+    g.fillRect(badgeBounds);
+
+    g.setColour(skin_->getColour(SkinColourId::kFooterPanelBackground));
+    g.drawText(badgeLabel, badgeBounds, juce::Justification::centred, false);
+
+    bounds.removeFromLeft(badgeWidth + badgeGap);
+    g.setFont(font);
+    g.setColour(detailColour);
+    g.drawFittedText(detailText,
+                     bounds,
+                     juce::Justification::centredLeft,
+                     1,
+                     1.0f);
+}
+
 void FooterPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
 
     const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.padding) * uiScale_));
-    const int iconSize = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.iconSize) * uiScale_));
     const int bandHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dimensions_.bandHeight), uiScale_);
     const int bandVerticalInset = TSS::ScaledLayout::scaledInt(
@@ -56,44 +100,40 @@ void FooterPanel::paint(juce::Graphics& g)
     const juce::Rectangle<int> centreBand { leftBand.getRight() + gap, bandY, sharedW, bandHeight };
     const juce::Rectangle<int> rightBand { centreBand.getRight() + gap, bandY, masterEditW, bandHeight };
 
-    g.setColour(skin_->getColour(SkinColourId::kBodyPanelBackground));
+    g.setColour(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.0f));
     g.fillRect(leftBand);
     g.fillRect(centreBand);
     g.fillRect(rightBand);
 
     const auto font = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const auto chromeGrey = skin_->getColour(SkinColourId::kFooterMessageInfo);
 
     if (! currentMessage.isEmpty() && currentSeverity != MessageSeverity::None)
     {
-        auto messageBounds = leftBand.reduced(padding, 0);
-        g.setColour(getSeverityColour(currentSeverity));
-        g.setFont(font);
-
-        const juce::String icon = getSeverityIcon(currentSeverity);
-        const int iconSlotWidth = iconSize + padding;
-        if (icon.isNotEmpty() && messageBounds.getWidth() > iconSlotWidth)
-        {
-            const auto iconBounds = messageBounds.removeFromLeft(iconSlotWidth);
-            g.drawText(icon, iconBounds, juce::Justification::centredLeft);
-        }
-
-        g.drawFittedText(currentMessage,
-                         messageBounds,
-                         juce::Justification::centredLeft,
-                         1,
-                         1.0f);
+        paintBadgeAndDetail(g,
+                            leftBand.reduced(padding, 0),
+                            getSeverityPrefix(currentSeverity),
+                            currentMessage,
+                            getSeverityColour(currentSeverity),
+                            chromeGrey,
+                            font);
     }
 
-    const auto identityText = buildDeviceIdentityText();
-    if (identityText.isNotEmpty())
     {
-        g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-        g.setFont(font);
-        g.drawFittedText(identityText,
-                         rightBand,
-                         juce::Justification::centred,
-                         1,
-                         1.0f);
+        const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
+        const bool deviceOk = deviceDetected_
+            && MatrixDeviceTypes::isSupportedMatrixDevice(type);
+        const auto detailColour = skin_->getColour(deviceOk
+                                                       ? SkinColourId::kFooterMessageInfo
+                                                       : SkinColourId::kFooterMessageError);
+
+        paintBadgeAndDetail(g,
+                            rightBand.reduced(padding, 0),
+                            PluginDisplayNames::FooterPanel::kDeviceLabel,
+                            buildDeviceDetailText(),
+                            chromeGrey,
+                            detailColour,
+                            font);
     }
 }
 
@@ -171,34 +211,37 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
     }
 }
 
-juce::String FooterPanel::getSeverityIcon(MessageSeverity severity) const
+juce::String FooterPanel::getSeverityPrefix(MessageSeverity severity) const
 {
     switch (severity)
     {
         case MessageSeverity::None:
-            return juce::String();
+            return {};
         case MessageSeverity::Info:
-            return "ℹ";
+            return PluginDisplayNames::FooterPanel::kSeverityInfoPrefix;
         case MessageSeverity::Success:
-            return "✓";
+            return PluginDisplayNames::FooterPanel::kSeveritySuccessPrefix;
         case MessageSeverity::Warning:
-            return "⚠";
+            return PluginDisplayNames::FooterPanel::kSeverityWarningPrefix;
         case MessageSeverity::Error:
-            return "✗";
+            return PluginDisplayNames::FooterPanel::kSeverityErrorPrefix;
         default:
-            return juce::String();
+            return {};
     }
 }
 
-juce::String FooterPanel::buildDeviceIdentityText() const
+juce::String FooterPanel::buildDeviceDetailText() const
 {
-    if (! deviceDetected_ || deviceType_.isEmpty())
-        return {};
+    if (! deviceDetected_)
+        return PluginDisplayNames::FooterPanel::kDeviceNotConnectedDetail;
 
-    juce::String identity = MatrixDeviceTypes::toDisplayString(
-        MatrixDeviceTypes::fromApvtsString(deviceType_));
+    const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
+    if (! MatrixDeviceTypes::isSupportedMatrixDevice(type))
+        return PluginDisplayNames::FooterPanel::kDeviceUnknownDetail;
+
+    juce::String detail = MatrixDeviceTypes::toDisplayString(type).toUpperCase();
     if (deviceVersion_.isNotEmpty())
-        identity += " · v" + deviceVersion_;
+        detail += " (V" + deviceVersion_.toUpperCase() + ")";
 
-    return identity;
+    return detail;
 }

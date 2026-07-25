@@ -48,6 +48,9 @@ struct FooterPanelDimensions
     int sharedPanelWidth;
     int masterEditPanelWidth;
     int interColumnGap;
+    int severityBadgeHeight;
+    int severityBadgeHorizontalPadding;
+    int severityBadgeToMessageGap;
 };
 
 struct PatchEditModulesRowDimensions

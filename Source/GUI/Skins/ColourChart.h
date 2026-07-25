@@ -14,6 +14,8 @@ struct ColourChart
     static constexpr juce::uint32 kDarkGrey3   = 0xFF303030;
     static constexpr juce::uint32 kDarkGrey4   = 0xFF404040;
     static constexpr juce::uint32 kDarkGrey5   = 0xFF505050;
+    static constexpr juce::uint32 kDarkGrey6   = 0xFF606060;
+    static constexpr juce::uint32 kDarkGrey7   = 0xFF707070;
     
     static constexpr juce::uint32 kLightGrey1  = 0xFF999999;
     static constexpr juce::uint32 kLightGrey2  = 0xFFB9B9B9;

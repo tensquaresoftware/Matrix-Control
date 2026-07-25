@@ -93,16 +93,17 @@ namespace TSS::SkinColours
 
         namespace FooterPanel
         {
+            // Trial chrome grey for footer message body / INFO·SUCCESS badges.
             inline constexpr ColourElement kMessageInfo = {
                 "FooterMessageInfo",
-                ColourChart::kLightGrey1,
-                ColourChart::kLightGrey1
+                ColourChart::kDarkGrey6,
+                ColourChart::kDarkGrey6
             };
 
             inline constexpr ColourElement kMessageSuccess = {
                 "FooterMessageSuccess",
-                ColourChart::kGreen4,
-                ColourChart::kGreen4
+                ColourChart::kDarkGrey6,
+                ColourChart::kDarkGrey6
             };
 
             inline constexpr ColourElement kMessageWarning = {

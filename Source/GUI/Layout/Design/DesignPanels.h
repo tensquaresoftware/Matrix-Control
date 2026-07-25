@@ -207,9 +207,12 @@ namespace TSS::Design
             inline constexpr int kHeight = 32;
             inline constexpr int kBandHeight = 24;
             inline constexpr int kBandVerticalInset = (kHeight - kBandHeight) / 2; // 4 px above/below
-            inline constexpr int kPadding = Spacing::kMedium;
+            inline constexpr int kPadding = Spacing::kLarge; // 12 — align with Body column / Patch Edit inset
             // Intentional ÷4 exception: severity icon slot stays 14 (do not snap to 12/16).
             inline constexpr int kIconSize = 14;
+            inline constexpr int kSeverityBadgeHeight = 16;
+            inline constexpr int kSeverityBadgeHorizontalPadding = Spacing::kStandard;
+            inline constexpr int kSeverityBadgeToMessageGap = Spacing::kMedium;
         }
     }
 

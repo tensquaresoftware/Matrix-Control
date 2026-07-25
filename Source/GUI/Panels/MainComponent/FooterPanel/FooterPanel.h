@@ -57,8 +57,15 @@ private:
 
     MessageSeverity parseSeverity(const juce::String& severityStr) const;
     juce::Colour getSeverityColour(MessageSeverity severity) const;
-    juce::String getSeverityIcon(MessageSeverity severity) const;
-    juce::String buildDeviceIdentityText() const;
+    juce::String getSeverityPrefix(MessageSeverity severity) const;
+    juce::String buildDeviceDetailText() const;
+    void paintBadgeAndDetail(juce::Graphics& g,
+                             juce::Rectangle<int> bounds,
+                             const juce::String& badgeLabel,
+                             const juce::String& detailText,
+                             juce::Colour badgeFill,
+                             juce::Colour detailColour,
+                             const juce::Font& font) const;
     void syncFromApvtsState(juce::ValueTree& tree);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)

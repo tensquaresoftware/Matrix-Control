@@ -22,10 +22,19 @@ namespace TSS::Design
     static_assert(Panels::Footer::kBandVerticalInset * 2 + Panels::Footer::kBandHeight
                       == Panels::Footer::kHeight,
                   "Footer height = band + vertical insets");
-    static_assert(Panels::Footer::kPadding == 8, "Footer padding");
+    static_assert(Panels::Footer::kPadding == 12, "Footer padding");
     static_assert(Panels::Footer::kPadding % 4 == 0, "Footer padding must be on the design ÷4 grid");
+    static_assert(Panels::Footer::kPadding == Panels::Body::kColumnPadding,
+                  "Footer left inset matches Body column / Patch Edit module inset");
     static_assert(Panels::Footer::kIconSize == 14,
                   "Footer icon size intentional ÷4 exception (do not snap to 12/16)");
+    static_assert(Panels::Footer::kSeverityBadgeHeight == 16, "Footer severity badge height");
+    static_assert(Panels::Footer::kSeverityBadgeHeight % 4 == 0,
+                  "Footer severity badge height must be on the design ÷4 grid");
+    static_assert(Panels::Footer::kSeverityBadgeHorizontalPadding == 4,
+                  "Footer severity badge horizontal padding");
+    static_assert(Panels::Footer::kSeverityBadgeToMessageGap == 8,
+                  "Footer severity badge to message gap");
 
     static_assert(Recipes::ParameterCell::kWidth == 152, "ParameterCell width");
     static_assert(Recipes::ParameterCell::kHeight == 24, "ParameterCell height");
