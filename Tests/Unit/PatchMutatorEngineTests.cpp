@@ -223,6 +223,7 @@ private:
                      &midiManager.getSysExEncoder())
         {
             proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+            proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
             model.loadFrom(Core::InitDefaults::patchData());
         }
 

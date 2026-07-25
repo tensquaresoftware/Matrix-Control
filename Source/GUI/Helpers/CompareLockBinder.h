@@ -5,10 +5,13 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "Shared/Definitions/MatrixDeviceTypes.h"
+
 namespace TSS
 {
     // Composes FR-2 device lock with Mutator Compare lock on a set of section containers.
-    // Interactive children are enabled only when deviceDetected && !(compareActive && lockOnCompare).
+    // Interactive children are enabled only when a supported device is detected and
+    // !(compareActive && lockOnCompare). Unknown Matrix-family members stay locked.
     // Use lockOnCompare=false for Patch Mutator (COMPARE must stay live while Compare is active).
     class CompareLockBinder : public juce::ValueTree::Listener
     {
@@ -28,7 +31,9 @@ namespace TSS
 
     private:
         void apply();
-        void syncDeviceLockFooter(bool deviceDetected, bool compareActive);
+        void syncDeviceLockFooter(bool deviceDetected,
+                                  MatrixDeviceTypes::Type deviceType,
+                                  bool compareActive);
 
         juce::AudioProcessorValueTreeState& apvts_;
         std::vector<juce::Component::SafePointer<juce::Component>> locked_;

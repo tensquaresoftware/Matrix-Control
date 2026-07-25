@@ -104,7 +104,7 @@ void MasterEditPanel::refreshDeviceGating()
         false));
 
     // Root Compare/device lock already dims the panel — skip child gray to avoid ~0.25 alpha.
-    const bool rootLocked = Core::isSectionLocked(deviceDetected, compareActive);
+    const bool rootLocked = Core::isSectionLocked(deviceDetected, deviceType, compareActive);
     const bool shouldGray = ! rootLocked
         && deviceDetected
         && ! Core::isMasterEditAllowed(deviceDetected, deviceType);

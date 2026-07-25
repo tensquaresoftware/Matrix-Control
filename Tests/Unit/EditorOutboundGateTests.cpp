@@ -2,6 +2,7 @@
 
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 class EditorOutboundGateTests : public juce::UnitTest
 {
@@ -10,34 +11,43 @@ public:
 
     void runTest() override
     {
-        beginTest("isEditorOutboundAllowed — follows deviceDetected");
-        expect(! Core::isEditorOutboundAllowed(false));
-        expect(Core::isEditorOutboundAllowed(true));
+        using Type = MatrixDeviceTypes::Type;
 
-        beginTest("maySendEditorProgramChange — blocked when undetected");
-        expect(! Core::maySendEditorProgramChange(false));
-        expect(Core::maySendEditorProgramChange(true));
+        beginTest("isEditorOutboundAllowed — supported device only");
+        expect(! Core::isEditorOutboundAllowed(false, Type::kMatrix1000));
+        expect(! Core::isEditorOutboundAllowed(true, Type::kUnknown));
+        expect(Core::isEditorOutboundAllowed(true, Type::kMatrix1000));
+        expect(Core::isEditorOutboundAllowed(true, Type::kMatrix6));
+        expect(Core::isEditorOutboundAllowed(true, Type::kMatrix6R));
 
-        beginTest("maySendEditorSysEx — blocks editor SysEx when undetected");
+        beginTest("maySendEditorProgramChange — blocked when undetected or Unknown");
+        expect(! Core::maySendEditorProgramChange(false, Type::kMatrix1000));
+        expect(! Core::maySendEditorProgramChange(true, Type::kUnknown));
+        expect(Core::maySendEditorProgramChange(true, Type::kMatrix1000));
+
+        beginTest("maySendEditorSysEx — blocks editor SysEx when undetected or Unknown");
         juce::MemoryBlock remoteEdit;
         {
             const juce::uint8 bytes[] = { 0xF0, 0x10, 0x06, 0x06, 0x00, 0x40, 0xF7 };
             remoteEdit.append(bytes, sizeof(bytes));
         }
-        expect(! Core::maySendEditorSysEx(false, remoteEdit));
-        expect(Core::maySendEditorSysEx(true, remoteEdit));
+        expect(! Core::maySendEditorSysEx(false, Type::kMatrix1000, remoteEdit));
+        expect(! Core::maySendEditorSysEx(true, Type::kUnknown, remoteEdit));
+        expect(Core::maySendEditorSysEx(true, Type::kMatrix1000, remoteEdit));
 
-        beginTest("maySendEditorSysEx — Device Inquiry allowlisted while undetected");
+        beginTest("maySendEditorSysEx — Device Inquiry allowlisted while locked");
         const auto inquiry = SysExEncoder::encodeDeviceInquiry();
         expect(Core::isDeviceInquirySysEx(inquiry));
-        expect(Core::maySendEditorSysEx(false, inquiry));
-        expect(Core::maySendEditorSysEx(true, inquiry));
+        expect(Core::maySendEditorSysEx(false, Type::kUnknown, inquiry));
+        expect(Core::maySendEditorSysEx(true, Type::kUnknown, inquiry));
+        expect(Core::maySendEditorSysEx(true, Type::kMatrix1000, inquiry));
 
-        beginTest("isSectionLocked — composes device detection and Compare");
-        expect(Core::isSectionLocked(false, false));
-        expect(Core::isSectionLocked(false, true));
-        expect(Core::isSectionLocked(true, true));
-        expect(! Core::isSectionLocked(true, false));
+        beginTest("isSectionLocked — composes detection, Unknown, and Compare");
+        expect(Core::isSectionLocked(false, Type::kMatrix1000, false));
+        expect(Core::isSectionLocked(true, Type::kUnknown, false));
+        expect(Core::isSectionLocked(true, Type::kMatrix1000, true));
+        expect(! Core::isSectionLocked(true, Type::kMatrix1000, false));
+        expect(! Core::isSectionLocked(true, Type::kMatrix6, false));
     }
 };
 

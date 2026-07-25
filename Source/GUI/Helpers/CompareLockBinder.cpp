@@ -1,7 +1,9 @@
 #include "GUI/Helpers/CompareLockBinder.h"
 
 #include "Core/MIDI/EditorOutboundGate.h"
+#include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/GrayedControlHelper.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -13,6 +15,7 @@ namespace
 
     constexpr float kLockedAlpha = 0.5f;
     const juce::Identifier kDeviceDetectedId("deviceDetected");
+    const juce::Identifier kDeviceTypeId(MatrixDeviceTypes::kApvtsPropertyName);
 
     void applySectionLock(juce::Component& component, bool locked)
     {
@@ -25,6 +28,12 @@ namespace
 
         if (locked)
             component.giveAwayKeyboardFocus();
+    }
+
+    bool isOwnedDeviceLockFooter(const juce::String& text)
+    {
+        return text == juce::String(FooterCopy::kDeviceLockGuidance)
+            || text == juce::String(FooterCopy::kUnsupportedMatrixDeviceFooter);
     }
 }
 
@@ -51,8 +60,12 @@ namespace TSS
 
     void CompareLockBinder::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
     {
-        if (property.toString() == MutatorState::kCompareActive || property == kDeviceDetectedId)
+        if (property.toString() == MutatorState::kCompareActive
+            || property == kDeviceDetectedId
+            || property == kDeviceTypeId)
+        {
             apply();
+        }
     }
 
     void CompareLockBinder::valueTreeRedirected(juce::ValueTree&)
@@ -60,19 +73,23 @@ namespace TSS
         apply();
     }
 
-    void CompareLockBinder::syncDeviceLockFooter(bool deviceDetected, bool compareActive)
+    void CompareLockBinder::syncDeviceLockFooter(bool deviceDetected,
+                                                 MatrixDeviceTypes::Type deviceType,
+                                                 bool compareActive)
     {
-        if (! deviceDetected)
+        const bool deviceLocked = ! Core::isEditorOutboundAllowed(deviceDetected, deviceType);
+
+        if (deviceLocked)
         {
-            GrayedControlHelper::setFooterInfoMessage(apvts_, FooterCopy::kDeviceLockGuidance);
+            const auto* message = deviceDetected
+                                      ? FooterCopy::kUnsupportedMatrixDeviceFooter
+                                      : FooterCopy::kDeviceLockGuidance;
+            GrayedControlHelper::setFooterInfoMessage(apvts_, message);
             return;
         }
 
-        if (apvts_.state.getProperty("uiMessageText").toString()
-            != juce::String(FooterCopy::kDeviceLockGuidance))
-        {
+        if (! isOwnedDeviceLockFooter(apvts_.state.getProperty("uiMessageText").toString()))
             return;
-        }
 
         // Exact-string clear (match Compare): text + severity, then restore Compare copy if still active.
         apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
@@ -88,10 +105,12 @@ namespace TSS
             apvts_.state.getProperty(MutatorState::kCompareActive, false));
         const bool deviceDetected = static_cast<bool>(
             apvts_.state.getProperty(kDeviceDetectedId, false));
+        const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+            apvts_.state.getProperty(kDeviceTypeId));
 
         const bool locked = lockOnCompare_
-                                ? Core::isSectionLocked(deviceDetected, compareActive)
-                                : ! deviceDetected;
+                                ? Core::isSectionLocked(deviceDetected, deviceType, compareActive)
+                                : ! Core::isEditorOutboundAllowed(deviceDetected, deviceType);
 
         for (auto& safeComponent : locked_)
         {
@@ -99,6 +118,6 @@ namespace TSS
                 applySectionLock(*component, locked);
         }
 
-        syncDeviceLockFooter(deviceDetected, compareActive);
+        syncDeviceLockFooter(deviceDetected, deviceType, compareActive);
     }
 }

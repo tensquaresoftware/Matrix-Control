@@ -56,7 +56,8 @@ namespace
             apvts.state.setProperty("midiOutputPortId", deviceId, nullptr);
     }
 
-    // Mirrors PluginProcessor::setKeyboardFromPort (post-review) without standalone guard.
+    // Mirrors PluginProcessor::setKeyboardFromPort (V1.2 review): leave APVTS unchanged on
+    // open failure so the editor can restore the previous selection without a race.
     bool setKeyboardFromPortLikeProcessor(juce::ValueTree& state,
                                         Core::KeyboardFromMidiInput& keyboardFrom,
                                         const juce::String& deviceId)
@@ -70,11 +71,7 @@ namespace
         }
 
         if (!keyboardFrom.setPort(deviceId))
-        {
-            state.setProperty("keyboardFromEnabled", false, nullptr);
-            state.setProperty("keyboardFromPortId", juce::String(), nullptr);
             return false;
-        }
 
         state.setProperty("keyboardFromEnabled", true, nullptr);
         state.setProperty("keyboardFromPortId", deviceId, nullptr);
@@ -94,7 +91,7 @@ public:
         testMidiOutputPortEmptyClearsApvtsProperty();
         testMidiOutputPortInvalidIdLeavesApvtsUnchanged();
         testKeyboardFromPortEmptyClearsProperties();
-        testKeyboardFromPortInvalidIdClearsProperties();
+        testKeyboardFromPortInvalidIdLeavesPropertiesUnchanged();
         testKeyboardFromPortValidIdWouldSetProperties();
     }
 
@@ -179,9 +176,9 @@ private:
         expectEquals(state.getProperty("keyboardFromPortId").toString(), juce::String());
     }
 
-    void testKeyboardFromPortInvalidIdClearsProperties()
+    void testKeyboardFromPortInvalidIdLeavesPropertiesUnchanged()
     {
-        beginTest("setKeyboardFromPort invalid id — clears properties and returns false");
+        beginTest("setKeyboardFromPort invalid id — leaves properties unchanged and returns false");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -193,8 +190,8 @@ private:
 
         expect(!setKeyboardFromPortLikeProcessor(state, keyboardFrom, "matrix-control-nonexistent-keyboard-port"));
         expect(!keyboardFrom.isPortOpen());
-        expect(!static_cast<bool>(state.getProperty("keyboardFromEnabled")));
-        expectEquals(state.getProperty("keyboardFromPortId").toString(), juce::String());
+        expect(static_cast<bool>(state.getProperty("keyboardFromEnabled")));
+        expectEquals(state.getProperty("keyboardFromPortId").toString(), juce::String("stale-keyboard-id"));
     }
 
     void testKeyboardFromPortValidIdWouldSetProperties()

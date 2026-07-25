@@ -3,7 +3,9 @@
 
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
+#include "Core/MIDI/MidiPortStateCoherence.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace
@@ -80,6 +82,8 @@ public:
         testFailedOpenDoesNotUpdateApvtsPortId();
         testEmptyDeviceIdClearDoesNotSetFooterMessage();
         testPortFailureDoesNotUpdateLastErrorState();
+        testSyncPathFailureAlignsApvtsToOpenReality();
+        testSoftSyncKeepsDesiredIdUntilReportingAlign();
     }
 
 private:
@@ -167,6 +171,9 @@ private:
                      juce::String("info"));
 
         processor.apvts.state.setProperty("deviceDetected", true, nullptr);
+        processor.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                          MatrixDeviceTypes::kMatrix1000Id,
+                                          nullptr);
         expect(midiManager.setMidiInputPort(juce::String()));
         expect(midiManager.setMidiOutputPort(juce::String()));
         expect(processor.apvts.state.getProperty("uiMessageText").toString().isEmpty());
@@ -191,6 +198,59 @@ private:
 
         expectEquals(processor.apvts.state.getProperty("lastError").toString(), priorError);
         expectEquals(processor.apvts.state.getProperty("errorType").toString(), priorType);
+    }
+
+    void testSyncPathFailureAlignsApvtsToOpenReality()
+    {
+        beginTest("reporting sync open failure — APVTS cleared to none sentinel");
+
+        MinimalAudioProcessor processor;
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManager midiManager(processor.apvts, queue, tracker);
+
+        const juce::String staleId { "matrix-control-stale-sync-input-id" };
+        processor.apvts.state.setProperty("midiInputPortId", staleId, nullptr);
+
+        const bool opened = midiManager.setMidiInputPort(staleId, true);
+        expect(! opened);
+
+        Core::maybeAlignApvtsPortIdAfterOpenAttempt(
+            processor.apvts.state,
+            "midiInputPortId",
+            true,
+            opened,
+            staleId,
+            midiManager.getOpenInputDeviceId());
+
+        expectEquals(processor.apvts.state.getProperty("midiInputPortId").toString(), juce::String());
+        expect(processor.apvts.state.getProperty("uiMessageText").toString().contains("MIDI From"));
+    }
+
+    void testSoftSyncKeepsDesiredIdUntilReportingAlign()
+    {
+        beginTest("soft sync open failure — APVTS keeps desired id (option 2 intermediate)");
+
+        MinimalAudioProcessor processor;
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MidiManager midiManager(processor.apvts, queue, tracker);
+
+        const juce::String desiredId { "matrix-control-soft-sync-input-id" };
+        processor.apvts.state.setProperty("midiInputPortId", desiredId, nullptr);
+
+        const bool opened = midiManager.setMidiInputPort(desiredId, false);
+        expect(! opened);
+
+        Core::maybeAlignApvtsPortIdAfterOpenAttempt(
+            processor.apvts.state,
+            "midiInputPortId",
+            false,
+            opened,
+            desiredId,
+            midiManager.getOpenInputDeviceId());
+
+        expectEquals(processor.apvts.state.getProperty("midiInputPortId").toString(), desiredId);
     }
 };
 

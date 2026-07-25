@@ -395,6 +395,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/KeyboardFromMidiInputTests.cpp
         Tests/Unit/MidiPortOpenFeedbackTests.cpp
         Tests/Unit/MidiPortOpenFailurePropagationTests.cpp
+        Tests/Unit/MidiPortStateCoherenceTests.cpp
         Tests/Unit/MidiPortRoutingPropertyTests.cpp
         Tests/Unit/MidiOutboundQueueTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp

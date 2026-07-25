@@ -108,6 +108,15 @@ private:
         expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(m6)),
                      static_cast<int>(MatrixDeviceTypes::Type::kMatrix6));
 
+        const auto unknownMember = makeInquiryInfo(
+            SysExConstants::DeviceInquiry::kExpectedManufacturer,
+            SysExConstants::DeviceInquiry::kExpectedFamily,
+            SysExConstants::DeviceInquiry::kExpectedFamilyHigh,
+            0x55,
+            0x00);
+        expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(unknownMember)),
+                     static_cast<int>(MatrixDeviceTypes::Type::kUnknown));
+
         auto wrongManuf = m1000;
         wrongManuf.manufacturerId = 0x41;
         expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(wrongManuf)),
@@ -174,6 +183,18 @@ private:
         const auto rejected = decoder.decodeDeviceId(
             juce::MemoryBlock(badFamilyHigh, sizeof(badFamilyHigh)));
         expect(!rejected.isValid);
+
+        const juce::uint8 unknownMemberReply[] = {
+            0xF0, 0x7E, 0x00, 0x06, 0x02,
+            0x10, 0x06, 0x00, 0x55, 0x00,
+            '1', '.', '1', '1',
+            0xF7
+        };
+        const auto unknownMember = decoder.decodeDeviceId(
+            juce::MemoryBlock(unknownMemberReply, sizeof(unknownMemberReply)));
+        expect(unknownMember.isValid);
+        expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(unknownMember)),
+                     static_cast<int>(MatrixDeviceTypes::Type::kUnknown));
     }
 };
 

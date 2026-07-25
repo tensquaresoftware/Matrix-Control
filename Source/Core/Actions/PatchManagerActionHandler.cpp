@@ -4,6 +4,7 @@
 #include "Core/Init/PatchInitService.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/PatchSelectionMidiSync.h"
+#include "Core/MIDI/Queue/MidiRequestTiming.h"
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
@@ -23,14 +24,6 @@
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
 namespace MutatorMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
-
-namespace
-{
-    // Time given to the synth to settle after Set Bank / Program Change before the dump request.
-    constexpr int kDeviceSettleMs = 50;
-    // Upper bound on non-blocking outbound-idle polling before the async dump request.
-    constexpr int kOutboundIdleTimeoutMs = 500;
-}
 
 namespace
 {
@@ -864,10 +857,12 @@ namespace Core
             return;
         }
 
-        midiManager_->requestSinglePatchAsync(patchNumber,
-                                              std::move(onResult),
-                                              kDeviceSettleMs,
-                                              kOutboundIdleTimeoutMs);
+        const int profileDelayMs = midiManager_->getRequiredSysExDelayMs();
+        midiManager_->requestSinglePatchAsync(
+            patchNumber,
+            std::move(onResult),
+            Core::MidiRequestTiming::deviceSettleMs(profileDelayMs),
+            Core::MidiRequestTiming::outboundIdleTimeoutMs(profileDelayMs));
     }
 
     void PatchManagerActionHandler::noteStableComputerPatchesSelection(int selectedId)

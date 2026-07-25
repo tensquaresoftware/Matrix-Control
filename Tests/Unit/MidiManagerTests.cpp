@@ -4,6 +4,7 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/MidiManager.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace
 {
@@ -98,6 +99,7 @@ public:
         testEditorOutboundGateBlocksProgramChangeWhenUndetected();
         testEditorOutboundGateBlocksSysExWhenUndetected();
         testEditorOutboundGateAllowsSendWhenDetected();
+        testRequestSinglePatchAsyncIdleTimeoutFailsVisibly();
     }
 
 private:
@@ -204,6 +206,7 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
         expect(manager.isEditorOutboundAllowed());
 
         manager.startThread();
@@ -225,6 +228,7 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
 
         manager.startThread();
         manager.sendProgramChange(42, 1);
@@ -245,6 +249,7 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
 
         manager.startThread();
         manager.enqueueRemoteParameterEdit(10, 64);
@@ -265,6 +270,7 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
 
         if (!openFirstAvailableOutputOrSkip(manager, *this))
             return;
@@ -291,6 +297,7 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
 
         manager.startThread();
 
@@ -383,6 +390,7 @@ private:
         MidiManager manager(proc.apvts, queue, tracker);
 
         proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
 
         if (!manager.setMidiOutputPort(outputId))
         {
@@ -409,6 +417,44 @@ private:
                "Draining realtime during SysEx gate should complete well under gate*N blocking");
 
         manager.stopThread(2000);
+    }
+
+    void testRequestSinglePatchAsyncIdleTimeoutFailsVisibly()
+    {
+        beginTest("requestSinglePatchAsync — injectable idle timeout fails with empty callback");
+
+        Core::MidiOutboundQueue queue;
+        Core::MidiActivityTracker tracker;
+        MinimalAudioProcessor proc;
+        MidiManager manager(proc.apvts, queue, tracker);
+
+        proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+        proc.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                      MatrixDeviceTypes::kMatrix1000Id,
+                                      nullptr);
+
+        // Keep the outbound queue non-idle without starting the consumer thread.
+        const juce::uint8 stuckBytes[] = { 0xF0, 0x10, 0x06, 0x06, 0x00, 0x40, 0xF7 };
+        juce::MemoryBlock stuckSysEx(stuckBytes, sizeof(stuckBytes));
+        queue.enqueueSysEx(stuckSysEx);
+
+        bool callbackRan = false;
+        bool callbackEmpty = false;
+        manager.requestSinglePatchAsync(
+            0,
+            [&](std::vector<juce::uint8> packed)
+            {
+                callbackRan = true;
+                callbackEmpty = packed.empty();
+            },
+            0,
+            0);
+
+        expect(callbackRan, "Idle timeout must invoke the dump callback");
+        expect(callbackEmpty, "Timed-out dump must fail with an empty packed buffer");
+        expect(proc.apvts.state.getProperty("lastError").toString().contains("Timeout"),
+               "Idle timeout must surface a visible Timeout error state");
+        expectEquals(proc.apvts.state.getProperty("errorType").toString(), juce::String("Timeout"));
     }
 };
 

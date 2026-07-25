@@ -199,16 +199,9 @@ void SysExDecoder::validateMatrixFamilyDevice(DeviceIdInfo& info) const
         info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily
         && info.familyHigh == SysExConstants::DeviceInquiry::kExpectedFamilyHigh;
 
-    const bool memberMatchesMatrix1000 =
-        info.memberLow == SysExConstants::DeviceInquiry::kExpectedMemberLow
-        && info.memberHigh == SysExConstants::DeviceInquiry::kExpectedMemberHigh;
-
-    const bool memberMatchesMatrix6 =
-        info.memberLow == SysExConstants::DeviceInquiry::kMatrix6MemberLow
-        && info.memberHigh == SysExConstants::DeviceInquiry::kMatrix6MemberHigh;
-
-    info.isValid = manufacturerMatches && familyMatches
-        && (memberMatchesMatrix1000 || memberMatchesMatrix6);
+    // Family match is enough for inquiry success. Unknown member bytes map to
+    // deviceType=Unknown (connected-but-unsupported) via DeviceTypeRegistry.
+    info.isValid = manufacturerMatches && familyMatches;
 
     if (!info.isValid && manufacturerMatches
         && info.familyLow == SysExConstants::DeviceInquiry::kExpectedFamily

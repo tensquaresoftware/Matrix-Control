@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of v1-2-device-connection-and-ports (2026-07-25)
+
+- `DeviceMemoryLimits::resolve(kUnknown)` still returns Matrix-1000 limits — known Project Map warning; V1.2 locks Unknown via CompareLockBinder / outbound gate instead of neutral limits.
+- Brief Header combo can show an older port than APVTS under rapid port-id changes before `callAsync` runs (`PluginEditor.cpp` property listener).
+- Interactive MIDI From/To open failure leaves a short window with previous port closed and no Device Inquiry refresh until onChange restores the prior selection.
+- `EditorOutboundGate::maySendEditorSysEx` is not wired into production `sendSysExWithDelay` / queue drain; Device Inquiry remains ungated by design; allow predicates still use `isEditorOutboundAllowed`.
+- No MidiManager end-to-end inquiry-success fixture asserting Unknown → lock/footer (decoder/registry + Matrix-Simulator Unknown Device cover the live path).
+
 ## Deferred from: code review of v1-1-unsaved-navigation-consistency (2026-07-25)
 
 - Mid-window dump abort uses full-buffer `memcmp` after APVTS sync: host automation or parameter SysEx echo during the settle window can false-abort a good dump (keeps edits + dirty + footer). Accepted V1 strictness vs silent overwrite; revisit only if false aborts show up in real use.
@@ -113,7 +121,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: code review of spec-8-4-virtual-instrument-registration-and-bus-layout (2026-07-19)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
-  summary: When device is detected but type is Unknown (neither Matrix-1000 nor Matrix-6/6R), gray the entire GUI and show an explicit footer — product rule confirmed in 8-4 review; out of 8-4 scope (MASTER keep allowlist; footer wording patched in 8-4).
+  summary: ~~When device is detected but type is Unknown (neither Matrix-1000 nor Matrix-6/6R), gray the entire GUI and show an explicit footer — product rule confirmed in 8-4 review; out of 8-4 scope (MASTER keep allowlist; footer wording patched in 8-4).~~ **Resolved 2026-07-25 (v1-2)**: family+unknown member reaches `deviceDetected` + `deviceType=Unknown`; `CompareLockBinder` / outbound gate lock supported-device-only; distinct footer `kUnsupportedMatrixDeviceFooter`.
   evidence: Decision 1 resolution 2026-07-19; follow-up story / correct course.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-4-virtual-instrument-registration-and-bus-layout.md`
@@ -572,10 +580,10 @@ Original review bullets below remain for history; status for U-10-owned residual
 
 ## Deferred from: code review of 2-9b-header-routing-controls-uat-slice (2026-06-05)
 
-- **Combo/backend mismatch si `MidiManager::set*Port` échoue** (`PluginProcessor.cpp:249-268`) — pattern brownfield pre-existing ; combo avance, APVTS inchangé jusqu’au prochain succès.
+- **~~Combo/backend mismatch si `MidiManager::set*Port` échoue~~** (`PluginProcessor.cpp`) — ~~pattern brownfield pre-existing ; combo avance, APVTS inchangé jusqu’au prochain succès.~~ **Resolved 2026-07-25 (v1-2, review patch option 2)**: reporting sync / standalone / last deferred attempt align APVTS to open reality; soft intermediate plugin retries keep the desired id for reopen; Header combo resyncs from APVTS.
 - **Double forwarding host buffer en standalone** (`PluginProcessor.cpp:210-218`) — AC #7 assume buffer hôte vide ; edge case host injectant MIDI en standalone.
-- **MIDI FROM + KEYBOARD FROM même device** (`HeaderPanel` / `PluginProcessor`) — deux `juce::MidiInput` sur un identifiant ; pas de garde UI dans scope UAT slice.
-- **`setStateInformation` sans resync ports/combos** (`PluginProcessor.cpp:233-246`) — restore ports uniquement au ctor `PluginEditor` ; reload session complète OK.
+- **~~MIDI FROM + KEYBOARD FROM même device~~** (`HeaderPanel` / `PluginProcessor`) — ~~deux `juce::MidiInput` sur un identifiant ; pas de garde UI dans scope UAT slice.~~ **Resolved 2026-07-25 (v1-2, review patch)**: standalone rejects same-id on interactive setters **and** on `syncMidiPortsFromStateImpl`; conflict footer clears after a successful distinct selection.
+- **`setStateInformation` sans resync ports/combos** (`PluginProcessor.cpp:233-246`) — restore ports uniquement au ctor `PluginEditor` ; reload session complète OK. (Full host reload resync remains out of v1-2 scope beyond open/combo coherence.)
 - **Thread safety `keyboardFromEnabled` message/audio** (`PluginProcessor.cpp:213-214`) — `juce::var` lu audio thread, écrit message thread ; pre-existing story 2.3.
 
 ## Deferred from: code review of 2-9-wire-midimanager-queue-consumer (2026-06-05)
@@ -675,7 +683,7 @@ Original review bullets below remain for history; status for U-10-owned residual
   evidence: Blind Hunter; `handlePatchNumberChange` → `confirmPatchContextChangeGate` → `runModalLoop`; re-entrancy risk if timers/edits fire during modal. Partial mitigation (2026-07-16 review): gate refuses off message-thread; nested-loop redesign still open.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`
-  summary: Hard-coded 50 ms settle / 500 ms queue-idle timeouts for device dump may be wrong for slow MIDI interfaces.
+  summary: ~~Hard-coded 50 ms settle / 500 ms queue-idle timeouts for device dump may be wrong for slow MIDI interfaces.~~ **Resolved 2026-07-25 (v1-2)**: `MidiRequestTiming` SSOT with profile-aware floors shared by dump + inquiry; idle timeout still fails dump (v1-1 path).
   evidence: Blind Hunter / Edge Case; silent stale-buffer risk if synth is slower than settle; needs hardware profiling or delay profile hook.
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-mutator-synth-load-history-export-compare.md`

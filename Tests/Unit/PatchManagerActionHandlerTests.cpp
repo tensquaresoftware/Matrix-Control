@@ -370,6 +370,7 @@ private:
                 Core::InitDefaults::patchData(),
                 Core::InitDefaults::patchData() + Core::PatchModel::kBufferSize);
             proc.apvts.state.setProperty("deviceDetected", true, nullptr);
+            proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);
             initializePatchManagerState(proc.apvts.state, 0, 0, false);
             patchSelectionMidiSync.clearSyncedBankState();
         }

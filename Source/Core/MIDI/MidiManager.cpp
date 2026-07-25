@@ -6,6 +6,7 @@
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MidiPortOpenFeedback.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
+#include "Core/MIDI/Queue/MidiRequestTiming.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -13,17 +14,22 @@
 
 namespace
 {
-    // Port open/clear paths wipe the left-zone footer; re-assert FR-2 guidance while still locked.
+    // Port open/clear paths wipe the left-zone footer; re-assert FR-2 / Unknown guidance while locked.
     void clearFooterThenReassertDeviceLockGuidance(juce::AudioProcessorValueTreeState& apvts)
     {
         ExceptionPropagator::clearMessage(apvts);
 
-        if (static_cast<bool>(apvts.state.getProperty("deviceDetected", false)))
+        const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+        const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+            apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+
+        if (Core::isEditorOutboundAllowed(deviceDetected, deviceType))
             return;
 
-        apvts.state.setProperty("uiMessageText",
-                                 juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance),
-                                 nullptr);
+        const auto* message = deviceDetected
+                                  ? PluginDisplayNames::FooterPanel::kUnsupportedMatrixDeviceFooter
+                                  : PluginDisplayNames::FooterPanel::kDeviceLockGuidance;
+        apvts.state.setProperty("uiMessageText", juce::String(message), nullptr);
         apvts.state.setProperty("uiMessageSeverity", "info", nullptr);
     }
 
@@ -225,6 +231,21 @@ bool MidiManager::isInputPortOpenWithDevice(const juce::String& deviceId) const
 bool MidiManager::isOutputPortOpenWithDevice(const juce::String& deviceId) const
 {
     return outputMidiPort != nullptr && outputMidiPort->isOpenWithDevice(deviceId);
+}
+
+juce::String MidiManager::getOpenInputDeviceId() const
+{
+    return inputMidiPort != nullptr ? inputMidiPort->getOpenDeviceId() : juce::String();
+}
+
+juce::String MidiManager::getOpenOutputDeviceId() const
+{
+    return outputMidiPort != nullptr ? outputMidiPort->getOpenDeviceId() : juce::String();
+}
+
+int MidiManager::getRequiredSysExDelayMs() const noexcept
+{
+    return sysExDelay_.getRequiredDelayMs();
 }
 
 void MidiManager::sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData)
@@ -652,8 +673,10 @@ bool MidiManager::isDeviceDumpAvailable() const
 
 bool MidiManager::isEditorOutboundAllowed() const
 {
-    return Core::isEditorOutboundAllowed(
-        static_cast<bool>(apvts.state.getProperty("deviceDetected", false)));
+    const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    return Core::isEditorOutboundAllowed(deviceDetected, deviceType);
 }
 
 bool MidiManager::waitUntilOutboundQueueIdle(int timeoutMs)
@@ -928,11 +951,12 @@ void MidiManager::performDeviceInquiry()
     }
 
     const auto token = asyncRequestToken_.load(std::memory_order_acquire);
+    const int profileDelayMs = sysExDelay_.getRequiredDelayMs();
     wakeConsumer();
     pollOutboundIdleThenDeviceInquiry(token,
-                                      50,
+                                      Core::MidiRequestTiming::deviceSettleMs(profileDelayMs),
                                       juce::Time::getMillisecondCounter(),
-                                      500);
+                                      Core::MidiRequestTiming::outboundIdleTimeoutMs(profileDelayMs));
 }
 
 std::vector<juce::uint8> MidiManager::requestSysExData(juce::uint8 requestType,
@@ -1041,6 +1065,12 @@ bool MidiManager::processOutboundQueue()
             if (msg->sysExData.getSize() == 0)
                 continue;
 
+            const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+            const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+                apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+            if (! Core::maySendEditorSysEx(deviceDetected, deviceType, msg->sysExData))
+                continue;
+
             if (pendingSysEx_.has_value())
             {
                 outboundQueue_.enqueueSysEx(std::move(msg->sysExData));
@@ -1074,11 +1104,21 @@ bool MidiManager::processOutboundQueue()
     {
         try
         {
-            sendQueuedSysEx(pendingSysEx_->sysExData, "QUEUED");
-            activityTracker_.notifyActivity(pathForOutboundMessage(*pendingSysEx_));
-            activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
-            pendingSysEx_.reset();
-            didWork = true;
+            const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+            const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+                apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+            if (! Core::maySendEditorSysEx(deviceDetected, deviceType, pendingSysEx_->sysExData))
+            {
+                pendingSysEx_.reset();
+            }
+            else
+            {
+                sendQueuedSysEx(pendingSysEx_->sysExData, "QUEUED");
+                activityTracker_.notifyActivity(pathForOutboundMessage(*pendingSysEx_));
+                activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
+                pendingSysEx_.reset();
+                didWork = true;
+            }
         }
         catch (const MidiConnectionException& e)
         {

@@ -306,19 +306,26 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     headerPanel.setPluginMode(!pluginProcessor.isStandalone());
     headerPanel.refreshPortLists();
 
-    const auto savedMidiInputPortId = pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString();
-    headerPanel.selectMidiFromPort(savedMidiInputPortId);
-
-    const auto savedMidiOutputPortId = pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString();
-    headerPanel.selectMidiToPort(savedMidiOutputPortId);
-
     pluginProcessor.restoreMidiPortsForHost();
+
+    // Combo must mirror open reality after restore/sync (APVTS may have been cleared on failure).
+    headerPanel.selectMidiFromPort(
+        pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
+    headerPanel.selectMidiToPort(
+        pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString());
 
     if (pluginProcessor.isStandalone())
     {
         const auto savedKeyboardFromPortId = pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString();
-        headerPanel.selectKeyboardFromPort(savedKeyboardFromPortId);
-        pluginProcessor.setKeyboardFromPort(headerPanel.getSelectedKeyboardFromPortIdentifier());
+        if (savedKeyboardFromPortId.isNotEmpty()
+            && ! pluginProcessor.setKeyboardFromPort(savedKeyboardFromPortId))
+        {
+            // Open failure or MIDI From conflict — drop the dead selection.
+            pluginProcessor.setKeyboardFromPort({});
+        }
+
+        headerPanel.selectKeyboardFromPort(
+            pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
 
         refreshAudioFromCombo(&headerPanel);
 
@@ -962,10 +969,34 @@ void PluginEditor::changeListenerCallback(juce::ChangeBroadcaster*)
 void PluginEditor::valueTreePropertyChanged(juce::ValueTree&,
                                             const juce::Identifier& property)
 {
+    const auto propertyName = property.toString();
+
+    if (propertyName == "midiInputPortId" || propertyName == "midiOutputPortId"
+        || propertyName == "keyboardFromPortId")
+    {
+        juce::MessageManager::callAsync(
+            [safeThis = juce::Component::SafePointer<PluginEditor>(this), propertyName]
+            {
+                if (safeThis == nullptr || safeThis->mainComponent_ == nullptr)
+                    return;
+
+                auto& header = safeThis->mainComponent_->getHeaderPanel();
+                auto& state = safeThis->pluginProcessor.getApvts().state;
+
+                if (propertyName == "midiInputPortId")
+                    header.selectMidiFromPort(state.getProperty("midiInputPortId", juce::String()).toString());
+                else if (propertyName == "midiOutputPortId")
+                    header.selectMidiToPort(state.getProperty("midiOutputPortId", juce::String()).toString());
+                else if (safeThis->pluginProcessor.isStandalone())
+                    header.selectKeyboardFromPort(
+                        state.getProperty("keyboardFromPortId", juce::String()).toString());
+            });
+        return;
+    }
+
     if (! pluginProcessor.isStandalone())
         return;
 
-    const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
         || propertyName == "deviceDetected")
     {

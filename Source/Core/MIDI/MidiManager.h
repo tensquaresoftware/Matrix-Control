@@ -25,6 +25,7 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/MIDI/Queue/SysExInterMessageDelay.h"
+#include "Core/MIDI/Queue/MidiRequestTiming.h"
 
 class MidiManager : public juce::Thread
 {
@@ -39,6 +40,9 @@ public:
 
     bool isInputPortOpenWithDevice(const juce::String& deviceId) const;
     bool isOutputPortOpenWithDevice(const juce::String& deviceId) const;
+    juce::String getOpenInputDeviceId() const;
+    juce::String getOpenOutputDeviceId() const;
+    int getRequiredSysExDelayMs() const noexcept;
 
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendPatchToEditBuffer(const juce::uint8* packedData);
@@ -71,16 +75,18 @@ public:
     using PackedPatchCallback = std::function<void(std::vector<juce::uint8>)>;
     void requestSinglePatchAsync(juce::uint8 patchNumber,
                                  PackedPatchCallback callback,
-                                 int settleMs = 50,
-                                 int outboundIdleTimeoutMs = 500);
+                                 int settleMs = Core::MidiRequestTiming::kMinDeviceSettleMs,
+                                 int outboundIdleTimeoutMs = Core::MidiRequestTiming::kMinOutboundIdleTimeoutMs);
     void cancelPendingSysExRequest() noexcept;
 
     // True when MIDI output and input ports are open so a dump / inquiry can be attempted.
-    // Ports alone do not satisfy FR-2: editor Program Change and SysEx still require deviceDetected
-    // (see isEditorOutboundAllowed). Device Inquiry is the unlock path and bypasses that gate.
+    // Ports alone do not satisfy FR-2 / V1.2: editor Program Change and SysEx still require a
+    // supported Matrix device (see isEditorOutboundAllowed). Device Inquiry is the unlock path
+    // and bypasses that gate.
     bool isDeviceDumpAvailable() const;
 
-    // FR-2: true when deviceDetected — editor PC / SysEx may be enqueued (inquiry excepted).
+    // FR-2 / V1.2: true when a supported Matrix is detected — editor PC / SysEx may be enqueued
+    // (inquiry excepted). Unknown Matrix-family members stay locked.
     bool isEditorOutboundAllowed() const;
 
     // Blocks (message thread) until the outbound queue has drained and no SysEx is pending,

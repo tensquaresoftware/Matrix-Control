@@ -23,6 +23,7 @@
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MidiActivityTracker.h"
+#include "Core/MIDI/MidiPortStateCoherence.h"
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 #include "Core/Models/ApvtsMasterMapper.h"
 #include "Core/Models/ApvtsPatchMapper.h"
@@ -654,7 +655,10 @@ void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
             initializeMutatorActionEnabledMirrorsForEmptyHistory();
             syncAudioRuntimeFromState();
             syncHardwareLatencyFromState();
-            syncMidiPortsFromState(false);
+            // Option 2 (V1.2 review): standalone has no deferred retry series — align to open
+            // reality immediately. Plugin host keeps a soft first sync so the desired id survives
+            // intermediate retries; the last deferred attempt reports failures and aligns.
+            syncMidiPortsFromState(isStandaloneWrapper());
             scheduleDeferredMidiPortSyncForPluginHost();
 
             if (patchManagerActionHandler_ != nullptr)
@@ -683,9 +687,23 @@ bool PluginProcessor::setMidiInputPort(const juce::String& deviceId)
     if (midiManager == nullptr)
         return false;
 
+    if (isStandaloneWrapper()
+        && Core::isMidiFromKeyboardFromConflict(
+               deviceId,
+               apvts.state.getProperty("keyboardFromPortId", juce::String()).toString()))
+    {
+        apvts.state.setProperty(
+            "uiMessageText",
+            juce::String(PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter),
+            nullptr);
+        apvts.state.setProperty("uiMessageSeverity", "warning", nullptr);
+        return false;
+    }
+
     if (midiManager->setMidiInputPort(deviceId))
     {
         apvts.state.setProperty("midiInputPortId", deviceId, nullptr);
+        Core::clearMidiFromKeyboardFromConflictFooterIfPresent(apvts.state);
         notifyNonParameterStateChanged();
         midiManager->refreshDeviceInquiryAfterPortSync();
         return true;
@@ -725,18 +743,30 @@ bool PluginProcessor::setKeyboardFromPort(const juce::String& deviceId)
         keyboardFromMidiInput_->closePort();
         apvts.state.setProperty("keyboardFromEnabled", false, nullptr);
         apvts.state.setProperty("keyboardFromPortId", juce::String(), nullptr);
+        Core::clearMidiFromKeyboardFromConflictFooterIfPresent(apvts.state);
         return true;
     }
 
-    if (!keyboardFromMidiInput_->setPort(deviceId))
+    if (Core::isMidiFromKeyboardFromConflict(
+            apvts.state.getProperty("midiInputPortId", juce::String()).toString(),
+            deviceId))
     {
-        apvts.state.setProperty("keyboardFromEnabled", false, nullptr);
-        apvts.state.setProperty("keyboardFromPortId", juce::String(), nullptr);
+        apvts.state.setProperty(
+            "uiMessageText",
+            juce::String(PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter),
+            nullptr);
+        apvts.state.setProperty("uiMessageSeverity", "warning", nullptr);
         return false;
     }
 
+    // Match MIDI From: leave APVTS unchanged on open failure so the editor can restore the
+    // previous selection without racing a premature empty-id combo resync.
+    if (!keyboardFromMidiInput_->setPort(deviceId))
+        return false;
+
     apvts.state.setProperty("keyboardFromEnabled", true, nullptr);
     apvts.state.setProperty("keyboardFromPortId", deviceId, nullptr);
+    Core::clearMidiFromKeyboardFromConflictFooterIfPresent(apvts.state);
     return true;
 }
 
@@ -1142,7 +1172,38 @@ void PluginProcessor::syncMidiPortsFromStateImpl(bool reportOpenFailures)
     if (sanitizedInputPortId != inputPortId)
         apvts.state.setProperty("midiInputPortId", sanitizedInputPortId, nullptr);
 
-    midiManager->setMidiInputPort(sanitizedInputPortId, reportOpenFailures);
+    const auto keyboardFromId = apvts.state.getProperty("keyboardFromPortId", juce::String()).toString();
+    const bool midiFromConflictsWithKeyboard = isStandaloneWrapper()
+        && Core::isMidiFromKeyboardFromConflict(sanitizedInputPortId, keyboardFromId);
+
+    if (midiFromConflictsWithKeyboard)
+    {
+        // Refuse double-open on sync (interactive setters already guard). Clear MIDI From —
+        // retries cannot succeed while Keyboard From holds the same device.
+        midiManager->setMidiInputPort(juce::String(), reportOpenFailures);
+        apvts.state.setProperty("midiInputPortId", juce::String(), nullptr);
+        if (reportOpenFailures)
+        {
+            apvts.state.setProperty(
+                "uiMessageText",
+                juce::String(PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter),
+                nullptr);
+            apvts.state.setProperty("uiMessageSeverity", "warning", nullptr);
+        }
+    }
+    else
+    {
+        const bool inputOpened = midiManager->setMidiInputPort(sanitizedInputPortId, reportOpenFailures);
+        // Option 2: align APVTS only when reporting (final attempt / standalone). Soft intermediate
+        // plugin retries keep the desired id so deferred reopen can retry the same target.
+        Core::maybeAlignApvtsPortIdAfterOpenAttempt(
+            apvts.state,
+            "midiInputPortId",
+            reportOpenFailures,
+            inputOpened,
+            sanitizedInputPortId,
+            midiManager->getOpenInputDeviceId());
+    }
 
     auto outputPortId = apvts.state.getProperty("midiOutputPortId", juce::String()).toString();
     const auto sanitizedOutputPortId = sanitizePersistedMidiOutputPortId(outputPortId);
@@ -1150,7 +1211,15 @@ void PluginProcessor::syncMidiPortsFromStateImpl(bool reportOpenFailures)
     if (sanitizedOutputPortId != outputPortId)
         apvts.state.setProperty("midiOutputPortId", sanitizedOutputPortId, nullptr);
 
-    midiManager->setMidiOutputPort(sanitizedOutputPortId, reportOpenFailures);
+    const bool outputOpened = midiManager->setMidiOutputPort(sanitizedOutputPortId, reportOpenFailures);
+    Core::maybeAlignApvtsPortIdAfterOpenAttempt(
+        apvts.state,
+        "midiOutputPortId",
+        reportOpenFailures,
+        outputOpened,
+        sanitizedOutputPortId,
+        midiManager->getOpenOutputDeviceId());
+
     midiManager->refreshDeviceInquiryAfterPortSync();
 }
 

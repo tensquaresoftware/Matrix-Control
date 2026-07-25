@@ -3,14 +3,17 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 namespace Core
 {
-    /** FR-2: editor SysEx / Program Change only when a synth is detected.
+    /** FR-2 / V1.2: editor SysEx / Program Change only when a supported Matrix is detected.
+        Unknown Matrix-family members are connected-but-unsupported (locked).
         Device Inquiry is the unlock path and must bypass this gate (see maySendEditorSysEx). */
-    inline bool isEditorOutboundAllowed(bool deviceDetected) noexcept
+    inline bool isEditorOutboundAllowed(bool deviceDetected,
+                                        MatrixDeviceTypes::Type deviceType) noexcept
     {
-        return deviceDetected;
+        return deviceDetected && MatrixDeviceTypes::isSupportedMatrixDevice(deviceType);
     }
 
     /** Named allowlist: Universal Device Inquiry request (MMA non-realtime). */
@@ -30,19 +33,24 @@ namespace Core
         return true;
     }
 
-    inline bool maySendEditorProgramChange(bool deviceDetected) noexcept
+    inline bool maySendEditorProgramChange(bool deviceDetected,
+                                           MatrixDeviceTypes::Type deviceType) noexcept
     {
-        return isEditorOutboundAllowed(deviceDetected);
+        return isEditorOutboundAllowed(deviceDetected, deviceType);
     }
 
-    inline bool maySendEditorSysEx(bool deviceDetected, const juce::MemoryBlock& sysEx) noexcept
+    inline bool maySendEditorSysEx(bool deviceDetected,
+                                   MatrixDeviceTypes::Type deviceType,
+                                   const juce::MemoryBlock& sysEx) noexcept
     {
-        return isEditorOutboundAllowed(deviceDetected) || isDeviceInquirySysEx(sysEx);
+        return isEditorOutboundAllowed(deviceDetected, deviceType) || isDeviceInquirySysEx(sysEx);
     }
 
-    /** Panels stay locked while undetected or while Mutator Compare is active. */
-    inline bool isSectionLocked(bool deviceDetected, bool compareActive) noexcept
+    /** Panels stay locked while undetected, unsupported (Unknown), or while Mutator Compare is active. */
+    inline bool isSectionLocked(bool deviceDetected,
+                                MatrixDeviceTypes::Type deviceType,
+                                bool compareActive) noexcept
     {
-        return ! deviceDetected || compareActive;
+        return ! isEditorOutboundAllowed(deviceDetected, deviceType) || compareActive;
     }
 }

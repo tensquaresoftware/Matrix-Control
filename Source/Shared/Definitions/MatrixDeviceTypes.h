@@ -24,6 +24,14 @@ namespace MatrixDeviceTypes
         return type == Type::kMatrix6 || type == Type::kMatrix6R;
     }
 
+    /** True for Matrix members the editor may control (not family-Unknown). */
+    inline bool isSupportedMatrixDevice(Type type) noexcept
+    {
+        return type == Type::kMatrix1000
+            || type == Type::kMatrix6
+            || type == Type::kMatrix6R;
+    }
+
     inline juce::String toApvtsString(Type type)
     {
         switch (type)

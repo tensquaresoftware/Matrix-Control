@@ -35,6 +35,14 @@ namespace PluginDisplayNames
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
             "No synth detected — check MIDI cables, MIDI From / MIDI To, and power-cycle the Matrix.";
+
+        // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
+        constexpr const char* kUnsupportedMatrixDeviceFooter =
+            "Connected Matrix device is not supported — editing is locked. Use MIDI From / MIDI To to change ports.";
+
+        // Standalone: MIDI From and Keyboard From must open distinct input devices.
+        constexpr const char* kMidiFromKeyboardFromConflictFooter =
+            "MIDI From and Keyboard From must use different MIDI input devices.";
     }
 
     namespace About
