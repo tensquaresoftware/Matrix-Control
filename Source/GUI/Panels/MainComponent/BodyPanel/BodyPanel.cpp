@@ -40,21 +40,8 @@ BodyPanel::~BodyPanel() = default;
 
 void BodyPanel::paint(juce::Graphics& g)
 {
-    if (skin_ == nullptr)
-        return;
-
-    g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
-
-    // Inter-column gaps match former VerticalSeparator line (Header/Footer chrome), not Body fill.
-    const float sf = uiScale_;
-    const int patchEditW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.patchEditWidth), sf);
-    const int sharedW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sharedColumnWidth), sf);
-    const int gap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.interColumnGap), sf);
-    const auto chrome = skin_->getColour(SkinColourId::kHeaderPanelBackground);
-
-    g.setColour(chrome);
-    g.fillRect(patchEditW, 0, gap, getHeight());
-    g.fillRect(patchEditW + gap + sharedW, 0, gap, getHeight());
+    if (skin_ != nullptr)
+        g.fillAll(skin_->getColour(SkinColourId::kBodyPanelBackground));
 }
 
 void BodyPanel::resized()
