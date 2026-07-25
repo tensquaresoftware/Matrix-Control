@@ -179,7 +179,8 @@ juce::String FooterPanel::buildDeviceIdentityText() const
     if (deviceType_.isEmpty())
         return PluginDisplayNames::FooterPanel::kNoDevice;
 
-    juce::String identity = deviceType_;
+    juce::String identity = MatrixDeviceTypes::toDisplayString(
+        MatrixDeviceTypes::fromApvtsString(deviceType_));
     if (deviceVersion_.isNotEmpty())
         identity += " · v" + deviceVersion_;
 

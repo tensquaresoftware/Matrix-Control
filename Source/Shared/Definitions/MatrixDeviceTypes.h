@@ -18,6 +18,8 @@ namespace MatrixDeviceTypes
     constexpr const char* kMatrix6Id = "Matrix-6";
     constexpr const char* kMatrix6RId = "Matrix-6R";
     constexpr const char* kUnknownId = "Unknown";
+    /** Footer / UI label when a Matrix-family member is connected but unsupported. */
+    constexpr const char* kUnknownDisplayName = "Unknown Device";
 
     inline bool isMatrix6Family(Type type) noexcept
     {
@@ -41,6 +43,19 @@ namespace MatrixDeviceTypes
             case Type::kMatrix6R:   return kMatrix6RId;
             case Type::kUnknown:
             default:                return kUnknownId;
+        }
+    }
+
+    /** Human-readable identity for the footer (and similar UI). */
+    inline juce::String toDisplayString(Type type)
+    {
+        switch (type)
+        {
+            case Type::kMatrix1000: return kMatrix1000Id;
+            case Type::kMatrix6:    return kMatrix6Id;
+            case Type::kMatrix6R:   return kMatrix6RId;
+            case Type::kUnknown:
+            default:                return kUnknownDisplayName;
         }
     }
 

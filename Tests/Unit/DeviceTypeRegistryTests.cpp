@@ -17,6 +17,7 @@ public:
         testFromMemberBytes();
         testFromDeviceInquiryAcceptReject();
         testDecodeDeviceIdGoldenBytes();
+        testDisplayNames();
     }
 
 private:
@@ -195,6 +196,18 @@ private:
         expect(unknownMember.isValid);
         expectEquals(static_cast<int>(Core::DeviceTypeRegistry::fromDeviceInquiry(unknownMember)),
                      static_cast<int>(MatrixDeviceTypes::Type::kUnknown));
+    }
+
+    void testDisplayNames()
+    {
+        beginTest("toDisplayString — Unknown shows Unknown Device in footer identity");
+
+        expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kUnknown),
+                     juce::String(MatrixDeviceTypes::kUnknownDisplayName));
+        expectEquals(MatrixDeviceTypes::toDisplayString(MatrixDeviceTypes::Type::kMatrix1000),
+                     juce::String(MatrixDeviceTypes::kMatrix1000Id));
+        expect(juce::String(MatrixDeviceTypes::kUnknownDisplayName)
+               != juce::String(MatrixDeviceTypes::kUnknownId));
     }
 };
 
