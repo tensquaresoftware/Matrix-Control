@@ -20,6 +20,7 @@ namespace TSS
 
         std::function<void()> onPopupRequested;
         std::function<void()> onSettingsRequested;
+        std::function<void()> onAudioMidiSettingsRequested;
 #if JUCE_DEBUG
         std::function<void()> onUiTestsToggleRequested;
 #endif
@@ -36,6 +37,7 @@ namespace TSS
 
         ISkin* skin_ = nullptr;
         bool isHighlighted_ = false;
+        bool pendingAudioMidiSettings_ = false;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Logo)
     };

@@ -96,6 +96,14 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
         if (onSettingsRequested)
             onSettingsRequested();
     };
+    logo_.onAudioMidiSettingsRequested = [this]
+    {
+        if (isPluginMode_)
+            return;
+
+        if (onAudioMidiSettingsRequested)
+            onAudioMidiSettingsRequested();
+    };
 #if JUCE_DEBUG
     logo_.onUiTestsToggleRequested = [this]
     {

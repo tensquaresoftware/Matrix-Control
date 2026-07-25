@@ -6,7 +6,7 @@ Titre: Matrix-Control — Manuel utilisateur
 Version: 0.1
 Version-Produit: 0.1.2-alpha
 Created: 2026-07-20
-Updated: 2026-07-20
+Updated: 2026-07-25
 References:
   - Documentation/User/user-manual.md (à venir)
   - CONTRIBUTING.md
@@ -449,6 +449,15 @@ Un clic sur le logo (en haut à gauche) ouvre le menu suivant :
 | `SETTINGS...` | Préférences |
 | `ABOUT...` | Version, crédits, liens |
 
+Raccourcis sur le logo :
+
+| Geste | Effet |
+|-------|--------|
+| Clic simple | Ouvre le menu du logo |
+| Double-clic | Remet `UI SCALE` à 100 % |
+| Shift + clic | Ouvre `SETTINGS...` |
+| Option + clic (macOS) / Alt + clic (Windows, Linux) | Ouvre `AUDIO/MIDI...` (Standalone uniquement) |
+
 La touche **Échap** ferme en général les fenêtres `SETTINGS` et `ABOUT`, ainsi que certains dialogues.
 
 ### Fenêtre `SETTINGS`
@@ -475,7 +484,7 @@ L’apparence et la taille ne se règlent **pas** dans Settings : elles se trouv
 |----------|--------------------|------------|
 | `KEYBOARD FROM` | Fixé à `HOST` | Choix d’un port MIDI clavier |
 | `AUDIO FROM` / `INPUT GAIN` | Masqués | Visibles (retour audio du synthé dans l’application) |
-| `AUDIO/MIDI...` | Non | Oui (menu du logo `MATRIX-CONTROL`) |
+| `AUDIO/MIDI...` | Non | Oui (menu du logo `MATRIX-CONTROL`, ou Option/Alt + clic sur le logo) |
 | `HARDWARE LATENCY` (Settings) | Visible | Masqué |
 | Notes jouées | Depuis le DAW / le clavier routé vers la piste | Depuis le port Keyboard From |
 

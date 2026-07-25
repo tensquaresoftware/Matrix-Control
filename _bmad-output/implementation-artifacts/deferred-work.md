@@ -891,3 +891,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-standalone-audio-input-passthrough.md`
   summary: Compacted `mono:N` / `stereo:N` ids are stable only for a given active-channel bitmask — enabling a different subset can make the same string refer to a different physical input.
   evidence: Blind Hunter; related to deferred Story 2.7 unstable numeric channel indices; hardware-name ids would be a larger hardening.
+
+## Deferred from: quick-dev spec-logo-alt-click-audio-midi (2026-07-25)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-alt-click-audio-midi.md`
+  summary: Shift+double-click still opens Settings then resets UI scale (pre-existing immediate Shift path).
+  evidence: Blind Hunter; Alt path now uses the click/double-click timer; unifying Shift would be a separate behavior change.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-alt-click-audio-midi.md`
+  summary: No automated tests for the logo gesture matrix (click, modifiers, plugin no-op).
+  evidence: Blind Hunter; no existing Logo tests in Tests/; add only if gesture regressions become frequent.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-logo-alt-click-audio-midi.md`
+  summary: English user manual still absent while FR shortcut docs were extended.
+  evidence: Blind Hunter; pre-existing gap (user-manual.md à venir).
+
