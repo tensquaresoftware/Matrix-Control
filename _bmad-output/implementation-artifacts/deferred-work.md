@@ -942,3 +942,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-inline-edit-and-mutator-dual-line.md`
   summary: Device-type change mid-edit is not in the interrupt property allowlist.
   evidence: Edge Case Hunter; uncommon during a caret session; bank/patch/history/compare changes still cancel.
+
+## Deferred from: quick-dev spec-confirmation-modal-button-order (2026-07-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-confirmation-modal-button-order.md`
+  summary: Win/Linux AlertWindow middle buttons (Keep/Discard/Internal) are mouse-only — no Tab focus or letter shortcut.
+  evidence: Blind Hunter; Enter/Escape paths covered; a11y keyboard path for middle not in this story’s AC.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-confirmation-modal-button-order.md`
+  summary: Master Init overlay is still non-modal — Tab can move focus under the overlay so Escape/Enter miss the dialog.
+  evidence: Edge Case Hunter; pre-existing overlay pattern; button LTR/Enter-on-dialog focus subtree is in scope, focus trap is not.

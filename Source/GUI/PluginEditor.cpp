@@ -36,17 +36,77 @@ bool isMessageThread()
     return false;
 }
 
-/** AlertWindow-compatible result codes: button i → ((i + 1) % N), cancel → 0.
-    Uses NativeMessageBox plain indices when native alerts are enabled so that
-    out-of-range dismiss codes (e.g. Windows IDCANCEL on a 2-button TaskDialog)
-    map to cancel instead of accidentally confirming. */
-int showMappedAlert(const juce::MessageBoxOptions& options)
+/** True when macOS NSAlert places the first registered button as rightmost default. */
+bool usesMacOsNativeAlertButtonOrder()
 {
-    const int numButtons = options.getNumButtons();
-    jassert(numButtons > 0);
+   #if JUCE_MAC
+    return juce::LookAndFeel::getDefaultLookAndFeel().isUsingNativeAlertWindows();
+   #else
+    return false;
+   #endif
+}
 
-    if (juce::LookAndFeel::getDefaultLookAndFeel().isUsingNativeAlertWindows())
+/** Prevent non-primary AlertWindow buttons from consuming Return when focused. */
+void configureOrderedAlertButtons(juce::AlertWindow& alert,
+                                  const juce::String& cancelLabel,
+                                  const juce::String& primaryLabel,
+                                  const juce::String& middleLabel)
+{
+    auto* cancel = alert.getButton(cancelLabel);
+    auto* primary = alert.getButton(primaryLabel);
+    jassert(cancel != nullptr);
+    jassert(primary != nullptr);
+
+    if (cancel != nullptr)
+        cancel->setWantsKeyboardFocus(false);
+
+    if (middleLabel.isNotEmpty())
     {
+        auto* middle = alert.getButton(middleLabel);
+        jassert(middle != nullptr);
+
+        if (middle != nullptr)
+            middle->setWantsKeyboardFocus(false);
+    }
+
+    // Primary keeps keyboard focus so Return activates it; Cancel/middle are click-only.
+    if (primary != nullptr)
+        primary->grabKeyboardFocus();
+}
+
+/** Visual LTR: Cancel → [middle] → primary (rightmost = default).
+    Semantic codes (stable across platforms): Cancel/Escape/OOR → 0, primary → 1, middle → 2.
+
+    macOS native: register primary-first (NSAlert rightmost-first).
+    Windows/Linux: controlled AlertWindow with Cancel-first layout and Return/Escape wired
+    by role — preferred over TaskDialog so LTR + Enter=primary both hold. */
+int showOrderedConfirmAlert(juce::MessageBoxIconType iconType,
+                            const juce::String& title,
+                            const juce::String& message,
+                            const juce::String& cancelLabel,
+                            const juce::String& primaryLabel,
+                            juce::Component* associatedComponent,
+                            const juce::String& middleLabel = {})
+{
+    jassert(cancelLabel.isNotEmpty());
+    jassert(primaryLabel.isNotEmpty());
+
+    const bool hasMiddle = middleLabel.isNotEmpty();
+
+    if (usesMacOsNativeAlertButtonOrder())
+    {
+        auto options = juce::MessageBoxOptions()
+                           .withIconType(iconType)
+                           .withTitle(title)
+                           .withMessage(message)
+                           .withButton(primaryLabel);
+
+        if (hasMiddle)
+            options = options.withButton(middleLabel);
+
+        options = options.withButton(cancelLabel).withAssociatedComponent(associatedComponent);
+
+        const int numButtons = options.getNumButtons();
         const int raw = juce::NativeMessageBox::show(options);
 
         if (raw < 0 || raw >= numButtons)
@@ -55,7 +115,22 @@ int showMappedAlert(const juce::MessageBoxOptions& options)
         return (raw + 1) % numButtons;
     }
 
-    return juce::AlertWindow::show(options);
+   #if JUCE_MODAL_LOOPS_PERMITTED
+    juce::AlertWindow alert(title, message, iconType, associatedComponent);
+    alert.addButton(cancelLabel, 0, juce::KeyPress(juce::KeyPress::escapeKey));
+
+    if (hasMiddle)
+        alert.addButton(middleLabel, 2);
+
+    alert.addButton(primaryLabel, 1, juce::KeyPress(juce::KeyPress::returnKey));
+    configureOrderedAlertButtons(alert, cancelLabel, primaryLabel, middleLabel);
+    return alert.runModalLoop();
+   #else
+    jassertfalse;
+    juce::ignoreUnused(iconType, title, message, associatedComponent, hasMiddle,
+                       cancelLabel, primaryLabel, middleLabel);
+    return 0;
+   #endif
 }
 } // namespace
 
@@ -221,14 +296,13 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
             namespace Dialog = PluginDisplayNames::Dialogs::MutatorHistoryDefrag;
 
-            const int result = showMappedAlert(
-                juce::MessageBoxOptions()
-                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
-                    .withTitle(Dialog::kTitle)
-                    .withMessage(Dialog::kBody)
-                    .withButton(Dialog::kConfirm)
-                    .withButton(Dialog::kCancel)
-                    .withAssociatedComponent(safeThis.getComponent()));
+            const int result = showOrderedConfirmAlert(
+                juce::MessageBoxIconType::QuestionIcon,
+                Dialog::kTitle,
+                Dialog::kBody,
+                Dialog::kCancel,
+                Dialog::kConfirm,
+                safeThis.getComponent());
 
             if (result == 1 && onConfirmed)
                 onConfirmed();
@@ -249,15 +323,14 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
             namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
-            switch (showMappedAlert(
-                juce::MessageBoxOptions()
-                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
-                    .withTitle(Msg::kExportCollisionTitle)
-                    .withMessage(Msg::kExportCollisionMessage)
-                    .withButton(Msg::kExportCollisionOverwrite)
-                    .withButton(Msg::kExportCollisionKeep)
-                    .withButton(Msg::kExportCollisionCancel)
-                    .withAssociatedComponent(safeThis.getComponent())))
+            switch (showOrderedConfirmAlert(
+                juce::MessageBoxIconType::QuestionIcon,
+                Msg::kExportCollisionTitle,
+                Msg::kExportCollisionMessage,
+                Msg::kExportCollisionCancel,
+                Msg::kExportCollisionOverwrite,
+                safeThis.getComponent(),
+                Msg::kExportCollisionKeep))
             {
                 case 1: onResolved(Core::ExportCollisionResolution::kOverwrite); break;
                 case 2: onResolved(Core::ExportCollisionResolution::kKeep); break;
@@ -273,15 +346,14 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
             namespace Msg = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
-            switch (showMappedAlert(
-                juce::MessageBoxOptions()
-                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
-                    .withTitle(Msg::kHistoryGateTitle)
-                    .withMessage(Msg::kHistoryGateMessage)
-                    .withButton(Msg::kHistoryGateExport)
-                    .withButton(Msg::kHistoryGateDiscard)
-                    .withButton(Msg::kHistoryGateCancel)
-                    .withAssociatedComponent(safeThis.getComponent())))
+            switch (showOrderedConfirmAlert(
+                juce::MessageBoxIconType::QuestionIcon,
+                Msg::kHistoryGateTitle,
+                Msg::kHistoryGateMessage,
+                Msg::kHistoryGateCancel,
+                Msg::kHistoryGateExport,
+                safeThis.getComponent(),
+                Msg::kHistoryGateDiscard))
             {
                 case 1: return Core::MutatorHistoryGateChoice::kExport;
                 case 2: return Core::MutatorHistoryGateChoice::kDiscard;
@@ -297,14 +369,13 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
             namespace Dialog = PluginDisplayNames::Dialogs::UnsavedEditConfirm;
 
-            return showMappedAlert(
-                       juce::MessageBoxOptions()
-                           .withIconType(juce::MessageBoxIconType::WarningIcon)
-                           .withTitle(Dialog::kTitle)
-                           .withMessage(Dialog::kBody)
-                           .withButton(Dialog::kContinue)
-                           .withButton(Dialog::kCancel)
-                           .withAssociatedComponent(safeThis.getComponent()))
+            return showOrderedConfirmAlert(
+                       juce::MessageBoxIconType::WarningIcon,
+                       Dialog::kTitle,
+                       Dialog::kBody,
+                       Dialog::kCancel,
+                       Dialog::kContinue,
+                       safeThis.getComponent())
                    == 1;
         });
 
@@ -319,14 +390,13 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
             namespace Dialog = PluginDisplayNames::Dialogs::MutatorFlushConfirm;
 
-            return showMappedAlert(
-                       juce::MessageBoxOptions()
-                           .withIconType(juce::MessageBoxIconType::WarningIcon)
-                           .withTitle(Dialog::kTitle)
-                           .withMessage(Dialog::kBody)
-                           .withButton(Dialog::kContinue)
-                           .withButton(Dialog::kCancel)
-                           .withAssociatedComponent(safeThis.getComponent()))
+            return showOrderedConfirmAlert(
+                       juce::MessageBoxIconType::WarningIcon,
+                       Dialog::kTitle,
+                       Dialog::kBody,
+                       Dialog::kCancel,
+                       Dialog::kContinue,
+                       safeThis.getComponent())
                    == 1;
         });
 
@@ -363,18 +433,17 @@ PluginEditor::PluginEditor(PluginProcessor& p)
                                   .replace("{INTERNAL}", internalSanitized)
                                   .replace("{FILENAME}", fileSanitized);
 
-            switch (showMappedAlert(
-                juce::MessageBoxOptions()
-                    .withIconType(juce::MessageBoxIconType::QuestionIcon)
-                    .withTitle(Dialog::kTitle)
-                    .withMessage(body)
-                    .withButton(Dialog::kInternal)
-                    .withButton(Dialog::kFilename)
-                    .withButton(Dialog::kCancel)
-                    .withAssociatedComponent(safeThis.getComponent())))
+            switch (showOrderedConfirmAlert(
+                juce::MessageBoxIconType::QuestionIcon,
+                Dialog::kTitle,
+                body,
+                Dialog::kCancel,
+                Dialog::kFilename,
+                safeThis.getComponent(),
+                Dialog::kInternal))
             {
-                case 1: return Core::NameReconciliationChoice::kInternal;
-                case 2: return Core::NameReconciliationChoice::kFilename;
+                case 1: return Core::NameReconciliationChoice::kFilename;
+                case 2: return Core::NameReconciliationChoice::kInternal;
                 default: return std::nullopt;
             }
         });

@@ -22,6 +22,10 @@ MasterInitConfirmDialog::MasterInitConfirmDialog(TSS::ISkin& skin, std::function
 
     resetButton_.onClick = [this] { confirm(); };
     cancelButton_.onClick = [this] { dismiss(); };
+    // Cancel must not consume Return — Enter always confirms Reset (primary).
+    cancelButton_.setWantsKeyboardFocus(false);
+    cancelButton_.setMouseClickGrabsKeyboardFocus(false);
+    resetButton_.setMouseClickGrabsKeyboardFocus(false);
     addAndMakeVisible(resetButton_);
     addAndMakeVisible(cancelButton_);
 }
@@ -133,9 +137,10 @@ void MasterInitConfirmDialog::resized()
     const int buttonGap = juce::roundToInt(8.0f * uiScale_);
 
     auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
-    cancelButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
-    buttonRow.removeFromRight(buttonGap);
+    // LTR: Cancel left, Reset (primary / default) right
     resetButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+    buttonRow.removeFromRight(buttonGap);
+    cancelButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
 }
 
 void MasterInitConfirmDialog::mouseDown(const juce::MouseEvent& e)
@@ -149,6 +154,12 @@ bool MasterInitConfirmDialog::keyPressed(const juce::KeyPress& key)
     if (key == juce::KeyPress::escapeKey)
     {
         dismiss();
+        return true;
+    }
+
+    if (key == juce::KeyPress::returnKey)
+    {
+        confirm();
         return true;
     }
 
