@@ -149,6 +149,9 @@ public:
         compare_delegatesToEngine();
         delete_delegatesToEngine();
         clear_delegatesToEngine();
+        clear_confirmContinue_clears();
+        clear_confirmCancel_skipsClear();
+        clear_emptyHistory_skipsModal();
         export_invokesPickerThenEngine();
         export_cancelledPicker_noEngineCall();
         mutate_blocked_setsFooter();
@@ -179,6 +182,23 @@ private:
                       },
                       {},
                       {},
+                      {},
+                      debounceMs)
+        {
+        }
+
+        Harness(Core::MutatorActionHandler::FlushConfirmModalGate flushGate,
+                int debounceMs = Core::kComboboxPatchSendDebounceMs)
+            : handler(proc.apvts,
+                      &engine,
+                      [this]()
+                      {
+                          ++exportPickerCallCount;
+                          return exportPickerResult;
+                      },
+                      {},
+                      {},
+                      std::move(flushGate),
                       debounceMs)
         {
         }
@@ -241,6 +261,72 @@ private:
 
         harness.handler.handleAction(PatchMutator::kClear, juce::int64(1));
 
+        expectEquals(harness.engine.clearCallCount, 1);
+    }
+
+    void clear_confirmContinue_clears()
+    {
+        beginTest("clear_confirmContinue_clears");
+
+        int gateCalls = 0;
+        Harness harness([&gateCalls]()
+                        {
+                            ++gateCalls;
+                            return true;
+                        });
+        harness.engine.clearResult.success = true;
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kClearEnabled,
+            true,
+            nullptr);
+
+        harness.handler.handleAction(PatchMutator::kClear, juce::int64(1));
+
+        expectEquals(gateCalls, 1);
+        expectEquals(harness.engine.clearCallCount, 1);
+    }
+
+    void clear_confirmCancel_skipsClear()
+    {
+        beginTest("clear_confirmCancel_skipsClear");
+
+        int gateCalls = 0;
+        Harness harness([&gateCalls]()
+                        {
+                            ++gateCalls;
+                            return false;
+                        });
+        harness.engine.clearResult.success = true;
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kClearEnabled,
+            true,
+            nullptr);
+
+        harness.handler.handleAction(PatchMutator::kClear, juce::int64(1));
+
+        expectEquals(gateCalls, 1);
+        expectEquals(harness.engine.clearCallCount, 0);
+    }
+
+    void clear_emptyHistory_skipsModal()
+    {
+        beginTest("clear_emptyHistory_skipsModal");
+
+        int gateCalls = 0;
+        Harness harness([&gateCalls]()
+                        {
+                            ++gateCalls;
+                            return false;
+                        });
+        harness.engine.clearResult.success = true;
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kClearEnabled,
+            false,
+            nullptr);
+
+        harness.handler.handleAction(PatchMutator::kClear, juce::int64(1));
+
+        expectEquals(gateCalls, 0);
         expectEquals(harness.engine.clearCallCount, 1);
     }
 
