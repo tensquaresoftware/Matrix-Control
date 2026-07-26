@@ -123,16 +123,16 @@ void FooterPanel::paint(juce::Graphics& g)
         const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
         const bool deviceOk = deviceDetected_
             && MatrixDeviceTypes::isSupportedMatrixDevice(type);
-        const auto detailColour = skin_->getColour(deviceOk
-                                                       ? SkinColourId::kFooterMessageInfo
-                                                       : SkinColourId::kFooterMessageError);
+        const auto badgeFill = deviceOk
+            ? skin_->getColour(SkinColourId::kFooterMessageInfo)
+            : skin_->getColour(SkinColourId::kFooterMessageError).withAlpha(0.8f);
 
         paintBadgeAndDetail(g,
                             rightBand.reduced(padding, 0),
                             PluginDisplayNames::FooterPanel::kDeviceLabel,
                             buildDeviceDetailText(),
+                            badgeFill,
                             chromeGrey,
-                            detailColour,
                             font);
     }
 }
@@ -205,7 +205,7 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
         case MessageSeverity::Warning:
             return skin_->getColour(SkinColourId::kFooterMessageWarning);
         case MessageSeverity::Error:
-            return skin_->getColour(SkinColourId::kFooterMessageError);
+            return skin_->getColour(SkinColourId::kFooterMessageError).withAlpha(0.8f);
         default:
             return skin_->getColour(SkinColourId::kDarkPanelText);
     }
