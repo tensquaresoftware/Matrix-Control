@@ -9,8 +9,8 @@
 namespace TSS
 {
     // Paint-only Patch Name display + inline rename editor. Deliberately NOT a JUCE
-    // TextEditor: the rename UX is a fixed 8-slot, uppercase, custom-caret editor closer
-    // to a hardware LCD name editor (see the Patch Name inline edit spec).
+    // TextEditor overlay: custom caret paint, but editing semantics match a normal
+    // text field (insert / backspace-shift / delete-shift) capped at 8 Matrix chars.
     class PatchNameDisplay : public juce::Component,
                              private juce::Timer
     {
@@ -101,13 +101,17 @@ namespace TSS
 
         void timerCallback() override;
 
-        juce::String buildEmptyEditBuffer() const;
         void commitEdit();
         void insertCharacterAtCaret(juce::juce_wchar character);
+        void deleteCharacterBeforeCaret();
+        void deleteCharacterAtCaret();
         void moveCaret(int delta);
         void restartCaretBlink();
         void clearIllegalCharacterPending();
         void updateHoverFromPosition(juce::Point<float> position);
+        // Past-the-end caret is allowed only while length < 8 (room to type). At max
+        // length the caret parks on the last real character — never a 9th slot.
+        int maxCaretIndex() const noexcept;
 
         TextBlockLayout computeTextBlockLayout(juce::Rectangle<float> bounds) const;
         juce::Colour primaryTextColour() const;

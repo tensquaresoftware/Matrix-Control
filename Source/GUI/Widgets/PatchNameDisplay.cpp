@@ -93,8 +93,8 @@ namespace TSS
         if (! editable_ || editing_)
             return;
 
-        // Fresh empty LCD buffer — do not preload the current patch name.
-        editBuffer_ = buildEmptyEditBuffer();
+        // Fresh empty field — do not preload the current patch name.
+        editBuffer_.clear();
         caretIndex_ = 0;
         caretOn_ = true;
         illegalCharPending_ = false;
@@ -138,21 +138,66 @@ namespace TSS
             onEditEnded_();
     }
 
-    juce::String PatchNameDisplay::buildEmptyEditBuffer() const
+    int PatchNameDisplay::maxCaretIndex() const noexcept
     {
-        return juce::String::repeatedString(" ", kNameLength_);
+        if (editBuffer_.isEmpty())
+            return 0;
+
+        if (editBuffer_.length() >= kNameLength_)
+            return kNameLength_ - 1;
+
+        return editBuffer_.length();
     }
 
     void PatchNameDisplay::insertCharacterAtCaret(juce::juce_wchar character)
     {
-        editBuffer_ = editBuffer_.replaceSection(caretIndex_, 1, juce::String::charToString(character));
-        caretIndex_ = juce::jmin(kNameLength_ - 1, caretIndex_ + 1);
+        if (editBuffer_.length() >= kNameLength_)
+            return;
+
+        editBuffer_ = editBuffer_.substring(0, caretIndex_)
+            + juce::String::charToString(character)
+            + editBuffer_.substring(caretIndex_);
+        ++caretIndex_;
+        caretIndex_ = juce::jmin(caretIndex_, maxCaretIndex());
+        restartCaretBlink();
+    }
+
+    void PatchNameDisplay::deleteCharacterBeforeCaret()
+    {
+        if (editBuffer_.isEmpty())
+            return;
+
+        // At max length the caret sits on the last character (no 9th slot). Backspace
+        // must delete that last character, not the one before it.
+        if (editBuffer_.length() == kNameLength_ && caretIndex_ == kNameLength_ - 1)
+        {
+            deleteCharacterAtCaret();
+            return;
+        }
+
+        if (caretIndex_ <= 0)
+            return;
+
+        editBuffer_ = editBuffer_.substring(0, caretIndex_ - 1)
+            + editBuffer_.substring(caretIndex_);
+        --caretIndex_;
+        restartCaretBlink();
+    }
+
+    void PatchNameDisplay::deleteCharacterAtCaret()
+    {
+        if (caretIndex_ >= editBuffer_.length())
+            return;
+
+        editBuffer_ = editBuffer_.substring(0, caretIndex_)
+            + editBuffer_.substring(caretIndex_ + 1);
+        caretIndex_ = juce::jmin(caretIndex_, maxCaretIndex());
         restartCaretBlink();
     }
 
     void PatchNameDisplay::moveCaret(int delta)
     {
-        caretIndex_ = juce::jlimit(0, kNameLength_ - 1, caretIndex_ + delta);
+        caretIndex_ = juce::jlimit(0, maxCaretIndex(), caretIndex_ + delta);
         clearIllegalCharacterPending();
         restartCaretBlink();
     }
@@ -259,23 +304,19 @@ namespace TSS
             return true;
         }
 
-        // LCD-style overwrite editor: Backspace/Delete clear a slot to a space
-        // (they must not fall through as "illegal characters").
+        // Normal text-field editing: Backspace removes the char before the caret and
+        // shifts the tail left; Delete removes at the caret. Cap remains 8 chars.
         if (key.getKeyCode() == juce::KeyPress::backspaceKey)
         {
             clearIllegalCharacterPending();
-            if (caretIndex_ > 0)
-                --caretIndex_;
-            editBuffer_ = editBuffer_.replaceSection(caretIndex_, 1, " ");
-            restartCaretBlink();
+            deleteCharacterBeforeCaret();
             return true;
         }
 
         if (key.getKeyCode() == juce::KeyPress::deleteKey)
         {
             clearIllegalCharacterPending();
-            editBuffer_ = editBuffer_.replaceSection(caretIndex_, 1, " ");
-            restartCaretBlink();
+            deleteCharacterAtCaret();
             return true;
         }
 
@@ -394,8 +435,7 @@ namespace TSS
             return;
         }
 
-        // Same font as the idle name; slot pitch stays close to natural string spacing
-        // (only a thin caret pad around each glyph — not a full-width / 8 stretch).
+        // Characters use natural pitch. Past-the-end caret exists only while length < 8.
         const float glyphWidth = juce::jmax(
             1.0f,
             juce::GlyphArrangement::getStringWidth(scaledFont, "M"));
@@ -404,35 +444,48 @@ namespace TSS
         const float caretBottomTrim = kCaretBottomTrim_ * uiScale_;
         const float slotWidth = glyphWidth + 2.0f * caretPadX;
         const float slotGap = kSlotGap_ * uiScale_;
-        const float blockWidth = slotWidth * static_cast<float>(kNameLength_)
-            + slotGap * static_cast<float>(kNameLength_ - 1);
+        const bool showEndCaretSlot = editBuffer_.length() < kNameLength_;
+        const int drawnSlots = juce::jmax(1, editBuffer_.length() + (showEndCaretSlot ? 1 : 0));
+        const float blockWidth = slotWidth * static_cast<float>(drawnSlots)
+            + slotGap * static_cast<float>(juce::jmax(0, drawnSlots - 1));
         const float blockX = rowBounds.getCentreX() - 0.5f * blockWidth;
         const float fullCaretHeight = scaledFont.getHeight() + 2.0f * caretPadY;
         const float caretHeight = juce::jmax(1.0f, fullCaretHeight - caretBottomTrim);
-        // Keep the top edge; shorten only from the bottom for optical vertical balance.
         const float caretY = rowBounds.getCentreY() - 0.5f * fullCaretHeight;
 
-        for (int i = 0; i < kNameLength_; ++i)
+        auto slotBoundsAt = [&](int index) -> juce::Rectangle<float>
         {
-            const float slotX = blockX + static_cast<float>(i) * (slotWidth + slotGap);
-            const auto slotBounds = juce::Rectangle<float>(slotX, caretY, slotWidth, caretHeight);
-            const auto character = editBuffer_.substring(i, i + 1);
-            const bool isBlank = character.trim().isEmpty();
-            const bool isBlinkingCaretSlot = (i == caretIndex_) && caretOn_;
+            const float slotX = blockX + static_cast<float>(index) * (slotWidth + slotGap);
+            return { slotX, caretY, slotWidth, caretHeight };
+        };
 
-            if (isBlinkingCaretSlot)
+        for (int i = 0; i < editBuffer_.length(); ++i)
+        {
+            const auto character = editBuffer_.substring(i, i + 1);
+            const bool isSpace = character == " ";
+            const auto bounds = slotBoundsAt(i);
+            const bool caretHere = (i == caretIndex_) && caretOn_;
+
+            if (caretHere)
             {
                 g.setColour(look_.text);
-                g.fillRect(slotBounds);
+                g.fillRect(bounds);
                 g.setColour(juce::Colour(ColourChart::kBlack));
-                if (! isBlank)
-                    g.drawText(character, slotBounds, juce::Justification::centred, false);
+                if (! isSpace)
+                    g.drawText(character, bounds, juce::Justification::centred, false);
             }
-            else if (! isBlank)
+            else if (! isSpace)
             {
                 g.setColour(look_.text.withAlpha(kPrimaryIdleAlpha_));
-                g.drawText(character, slotBounds, juce::Justification::centred, false);
+                g.drawText(character, bounds, juce::Justification::centred, false);
             }
+        }
+
+        // Empty insertion caret after the last character — only while there is room to type.
+        if (showEndCaretSlot && caretIndex_ == editBuffer_.length() && caretOn_)
+        {
+            g.setColour(look_.text);
+            g.fillRect(slotBoundsAt(editBuffer_.length()));
         }
     }
 
