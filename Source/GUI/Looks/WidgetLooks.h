@@ -111,8 +111,8 @@ namespace TSS
         juce::Colour border{};
         juce::Colour text{};
         juce::Font font{juce::FontOptions{}};
-        // Mutator / Compare secondary line (Mxx, Mxx-Ryy, INITIAL) — dimmer + smaller than
-        // the primary user patch name so the eye keeps the name as the dominant line.
+        // Mutator / Compare secondary line (Mxx, Mxx-Ryy, INITIAL) — ~50% opacity + smaller
+        // than the primary user patch name so the eye keeps the name as the dominant line.
         juce::Colour secondaryText{};
         juce::Font secondaryFont{juce::FontOptions{}};
     };

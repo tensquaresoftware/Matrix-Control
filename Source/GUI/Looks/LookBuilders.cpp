@@ -151,9 +151,9 @@ namespace TSS
 
     PatchNameDisplayLook patchNameDisplayLookFromSkin(const ISkin& skin)
     {
-        // Secondary line reuses the primary red at ~75% opacity (no separate skin token yet)
-        // and ~70% of the Patch Name font height, per the dual-line display spec.
-        constexpr float kSecondaryTextAlpha = 0.75f;
+        // Secondary Mutator/Compare label at 50% opacity; primary idle/hover alphas
+        // (80% / 100%) are applied in PatchNameDisplay paint for the editability affordance.
+        constexpr float kSecondaryTextAlpha = 0.50f;
         constexpr float kSecondaryFontHeightRatio = 0.7f;
 
         PatchNameDisplayLook look;

@@ -47,6 +47,9 @@ namespace TSS
 
         void paint(juce::Graphics& g) override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
+        void mouseEnter(const juce::MouseEvent& e) override;
+        void mouseExit(const juce::MouseEvent& e) override;
+        void mouseMove(const juce::MouseEvent& e) override;
         bool keyPressed(const juce::KeyPress& key) override;
         void focusLost(juce::Component::FocusChangeType cause) override;
 
@@ -54,10 +57,27 @@ namespace TSS
         int getHeight() const { return height_; }
 
     private:
+        struct TextBlockLayout
+        {
+            juce::Rectangle<float> primaryRow;
+            juce::Rectangle<float> secondaryRow; // empty when single-line
+            bool hasSecondary = false;
+        };
+
         inline constexpr static int kBorderThickness_ = 2;
         inline constexpr static int kNameLength_ = 8;
         inline constexpr static int kCaretBlinkIntervalMs_ = 500;
-        inline constexpr static float kPrimaryRowHeightRatio_ = 0.62f; // dual-line split of the fixed 72px box
+        // Design-space gaps (scaled by uiScale_ at paint time).
+        inline constexpr static float kDualLineGap_ = 2.0f;
+        // Edit slots stay close to natural string pitch (tiny gap + minimal caret pad).
+        inline constexpr static float kSlotGap_ = 0.0f;
+        inline constexpr static float kCaretPadX_ = 1.0f;
+        inline constexpr static float kCaretPadY_ = 1.0f;
+        // Font metrics leave optical slack under the glyph — trim caret bottom so the
+        // letter reads centred in the red rect.
+        inline constexpr static float kCaretBottomTrim_ = 3.0f;
+        inline constexpr static float kPrimaryIdleAlpha_ = 0.80f;
+        inline constexpr static float kPrimaryHoverAlpha_ = 1.00f;
 
         PatchNameDisplayLook look_{};
         int width_;
@@ -68,6 +88,7 @@ namespace TSS
 
         bool editable_ = false;
         bool editing_ = false;
+        bool hoveredPrimary_ = false;
         bool illegalCharPending_ = false;
         juce::String editBuffer_;
         int caretIndex_ = 0;
@@ -80,17 +101,21 @@ namespace TSS
 
         void timerCallback() override;
 
-        juce::String buildEditBufferFromCurrentName() const;
+        juce::String buildEmptyEditBuffer() const;
         void commitEdit();
         void insertCharacterAtCaret(juce::juce_wchar character);
         void moveCaret(int delta);
         void restartCaretBlink();
         void clearIllegalCharacterPending();
+        void updateHoverFromPosition(juce::Point<float> position);
+
+        TextBlockLayout computeTextBlockLayout(juce::Rectangle<float> bounds) const;
+        juce::Colour primaryTextColour() const;
+        juce::Font scaledPrimaryFont() const;
+        juce::Font scaledSecondaryFont() const;
 
         void drawBackground(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        void drawSingleLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
-        void drawDualLine(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawNameSlots(juce::Graphics& g, const juce::Rectangle<float>& rowBounds);
         void drawSecondaryText(juce::Graphics& g, const juce::Rectangle<float>& rowBounds);
 
