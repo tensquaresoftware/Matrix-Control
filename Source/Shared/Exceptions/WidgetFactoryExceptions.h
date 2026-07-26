@@ -8,10 +8,9 @@ namespace WidgetFactoryErrors
 {
     enum class Severity
     {
-        Info,      // Message informatif (gris)
-        Success,   // Opération réussie (vert)
-        Warning,   // Avertissement (orange)
-        Error      // Erreur (rouge)
+        Info,      // Informational message
+        Warning,   // Warning (orange)
+        Error      // Error (red)
     };
 }
 
@@ -36,7 +35,6 @@ public:
         switch (severity)
         {
             case WidgetFactoryErrors::Severity::Info: return "INFO";
-            case WidgetFactoryErrors::Severity::Success: return "SUCCESS";
             case WidgetFactoryErrors::Severity::Warning: return "WARNING";
             case WidgetFactoryErrors::Severity::Error: return "ERROR";
             default: return "UNKNOWN";

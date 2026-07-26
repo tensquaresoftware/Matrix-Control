@@ -32,7 +32,6 @@ private:
     {
         None,
         Info,
-        Success,
         Warning,
         Error
     };

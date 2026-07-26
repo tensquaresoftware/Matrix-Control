@@ -12,7 +12,6 @@ namespace TSS
         kFooterPanelBackground,
         kDarkPanelText,
         kFooterMessageInfo,
-        kFooterMessageSuccess,
         kFooterMessageWarning,
         kFooterMessageError,
         

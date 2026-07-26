@@ -23,9 +23,6 @@ public:
             case WidgetFactoryErrors::Severity::Info:
                 severityStr = "info";
                 break;
-            case WidgetFactoryErrors::Severity::Success:
-                severityStr = "success";
-                break;
             case WidgetFactoryErrors::Severity::Warning:
                 severityStr = "warning";
                 break;

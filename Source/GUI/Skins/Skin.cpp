@@ -190,7 +190,6 @@ namespace TSS
         colours_[SkinColourId::kFooterPanelBackground] = juce::Colour(accessColour(Panels::kFooterPanelBackground));
         colours_[SkinColourId::kDarkPanelText] = juce::Colour(accessColour(Widgets::DarkPanel::kText));
         colours_[SkinColourId::kFooterMessageInfo] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageInfo));
-        colours_[SkinColourId::kFooterMessageSuccess] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageSuccess));
         colours_[SkinColourId::kFooterMessageWarning] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageWarning));
         colours_[SkinColourId::kFooterMessageError] = juce::Colour(accessColour(Widgets::FooterPanel::kMessageError));
     }

@@ -180,10 +180,8 @@ void FooterPanel::syncFromApvtsState(juce::ValueTree& tree)
 
 FooterPanel::MessageSeverity FooterPanel::parseSeverity(const juce::String& severityStr) const
 {
-    if (severityStr == "info")
+    if (severityStr == "info" || severityStr == "success")
         return MessageSeverity::Info;
-    if (severityStr == "success")
-        return MessageSeverity::Success;
     if (severityStr == "warning")
         return MessageSeverity::Warning;
     if (severityStr == "error")
@@ -200,8 +198,6 @@ juce::Colour FooterPanel::getSeverityColour(MessageSeverity severity) const
             return skin_->getColour(SkinColourId::kDarkPanelText);
         case MessageSeverity::Info:
             return skin_->getColour(SkinColourId::kFooterMessageInfo);
-        case MessageSeverity::Success:
-            return skin_->getColour(SkinColourId::kFooterMessageSuccess);
         case MessageSeverity::Warning:
             return skin_->getColour(SkinColourId::kFooterMessageWarning);
         case MessageSeverity::Error:
@@ -219,8 +215,6 @@ juce::String FooterPanel::getSeverityPrefix(MessageSeverity severity) const
             return {};
         case MessageSeverity::Info:
             return PluginDisplayNames::FooterPanel::kSeverityInfoPrefix;
-        case MessageSeverity::Success:
-            return PluginDisplayNames::FooterPanel::kSeveritySuccessPrefix;
         case MessageSeverity::Warning:
             return PluginDisplayNames::FooterPanel::kSeverityWarningPrefix;
         case MessageSeverity::Error:
