@@ -19,7 +19,10 @@ namespace TSS
         setWantsKeyboardFocus(true);
     }
 
-    PatchNameDisplay::~PatchNameDisplay() = default;
+    PatchNameDisplay::~PatchNameDisplay()
+    {
+        detachOutsideClickListener();
+    }
 
     void PatchNameDisplay::setLook(const PatchNameDisplayLook& look)
     {
@@ -101,6 +104,7 @@ namespace TSS
         editing_ = true;
 
         grabKeyboardFocus();
+        attachOutsideClickListener();
         startTimer(kCaretBlinkIntervalMs_);
         repaint();
     }
@@ -111,6 +115,7 @@ namespace TSS
             return;
 
         stopTimer();
+        detachOutsideClickListener();
         editing_ = false;
         illegalCharPending_ = false;
         repaint();
@@ -127,6 +132,7 @@ namespace TSS
         const auto resolvedName = Core::PatchNameEditRules::resolveCommittedPatchName(editBuffer_, patchName_);
 
         stopTimer();
+        detachOutsideClickListener();
         editing_ = false;
         illegalCharPending_ = false;
         repaint();
@@ -136,6 +142,24 @@ namespace TSS
 
         if (onEditEnded_)
             onEditEnded_();
+    }
+
+    void PatchNameDisplay::attachOutsideClickListener()
+    {
+        if (listeningForOutsideClicks_)
+            return;
+
+        juce::Desktop::getInstance().addGlobalMouseListener(this);
+        listeningForOutsideClicks_ = true;
+    }
+
+    void PatchNameDisplay::detachOutsideClickListener()
+    {
+        if (! listeningForOutsideClicks_)
+            return;
+
+        juce::Desktop::getInstance().removeGlobalMouseListener(this);
+        listeningForOutsideClicks_ = false;
     }
 
     int PatchNameDisplay::maxCaretIndex() const noexcept
@@ -244,6 +268,19 @@ namespace TSS
             repaint();
     }
 
+    void PatchNameDisplay::mouseDown(const juce::MouseEvent& e)
+    {
+        if (! editing_)
+            return;
+
+        // Commit when the click is outside this display rectangle (e.g. module header
+        // or anywhere else in the UI). Clicks inside the afficheur keep editing.
+        if (getScreenBounds().contains(e.getScreenPosition()))
+            return;
+
+        commitEdit();
+    }
+
     void PatchNameDisplay::mouseDoubleClick(const juce::MouseEvent& e)
     {
         if (! editable_)
@@ -341,7 +378,9 @@ namespace TSS
 
     void PatchNameDisplay::focusLost(juce::Component::FocusChangeType)
     {
-        cancelEdit();
+        // Keyboard focus leaving the display also commits (e.g. Tab). Outside clicks are
+        // handled by the global mouse listener against this component's screen bounds.
+        commitEdit();
     }
 
     juce::Font PatchNameDisplay::scaledPrimaryFont() const

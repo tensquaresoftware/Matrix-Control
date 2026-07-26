@@ -46,6 +46,7 @@ namespace TSS
         void onEditEnded(std::function<void()> callback);
 
         void paint(juce::Graphics& g) override;
+        void mouseDown(const juce::MouseEvent& e) override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
         void mouseEnter(const juce::MouseEvent& e) override;
         void mouseExit(const juce::MouseEvent& e) override;
@@ -89,6 +90,7 @@ namespace TSS
         bool editable_ = false;
         bool editing_ = false;
         bool hoveredPrimary_ = false;
+        bool listeningForOutsideClicks_ = false;
         bool illegalCharPending_ = false;
         juce::String editBuffer_;
         int caretIndex_ = 0;
@@ -109,6 +111,8 @@ namespace TSS
         void restartCaretBlink();
         void clearIllegalCharacterPending();
         void updateHoverFromPosition(juce::Point<float> position);
+        void attachOutsideClickListener();
+        void detachOutsideClickListener();
         // Past-the-end caret is allowed only while length < 8 (room to type). At max
         // length the caret parks on the last real character — never a 9th slot.
         int maxCaretIndex() const noexcept;
