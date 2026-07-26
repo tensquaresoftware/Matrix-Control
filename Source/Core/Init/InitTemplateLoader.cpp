@@ -56,9 +56,9 @@ namespace Core
         const auto fileName = kind == InitTemplateKind::kPatch ? kPatchInitFileName : kMasterInitFileName;
 
         if (reason == InitTemplateFallbackReason::kFileMissing)
-            return juce::String(fileName) + " not found — using built-in defaults.";
+            return juce::String(fileName) + " not found - using built-in defaults.";
 
-        return juce::String(fileName) + " is invalid — using built-in defaults.";
+        return juce::String(fileName) + " is invalid - using built-in defaults.";
     }
 
     InitTemplateLoadResult InitTemplateLoader::loadPatch(PatchModel& model,

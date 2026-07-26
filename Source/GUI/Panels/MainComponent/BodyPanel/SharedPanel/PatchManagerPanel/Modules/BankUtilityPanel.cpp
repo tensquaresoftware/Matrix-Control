@@ -56,11 +56,13 @@ BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimen
     setupModuleHeader(skin, widgetFactory, PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId);
     setupBankSelectorLabel(skin);
     setupSelectBankButtons(skin, widgetFactory);
+    setupImportExportButtons(skin, widgetFactory);
 
     normalBankLook_ = TSS::buttonLookFromSkin(skin);
     apvts_.state.addListener(this);
     refreshDeviceGating();
     refreshSelectedBankHighlight();
+    refreshImportExportEnabled();
 
     setSize(dims_.width, dims_.height);
 }
@@ -83,6 +85,7 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
     else if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank)
     {
         refreshSelectedBankHighlight();
+        refreshImportExportEnabled();
     }
 }
 
@@ -90,6 +93,7 @@ void BankUtilityPanel::valueTreeRedirected(juce::ValueTree&)
 {
     refreshDeviceGating();
     refreshSelectedBankHighlight();
+    refreshImportExportEnabled();
 }
 
 void BankUtilityPanel::refreshDeviceGating()
@@ -109,6 +113,7 @@ void BankUtilityPanel::refreshDeviceGating()
         && deviceDetected
         && ! limits.hasBankConcept();
     setBankUtilityGrayed(shouldGray);
+    refreshImportExportEnabled();
 }
 
 void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
@@ -145,6 +150,42 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 
     refreshSelectedBankHighlight();
     repaint();
+}
+
+void BankUtilityPanel::refreshImportExportEnabled()
+{
+    const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected"));
+    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
+        apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
+    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
+        false));
+    const bool rootLocked = Core::isSectionLocked(deviceDetected, deviceType, compareActive);
+
+    if (exportBankButton_)
+        exportBankButton_->setEnabled(! rootLocked);
+
+    if (importBankButton_ == nullptr)
+        return;
+
+    if (rootLocked)
+    {
+        importBankButton_->setEnabled(false);
+        return;
+    }
+
+    if (! limits.hasBankConcept())
+    {
+        // Matrix-6/6R: single 100-patch memory, always importable when the section is unlocked.
+        importBankButton_->setEnabled(true);
+        return;
+    }
+
+    const int selectedBank = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+        0));
+    importBankButton_->setEnabled(! limits.isRomBank(selectedBank));
 }
 
 void BankUtilityPanel::refreshSelectedBankHighlight()
@@ -218,6 +259,10 @@ void BankUtilityPanel::resized()
     const int buttonHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
     const int lockButtonWidth = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.buttons.patchManagerUnlockBankWidth), sf);
+    const int importButtonWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.buttons.patchManagerImportBankWidth), sf);
+    const int exportButtonWidth = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.buttons.patchManagerExportBankWidth), sf);
     const int rowGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
     const int rowH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.contentRowHeight), sf);
 
@@ -235,9 +280,12 @@ void BankUtilityPanel::resized()
         selectBank0Button_.get(), selectBank1Button_.get(), selectBank2Button_.get(),
         selectBank3Button_.get(), selectBank4Button_.get()
     };
-    TSS::placeEqualWidthStrip(labelWidth + rowGap, row1Y, sf,
+    const int row1AfterBanksX = TSS::placeEqualWidthStrip(labelWidth + rowGap, row1Y, sf,
                               dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
                               dims_.layout.interControlGap, row1Banks, 5);
+
+    if (auto* button = importBankButton_.get())
+        button->setBounds(row1AfterBanksX + rowGap, row1Y, importButtonWidth, buttonHeight);
 
     // Row 2 — unlock + banks 5–9 (successive integer stack: header + row + gap)
     const int row2Y = row1Y + rowH + rowGap;
@@ -249,9 +297,12 @@ void BankUtilityPanel::resized()
         selectBank5Button_.get(), selectBank6Button_.get(), selectBank7Button_.get(),
         selectBank8Button_.get(), selectBank9Button_.get()
     };
-    TSS::placeEqualWidthStrip(lockButtonWidth + rowGap, row2Y, sf,
+    const int row2AfterBanksX = TSS::placeEqualWidthStrip(lockButtonWidth + rowGap, row2Y, sf,
                               dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
                               dims_.layout.interControlGap, row2Banks, 5);
+
+    if (auto* button = exportBankButton_.get())
+        button->setBounds(row2AfterBanksX + rowGap, row2Y, exportButtonWidth, buttonHeight);
 
     if (bankSelectorLabel_)      bankSelectorLabel_->setUiScale(sf);
     if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setUiScale(sf);
@@ -266,6 +317,8 @@ void BankUtilityPanel::resized()
     if (selectBank7Button_)      selectBank7Button_->setUiScale(sf);
     if (selectBank8Button_)      selectBank8Button_->setUiScale(sf);
     if (selectBank9Button_)      selectBank9Button_->setUiScale(sf);
+    if (importBankButton_)       importBankButton_->setUiScale(sf);
+    if (exportBankButton_)       exportBankButton_->setUiScale(sf);
 }
 
 void BankUtilityPanel::setSkin(TSS::ISkin& skin)
@@ -300,6 +353,10 @@ void BankUtilityPanel::setSkin(TSS::ISkin& skin)
         selectBank8Button_->setLook(normalBankLook_);
     if (selectBank9Button_)
         selectBank9Button_->setLook(normalBankLook_);
+    if (importBankButton_)
+        importBankButton_->setLook(normalBankLook_);
+    if (exportBankButton_)
+        exportBankButton_->setLook(normalBankLook_);
 
     refreshSelectedBankHighlight();
 }
@@ -460,4 +517,37 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
     selectBank9Button_->onClick = makeBankAction(
         PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9);
     addAndMakeVisible(*selectBank9Button_);
+}
+
+void BankUtilityPanel::setupImportExportButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory)
+{
+    // IMPORT/EXPORT stay usable on Matrix-6/6R (and on M1000 ROM banks for EXPORT) even while
+    // the bank row / UNLOCK are grayed — do not gate their onClick on bankUtilityGrayed_.
+    importBankButton_ = std::make_unique<TSS::Button>(
+        dims_.buttons.patchManagerImportBankWidth,
+        dims_.buttons.height,
+        TSS::buttonLookFromSkin(skin),
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank).value_or(""));
+    importBankButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
+    };
+    addAndMakeVisible(*importBankButton_);
+
+    exportBankButton_ = std::make_unique<TSS::Button>(
+        dims_.buttons.patchManagerExportBankWidth,
+        dims_.buttons.height,
+        TSS::buttonLookFromSkin(skin),
+        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank).value_or(""));
+    exportBankButton_->onClick = [this]
+    {
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
+    };
+    addAndMakeVisible(*exportBankButton_);
 }

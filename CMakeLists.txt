@@ -168,6 +168,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/DeviceTypeRegistry.cpp
     Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
+    Source/Core/Services/BankImportPlanner.cpp
     Source/Core/Services/PatchNameEditRules.cpp
     Source/Core/Services/Matrix1000FactoryPatchNames.cpp
     Source/Core/Services/PatchFileNameReconciler.cpp
@@ -188,6 +189,7 @@ set(PLUGIN_SOURCES
     Source/GUI/PluginEditor.cpp
     Source/GUI/About/AboutPanel.cpp
     Source/GUI/About/AboutWindow.cpp
+    Source/GUI/Dialogs/BankTransferProgressDialog.cpp
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
@@ -387,6 +389,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
+        Tests/Unit/BankImportPlannerTests.cpp
         Tests/Unit/PatchNameEditRulesTests.cpp
         Tests/Unit/PatchFileNameReconcilerTests.cpp
         Tests/Unit/MutatorActionHandlerTests.cpp
@@ -445,6 +448,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/DeviceTypeRegistry.cpp
         Source/Core/Services/PatchFileService.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
+        Source/Core/Services/BankImportPlanner.cpp
         Source/Core/Services/PatchNameEditRules.cpp
         Source/Core/Services/Matrix1000FactoryPatchNames.cpp
         Source/Core/Services/PatchFileNameReconciler.cpp

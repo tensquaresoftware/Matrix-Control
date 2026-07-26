@@ -24,6 +24,10 @@ namespace Core
 
         static juce::String ensureSyxExtension(const juce::String& stem);
 
+        // Bank Utility EXPORT filename stem: "Pxx - {Name}" (slot 0-99, name OS-sanitized from
+        // the payload's name bytes), or "Pxx" when the sanitized name is empty.
+        static juce::String bankExportFileStem(int slot0to99, juce::String patchNameFromBytes);
+
         // Charset SSOT for the Matrix name (A-Z, 0-9, space, -, _) — reused by the Patch Name
         // inline editor to accept/reject typed characters without duplicating the rule.
         static bool isAllowedMatrixChar(juce::juce_wchar character) noexcept;

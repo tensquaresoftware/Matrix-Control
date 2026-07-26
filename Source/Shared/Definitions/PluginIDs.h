@@ -544,6 +544,8 @@ namespace PluginIDs
                 constexpr const char* kSelectBank7 = "bankUtilitySelectBank7";
                 constexpr const char* kSelectBank8 = "bankUtilitySelectBank8";
                 constexpr const char* kSelectBank9 = "bankUtilitySelectBank9";
+                constexpr const char* kImportBank  = "bankUtilityImportBank";
+                constexpr const char* kExportBank  = "bankUtilityExportBank";
             }
         }
 

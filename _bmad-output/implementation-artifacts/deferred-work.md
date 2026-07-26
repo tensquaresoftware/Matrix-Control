@@ -952,3 +952,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-confirmation-modal-button-order.md`
   summary: Master Init overlay is still non-modal — Tab can move focus under the overlay so Escape/Enter miss the dialog.
   evidence: Edge Case Hunter; pre-existing overlay pattern; button LTR/Enter-on-dialog focus subtree is in scope, focus trap is not.
+
+## Deferred from: quick-dev spec-bank-utility-import-export (2026-07-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-bank-utility-import-export.md`
+  summary: Re-export into an existing BANK N/PATCHES folder can leave orphan .syx files when a patch name changes between runs (old Pxx - OLDNAME.syx remains beside Pxx - NEWNAME.syx).
+  evidence: Blind Hunter; overwrite of the same stem is intentional; clearing or slot-prefix cleanup needs a product choice later.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-bank-utility-import-export.md`
+  summary: No dedicated unit tests for the PatchManagerActionHandler bank transfer state machine (cancel/snapshot/restore/generation).
+  evidence: Blind Hunter; pure helpers BankImportPlanner and bankExportFileStem are covered; MIDI hardware orchestration remains manual UAT.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-bank-utility-import-export.md`
+  summary: Mid-transfer device swap / reconnect is not re-validated beyond outbound-allowed checks already present.
+  evidence: Blind Hunter; rare during a ~100-slot transfer; existing disconnect paths abort or fail restore messaging.

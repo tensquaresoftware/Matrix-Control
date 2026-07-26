@@ -82,6 +82,18 @@ namespace PluginDescriptors
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank,
+            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank,
+            .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank,
+            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank,
+            .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
         }
     };
 

@@ -1154,6 +1154,30 @@ void PluginProcessor::setPatchNameReconciliationPicker(PatchNameReconciliationPi
     patchNameReconciliationPicker_ = std::move(picker);
 }
 
+void PluginProcessor::setBankExportFolderPicker(PatchFolderPicker picker)
+{
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->setBankExportFolderPicker(std::move(picker));
+}
+
+void PluginProcessor::setBankImportFolderPicker(PatchFolderPicker picker)
+{
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->setBankImportFolderPicker(std::move(picker));
+}
+
+void PluginProcessor::setBankImportConfirmGate(BankImportConfirmGate gate)
+{
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->setBankImportConfirmGate(std::move(gate));
+}
+
+void PluginProcessor::setBankTransferProgressPresenter(Core::BankTransferProgressPresenter presenter)
+{
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->setBankTransferProgressPresenter(std::move(presenter));
+}
+
 int PluginProcessor::getSkinVariantId() const
 {
     return static_cast<int>(apvts.state.getProperty(

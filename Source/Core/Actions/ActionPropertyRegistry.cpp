@@ -74,6 +74,8 @@ namespace Core
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank, ActionHandlerKind::PatchManager },
 
             // InternalPatchesModule
             { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch, ActionHandlerKind::PatchManager },

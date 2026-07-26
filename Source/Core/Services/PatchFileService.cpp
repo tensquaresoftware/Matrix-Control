@@ -48,7 +48,8 @@ namespace Core
 
     PatchFileSaveResult PatchFileService::savePatchSysExFile(const juce::File& targetFile,
                                                              const juce::uint8* packedData,
-                                                             SysExEncoder& encoder)
+                                                             SysExEncoder& encoder,
+                                                             int patchNumber)
     {
         PatchFileSaveResult result;
 
@@ -69,7 +70,7 @@ namespace Core
             return result;
         }
 
-        const auto encoded = encoder.encodePatchSysEx(0, packedData);
+        const auto encoded = encoder.encodePatchSysEx(static_cast<juce::uint8>(patchNumber), packedData);
         if (encoded.getSize() == 0)
         {
             result.errorMessage = "Encode failed";

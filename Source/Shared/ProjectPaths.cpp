@@ -224,6 +224,6 @@ bool ProjectPaths::isUsingFallbackRoot()
 
 juce::String ProjectPaths::getFallbackRootWarning()
 {
-    return "Project root not found — logs written to user data folder: "
+    return "Project root not found - logs written to user data folder: "
         + getProjectRoot().getFullPathName();
 }

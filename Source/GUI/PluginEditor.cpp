@@ -16,6 +16,7 @@
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "GUI/About/AboutWindow.h"
+#include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
@@ -448,6 +449,113 @@ PluginEditor::PluginEditor(PluginProcessor& p)
             }
         });
 
+    pluginProcessor.setBankExportFolderPicker(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> juce::File
+        {
+            if (safeThis == nullptr)
+                return {};
+
+            juce::File startDirectory;
+            const auto persistedPath = safeThis->pluginProcessor.getApvts().state.getProperty(
+                PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+                juce::String()).toString();
+            if (persistedPath.isNotEmpty())
+            {
+                const juce::File persistedFolder(persistedPath);
+                if (persistedFolder.isDirectory())
+                    startDirectory = persistedFolder;
+            }
+
+            juce::FileChooser chooser("Select bank export folder",
+                                      startDirectory,
+                                      juce::String(),
+                                      true,
+                                      false,
+                                      safeThis.getComponent());
+
+            if (chooser.browseForDirectory())
+                return chooser.getResult();
+
+            return {};
+        });
+
+    pluginProcessor.setBankImportFolderPicker(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> juce::File
+        {
+            if (safeThis == nullptr)
+                return {};
+
+            juce::File startDirectory;
+            const auto persistedPath = safeThis->pluginProcessor.getApvts().state.getProperty(
+                PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kFolderPath,
+                juce::String()).toString();
+            if (persistedPath.isNotEmpty())
+            {
+                const juce::File persistedFolder(persistedPath);
+                if (persistedFolder.isDirectory())
+                    startDirectory = persistedFolder;
+            }
+
+            juce::FileChooser chooser("Select bank import folder",
+                                      startDirectory,
+                                      juce::String(),
+                                      true,
+                                      false,
+                                      safeThis.getComponent());
+
+            if (chooser.browseForDirectory())
+                return chooser.getResult();
+
+            return {};
+        });
+
+    pluginProcessor.setBankImportConfirmGate(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> bool
+        {
+            if (! isMessageThread() || safeThis == nullptr)
+                return false;
+
+            namespace Dialog = PluginDisplayNames::Dialogs::BankImportConfirm;
+
+            return showOrderedConfirmAlert(
+                       juce::MessageBoxIconType::WarningIcon,
+                       Dialog::kTitle,
+                       Dialog::kBody,
+                       Dialog::kCancel,
+                       Dialog::kContinue,
+                       safeThis.getComponent())
+                   == 1;
+        });
+
+    pluginProcessor.setBankTransferProgressPresenter(Core::BankTransferProgressPresenter {
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
+            const juce::String& title, const juce::String& message, int totalSteps, std::function<void()> onCancel)
+        {
+            if (safeThis != nullptr)
+                safeThis->showBankTransferProgressDialog(title, message, totalSteps, std::move(onCancel));
+        },
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](int completedSteps)
+        {
+            if (safeThis != nullptr && safeThis->bankTransferProgressDialog_ != nullptr)
+                safeThis->bankTransferProgressDialog_->setProgress(completedSteps);
+        },
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](const juce::String& message)
+        {
+            if (safeThis != nullptr && safeThis->bankTransferProgressDialog_ != nullptr)
+                safeThis->bankTransferProgressDialog_->setMessage(message);
+        },
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](bool enabled)
+        {
+            if (safeThis != nullptr && safeThis->bankTransferProgressDialog_ != nullptr)
+                safeThis->bankTransferProgressDialog_->setCancelEnabled(enabled);
+        },
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]
+        {
+            if (safeThis != nullptr)
+                safeThis->hideBankTransferProgressDialog();
+        }
+    });
+
     skinBlack_ = TSS::Skin::create(TSS::Skin::ColourVariant::Black);
     skinCream_ = TSS::Skin::create(TSS::Skin::ColourVariant::Cream);
 
@@ -725,6 +833,9 @@ void PluginEditor::syncUiScaleFromEditor()
 
     if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
         updateMasterInitConfirmDialogLayout(uiScale);
+
+    if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
+        updateBankTransferProgressDialogLayout(uiScale);
 }
 
 void PluginEditor::updateSettingsWindowLayout(float uiScale)
@@ -752,6 +863,15 @@ void PluginEditor::updateMasterInitConfirmDialogLayout(float uiScale)
 
     masterInitConfirmDialog_->setUiScale(uiScale);
     masterInitConfirmDialog_->setBounds(getLocalBounds());
+}
+
+void PluginEditor::updateBankTransferProgressDialogLayout(float uiScale)
+{
+    if (bankTransferProgressDialog_ == nullptr)
+        return;
+
+    bankTransferProgressDialog_->setUiScale(uiScale);
+    bankTransferProgressDialog_->setBounds(getLocalBounds());
 }
 
 void PluginEditor::applySkinFromItemId(int skinItemId, bool persistToState)
@@ -863,6 +983,8 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
             return false;
         if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
             return false;
+        if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
+            return false;
 
         if (! pluginProcessor.clearClipboardFeedbackFromEscape())
             return false;
@@ -893,6 +1015,9 @@ void PluginEditor::updateSkin()
 
     if (aboutWindow_ != nullptr)
         aboutWindow_->setSkin(*skin_);
+
+    if (bankTransferProgressDialog_ != nullptr)
+        bankTransferProgressDialog_->setSkin(*skin_);
 
 #if JUCE_DEBUG
     if (testComponent_ != nullptr)
@@ -960,6 +1085,10 @@ PluginEditor::~PluginEditor()
     pluginProcessor.setUnsavedEditConfirmModalGate({});
     pluginProcessor.setMutatorFlushConfirmModalGate({});
     pluginProcessor.setPatchNameReconciliationPicker({});
+    pluginProcessor.setBankExportFolderPicker({});
+    pluginProcessor.setBankImportFolderPicker({});
+    pluginProcessor.setBankImportConfirmGate({});
+    pluginProcessor.setBankTransferProgressPresenter({});
 
     pluginProcessor.getApvts().state.removeListener(this);
     detachStandaloneAudioDeviceListener();
@@ -1083,6 +1212,43 @@ void PluginEditor::closeMasterInitConfirmDialog()
 {
     if (masterInitConfirmDialog_ != nullptr)
         masterInitConfirmDialog_->setVisible(false);
+}
+
+void PluginEditor::showBankTransferProgressDialog(const juce::String& title,
+                                                  const juce::String& message,
+                                                  int totalSteps,
+                                                  std::function<void()> onCancelRequested)
+{
+    closeSettingsWindow();
+    closeAboutWindow();
+
+    if (bankTransferProgressDialog_ == nullptr)
+    {
+        bankTransferProgressDialog_ = std::make_unique<BankTransferProgressDialog>(*skin_);
+        addChildComponent(*bankTransferProgressDialog_);
+    }
+    else
+    {
+        bankTransferProgressDialog_->setSkin(*skin_);
+    }
+
+    bankTransferProgressDialog_->prepareForShow(title, message, totalSteps, std::move(onCancelRequested));
+
+    const int baseWidth = layoutDimensions_.editor.width;
+    const float uiScale = (baseWidth > 0)
+        ? TSS::ScaledLayout::uiScaleFromEditorBounds(getWidth(), baseWidth)
+        : 1.0f;
+    updateBankTransferProgressDialogLayout(uiScale);
+
+    bankTransferProgressDialog_->setVisible(true);
+    bankTransferProgressDialog_->toFront(true);
+    bankTransferProgressDialog_->grabKeyboardFocus();
+}
+
+void PluginEditor::hideBankTransferProgressDialog()
+{
+    if (bankTransferProgressDialog_ != nullptr)
+        bankTransferProgressDialog_->setVisible(false);
 }
 
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)

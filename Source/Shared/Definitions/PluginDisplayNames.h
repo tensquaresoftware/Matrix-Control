@@ -44,11 +44,11 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected — check MIDI cables, MIDI From / MIDI To, and power-cycle the Matrix.";
+            "No synth detected - check MIDI cables, MIDI From / MIDI To, and power-cycle the Matrix.";
 
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =
-            "Connected Matrix device is not supported — editing is locked. Use MIDI From / MIDI To to change ports.";
+            "Connected Matrix device is not supported - editing is locked. Use MIDI From / MIDI To to change ports.";
 
         // Standalone: MIDI From and Keyboard From must open distinct input devices.
         constexpr const char* kMidiFromKeyboardFromConflictFooter =
@@ -147,6 +147,23 @@ namespace PluginDisplayNames
                 "Continue to flush, or Cancel to keep the history.";
             constexpr const char* kCancel   = "Cancel";
             constexpr const char* kContinue = "Continue";
+        }
+
+        namespace BankImportConfirm
+        {
+            constexpr const char* kTitle = "Import bank?";
+            constexpr const char* kBody =
+                "This overwrites patches on the device with files from the selected folder.\n\n"
+                "Continue to import, or Cancel to keep the device unchanged.";
+            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kContinue = "Continue";
+        }
+
+        namespace BankTransferProgress
+        {
+            constexpr const char* kExportTitle = "Exporting bank";
+            constexpr const char* kImportTitle = "Importing bank";
+            constexpr const char* kCancel      = "Cancel";
         }
     }
 
@@ -803,7 +820,23 @@ namespace PluginDisplayNames
             constexpr const char* kMatrix1000OnlyFooterMessage =
                 "Bank selection is available on Matrix-1000 only. Matrix-6/6R have no patch banks.";
             constexpr const char* kUnlockBankFooterMessage =
-                "Synth bank lock released — use front panel for 3-digit entry; plugin bank/patch unchanged.";
+                "Synth bank lock released - use front panel for 3-digit entry; plugin bank/patch unchanged.";
+            constexpr const char* kMatrix6ExportFolderName = "PATCHES";
+            constexpr const char* kImportRomBlockedFooterMessage =
+                "Import is only available on Matrix-1000 RAM banks 0 and 1.";
+            constexpr const char* kDeviceUnavailableFooterMessage =
+                "Bank transfer requires a connected, supported Matrix device.";
+            constexpr const char* kSnapshotFailedFooterMessage =
+                "Could not read the current bank from the device - import aborted, nothing was written.";
+            constexpr const char* kExportCancelledFooterMessage = "Export cancelled - no files kept for this run.";
+            constexpr const char* kImportCancelledFooterMessage = "Import cancelled - device restored to its prior state.";
+            constexpr const char* kFolderNotWritableFooterMessage = "Could not create or write to the export folder.";
+            constexpr const char* kImportRestoreFailedFooterMessage =
+                "Import cancelled - the device could not be fully restored. Check the connection and try again.";
+            constexpr const char* kExportingMessage = "Exporting bank to disk...";
+            constexpr const char* kImportingReadingMessage = "Reading current bank from device...";
+            constexpr const char* kImportingWritingMessage = "Writing patches to device...";
+            constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device to its prior state...";
 
             namespace StandaloneWidgets
             {
@@ -819,6 +852,28 @@ namespace PluginDisplayNames
                 constexpr const char* kSelectBank7  = "7";
                 constexpr const char* kSelectBank8  = "8";
                 constexpr const char* kSelectBank9  = "9";
+                constexpr const char* kImportBank   = "IMPORT";
+                constexpr const char* kExportBank   = "EXPORT";
+            }
+
+            namespace FooterMessages
+            {
+                inline juce::String formatExportSuccess(const juce::String& folderName)
+                {
+                    return "Exported 100 patches to " + folderName;
+                }
+
+                inline juce::String formatImportSuccess(int found, int valid, int imported)
+                {
+                    return "Import complete - found " + juce::String(found)
+                        + ", valid " + juce::String(valid)
+                        + ", imported " + juce::String(imported);
+                }
+
+                inline juce::String formatImportNoValidFiles(int found)
+                {
+                    return "No valid .syx files to import (found " + juce::String(found) + ")";
+                }
             }
         }
 

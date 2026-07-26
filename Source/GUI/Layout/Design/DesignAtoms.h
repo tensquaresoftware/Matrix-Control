@@ -50,8 +50,10 @@ namespace TSS::Design
                 inline constexpr int kCopy = 20;
                 inline constexpr int kPaste = 20;
 
-                inline constexpr int kPatchManagerBankSelect = 36;
+                inline constexpr int kPatchManagerBankSelect = 24;
                 inline constexpr int kPatchManagerUnlockBank = 68;
+                inline constexpr int kPatchManagerImportBank = 56;
+                inline constexpr int kPatchManagerExportBank = 56;
 
                 inline constexpr int kInternalPatchesInit = 36;
                 inline constexpr int kInternalPatchesCopy = 36;

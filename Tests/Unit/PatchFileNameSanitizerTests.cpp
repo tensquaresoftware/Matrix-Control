@@ -16,6 +16,9 @@ public:
         sanitizeFileStem_stripsPathAndExtension();
         sanitizeOsPathSegment_keepsSpacesStripsStar();
         sanitizeOsFileStem_fallbackWhenEmpty();
+        bankExportFileStem_padsSlotAndAppendsSanitizedName();
+        bankExportFileStem_omitsNameWhenSanitizedEmpty();
+        bankExportFileStem_clampsOutOfRangeSlots();
     }
 
 private:
@@ -83,6 +86,34 @@ private:
                      juce::String(Core::PatchFileNameSanitizer::kEmptyNameFallback));
         expectEquals(Core::PatchFileNameSanitizer::sanitizeOsFileStem("WARM PAD.syx"),
                      juce::String("WARM PAD"));
+    }
+
+    void bankExportFileStem_padsSlotAndAppendsSanitizedName()
+    {
+        beginTest("bankExportFileStem_padsSlotAndAppendsSanitizedName");
+
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(3, "WARM PAD"),
+                     juce::String("P03 - WARM PAD"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(99, "lead"),
+                     juce::String("P99 - LEAD"));
+    }
+
+    void bankExportFileStem_omitsNameWhenSanitizedEmpty()
+    {
+        beginTest("bankExportFileStem_omitsNameWhenSanitizedEmpty");
+
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(0, ""),
+                     juce::String("P00"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(7, "   "),
+                     juce::String("P07"));
+    }
+
+    void bankExportFileStem_clampsOutOfRangeSlots()
+    {
+        beginTest("bankExportFileStem_clampsOutOfRangeSlots");
+
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(-1, ""), juce::String("P00"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(150, ""), juce::String("P99"));
     }
 };
 

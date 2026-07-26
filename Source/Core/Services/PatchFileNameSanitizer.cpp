@@ -75,6 +75,17 @@ namespace Core
         return stem + ".syx";
     }
 
+    juce::String PatchFileNameSanitizer::bankExportFileStem(int slot0to99, juce::String patchNameFromBytes)
+    {
+        const auto slotLabel = "P" + juce::String(juce::jlimit(0, 99, slot0to99)).paddedLeft('0', 2);
+        const auto sanitizedName = sanitizeOsPathSegmentOrEmpty(std::move(patchNameFromBytes));
+
+        if (sanitizedName.isEmpty())
+            return slotLabel;
+
+        return slotLabel + " - " + sanitizedName;
+    }
+
     juce::String PatchFileNameSanitizer::stripOsForbiddenChars(juce::String text)
     {
         for (int i = text.length(); --i >= 0;)

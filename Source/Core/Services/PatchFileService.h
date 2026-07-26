@@ -48,9 +48,12 @@ namespace Core
         explicit PatchFileService(SysExDecoder& decoder) noexcept;
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
+        // patchNumber stamps the SysEx header slot byte (bank export needs the real slot 0-99;
+        // Computer Patches Save/Save As always pass 0 — the encoded slot is irrelevant on load).
         PatchFileSaveResult savePatchSysExFile(const juce::File& targetFile,
                                                const juce::uint8* packedData,
-                                               SysExEncoder& encoder);
+                                               SysExEncoder& encoder,
+                                               int patchNumber = 0);
         PatchFileLoadResult loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut);
         // userPatchName is the live SSOT musical name (model + APVTS), stamped onto bytes
         // 0-7 of every exported .syx before encoding. Filenames/folder stems stay Mxx/Mxx-Ryy

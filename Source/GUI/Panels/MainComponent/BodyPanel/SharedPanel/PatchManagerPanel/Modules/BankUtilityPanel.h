@@ -58,13 +58,17 @@ private:
     std::unique_ptr<TSS::Button> selectBank7Button_;
     std::unique_ptr<TSS::Button> selectBank8Button_;
     std::unique_ptr<TSS::Button> selectBank9Button_;
+    std::unique_ptr<TSS::Button> importBankButton_;
+    std::unique_ptr<TSS::Button> exportBankButton_;
 
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
     void setupBankSelectorLabel(TSS::ISkin& skin);
     void setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupImportExportButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
 
     void refreshDeviceGating();
     void refreshSelectedBankHighlight();
+    void refreshImportExportEnabled();
     void setBankUtilityGrayed(bool grayed);
     void showMatrix1000OnlyFooterMessage();
     void clearMatrix1000OnlyFooterIfPresent();

@@ -24,6 +24,11 @@ std::optional<int> WidgetDimensionRegistry::resolveStandaloneButtonWidth(const j
     if (widgetId.startsWith("bankUtilitySelectBank"))
         return BW::kPatchManagerBankSelect;
 
+    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank)
+        return BW::kPatchManagerImportBank;
+    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank)
+        return BW::kPatchManagerExportBank;
+
     if (widgetId == PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch)
         return BW::kInternalPatchesInit;
     if (widgetId == PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch)

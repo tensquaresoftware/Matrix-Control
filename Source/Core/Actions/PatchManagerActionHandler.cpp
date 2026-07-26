@@ -9,6 +9,7 @@
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "Core/Services/BankImportPlanner.h"
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
 #include "Core/Services/PatchFileService.h"
@@ -25,6 +26,7 @@
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
 namespace MutatorMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
+namespace BankFooterMessages = PluginDisplayNames::PatchManagerSection::BankUtilityModule::FooterMessages;
 
 namespace
 {
@@ -202,6 +204,18 @@ namespace Core
             if (nextId.has_value() && *nextId == beforeId)
                 handleLoadSelectedPatchFile(limits);
 
+            return;
+        }
+
+        if (propertyId == BankUtilityModule::StandaloneWidgets::kExportBank)
+        {
+            handleBankExport(limits);
+            return;
+        }
+
+        if (propertyId == BankUtilityModule::StandaloneWidgets::kImportBank)
+        {
+            handleBankImport(limits);
             return;
         }
 
@@ -1292,6 +1306,580 @@ namespace Core
         if (propertyId == kSelectBank9) return 9;
 
         return -1;
+    }
+
+    void PatchManagerActionHandler::setBankExportFolderPicker(PatchFolderPicker picker)
+    {
+        bankExportFolderPicker_ = std::move(picker);
+    }
+
+    void PatchManagerActionHandler::setBankImportFolderPicker(PatchFolderPicker picker)
+    {
+        bankImportFolderPicker_ = std::move(picker);
+    }
+
+    void PatchManagerActionHandler::setBankImportConfirmGate(BankImportConfirmGate gate)
+    {
+        bankImportConfirmGate_ = std::move(gate);
+    }
+
+    void PatchManagerActionHandler::setBankTransferProgressPresenter(BankTransferProgressPresenter presenter)
+    {
+        bankTransferProgress_ = std::move(presenter);
+    }
+
+    bool PatchManagerActionHandler::isBankTransferBusy() const noexcept
+    {
+        return bankTransfer_.kind != BankTransferState::Kind::kNone;
+    }
+
+    void PatchManagerActionHandler::publishBankTransferFooter(const juce::String& message, const juce::String& severity)
+    {
+        apvts_.state.setProperty("uiMessageText", message, nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", severity, nullptr);
+    }
+
+    int PatchManagerActionHandler::bankTransferWriteDelayMs() const
+    {
+        const int profileDelayMs = midiManager_ != nullptr ? midiManager_->getRequiredSysExDelayMs() : 0;
+        return juce::jmax(20, profileDelayMs + 5);
+    }
+
+    void PatchManagerActionHandler::requestBankTransferCancel(std::uint64_t generation)
+    {
+        if (bankTransfer_.kind == BankTransferState::Kind::kNone || bankTransfer_.generation != generation)
+            return;
+
+        bankTransfer_.cancelRequested = true;
+
+        // Unblock a pending dump so cancel is observed promptly (callback / timeout path).
+        if (midiManager_ != nullptr)
+            midiManager_->cancelPendingSysExRequest();
+    }
+
+    int PatchManagerActionHandler::getSelectedBankForTransfer(const DeviceMemoryLimits& limits) const
+    {
+        if (! limits.hasBankConcept())
+            return 0;
+
+        const int selected = static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+            limits.minBankNumber()));
+        return juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), selected);
+    }
+
+    void PatchManagerActionHandler::handleBankExport(const DeviceMemoryLimits& limits)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+        using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+        if (isBankTransferBusy() || patchFileService_ == nullptr || sysExEncoder_ == nullptr)
+            return;
+
+        if (! isDeviceDumpAvailable())
+        {
+            publishBankTransferFooter(kDeviceUnavailableFooterMessage, "warning");
+            return;
+        }
+
+        if (! bankExportFolderPicker_)
+            return;
+
+        // Match Bank Utility / Internal navigation gates before touching the device bank.
+        if (! confirmPatchContextChange())
+            return;
+
+        const juce::File parentFolder = bankExportFolderPicker_();
+        if (! parentFolder.isDirectory())
+            return; // OS picker cancelled
+
+        const bool hasBankConcept = limits.hasBankConcept();
+        const int bank = getSelectedBankForTransfer(limits);
+        const juce::String childName = hasBankConcept
+            ? ("BANK " + juce::String(bank))
+            : juce::String(kMatrix6ExportFolderName);
+
+        const juce::File folder = parentFolder.getChildFile(childName);
+        const bool folderExisted = folder.isDirectory();
+        if (! folderExisted && ! folder.createDirectory())
+        {
+            publishBankTransferFooter(kFolderNotWritableFooterMessage, "warning");
+            return;
+        }
+
+        bankTransfer_ = BankTransferState {};
+        bankTransfer_.kind = BankTransferState::Kind::kExport;
+        bankTransfer_.generation = ++bankTransferGeneration_;
+        bankTransfer_.totalSlots = 100;
+        bankTransfer_.limits = limits;
+        bankTransfer_.bank = bank;
+        bankTransfer_.targetFolder = folder;
+        bankTransfer_.childFolderDisplayName = childName;
+        bankTransfer_.createdTargetFolderThisRun = ! folderExisted;
+
+        const auto generation = bankTransfer_.generation;
+
+        if (bankTransferProgress_.show)
+        {
+            bankTransferProgress_.show(
+                juce::String(kExportTitle),
+                juce::String(kExportingMessage),
+                bankTransfer_.totalSlots,
+                [this, generation] { requestBankTransferCancel(generation); });
+        }
+
+        if (hasBankConcept)
+        {
+            if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
+            {
+                finishBankExport(false, kDeviceUnavailableFooterMessage, "warning");
+                return;
+            }
+
+            midiManager_->sendSetBank(bank);
+        }
+
+        exportNextSlot(0, generation);
+    }
+
+    void PatchManagerActionHandler::exportNextSlot(int slot, std::uint64_t generation)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (bankTransfer_.kind != BankTransferState::Kind::kExport || bankTransfer_.generation != generation)
+            return;
+
+        if (bankTransfer_.cancelRequested)
+        {
+            finishBankExport(false, kExportCancelledFooterMessage, "warning");
+            return;
+        }
+
+        if (slot >= bankTransfer_.totalSlots)
+        {
+            finishBankExport(true,
+                             BankFooterMessages::formatExportSuccess(bankTransfer_.childFolderDisplayName),
+                             "info");
+            return;
+        }
+
+        juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+        requestDeviceDump(static_cast<juce::uint8>(slot),
+            [weakThis, slot, generation](std::vector<juce::uint8> dump)
+            {
+                auto* self = weakThis.get();
+                if (self == nullptr)
+                    return;
+
+                using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+                if (self->bankTransfer_.kind != BankTransferState::Kind::kExport
+                    || self->bankTransfer_.generation != generation)
+                {
+                    return;
+                }
+
+                if (self->bankTransfer_.cancelRequested)
+                {
+                    self->finishBankExport(false, kExportCancelledFooterMessage, "warning");
+                    return;
+                }
+
+                if (dump.size() != SysExConstants::kPatchPackedDataSize)
+                {
+                    self->finishBankExport(false, kDeviceUnavailableFooterMessage, "warning");
+                    return;
+                }
+
+                PatchModel dumpedPatch;
+                dumpedPatch.loadFrom(dump.data());
+                const auto stem = PatchFileNameSanitizer::bankExportFileStem(slot, dumpedPatch.getName());
+                const auto file = self->bankTransfer_.targetFolder.getChildFile(
+                    PatchFileNameSanitizer::ensureSyxExtension(stem));
+
+                const bool existedBefore = file.existsAsFile();
+                const auto saveResult = self->patchFileService_->savePatchSysExFile(
+                    file, dump.data(), *self->sysExEncoder_, slot);
+                if (! saveResult.success)
+                {
+                    self->finishBankExport(false, saveResult.errorMessage, "warning");
+                    return;
+                }
+
+                if (! existedBefore)
+                    self->bankTransfer_.filesCreatedThisRun.add(file.getFullPathName());
+
+                self->bankTransfer_.completedSlots = slot + 1;
+
+                if (self->bankTransferProgress_.update)
+                    self->bankTransferProgress_.update(self->bankTransfer_.completedSlots);
+
+                self->exportNextSlot(slot + 1, generation);
+            });
+    }
+
+    void PatchManagerActionHandler::finishBankExport(bool success,
+                                                     const juce::String& footerMessage,
+                                                     const juce::String& severity)
+    {
+        if (bankTransferProgress_.hide)
+            bankTransferProgress_.hide();
+
+        if (! success)
+        {
+            for (const auto& path : bankTransfer_.filesCreatedThisRun)
+                juce::File(path).deleteFile();
+
+            if (bankTransfer_.createdTargetFolderThisRun
+                && bankTransfer_.targetFolder.isDirectory()
+                && bankTransfer_.targetFolder.getNumberOfChildFiles(juce::File::findFilesAndDirectories) == 0)
+            {
+                bankTransfer_.targetFolder.deleteRecursively();
+            }
+        }
+
+        bankTransfer_ = BankTransferState {};
+        publishBankTransferFooter(footerMessage, severity);
+    }
+
+    void PatchManagerActionHandler::handleBankImport(const DeviceMemoryLimits& limits)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+        using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+        if (isBankTransferBusy() || patchFileService_ == nullptr)
+            return;
+
+        const bool hasBankConcept = limits.hasBankConcept();
+        const int bank = getSelectedBankForTransfer(limits);
+
+        if (hasBankConcept && limits.isRomBank(bank))
+        {
+            publishBankTransferFooter(kImportRomBlockedFooterMessage, "warning");
+            return;
+        }
+
+        if (! isDeviceDumpAvailable())
+        {
+            publishBankTransferFooter(kDeviceUnavailableFooterMessage, "warning");
+            return;
+        }
+
+        if (! bankImportFolderPicker_)
+            return;
+
+        if (! confirmPatchContextChange())
+            return;
+
+        const juce::File folder = bankImportFolderPicker_();
+        if (! folder.isDirectory())
+            return; // OS picker cancelled
+
+        // Cancel/Continue confirm — Cancel leaves the device untouched.
+        if (! bankImportConfirmGate_ || ! bankImportConfirmGate_())
+            return;
+
+        const auto scan = patchFileService_->scanFolder(folder);
+        if (! scan.folderUsable)
+        {
+            publishBankTransferFooter(scan.footerMessage, scan.footerSeverity);
+            return;
+        }
+
+        const auto plan = BankImportPlanner::resolve(scan);
+        const int found = plan.foundCount;
+        const int cappedValidCount = plan.cappedFileCount;
+
+        if (cappedValidCount <= 0)
+        {
+            publishBankTransferFooter(BankFooterMessages::formatImportNoValidFiles(found), "warning");
+            return;
+        }
+
+        bankTransfer_ = BankTransferState {};
+        bankTransfer_.kind = BankTransferState::Kind::kImport;
+        bankTransfer_.generation = ++bankTransferGeneration_;
+        bankTransfer_.limits = limits;
+        bankTransfer_.bank = bank;
+        bankTransfer_.importFoundCount = found;
+
+        const auto generation = bankTransfer_.generation;
+
+        // Show progress before the synchronous disk read so the UI is not frozen without feedback.
+        if (bankTransferProgress_.show)
+        {
+            bankTransferProgress_.show(
+                juce::String(kImportTitle),
+                juce::String(kImportingReadingMessage),
+                juce::jmax(1, cappedValidCount),
+                [this, generation] { requestBankTransferCancel(generation); });
+        }
+
+        for (int i = 0; i < cappedValidCount; ++i)
+        {
+            if (bankTransfer_.cancelRequested)
+            {
+                finishBankImport(kImportCancelledFooterMessage, "warning");
+                return;
+            }
+
+            const auto file = scan.folder.getChildFile(scan.sortedValidFileNames[i]);
+            PackedPatchBuffer packed {};
+            const auto loadResult = patchFileService_->loadPatchSysExFile(file, packed.data());
+            if (loadResult.success)
+                bankTransfer_.importPatches.push_back(packed);
+        }
+
+        bankTransfer_.importValidCount = static_cast<int>(bankTransfer_.importPatches.size());
+
+        if (bankTransfer_.importValidCount <= 0)
+        {
+            finishBankImport(BankFooterMessages::formatImportNoValidFiles(found), "warning");
+            return;
+        }
+
+        bankTransfer_.totalSlots = bankTransfer_.importValidCount;
+
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(0);
+
+        if (hasBankConcept)
+        {
+            if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
+            {
+                finishBankImport(kDeviceUnavailableFooterMessage, "warning");
+                return;
+            }
+
+            midiManager_->sendSetBank(bank);
+        }
+
+        beginBankImportSnapshot(generation);
+    }
+
+    void PatchManagerActionHandler::beginBankImportSnapshot(std::uint64_t generation)
+    {
+        bankTransfer_.deviceSnapshot.clear();
+        snapshotNextImportSlot(0, generation);
+    }
+
+    void PatchManagerActionHandler::snapshotNextImportSlot(int slot, std::uint64_t generation)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+            return;
+
+        // Snapshot only reads the device; cancel here aborts with no restore needed.
+        // Note: sendSetBank may already have run before the snapshot loop.
+        if (bankTransfer_.cancelRequested)
+        {
+            finishBankImport(kImportCancelledFooterMessage, "warning");
+            return;
+        }
+
+        if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
+        {
+            finishBankImport(kDeviceUnavailableFooterMessage, "warning");
+            return;
+        }
+
+        if (slot >= bankTransfer_.totalSlots)
+        {
+            beginBankImportWrite(generation);
+            return;
+        }
+
+        juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+        requestDeviceDump(static_cast<juce::uint8>(slot),
+            [weakThis, slot, generation](std::vector<juce::uint8> dump)
+            {
+                auto* self = weakThis.get();
+                if (self == nullptr)
+                    return;
+
+                using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+                if (self->bankTransfer_.kind != BankTransferState::Kind::kImport
+                    || self->bankTransfer_.generation != generation)
+                {
+                    return;
+                }
+
+                if (self->bankTransfer_.cancelRequested)
+                {
+                    self->finishBankImport(kImportCancelledFooterMessage, "warning");
+                    return;
+                }
+
+                if (dump.size() != SysExConstants::kPatchPackedDataSize)
+                {
+                    self->finishBankImport(kSnapshotFailedFooterMessage, "warning");
+                    return;
+                }
+
+                PackedPatchBuffer packed {};
+                std::memcpy(packed.data(), dump.data(), packed.size());
+                self->bankTransfer_.deviceSnapshot.push_back(packed);
+
+                if (self->bankTransferProgress_.update)
+                    self->bankTransferProgress_.update(slot + 1);
+
+                self->snapshotNextImportSlot(slot + 1, generation);
+            });
+    }
+
+    void PatchManagerActionHandler::beginBankImportWrite(std::uint64_t generation)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+            return;
+
+        // Snapshot is complete but nothing has been written yet — safe to abort without restoring.
+        if (bankTransfer_.cancelRequested)
+        {
+            finishBankImport(kImportCancelledFooterMessage, "warning");
+            return;
+        }
+
+        bankTransfer_.completedSlots = 0;
+        bankTransfer_.importWrittenCount = 0;
+
+        if (bankTransferProgress_.setMessage)
+            bankTransferProgress_.setMessage(juce::String(kImportingWritingMessage));
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(0);
+
+        writeNextImportSlot(0, generation);
+    }
+
+    void PatchManagerActionHandler::writeNextImportSlot(int slot, std::uint64_t generation)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+            return;
+
+        if (bankTransfer_.cancelRequested)
+        {
+            beginBankImportRestore(generation, kImportCancelledFooterMessage, "warning");
+            return;
+        }
+
+        if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
+        {
+            beginBankImportRestore(generation, kDeviceUnavailableFooterMessage, "warning");
+            return;
+        }
+
+        if (slot >= bankTransfer_.importValidCount)
+        {
+            finishBankImport(
+                BankFooterMessages::formatImportSuccess(
+                    bankTransfer_.importFoundCount,
+                    bankTransfer_.importValidCount,
+                    bankTransfer_.importWrittenCount),
+                "info");
+            return;
+        }
+
+        midiManager_->sendPatch(static_cast<juce::uint8>(slot),
+                                bankTransfer_.importPatches[static_cast<size_t>(slot)].data());
+        ++bankTransfer_.importWrittenCount;
+
+        bankTransfer_.completedSlots = slot + 1;
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(bankTransfer_.completedSlots);
+
+        juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+        juce::Timer::callAfterDelay(bankTransferWriteDelayMs(),
+            [weakThis, slot, generation]
+            {
+                if (auto* self = weakThis.get())
+                    self->writeNextImportSlot(slot + 1, generation);
+            });
+    }
+
+    void PatchManagerActionHandler::beginBankImportRestore(std::uint64_t generation,
+                                                           const juce::String& footerMessage,
+                                                           const juce::String& severity)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+            return;
+
+        if (bankTransfer_.deviceSnapshot.empty())
+        {
+            // Cancel arrived before the first write reached the device — nothing to restore.
+            finishBankImport(footerMessage, severity);
+            return;
+        }
+
+        if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
+        {
+            finishBankImport(kImportRestoreFailedFooterMessage, "warning");
+            return;
+        }
+
+        bankTransfer_.isRestoring = true;
+        bankTransfer_.pendingFooterMessage = footerMessage;
+        bankTransfer_.pendingFooterSeverity = severity;
+        bankTransfer_.completedSlots = 0;
+
+        if (bankTransferProgress_.setCancelEnabled)
+            bankTransferProgress_.setCancelEnabled(false);
+        if (bankTransferProgress_.setMessage)
+            bankTransferProgress_.setMessage(juce::String(kImportingRestoringMessage));
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(0);
+
+        restoreNextSnapshotSlot(0, generation);
+    }
+
+    void PatchManagerActionHandler::restoreNextSnapshotSlot(int slot, std::uint64_t generation)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+            return;
+
+        if (slot >= static_cast<int>(bankTransfer_.deviceSnapshot.size()))
+        {
+            finishBankImport(bankTransfer_.pendingFooterMessage, bankTransfer_.pendingFooterSeverity);
+            return;
+        }
+
+        if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
+        {
+            finishBankImport(kImportRestoreFailedFooterMessage, "warning");
+            return;
+        }
+
+        midiManager_->sendPatch(static_cast<juce::uint8>(slot),
+                                bankTransfer_.deviceSnapshot[static_cast<size_t>(slot)].data());
+
+        bankTransfer_.completedSlots = slot + 1;
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(bankTransfer_.completedSlots);
+
+        juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+        juce::Timer::callAfterDelay(bankTransferWriteDelayMs(),
+            [weakThis, slot, generation]
+            {
+                if (auto* self = weakThis.get())
+                    self->restoreNextSnapshotSlot(slot + 1, generation);
+            });
+    }
+
+    void PatchManagerActionHandler::finishBankImport(const juce::String& footerMessage, const juce::String& severity)
+    {
+        if (bankTransferProgress_.hide)
+            bankTransferProgress_.hide();
+
+        bankTransfer_ = BankTransferState {};
+        publishBankTransferFooter(footerMessage, severity);
     }
 
 } // namespace Core

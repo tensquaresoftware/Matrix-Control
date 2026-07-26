@@ -10,6 +10,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Core/Actions/BankTransferProgressPresenter.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
@@ -192,6 +193,18 @@ public:
     using PatchNameReconciliationPicker = Core::PatchFileNameReconciler::Picker;
 
     void setPatchNameReconciliationPicker(PatchNameReconciliationPicker picker);
+
+    // Bank Utility EXPORT/IMPORT: OS folder pickers (reuse PatchFolderPicker), the ordered
+    // Cancel/Continue confirm gate for IMPORT, and the progress-modal presenter. Forwarded
+    // straight to the handler — it already exists by the time the editor wires these.
+    void setBankExportFolderPicker(PatchFolderPicker picker);
+    void setBankImportFolderPicker(PatchFolderPicker picker);
+
+    using BankImportConfirmGate = std::function<bool()>;
+
+    void setBankImportConfirmGate(BankImportConfirmGate gate);
+    void setBankTransferProgressPresenter(Core::BankTransferProgressPresenter presenter);
+
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
     const Core::PatchFileService& getPatchFileService() const noexcept { return *patchFileService_; }
 

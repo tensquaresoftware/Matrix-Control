@@ -12,6 +12,8 @@ struct ButtonDimensions
 
     int patchManagerBankSelectWidth;
     int patchManagerUnlockBankWidth;
+    int patchManagerImportBankWidth;
+    int patchManagerExportBankWidth;
 
     int internalPatchesInitWidth;
     int internalPatchesCopyWidth;

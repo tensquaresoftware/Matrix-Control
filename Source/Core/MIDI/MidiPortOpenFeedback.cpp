@@ -53,13 +53,13 @@ juce::String formatFooterMessage(bool isInput,
     if (reason == MidiPortOpenFailureReason::kNotFound)
     {
         return direction + ": \"" + displayName
-               + "\" — port not found (device disconnected or unavailable).";
+               + "\" - port not found (device disconnected or unavailable).";
     }
 
     if (reason == MidiPortOpenFailureReason::kOpenRejected)
     {
         juce::String message = direction + ": \"" + displayName
-                               + "\" — could not open (port may be in use by another application";
+                               + "\" - could not open (port may be in use by another application";
 
 #if JUCE_WINDOWS
         message += ", e.g. your DAW. Try closing other apps or use a virtual MIDI port such as loopMIDI";

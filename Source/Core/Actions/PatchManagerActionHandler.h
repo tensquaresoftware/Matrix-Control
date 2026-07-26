@@ -4,14 +4,17 @@
 #include <cstdint>
 #include <functional>
 #include <optional>
+#include <vector>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "Core/Actions/ActionExecutionHooks.h"
+#include "Core/Actions/BankTransferProgressPresenter.h"
 #include "Core/Actions/IActionHandler.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileNameReconciler.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 
 class MidiManager;
 class SysExEncoder;
@@ -36,6 +39,11 @@ namespace Core
                                                              juce::String suggestedStem)>;
         using PatchNameReconciliationPicker = PatchFileNameReconciler::Picker;
 
+        // Bank Utility IMPORT/EXPORT: OS folder pickers (reuse the PatchFolderPicker shape) and
+        // an ordered Cancel/Continue confirm gate for IMPORT. See BankTransferProgressPresenter.h
+        // for the progress-modal presenter type shared with PluginProcessor.
+        using BankImportConfirmGate = std::function<bool()>;
+
         PatchManagerActionHandler(juce::AudioProcessorValueTreeState& apvts,
                                   DeviceMemoryLimitsSupplier deviceMemoryLimits,
                                   PatchModel* patchModel,
@@ -54,6 +62,12 @@ namespace Core
                                   ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
+
+        // Bank Utility IMPORT/EXPORT wiring — optional; empty pickers/gates make the buttons no-op.
+        void setBankExportFolderPicker(PatchFolderPicker picker);
+        void setBankImportFolderPicker(PatchFolderPicker picker);
+        void setBankImportConfirmGate(BankImportConfirmGate gate);
+        void setBankTransferProgressPresenter(BankTransferProgressPresenter presenter);
 
         void rescanPersistedComputerPatchesFolder();
         void resetComputerPatchesBrowserAfterSessionLoad();
@@ -163,6 +177,67 @@ namespace Core
         int getCurrentPatch(const DeviceMemoryLimits& limits) const;
         int parseBankButtonIndex(const juce::String& propertyId) const;
 
+        // Bank Utility EXPORT/IMPORT orchestration (live MIDI dump/write, cancellable).
+        using PackedPatchBuffer = std::array<juce::uint8, PatchModel::kBufferSize>;
+
+        struct BankTransferState
+        {
+            enum class Kind
+            {
+                kNone,
+                kExport,
+                kImport
+            };
+
+            Kind kind = Kind::kNone;
+            std::uint64_t generation = 0;
+            bool cancelRequested = false;
+            int totalSlots = 0;
+            int completedSlots = 0;
+            DeviceMemoryLimits limits { DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kUnknown) };
+            int bank = 0;
+
+            // EXPORT-only.
+            juce::File targetFolder;
+            juce::String childFolderDisplayName;
+            juce::StringArray filesCreatedThisRun; // only paths that did not exist before this run
+            bool createdTargetFolderThisRun = false;
+
+            // IMPORT-only.
+            int importFoundCount = 0;
+            int importValidCount = 0;
+            int importWrittenCount = 0;
+            std::vector<PackedPatchBuffer> importPatches;
+            std::vector<PackedPatchBuffer> deviceSnapshot;
+            bool isRestoring = false;
+            juce::String pendingFooterMessage;
+            juce::String pendingFooterSeverity;
+        };
+
+        bool isBankTransferBusy() const noexcept;
+        int getSelectedBankForTransfer(const DeviceMemoryLimits& limits) const;
+        void handleBankExport(const DeviceMemoryLimits& limits);
+        void handleBankImport(const DeviceMemoryLimits& limits);
+        void exportNextSlot(int slot, std::uint64_t generation);
+        void finishBankExport(bool success, const juce::String& footerMessage, const juce::String& severity);
+        void beginBankImportSnapshot(std::uint64_t generation);
+        void snapshotNextImportSlot(int slot, std::uint64_t generation);
+        void beginBankImportWrite(std::uint64_t generation);
+        void writeNextImportSlot(int slot, std::uint64_t generation);
+        void beginBankImportRestore(std::uint64_t generation, const juce::String& footerMessage, const juce::String& severity);
+        void restoreNextSnapshotSlot(int slot, std::uint64_t generation);
+        void finishBankImport(const juce::String& footerMessage, const juce::String& severity);
+        void requestBankTransferCancel(std::uint64_t generation);
+        void publishBankTransferFooter(const juce::String& message, const juce::String& severity);
+        int bankTransferWriteDelayMs() const;
+
+        BankTransferState bankTransfer_;
+        std::uint64_t bankTransferGeneration_ = 0;
+        PatchFolderPicker bankExportFolderPicker_;
+        PatchFolderPicker bankImportFolderPicker_;
+        BankImportConfirmGate bankImportConfirmGate_;
+        BankTransferProgressPresenter bankTransferProgress_;
+
         juce::AudioProcessorValueTreeState& apvts_;
         DeviceMemoryLimitsSupplier deviceMemoryLimits_;
         PatchModel* patchModel_;
@@ -193,6 +268,8 @@ namespace Core
         };
 
         std::optional<ComputerPatchesBrowserSnapshot> pendingBrowserRestoreOnCancel_;
+
+        JUCE_DECLARE_WEAK_REFERENCEABLE(PatchManagerActionHandler)
     };
 
 } // namespace Core
