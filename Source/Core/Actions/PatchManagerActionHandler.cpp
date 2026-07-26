@@ -331,7 +331,14 @@ namespace Core
         }
 
         if (clipboardService_ == nullptr || !clipboardService_->canPasteFullPatch())
+        {
+            apvts_.state.setProperty(
+                "uiMessageText",
+                juce::String(PluginDisplayNames::ShortLabels::kNothingToPasteFooter),
+                nullptr);
+            apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
             return;
+        }
 
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
@@ -341,8 +348,22 @@ namespace Core
 
         abandonPendingDeviceLoad();
 
+        const auto sourceLabel = clipboardService_->getFullPatchSourceLabel().isNotEmpty()
+            ? clipboardService_->getFullPatchSourceLabel()
+            : juce::String("Patch");
+        const auto targetLabel = PluginDisplayNames::ClipboardMessages::formatInternalPatchLocation(
+            limits.hasBankConcept(), currentBank, getCurrentPatch(limits));
+
         apvtsPatchMapper_->apvtsToBuffer();
-        clipboardService_->pasteFullPatch(*patchModel_);
+        if (!clipboardService_->pasteFullPatch(*patchModel_))
+        {
+            apvts_.state.setProperty(
+                "uiMessageText",
+                PluginDisplayNames::ClipboardMessages::formatPasteFailed(sourceLabel, targetLabel),
+                nullptr);
+            apvts_.state.setProperty("uiMessageSeverity", juce::String("error"), nullptr);
+            return;
+        }
 
         if (hooks_.disarmClipboardFeedback)
             hooks_.disarmClipboardFeedback();
@@ -360,6 +381,12 @@ namespace Core
             midiManager_->sendFullPatchForAudition(patchModel_->data(),
                                                    static_cast<juce::uint8>(getCurrentPatch(limits)),
                                                    limits.hasBankConcept());
+
+        apvts_.state.setProperty(
+            "uiMessageText",
+            PluginDisplayNames::ClipboardMessages::formatPatchPasted(sourceLabel, targetLabel),
+            nullptr);
+        apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
     }
 
     void PatchManagerActionHandler::handleInternalPatchStore(const DeviceMemoryLimits& limits)

@@ -10,6 +10,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/ClipboardPasteEnabledResolver.h"
 #include "Core/Services/ClipboardService.h"
+#include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -18,6 +19,82 @@
 
 namespace Core
 {
+
+namespace
+{
+    juce::String patchModuleDisplayName(PatchModuleKind kind)
+    {
+        using namespace PluginDisplayNames::PatchEditSection;
+
+        switch (kind)
+        {
+            case PatchModuleKind::Dco1: return Dco1Module::kName;
+            case PatchModuleKind::Dco2: return Dco2Module::kName;
+            case PatchModuleKind::Env1: return Envelope1Module::kName;
+            case PatchModuleKind::Env2: return Envelope2Module::kName;
+            case PatchModuleKind::Env3: return Envelope3Module::kName;
+            case PatchModuleKind::Lfo1: return Lfo1Module::kName;
+            case PatchModuleKind::Lfo2: return Lfo2Module::kName;
+        }
+
+        return {};
+    }
+
+    void publishFooter(juce::AudioProcessorValueTreeState& apvts,
+                       const juce::String& text,
+                       const juce::String& severity)
+    {
+        apvts.state.setProperty("uiMessageText", text, nullptr);
+        apvts.state.setProperty("uiMessageSeverity", severity, nullptr);
+    }
+
+    juce::String currentInternalPatchLabel(juce::AudioProcessorValueTreeState& apvts)
+    {
+        const auto deviceType = DeviceTypeRegistry::fromApvtsProperty(
+            apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+        const auto limits = DeviceMemoryLimits::resolve(deviceType);
+
+        namespace Internal = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+        const int bank = static_cast<int>(apvts.state.getProperty(
+            Internal::kCurrentBankNumber, limits.minBankNumber()));
+        const int patch = static_cast<int>(apvts.state.getProperty(
+            Internal::kCurrentPatchNumber, limits.minPatchNumber()));
+
+        return PluginDisplayNames::ClipboardMessages::formatInternalPatchLocation(
+            limits.hasBankConcept(), bank, patch);
+    }
+
+    juce::String clipboardSourceLabelForWarnings(const ClipboardService& clipboard)
+    {
+        namespace ClipboardMsg = PluginDisplayNames::ClipboardMessages;
+
+        switch (clipboard.getMode())
+        {
+            case ClipboardMode::Empty:
+                return {};
+            case ClipboardMode::Module:
+            {
+                const auto kind = clipboard.getSourceModuleKind();
+                if (! kind.has_value())
+                    return {};
+
+                auto label = patchModuleDisplayName(*kind);
+                if (clipboard.isEnvelopeShapeOnly())
+                    label += " envelope shape";
+                return label;
+            }
+            case ClipboardMode::FullPatch:
+            {
+                const auto label = clipboard.getFullPatchSourceLabel();
+                return label.isNotEmpty() ? label : juce::String("Patch");
+            }
+            case ClipboardMode::MatrixModulation:
+                return ClipboardMsg::kMatrixModulationName;
+        }
+
+        return {};
+    }
+} // namespace
 
     ModuleActionHandler::ModuleActionHandler(juce::AudioProcessorValueTreeState& apvts,
                                              PatchModel* patchModel,
@@ -135,22 +212,36 @@ namespace Core
 
         namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
         namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+        namespace ClipboardMsg = PluginDisplayNames::ClipboardMessages;
+
+        const bool shapeOnlyIntent = static_cast<bool>(
+            apvts_.state.getProperty(PluginIDs::ClipboardFeedback::kCopyEnvelopeShapeOnly, false));
+        // Always clear ephemeral Alt intent once a Copy action is handled (or rejected).
+        const auto clearShapeFlag = [this]
+        {
+            apvts_.state.setProperty(PluginIDs::ClipboardFeedback::kCopyEnvelopeShapeOnly, false, nullptr);
+        };
 
         if (propertyId == InternalPatches::kCopyPatch)
         {
+            clearShapeFlag();
             apvtsPatchMapper_->apvtsToBuffer();
-            clipboardService_->copyFullPatch(*patchModel_);
+            const auto sourceLabel = currentInternalPatchLabel(apvts_);
+            clipboardService_->copyFullPatch(*patchModel_, sourceLabel);
             if (refreshPasteMirrors_)
                 refreshPasteMirrors_();
+            publishFooter(apvts_, ClipboardMsg::formatPatchCopied(sourceLabel), "info");
             return true;
         }
 
         if (propertyId == MatrixMod::kMatrixModulationCopy)
         {
+            clearShapeFlag();
             apvtsPatchMapper_->apvtsToBuffer();
             clipboardService_->copyMatrixModulation(*patchModel_);
             if (refreshPasteMirrors_)
                 refreshPasteMirrors_();
+            publishFooter(apvts_, ClipboardMsg::formatMatrixModulationCopied(), "info");
             return true;
         }
 
@@ -159,12 +250,23 @@ namespace Core
 
         const auto moduleKind = patchModuleKindFromWidgetId(propertyId);
         if (!moduleKind.has_value())
+        {
+            clearShapeFlag();
             return false;
+        }
 
+        clearShapeFlag();
         apvtsPatchMapper_->apvtsToBuffer();
-        clipboardService_->copyModule(*moduleKind, *patchModel_);
+        clipboardService_->copyModule(*moduleKind, *patchModel_, shapeOnlyIntent);
         if (refreshPasteMirrors_)
             refreshPasteMirrors_();
+
+        const auto moduleName = patchModuleDisplayName(*moduleKind);
+        if (clipboardService_->isEnvelopeShapeOnly())
+            publishFooter(apvts_, ClipboardMsg::formatEnvelopeShapeCopied(moduleName), "info");
+        else
+            publishFooter(apvts_, ClipboardMsg::formatModuleCopied(moduleName), "info");
+
         return true;
     }
 
@@ -174,13 +276,32 @@ namespace Core
             return false;
 
         namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+        namespace ClipboardMsg = PluginDisplayNames::ClipboardMessages;
+        namespace ShortLabels = PluginDisplayNames::ShortLabels;
 
         if (propertyId == MatrixMod::kMatrixModulationPaste)
         {
-            if (!clipboardService_->canPasteMatrixModulation())
-                return true;
+            const auto sourceLabel = clipboardSourceLabelForWarnings(*clipboardService_);
 
-            clipboardService_->pasteMatrixModulation(*patchModel_);
+            if (!clipboardService_->canPasteMatrixModulation())
+            {
+                publishFooter(apvts_,
+                              clipboardService_->hasContent()
+                                  ? ClipboardMsg::formatIncompatiblePaste(
+                                        sourceLabel, ClipboardMsg::kMatrixModulationName)
+                                  : juce::String(ShortLabels::kNothingToPasteFooter),
+                              "warning");
+                return true;
+            }
+
+            if (!clipboardService_->pasteMatrixModulation(*patchModel_))
+            {
+                publishFooter(apvts_,
+                              ClipboardMsg::formatPasteFailed(
+                                  sourceLabel, ClipboardMsg::kMatrixModulationName),
+                              "error");
+                return true;
+            }
 
             if (hooks_.setSuppressMatrixModSysEx)
                 hooks_.setSuppressMatrixModSysEx(true);
@@ -200,6 +321,7 @@ namespace Core
             if (hooks_.disarmClipboardFeedback)
                 hooks_.disarmClipboardFeedback();
 
+            publishFooter(apvts_, ClipboardMsg::formatMatrixModulationPasted(), "info");
             return true;
         }
 
@@ -210,14 +332,48 @@ namespace Core
         if (!moduleKind.has_value())
             return false;
 
+        const auto targetName = patchModuleDisplayName(*moduleKind);
+        const auto sourceLabel = clipboardSourceLabelForWarnings(*clipboardService_);
+
         if (!clipboardService_->canPasteModule(*moduleKind))
+        {
+            publishFooter(apvts_,
+                          clipboardService_->hasContent()
+                              ? ClipboardMsg::formatIncompatiblePaste(sourceLabel, targetName)
+                              : juce::String(ShortLabels::kNothingToPasteFooter),
+                          "warning");
             return true;
+        }
+
+        const bool shapeOnly = clipboardService_->isEnvelopeShapeOnly();
+        const auto sourceKind = clipboardService_->getSourceModuleKind();
+        const auto sourceName = sourceKind.has_value()
+            ? patchModuleDisplayName(*sourceKind)
+            : sourceLabel;
 
         if (!clipboardService_->pasteModule(*moduleKind, *patchModel_))
+        {
+            publishFooter(apvts_,
+                          ClipboardMsg::formatPasteFailed(sourceName, targetName),
+                          "error");
             return true;
+        }
 
         if (hooks_.disarmClipboardFeedback)
             hooks_.disarmClipboardFeedback();
+
+        if (shapeOnly)
+        {
+            publishFooter(apvts_,
+                          ClipboardMsg::formatEnvelopeShapePasted(sourceName, targetName),
+                          "info");
+        }
+        else
+        {
+            publishFooter(apvts_,
+                          ClipboardMsg::formatModulePasted(sourceName, targetName),
+                          "info");
+        }
 
         const auto moduleGroupId = PatchModuleInitService::moduleGroupIdFromPatchModuleKind(*moduleKind);
         if (moduleGroupId.isEmpty())

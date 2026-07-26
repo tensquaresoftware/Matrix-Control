@@ -38,7 +38,6 @@ namespace PluginDisplayNames
         constexpr const char* kNoDevice = kDeviceNotConnectedDetail;
 
         constexpr const char* kSeverityInfoPrefix = "INFO";
-        constexpr const char* kSeveritySuccessPrefix = "SUCCESS";
         constexpr const char* kSeverityWarningPrefix = "WARNING";
         constexpr const char* kSeverityErrorPrefix = "ERROR";
 
@@ -179,6 +178,86 @@ namespace PluginDisplayNames
         constexpr const char* kPaste = "P"; // Paste buttons
         constexpr const char* kIncompatiblePasteFooter =
             "Clipboard contents are not compatible with this module.";
+        constexpr const char* kPasteNotAvailableFooter = "Paste is not available.";
+        constexpr const char* kNothingToPasteFooter = "Nothing to paste.";
+        constexpr const char* kPasteFailedFooter = "Paste failed.";
+    }
+
+    namespace ClipboardMessages
+    {
+        constexpr const char* kMatrixModulationName = "Matrix Modulation";
+
+        inline juce::String formatModuleCopied(const juce::String& moduleName)
+        {
+            return moduleName + " copied to clipboard.";
+        }
+
+        inline juce::String formatEnvelopeShapeCopied(const juce::String& moduleName)
+        {
+            return moduleName
+                + " envelope shape copied to clipboard (Delay, Attack, Decay, Sustain, Release).";
+        }
+
+        inline juce::String formatMatrixModulationCopied()
+        {
+            return juce::String(kMatrixModulationName) + " copied to clipboard.";
+        }
+
+        inline juce::String formatPatchCopied(const juce::String& sourceLabel)
+        {
+            return sourceLabel + " copied to clipboard.";
+        }
+
+        inline juce::String formatModulePasted(const juce::String& sourceName, const juce::String& targetName)
+        {
+            return sourceName + " pasted successfully to " + targetName + ".";
+        }
+
+        inline juce::String formatEnvelopeShapePasted(const juce::String& sourceName,
+                                                      const juce::String& targetName)
+        {
+            return sourceName + " envelope shape pasted successfully to " + targetName
+                + " (Delay, Attack, Decay, Sustain, Release).";
+        }
+
+        inline juce::String formatMatrixModulationPasted()
+        {
+            return juce::String(kMatrixModulationName) + " pasted successfully.";
+        }
+
+        inline juce::String formatPatchPasted(const juce::String& sourceLabel, const juce::String& targetLabel)
+        {
+            return sourceLabel + " pasted successfully to " + targetLabel + ".";
+        }
+
+        inline juce::String formatInternalPatchLocation(bool hasBank, int bank, int patch)
+        {
+            if (hasBank)
+                return "BANK " + juce::String(bank) + " / PATCH " + juce::String(patch);
+
+            return "PATCH " + juce::String(patch);
+        }
+
+        inline juce::String formatPasteFailed(const juce::String& sourceLabel, const juce::String& targetLabel)
+        {
+            if (sourceLabel.isNotEmpty() && targetLabel.isNotEmpty())
+                return "Paste from " + sourceLabel + " to " + targetLabel + " failed.";
+            if (sourceLabel.isNotEmpty())
+                return "Paste from " + sourceLabel + " failed.";
+            return "Paste failed.";
+        }
+
+        inline juce::String formatIncompatiblePaste(const juce::String& sourceLabel,
+                                                    const juce::String& targetLabel)
+        {
+            if (sourceLabel.isNotEmpty() && targetLabel.isNotEmpty())
+                return "Clipboard contents from " + sourceLabel
+                    + " are not compatible with " + targetLabel + ".";
+            if (sourceLabel.isNotEmpty())
+                return "Clipboard contents from " + sourceLabel
+                    + " are not compatible with this module.";
+            return "Clipboard contents are not compatible with this module.";
+        }
     }
 
     namespace ChoiceLists

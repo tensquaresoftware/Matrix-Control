@@ -79,9 +79,9 @@ private:
             pasteButton_.onClick = nullptr;
             TSS::GrayedControlHelper::setGrayedClickHandler(pasteButton_, true, [this]
             {
-                TSS::GrayedControlHelper::setFooterInfoMessage(
+                TSS::GrayedControlHelper::setFooterWarningMessage(
                     apvts_,
-                    PluginDisplayNames::MatrixModulationSection::Header::kIncompatiblePasteFooter);
+                    PluginDisplayNames::ShortLabels::kPasteNotAvailableFooter);
             });
         }
     }
