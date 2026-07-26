@@ -12,6 +12,7 @@ namespace Core
                                                DefragLimitModalGate showDefragLimitModal,
                                                ExportCollisionModalGate showExportCollisionModal,
                                                FlushConfirmModalGate showFlushConfirmModal,
+                                               DeleteConfirmModalGate showDeleteConfirmModal,
                                                int historySelectionDebounceMs)
         : apvts_(apvts)
         , engine_(engine)
@@ -19,6 +20,7 @@ namespace Core
         , showDefragLimitModal_(std::move(showDefragLimitModal))
         , showExportCollisionModal_(std::move(showExportCollisionModal))
         , showFlushConfirmModal_(std::move(showFlushConfirmModal))
+        , showDeleteConfirmModal_(std::move(showDeleteConfirmModal))
         , historySelectionDebouncer_(historySelectionDebounceMs)
     {
     }
@@ -87,6 +89,14 @@ namespace Core
     void MutatorActionHandler::handleDelete()
     {
         if (engine_ == nullptr)
+            return;
+
+        using namespace PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
+        const bool deleteEnabled =
+            static_cast<bool>(apvts_.state.getProperty(kDeleteEnabled, false));
+
+        if (deleteEnabled && showDeleteConfirmModal_ && ! showDeleteConfirmModal_())
             return;
 
         handleEngineResult(engine_->deleteSelected());

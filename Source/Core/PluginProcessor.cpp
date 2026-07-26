@@ -355,6 +355,12 @@ PluginProcessor::PluginProcessor()
             if (! mutatorFlushConfirmModalGate_)
                 return true;
             return mutatorFlushConfirmModalGate_();
+        },
+        [this]() -> bool
+        {
+            if (! mutatorDeleteConfirmModalGate_)
+                return true;
+            return mutatorDeleteConfirmModalGate_();
         });
 
     actionDispatcher_ = std::make_unique<Core::ActionDispatcher>(
@@ -374,6 +380,7 @@ PluginProcessor::PluginProcessor()
     initializeComputerPatchesFolderProperty();
     initializeNameReconciliationPolicyProperty();
     initializeUnsavedEditWarningPolicyProperty();
+    initializeMutatorDeleteWarningPolicyProperty();
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
@@ -991,6 +998,11 @@ void PluginProcessor::setMutatorFlushConfirmModalGate(MutatorFlushConfirmModalGa
     mutatorFlushConfirmModalGate_ = std::move(gate);
 }
 
+void PluginProcessor::setMutatorDeleteConfirmModalGate(MutatorDeleteConfirmModalGate gate)
+{
+    mutatorDeleteConfirmModalGate_ = std::move(gate);
+}
+
 bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
 {
     using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
@@ -1241,6 +1253,17 @@ void PluginProcessor::initializeUnsavedEditWarningPolicyProperty()
         apvts.state.setProperty(
             PluginIDs::Settings::kUnsavedEditWarningPolicy,
             PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault,
+            nullptr);
+    }
+}
+
+void PluginProcessor::initializeMutatorDeleteWarningPolicyProperty()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kMutatorDeleteWarningPolicy))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+            PluginIDs::Settings::MutatorDeleteWarningPolicy::kDefault,
             nullptr);
     }
 }

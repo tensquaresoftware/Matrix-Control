@@ -966,3 +966,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-bank-utility-import-export.md`
   summary: Mid-transfer device swap / reconnect is not re-validated beyond outbound-allowed checks already present.
   evidence: Blind Hunter; rare during a ~100-slot transfer; existing disconnect paths abort or fail restore messaging.
+
+## Deferred from: quick-dev spec-patch-mutator-delete-confirmation (2026-07-26)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-delete-confirmation.md`
+  summary: Delete-confirm AlertWindow checkbox uses a fixed 360×24 size without UI scale awareness.
+  evidence: Blind Hunter; AlertWindow custom component; acceptable for V1 — revisit if high-DPI scale clips the row.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-delete-confirmation.md`
+  summary: New Delete confirm gate is not listed in the confirmation-modal button-order audit inventory.
+  evidence: Blind Hunter; LTR/Enter rules applied locally via configureOrderedAlertButtons; update that inventory in a follow-up if desired.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-delete-confirmation.md`
+  summary: No automated coverage for NEVER WARN bypass or Don't-ask-again policy write (editor/UI path).
+  evidence: Blind Hunter; handler Cancel/Continue covered; Settings/policy persistence remains manual UAT.

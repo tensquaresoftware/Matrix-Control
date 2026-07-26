@@ -95,6 +95,9 @@ namespace PluginDisplayNames
         constexpr const char* kUnsavedEditWarningLabel          = "UNSAVED :";
         constexpr const char* kUnsavedEditWarnAlways           = "WARN ALWAYS";
         constexpr const char* kUnsavedEditNeverWarn            = "NEVER WARN";
+        constexpr const char* kMutatorDeleteWarningLabel       = "MUTATOR DEL :";
+        constexpr const char* kMutatorDeleteWarnAlways         = "WARN ALWAYS";
+        constexpr const char* kMutatorDeleteNeverWarn          = "NEVER WARN";
     }
 
     namespace Dialogs
@@ -146,6 +149,18 @@ namespace PluginDisplayNames
                 "Continue to flush, or Cancel to keep the history.";
             constexpr const char* kCancel   = "Cancel";
             constexpr const char* kContinue = "Continue";
+        }
+
+        namespace MutatorDeleteConfirm
+        {
+            constexpr const char* kTitle = "Delete mutation?";
+            constexpr const char* kBody =
+                "This removes the selected mutation or retry from Patch Mutator history.\n"
+                "Deleting a root mutation also removes all of its retries.\n\n"
+                "Delete to remove it, or Cancel to keep the history.";
+            constexpr const char* kCancel        = "Cancel";
+            constexpr const char* kDelete        = "Delete";
+            constexpr const char* kDontAskAgain  = "Don't ask again";
         }
 
         namespace BankImportConfirm

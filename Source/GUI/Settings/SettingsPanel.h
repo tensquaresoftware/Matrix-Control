@@ -15,7 +15,7 @@ class SettingsPanel : public juce::Component
 {
 public:
     static constexpr int kDesignWidth = 240;
-    static constexpr int kDesignHeight = 220;
+    static constexpr int kDesignHeight = 252;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -30,6 +30,7 @@ public:
     TSS::Slider& getHardwareLatencySlider() { return hardwareLatencySlider_; }
     TSS::ComboBox& getNameReconciliationPolicyCombo() { return nameReconciliationPolicyCombo_; }
     TSS::ComboBox& getUnsavedEditWarningPolicyCombo() { return unsavedEditWarningPolicyCombo_; }
+    TSS::ComboBox& getMutatorDeleteWarningPolicyCombo() { return mutatorDeleteWarningPolicyCombo_; }
 
 private:
     void updateModeSpecificVisibility();
@@ -55,6 +56,8 @@ private:
     TSS::ComboBox nameReconciliationPolicyCombo_;
     TSS::Label unsavedEditWarningLabel_;
     TSS::ComboBox unsavedEditWarningPolicyCombo_;
+    TSS::Label mutatorDeleteWarningLabel_;
+    TSS::ComboBox mutatorDeleteWarningPolicyCombo_;
     TSS::Label defragLabel_;
     TSS::Label defragPlaceholder_;
     TSS::Label loggingLabel_;

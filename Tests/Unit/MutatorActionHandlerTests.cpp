@@ -148,6 +148,9 @@ public:
         retry_delegatesToEngine();
         compare_delegatesToEngine();
         delete_delegatesToEngine();
+        delete_confirmContinue_deletes();
+        delete_confirmCancel_skipsDelete();
+        delete_disabled_skipsModal();
         clear_delegatesToEngine();
         clear_confirmContinue_clears();
         clear_confirmCancel_skipsClear();
@@ -183,6 +186,7 @@ private:
                       {},
                       {},
                       {},
+                      {},
                       debounceMs)
         {
         }
@@ -199,8 +203,28 @@ private:
                       {},
                       {},
                       std::move(flushGate),
+                      {},
                       debounceMs)
         {
+        }
+
+        Harness(Core::MutatorActionHandler::DeleteConfirmModalGate deleteGate,
+                std::nullptr_t,
+                int debounceMs = Core::kComboboxPatchSendDebounceMs)
+            : handler(proc.apvts,
+                      &engine,
+                      [this]()
+                      {
+                          ++exportPickerCallCount;
+                          return exportPickerResult;
+                      },
+                      {},
+                      {},
+                      {},
+                      std::move(deleteGate),
+                      debounceMs)
+        {
+            juce::ignoreUnused(debounceMs);
         }
     };
 
@@ -249,6 +273,75 @@ private:
 
         harness.handler.handleAction(PatchMutator::kDelete, juce::int64(1));
 
+        expectEquals(harness.engine.deleteCallCount, 1);
+    }
+
+    void delete_confirmContinue_deletes()
+    {
+        beginTest("delete_confirmContinue_deletes");
+
+        int gateCalls = 0;
+        Harness harness([&gateCalls]()
+                        {
+                            ++gateCalls;
+                            return true;
+                        },
+                        nullptr);
+        harness.engine.deleteResult.success = true;
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kDeleteEnabled,
+            true,
+            nullptr);
+
+        harness.handler.handleAction(PatchMutator::kDelete, juce::int64(1));
+
+        expectEquals(gateCalls, 1);
+        expectEquals(harness.engine.deleteCallCount, 1);
+    }
+
+    void delete_confirmCancel_skipsDelete()
+    {
+        beginTest("delete_confirmCancel_skipsDelete");
+
+        int gateCalls = 0;
+        Harness harness([&gateCalls]()
+                        {
+                            ++gateCalls;
+                            return false;
+                        },
+                        nullptr);
+        harness.engine.deleteResult.success = true;
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kDeleteEnabled,
+            true,
+            nullptr);
+
+        harness.handler.handleAction(PatchMutator::kDelete, juce::int64(1));
+
+        expectEquals(gateCalls, 1);
+        expectEquals(harness.engine.deleteCallCount, 0);
+    }
+
+    void delete_disabled_skipsModal()
+    {
+        beginTest("delete_disabled_skipsModal");
+
+        int gateCalls = 0;
+        Harness harness([&gateCalls]()
+                        {
+                            ++gateCalls;
+                            return false;
+                        },
+                        nullptr);
+        harness.engine.deleteResult.success = true;
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kDeleteEnabled,
+            false,
+            nullptr);
+
+        harness.handler.handleAction(PatchMutator::kDelete, juce::int64(1));
+
+        expectEquals(gateCalls, 0);
         expectEquals(harness.engine.deleteCallCount, 1);
     }
 

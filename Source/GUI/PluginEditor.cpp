@@ -7,6 +7,7 @@
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/PluginProcessor.h"
 #include "Core/Services/PatchFileNameReconciler.h"
+#include "Core/Services/MutatorDeleteWarningPolicy.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
@@ -131,6 +132,46 @@ int showOrderedConfirmAlert(juce::MessageBoxIconType iconType,
     juce::ignoreUnused(iconType, title, message, associatedComponent, hasMiddle,
                        cancelLabel, primaryLabel, middleLabel);
     return 0;
+   #endif
+}
+
+/** Sync Delete confirm with optional "Don't ask again" checkbox.
+    Uses AlertWindow on all platforms (native NSAlert cannot host a checkbox).
+    Codes: Cancel/Escape → 0, Delete/Return → 1. */
+struct MutatorDeleteConfirmResult
+{
+    bool confirmed = false;
+    bool dontAskAgain = false;
+};
+
+MutatorDeleteConfirmResult showMutatorDeleteConfirmAlert(juce::Component* associatedComponent)
+{
+    namespace Dialog = PluginDisplayNames::Dialogs::MutatorDeleteConfirm;
+
+   #if JUCE_MODAL_LOOPS_PERMITTED
+    juce::AlertWindow alert(Dialog::kTitle,
+                            Dialog::kBody,
+                            juce::MessageBoxIconType::WarningIcon,
+                            associatedComponent);
+    juce::ToggleButton dontAskAgain(Dialog::kDontAskAgain);
+    dontAskAgain.setSize(360, 24);
+    // AlertWindow paints customComponent->getName() above the control; clear it so
+    // "Don't ask again" appears only once (ToggleButton text), not as a duplicate label.
+    dontAskAgain.setName({});
+    // Keep Enter on Delete (primary); checkbox is click-only, same as Cancel.
+    dontAskAgain.setWantsKeyboardFocus(false);
+    dontAskAgain.setMouseClickGrabsKeyboardFocus(false);
+    alert.addCustomComponent(&dontAskAgain);
+    alert.addButton(Dialog::kCancel, 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    alert.addButton(Dialog::kDelete, 1, juce::KeyPress(juce::KeyPress::returnKey));
+    configureOrderedAlertButtons(alert, Dialog::kCancel, Dialog::kDelete, {});
+
+    const int result = alert.runModalLoop();
+    return { result == 1, dontAskAgain.getToggleState() };
+   #else
+    jassertfalse;
+    juce::ignoreUnused(associatedComponent);
+    return {};
    #endif
 }
 } // namespace
@@ -399,6 +440,43 @@ PluginEditor::PluginEditor(PluginProcessor& p)
                        Dialog::kContinue,
                        safeThis.getComponent())
                    == 1;
+        });
+
+    pluginProcessor.setMutatorDeleteConfirmModalGate(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> bool
+        {
+            if (! isMessageThread() || safeThis == nullptr)
+            {
+                jassertfalse;
+                return false;
+            }
+
+            using namespace PluginIDs::Settings::MutatorDeleteWarningPolicy;
+
+            const int policyRaw = static_cast<int>(safeThis->pluginProcessor.getApvts().state.getProperty(
+                PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+                kDefault));
+            const int policy =
+                (policyRaw == kWarnAlways || policyRaw == kNeverWarn) ? policyRaw : kDefault;
+
+            if (! Core::MutatorDeleteWarning::shouldPrompt(policy))
+                return true;
+
+            const auto result = showMutatorDeleteConfirmAlert(safeThis.getComponent());
+
+            if (result.confirmed && result.dontAskAgain)
+            {
+                safeThis->pluginProcessor.getApvts().state.setProperty(
+                    PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+                    kNeverWarn,
+                    nullptr);
+
+                if (auto* settingsPanel = safeThis->getSettingsPanelIfOpen())
+                    settingsPanel->getMutatorDeleteWarningPolicyCombo().setSelectedId(
+                        kNeverWarn, juce::dontSendNotification);
+            }
+
+            return result.confirmed;
         });
 
     pluginProcessor.setPatchSaveFilePicker(
@@ -1084,6 +1162,7 @@ PluginEditor::~PluginEditor()
     pluginProcessor.setMutatorHistoryGateModalGate({});
     pluginProcessor.setUnsavedEditConfirmModalGate({});
     pluginProcessor.setMutatorFlushConfirmModalGate({});
+    pluginProcessor.setMutatorDeleteConfirmModalGate({});
     pluginProcessor.setPatchNameReconciliationPicker({});
     pluginProcessor.setBankExportFolderPicker({});
     pluginProcessor.setBankImportFolderPicker({});
@@ -1270,6 +1349,23 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
             ? unsavedPolicyRaw
             : PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault;
     panel.getUnsavedEditWarningPolicyCombo().setSelectedId(unsavedPolicy, juce::dontSendNotification);
+
+    const int mutatorDeletePolicyRaw = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+        PluginIDs::Settings::MutatorDeleteWarningPolicy::kDefault));
+    const int mutatorDeletePolicy =
+        (mutatorDeletePolicyRaw == PluginIDs::Settings::MutatorDeleteWarningPolicy::kWarnAlways
+         || mutatorDeletePolicyRaw == PluginIDs::Settings::MutatorDeleteWarningPolicy::kNeverWarn)
+            ? mutatorDeletePolicyRaw
+            : PluginIDs::Settings::MutatorDeleteWarningPolicy::kDefault;
+    if (mutatorDeletePolicy != mutatorDeletePolicyRaw)
+    {
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+            mutatorDeletePolicy,
+            nullptr);
+    }
+    panel.getMutatorDeleteWarningPolicyCombo().setSelectedId(mutatorDeletePolicy, juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -1292,6 +1388,20 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         pluginProcessor.getApvts().state.setProperty(
             PluginIDs::Settings::kUnsavedEditWarningPolicy,
             panel.getUnsavedEditWarningPolicyCombo().getSelectedId(),
+            nullptr);
+    };
+
+    panel.getMutatorDeleteWarningPolicyCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::MutatorDeleteWarningPolicy;
+
+        const int selectedId = panel.getMutatorDeleteWarningPolicyCombo().getSelectedId();
+        if (selectedId != kWarnAlways && selectedId != kNeverWarn)
+            return;
+
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+            selectedId,
             nullptr);
     };
 }

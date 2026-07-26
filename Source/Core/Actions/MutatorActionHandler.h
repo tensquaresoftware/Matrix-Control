@@ -22,6 +22,8 @@ namespace Core
             std::function<void(std::function<void(ExportCollisionResolution)>)>;
         // true = Continue (flush); false = Cancel / abort.
         using FlushConfirmModalGate = std::function<bool()>;
+        // true = Delete; false = Cancel / abort.
+        using DeleteConfirmModalGate = std::function<bool()>;
 
         MutatorActionHandler(juce::AudioProcessorValueTreeState& apvts,
                              PatchMutatorEnginePort* engine,
@@ -29,6 +31,7 @@ namespace Core
                              DefragLimitModalGate showDefragLimitModal = {},
                              ExportCollisionModalGate showExportCollisionModal = {},
                              FlushConfirmModalGate showFlushConfirmModal = {},
+                             DeleteConfirmModalGate showDeleteConfirmModal = {},
                              int historySelectionDebounceMs = kComboboxPatchSendDebounceMs);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
@@ -59,6 +62,7 @@ namespace Core
         DefragLimitModalGate showDefragLimitModal_;
         ExportCollisionModalGate showExportCollisionModal_;
         FlushConfirmModalGate showFlushConfirmModal_;
+        DeleteConfirmModalGate showDeleteConfirmModal_;
         ComboboxPatchSendDebouncer historySelectionDebouncer_;
     };
 

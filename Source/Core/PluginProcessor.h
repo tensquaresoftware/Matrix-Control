@@ -186,6 +186,11 @@ public:
 
     void setMutatorFlushConfirmModalGate(MutatorFlushConfirmModalGate gate);
 
+    // Patch Mutator Delete (D): returns true for Delete, false for Cancel.
+    using MutatorDeleteConfirmModalGate = std::function<bool()>;
+
+    void setMutatorDeleteConfirmModalGate(MutatorDeleteConfirmModalGate gate);
+
     using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
 
     void setPatchSaveFilePicker(PatchSaveFilePicker picker);
@@ -288,6 +293,7 @@ private:
     void initializeComputerPatchesFolderProperty();
     void initializeNameReconciliationPolicyProperty();
     void initializeUnsavedEditWarningPolicyProperty();
+    void initializeMutatorDeleteWarningPolicyProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();
@@ -388,6 +394,7 @@ private:
     MutatorHistoryGateModalGate mutatorHistoryGateModalGate_;
     UnsavedEditConfirmModalGate unsavedEditConfirmModalGate_;
     MutatorFlushConfirmModalGate mutatorFlushConfirmModalGate_;
+    MutatorDeleteConfirmModalGate mutatorDeleteConfirmModalGate_;
     Core::PatchLoadContext patchLoadContext_;
     int lastKnownPatchNumber_ = 0;
     bool lastKnownPatchNumberInitialized_ = false;

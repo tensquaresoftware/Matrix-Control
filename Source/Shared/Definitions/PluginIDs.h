@@ -21,6 +21,8 @@ namespace PluginIDs
             "settingsComputerPatchesNameReconciliationPolicy";
         constexpr const char* kUnsavedEditWarningPolicy =
             "settingsUnsavedEditWarningPolicy";
+        constexpr const char* kMutatorDeleteWarningPolicy =
+            "settingsMutatorDeleteWarningPolicy";
 
         namespace NameReconciliationPolicy
         {
@@ -31,6 +33,13 @@ namespace PluginIDs
         }
 
         namespace UnsavedEditWarningPolicy
+        {
+            constexpr int kWarnAlways = 1;
+            constexpr int kNeverWarn = 2;
+            constexpr int kDefault = kWarnAlways;
+        }
+
+        namespace MutatorDeleteWarningPolicy
         {
             constexpr int kWarnAlways = 1;
             constexpr int kNeverWarn = 2;
