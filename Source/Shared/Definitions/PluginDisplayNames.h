@@ -137,6 +137,17 @@ namespace PluginDisplayNames
             constexpr const char* kConfirm = "Defrag";
             constexpr const char* kCancel  = "Cancel";
         }
+
+        namespace MutatorFlushConfirm
+        {
+            constexpr const char* kTitle = "Flush mutation history?";
+            constexpr const char* kBody =
+                "This clears the Patch Mutator history for this session.\n"
+                "The initial patch snapshot is kept.\n\n"
+                "Continue to flush, or Cancel to keep the history.";
+            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kContinue = "Continue";
+        }
     }
 
     namespace Units

@@ -180,6 +180,11 @@ public:
 
     void setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate);
 
+    // Patch Mutator Flush (F): returns true for Continue, false for Cancel.
+    using MutatorFlushConfirmModalGate = std::function<bool()>;
+
+    void setMutatorFlushConfirmModalGate(MutatorFlushConfirmModalGate gate);
+
     using PatchSaveFilePicker = std::function<juce::File(juce::File suggestedFolder, juce::String suggestedStem)>;
 
     void setPatchSaveFilePicker(PatchSaveFilePicker picker);
@@ -369,6 +374,7 @@ private:
     MutatorExportCollisionModalGate mutatorExportCollisionModalGate_;
     MutatorHistoryGateModalGate mutatorHistoryGateModalGate_;
     UnsavedEditConfirmModalGate unsavedEditConfirmModalGate_;
+    MutatorFlushConfirmModalGate mutatorFlushConfirmModalGate_;
     Core::PatchLoadContext patchLoadContext_;
     int lastKnownPatchNumber_ = 0;
     bool lastKnownPatchNumberInitialized_ = false;

@@ -349,6 +349,12 @@ PluginProcessor::PluginProcessor()
         {
             if (mutatorExportCollisionModalGate_)
                 mutatorExportCollisionModalGate_(std::move(onResolved));
+        },
+        [this]() -> bool
+        {
+            if (! mutatorFlushConfirmModalGate_)
+                return true;
+            return mutatorFlushConfirmModalGate_();
         });
 
     actionDispatcher_ = std::make_unique<Core::ActionDispatcher>(
@@ -977,6 +983,11 @@ void PluginProcessor::setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate
 void PluginProcessor::setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate)
 {
     unsavedEditConfirmModalGate_ = std::move(gate);
+}
+
+void PluginProcessor::setMutatorFlushConfirmModalGate(MutatorFlushConfirmModalGate gate)
+{
+    mutatorFlushConfirmModalGate_ = std::move(gate);
 }
 
 bool PluginProcessor::confirmUnsavedEditGateIfNeeded()

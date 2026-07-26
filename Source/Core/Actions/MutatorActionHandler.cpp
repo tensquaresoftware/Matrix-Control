@@ -11,12 +11,14 @@ namespace Core
                                                ExportFolderPicker pickExportFolder,
                                                DefragLimitModalGate showDefragLimitModal,
                                                ExportCollisionModalGate showExportCollisionModal,
+                                               FlushConfirmModalGate showFlushConfirmModal,
                                                int historySelectionDebounceMs)
         : apvts_(apvts)
         , engine_(engine)
         , pickExportFolder_(std::move(pickExportFolder))
         , showDefragLimitModal_(std::move(showDefragLimitModal))
         , showExportCollisionModal_(std::move(showExportCollisionModal))
+        , showFlushConfirmModal_(std::move(showFlushConfirmModal))
         , historySelectionDebouncer_(historySelectionDebounceMs)
     {
     }
@@ -93,6 +95,14 @@ namespace Core
     void MutatorActionHandler::handleClear()
     {
         if (engine_ == nullptr)
+            return;
+
+        using namespace PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
+        const bool historyNonEmpty =
+            static_cast<bool>(apvts_.state.getProperty(kClearEnabled, false));
+
+        if (historyNonEmpty && showFlushConfirmModal_ && ! showFlushConfirmModal_())
             return;
 
         handleEngineResult(engine_->clearHistory());

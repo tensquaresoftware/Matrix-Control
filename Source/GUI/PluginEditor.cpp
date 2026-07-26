@@ -308,6 +308,28 @@ PluginEditor::PluginEditor(PluginProcessor& p)
                    == 1;
         });
 
+    pluginProcessor.setMutatorFlushConfirmModalGate(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)]() -> bool
+        {
+            if (! isMessageThread() || safeThis == nullptr)
+            {
+                jassertfalse;
+                return false;
+            }
+
+            namespace Dialog = PluginDisplayNames::Dialogs::MutatorFlushConfirm;
+
+            return showMappedAlert(
+                       juce::MessageBoxOptions()
+                           .withIconType(juce::MessageBoxIconType::WarningIcon)
+                           .withTitle(Dialog::kTitle)
+                           .withMessage(Dialog::kBody)
+                           .withButton(Dialog::kContinue)
+                           .withButton(Dialog::kCancel)
+                           .withAssociatedComponent(safeThis.getComponent()))
+                   == 1;
+        });
+
     pluginProcessor.setPatchSaveFilePicker(
         [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
             juce::File suggestedFolder, juce::String suggestedStem) -> juce::File
@@ -867,6 +889,7 @@ PluginEditor::~PluginEditor()
     pluginProcessor.setMutatorExportCollisionModalGate({});
     pluginProcessor.setMutatorHistoryGateModalGate({});
     pluginProcessor.setUnsavedEditConfirmModalGate({});
+    pluginProcessor.setMutatorFlushConfirmModalGate({});
     pluginProcessor.setPatchNameReconciliationPicker({});
 
     pluginProcessor.getApvts().state.removeListener(this);

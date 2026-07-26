@@ -20,12 +20,15 @@ namespace Core
         using DefragLimitModalGate = std::function<void(std::function<void()>)>;
         using ExportCollisionModalGate =
             std::function<void(std::function<void(ExportCollisionResolution)>)>;
+        // true = Continue (flush); false = Cancel / abort.
+        using FlushConfirmModalGate = std::function<bool()>;
 
         MutatorActionHandler(juce::AudioProcessorValueTreeState& apvts,
                              PatchMutatorEnginePort* engine,
                              ExportFolderPicker pickExportFolder = {},
                              DefragLimitModalGate showDefragLimitModal = {},
                              ExportCollisionModalGate showExportCollisionModal = {},
+                             FlushConfirmModalGate showFlushConfirmModal = {},
                              int historySelectionDebounceMs = kComboboxPatchSendDebounceMs);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
@@ -55,6 +58,7 @@ namespace Core
         ExportFolderPicker pickExportFolder_;
         DefragLimitModalGate showDefragLimitModal_;
         ExportCollisionModalGate showExportCollisionModal_;
+        FlushConfirmModalGate showFlushConfirmModal_;
         ComboboxPatchSendDebouncer historySelectionDebouncer_;
     };
 
