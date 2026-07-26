@@ -644,6 +644,7 @@ void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
     const char* feedbackIds[] = {
         Feedback::kActive,
         Feedback::kCopyLit,
+        Feedback::kCopyEnvelopeShapeOnly,
         Feedback::kDco1Copy,
         Feedback::kDco2Copy,
         Feedback::kEnv1Copy,
@@ -2261,6 +2262,10 @@ bool PluginProcessor::clearClipboardFeedbackFromEscape()
 
     disarmClipboardFeedbackSession();
     refreshClipboardPasteEnabledProperties();
+
+    apvts.state.setProperty(PluginIDs::ClipboardFeedback::kCopyEnvelopeShapeOnly, false, nullptr);
+    apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
+    apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
     return true;
 }
 

@@ -19,6 +19,7 @@ public:
     void runTest() override
     {
         testEnv1ToEnv3FullCopy();
+        testEnvShapeOnlyLeavesNonShapeParams();
         testDco1ToDco2SkipsSyncAndDetune();
         testDco2ToDco1SkipsNoiseAndOff();
         testDco2ToDco1PreservesSync();
@@ -177,6 +178,51 @@ private:
         expectEquals(target.getValue(envInt(3, PatchEdit::Envelope3Module::ParameterWidgets::kAttack)), 22);
         expectEquals(target.getValue(envInt(3, PatchEdit::Envelope3Module::ParameterWidgets::kSustain)), 33);
         expectEquals(target.getChoiceIndex(envChoice(3, PatchEdit::Envelope3Module::ParameterWidgets::kTriggerMode)), 2);
+    }
+
+    void testEnvShapeOnlyLeavesNonShapeParams()
+    {
+        beginTest("env shape-only — D/A/D/S/R only; leave amplitude/trigger");
+
+        Core::PatchModel source;
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kDelay), 10);
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kAttack), 20);
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kDecay), 30);
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kSustain), 40);
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kRelease), 50);
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kAmplitude), 60);
+        source.setValue(envInt(2, PatchEdit::Envelope2Module::ParameterWidgets::kAmplitudeModByVelocity), 15);
+        source.setChoiceIndex(envChoice(2, PatchEdit::Envelope2Module::ParameterWidgets::kTriggerMode), 2);
+        source.setChoiceIndex(envChoice(2, PatchEdit::Envelope2Module::ParameterWidgets::kEnvelopeMode), 1);
+        source.setChoiceIndex(envChoice(2, PatchEdit::Envelope2Module::ParameterWidgets::kLfo1Trigger), 1);
+
+        Core::PatchModel target;
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kDelay), 1);
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kAttack), 2);
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kDecay), 3);
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kSustain), 4);
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kRelease), 5);
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kAmplitude), 7);
+        target.setValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kAmplitudeModByVelocity), -9);
+        target.setChoiceIndex(envChoice(1, PatchEdit::Envelope1Module::ParameterWidgets::kTriggerMode), 0);
+        target.setChoiceIndex(envChoice(1, PatchEdit::Envelope1Module::ParameterWidgets::kEnvelopeMode), 0);
+        target.setChoiceIndex(envChoice(1, PatchEdit::Envelope1Module::ParameterWidgets::kLfo1Trigger), 0);
+
+        Core::ClipboardService clipboard;
+        clipboard.copyModule(Core::PatchModuleKind::Env2, source, true);
+        expect(clipboard.isEnvelopeShapeOnly());
+        expect(clipboard.pasteModule(Core::PatchModuleKind::Env1, target));
+
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kDelay)), 10);
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kAttack)), 20);
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kDecay)), 30);
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kSustain)), 40);
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kRelease)), 50);
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kAmplitude)), 7);
+        expectEquals(target.getValue(envInt(1, PatchEdit::Envelope1Module::ParameterWidgets::kAmplitudeModByVelocity)), -9);
+        expectEquals(target.getChoiceIndex(envChoice(1, PatchEdit::Envelope1Module::ParameterWidgets::kTriggerMode)), 0);
+        expectEquals(target.getChoiceIndex(envChoice(1, PatchEdit::Envelope1Module::ParameterWidgets::kEnvelopeMode)), 0);
+        expectEquals(target.getChoiceIndex(envChoice(1, PatchEdit::Envelope1Module::ParameterWidgets::kLfo1Trigger)), 0);
     }
 
     void testDco1ToDco2SkipsSyncAndDetune()
@@ -373,7 +419,7 @@ private:
             source.data()[i] = static_cast<juce::uint8>(i + 1);
 
         Core::ClipboardService clipboard;
-        clipboard.copyFullPatch(source);
+        clipboard.copyFullPatch(source, "BANK 0 / PATCH 0");
 
         Core::PatchModel target;
         expect(clipboard.pasteFullPatch(target));
@@ -389,7 +435,7 @@ private:
         patch.setValue(dco1Int(PatchEdit::Dco1Module::ParameterWidgets::kFrequency), 9);
 
         Core::ClipboardService clipboard;
-        clipboard.copyFullPatch(patch);
+        clipboard.copyFullPatch(patch, "BANK 0 / PATCH 0");
         expect(clipboard.canPasteFullPatch());
         expect(!clipboard.canPasteModule(Core::PatchModuleKind::Dco2));
         expect(!clipboard.getSourceModuleKind().has_value());

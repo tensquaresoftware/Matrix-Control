@@ -90,7 +90,7 @@ private:
 
         Core::ClipboardService clipboard;
         Core::PatchModel model;
-        clipboard.copyFullPatch(model);
+        clipboard.copyFullPatch(model, "BANK 0 / PATCH 0");
 
         const auto state = Core::resolvePasteEnabled(clipboard);
 
@@ -121,7 +121,7 @@ private:
         Core::ClipboardService clipboard;
         Core::PatchModel model;
 
-        clipboard.copyFullPatch(model);
+        clipboard.copyFullPatch(model, "BANK 0 / PATCH 0");
         auto state = Core::resolvePasteEnabled(clipboard);
         expect(state.internalPatches, "full patch enables internal paste");
         expectAllModulePasteDisabled(state);

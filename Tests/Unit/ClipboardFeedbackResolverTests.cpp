@@ -121,7 +121,7 @@ private:
 
         Core::PatchModel model;
         Core::ClipboardService clipboard;
-        clipboard.copyFullPatch(model);
+        clipboard.copyFullPatch(model, "BANK 0 / PATCH 0");
 
         const auto samePatch = Core::resolveClipboardFeedback(clipboard, true, false);
         expect(samePatch.internalPatchesCopy);

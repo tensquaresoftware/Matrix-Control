@@ -478,7 +478,7 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 3, 12, false);
         harness.mapper.apvtsToBuffer();
-        harness.clipboard.copyFullPatch(harness.model);
+        harness.clipboard.copyFullPatch(harness.model, "BANK 0 / PATCH 0");
 
         harness.handler.handleAction(InternalPatches::kPastePatch, juce::var());
 
@@ -495,7 +495,7 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 0, 7, false);
         harness.mapper.apvtsToBuffer();
-        harness.clipboard.copyFullPatch(harness.model);
+        harness.clipboard.copyFullPatch(harness.model, "BANK 0 / PATCH 0");
 
         harness.handler.handleAction(InternalPatches::kPastePatch, juce::var());
 
@@ -512,7 +512,7 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6));
         initializePatchManagerState(harness.proc.apvts.state, 0, 7, false);
         harness.mapper.apvtsToBuffer();
-        harness.clipboard.copyFullPatch(harness.model);
+        harness.clipboard.copyFullPatch(harness.model, "BANK 0 / PATCH 0");
 
         harness.handler.handleAction(InternalPatches::kPastePatch, juce::var());
 

@@ -5,6 +5,7 @@
 
 #include "Core/Models/PackedFieldCodec.h"
 #include "Shared/Definitions/PluginDescriptors.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
@@ -183,31 +184,58 @@ std::optional<PatchModuleKind> ClipboardService::getSourceModuleKind() const noe
     return sourceModuleKind_;
 }
 
-void ClipboardService::copyModule(PatchModuleKind source, const PatchModel& model)
+bool ClipboardService::isEnvelopeShapeOnly() const noexcept
+{
+    return mode_ == ClipboardMode::Module && envelopeShapeOnly_;
+}
+
+juce::String ClipboardService::getFullPatchSourceLabel() const
+{
+    if (mode_ != ClipboardMode::FullPatch)
+        return {};
+
+    return fullPatchSourceLabel_;
+}
+
+void ClipboardService::copyModule(PatchModuleKind source, const PatchModel& model, bool envelopeShapeOnly)
 {
     mode_ = ClipboardMode::Module;
     sourceModuleKind_ = source;
+    envelopeShapeOnly_ = envelopeShapeOnly && isEnvelopeModule(source);
+    fullPatchSourceLabel_.clear();
     moduleSnapshot_.intValues.clear();
     moduleSnapshot_.choiceIndices.clear();
 
     const auto views = descriptorsFor(source);
 
     for (const auto& descriptor : views.intParams)
-        moduleSnapshot_.intValues[descriptor.parameterId] = model.getValue(descriptor);
+    {
+        if (envelopeShapeOnly_ && ! isEnvelopeShapeDisplayName(descriptor.displayName))
+            continue;
 
-    for (const auto& descriptor : views.choiceParams)
-        moduleSnapshot_.choiceIndices[descriptor.parameterId] = model.getChoiceIndex(descriptor);
+        moduleSnapshot_.intValues[descriptor.parameterId] = model.getValue(descriptor);
+    }
+
+    if (! envelopeShapeOnly_)
+    {
+        for (const auto& descriptor : views.choiceParams)
+            moduleSnapshot_.choiceIndices[descriptor.parameterId] = model.getChoiceIndex(descriptor);
+    }
 }
 
-void ClipboardService::copyFullPatch(const PatchModel& model)
+void ClipboardService::copyFullPatch(const PatchModel& model, const juce::String& sourceLabel)
 {
     mode_ = ClipboardMode::FullPatch;
+    envelopeShapeOnly_ = false;
+    fullPatchSourceLabel_ = sourceLabel;
     std::memcpy(fullPatchSnapshot_.data(), model.data(), fullPatchSnapshot_.size());
 }
 
 void ClipboardService::copyMatrixModulation(const PatchModel& model)
 {
     mode_ = ClipboardMode::MatrixModulation;
+    envelopeShapeOnly_ = false;
+    fullPatchSourceLabel_.clear();
 
     const auto offset = PackedFieldCodec::safeOffset(
         static_cast<int>(kMatrixModSnapshotOffset),
@@ -220,6 +248,8 @@ void ClipboardService::clear() noexcept
 {
     mode_ = ClipboardMode::Empty;
     sourceModuleKind_ = PatchModuleKind::Dco1;
+    envelopeShapeOnly_ = false;
+    fullPatchSourceLabel_.clear();
     moduleSnapshot_.intValues.clear();
     moduleSnapshot_.choiceIndices.clear();
     fullPatchSnapshot_.fill(0);
@@ -286,6 +316,17 @@ bool ClipboardService::pasteMatrixModulation(PatchModel& model)
 bool ClipboardService::isEnvelopeModule(PatchModuleKind kind) noexcept
 {
     return kind == PatchModuleKind::Env1 || kind == PatchModuleKind::Env2 || kind == PatchModuleKind::Env3;
+}
+
+bool ClipboardService::isEnvelopeShapeDisplayName(const juce::String& displayName) noexcept
+{
+    using namespace PluginDisplayNames::PatchEditSection::Envelope1Module::ParameterWidgets;
+
+    return displayName == kDelay
+        || displayName == kAttack
+        || displayName == kDecay
+        || displayName == kSustain
+        || displayName == kRelease;
 }
 
 bool ClipboardService::isDcoModule(PatchModuleKind kind) noexcept

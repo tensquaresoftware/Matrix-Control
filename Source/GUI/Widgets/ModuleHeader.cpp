@@ -9,6 +9,7 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
 {
@@ -74,9 +75,9 @@ namespace TSS
                 pasteButton_.onClick = nullptr;
                 GrayedControlHelper::setGrayedClickHandler(pasteButton_, true, [this]
                 {
-                    GrayedControlHelper::setFooterInfoMessage(
+                    GrayedControlHelper::setFooterWarningMessage(
                         apvts_,
-                        PluginDisplayNames::ShortLabels::kIncompatiblePasteFooter);
+                        PluginDisplayNames::ShortLabels::kPasteNotAvailableFooter);
                 });
             }
         }
@@ -285,8 +286,20 @@ namespace TSS
             spec.copyWidgetId,
             spec.skin,
             dimensions_.buttonHeight);
-        copyButton_->onClick = [this, id = spec.copyWidgetId]
+        copyButton_->onClick = [this, id = spec.copyWidgetId, moduleId = spec.moduleId]
         {
+            using namespace PluginIDs::PatchEditSection;
+
+            const bool isEnvelope = moduleId == Envelope1Module::kGroupId
+                || moduleId == Envelope2Module::kGroupId
+                || moduleId == Envelope3Module::kGroupId;
+            const bool shapeOnly = isEnvelope
+                && juce::ModifierKeys::getCurrentModifiers().isAltDown();
+
+            apvts_->state.setProperty(
+                PluginIDs::ClipboardFeedback::kCopyEnvelopeShapeOnly,
+                shapeOnly,
+                nullptr);
             apvts_->state.setProperty(id, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
         };
         addAndMakeVisible(*copyButton_);

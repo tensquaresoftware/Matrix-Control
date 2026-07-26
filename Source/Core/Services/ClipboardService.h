@@ -40,9 +40,11 @@ namespace Core
         bool hasContent() const noexcept;
         ClipboardMode getMode() const noexcept;
         std::optional<PatchModuleKind> getSourceModuleKind() const noexcept;
+        bool isEnvelopeShapeOnly() const noexcept;
+        juce::String getFullPatchSourceLabel() const;
 
-        void copyModule(PatchModuleKind source, const PatchModel& model);
-        void copyFullPatch(const PatchModel& model);
+        void copyModule(PatchModuleKind source, const PatchModel& model, bool envelopeShapeOnly = false);
+        void copyFullPatch(const PatchModel& model, const juce::String& sourceLabel);
         void copyMatrixModulation(const PatchModel& model);
         void clear() noexcept;
 
@@ -65,6 +67,7 @@ namespace Core
         static bool isDcoModule(PatchModuleKind kind) noexcept;
         static bool isLfoModule(PatchModuleKind kind) noexcept;
         static bool areModulesCompatible(PatchModuleKind source, PatchModuleKind target) noexcept;
+        static bool isEnvelopeShapeDisplayName(const juce::String& displayName) noexcept;
 
         void pasteModuleDirect(PatchModuleKind target, PatchModel& model);
         void pasteEnvelopeModule(PatchModuleKind source, PatchModuleKind target, PatchModel& model);
@@ -73,6 +76,8 @@ namespace Core
 
         ClipboardMode mode_ { ClipboardMode::Empty };
         PatchModuleKind sourceModuleKind_ { PatchModuleKind::Dco1 };
+        bool envelopeShapeOnly_ { false };
+        juce::String fullPatchSourceLabel_;
         ModuleSnapshot moduleSnapshot_;
         std::array<juce::uint8, SysExConstants::kPatchPackedDataSize> fullPatchSnapshot_ {};
         std::array<juce::uint8, kMatrixModSnapshotSize> matrixModSnapshot_ {};

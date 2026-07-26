@@ -653,6 +653,8 @@ namespace PluginIDs
     {
         constexpr const char* kActive  = "clipboardFeedbackActive";
         constexpr const char* kCopyLit = "clipboardFeedbackCopyLit";
+        // Set by GUI immediately before a module Copy timestamp; Core reads and clears.
+        constexpr const char* kCopyEnvelopeShapeOnly = "clipboardCopyEnvelopeShapeOnly";
 
         constexpr const char* kDco1Copy = "dco1CopyFeedback";
         constexpr const char* kDco2Copy = "dco2CopyFeedback";
