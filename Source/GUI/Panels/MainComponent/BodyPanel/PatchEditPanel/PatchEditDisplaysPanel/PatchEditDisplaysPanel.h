@@ -28,6 +28,8 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
+    PatchNameDisplayPanel& getPatchNameDisplayPanel() noexcept { return *patchNameDisplayPanel_; }
+
 private:
     PatchEditDisplaysPanelDimensions dims_;
     TSS::ISkin* skin_;

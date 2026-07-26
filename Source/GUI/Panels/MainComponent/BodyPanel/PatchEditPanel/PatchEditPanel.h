@@ -35,6 +35,8 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
+    PatchEditDisplaysPanel& getPatchEditDisplaysPanel() noexcept { return *patchEditDisplaysPanel_; }
+
 private:
     PatchEditPanelDimensions dims_;
     TSS::ISkin* skin_;

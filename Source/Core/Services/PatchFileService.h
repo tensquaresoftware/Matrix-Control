@@ -52,16 +52,21 @@ namespace Core
                                                const juce::uint8* packedData,
                                                SysExEncoder& encoder);
         PatchFileLoadResult loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut);
+        // userPatchName is the live SSOT musical name (model + APVTS), stamped onto bytes
+        // 0-7 of every exported .syx before encoding. Filenames/folder stems stay Mxx/Mxx-Ryy
+        // via MutationNaming's format helpers, independent of the packed buffer's name bytes.
         PatchFileExportResult exportMutatorHistory(const juce::File& folder,
                                                    const MutationHistoryStore& store,
-                                                   SysExEncoder& encoder);
+                                                   SysExEncoder& encoder,
+                                                   const juce::String& userPatchName);
         // Hybrid session-folder export: writes the FR-33 layout inside sessionFolder.
         // When clearExisting is true the folder contents are removed first (Overwrite);
         // otherwise the folder must be created fresh.
         PatchFileExportResult exportMutatorHistorySession(const juce::File& sessionFolder,
                                                           const MutationHistoryStore& store,
                                                           SysExEncoder& encoder,
-                                                          bool clearExisting);
+                                                          bool clearExisting,
+                                                          const juce::String& userPatchName);
         // First non-existing session folder among basename, basename-2, basename-3, … (Keep).
         static juce::File resolveKeepSessionFolder(const juce::File& parentFolder,
                                                    const juce::String& basename);
@@ -91,28 +96,35 @@ namespace Core
                                                     const MutationHistoryStore& store);
         PatchFileExportResult writeInitialSnapshot(const juce::File& folder,
                                                    const MutationHistoryStore& store,
-                                                   SysExEncoder& encoder);
+                                                   SysExEncoder& encoder,
+                                                   const juce::String& userPatchName);
         PatchFileExportResult writeExportPatchFile(const juce::File& file,
                                                    const juce::uint8* packedData,
-                                                   SysExEncoder& encoder);
+                                                   SysExEncoder& encoder,
+                                                   const juce::String& userPatchName);
         PatchFileExportResult writeRootEntry(const juce::File& rootDir,
                                              int rootIndex,
                                              const MutationHistoryStore& store,
-                                             SysExEncoder& encoder);
+                                             SysExEncoder& encoder,
+                                             const juce::String& userPatchName);
         PatchFileExportResult writeRetryEntries(const juce::File& rootDir,
                                                 int rootIndex,
                                                 const MutationHistoryStore& store,
-                                                SysExEncoder& encoder);
+                                                SysExEncoder& encoder,
+                                                const juce::String& userPatchName);
         PatchFileExportResult writeRootFolder(const juce::File& folder,
                                               int rootIndex,
                                               const MutationHistoryStore& store,
-                                              SysExEncoder& encoder);
+                                              SysExEncoder& encoder,
+                                              const juce::String& userPatchName);
         PatchFileExportResult writeAllRootFolders(const juce::File& folder,
                                                   const MutationHistoryStore& store,
-                                                  SysExEncoder& encoder);
+                                                  SysExEncoder& encoder,
+                                                  const juce::String& userPatchName);
         PatchFileExportResult writeHistoryLayout(const juce::File& folder,
                                                  const MutationHistoryStore& store,
-                                                 SysExEncoder& encoder);
+                                                 SysExEncoder& encoder,
+                                                 const juce::String& userPatchName);
 
         SysExDecoder& decoder_;
         PatchFolderScanResult lastScan_;

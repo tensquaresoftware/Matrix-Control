@@ -719,6 +719,15 @@ namespace PluginDisplayNames
             {
                 // Patch names are 8 characters long in the Oberheim Matrix-1000 :
                 constexpr const char* kDefaultPatchName = "--------";
+                // Secondary line literal while Compare is active — distinct from the Mxx / Mxx-Ryy
+                // Mutator history labels used the rest of the time.
+                constexpr const char* kCompareSecondaryLabel = "INITIAL";
+            }
+
+            // Footer copy for the inline rename custom-caret editor. English only.
+            namespace Messages
+            {
+                constexpr const char* kInvalidCharacterFooter = "Invalid character for patch name";
             }
         }
     }

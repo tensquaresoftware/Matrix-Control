@@ -98,6 +98,10 @@ namespace Core
         // freeze the Export folder basename on the first MUTATE. Owned by PluginProcessor.
         void setPatchLoadContextProvider(std::function<PatchLoadContext()> provider);
 
+        // Recomputes the frozen Export folder basename with the new patch name after a rename.
+        // No-op when no basename has been frozen yet (no MUTATE performed in this session).
+        void refreshFrozenExportBasename(const juce::String& newPatchName);
+
         void auditionSelectedHistoryEntry() override;
         void rebuildHistoryListMirrors() override;
         void advanceHistorySelection(bool isNext) override;
@@ -123,6 +127,11 @@ namespace Core
         // RETRY-only — returns selected entry for parentSnapshot input; differs from audition semantics (D-083).
         std::optional<MutationEntry> resolveSelectedEntryForRetry(int rootIndex) const;
         void pushResultToEditorAndSynth(const PatchModel& mutatedModel);
+        // True when `candidate`, once stamped with the live model's name (the same stamp
+        // pushResultToEditorAndSynth would apply), differs from the live model buffer.
+        // Callers use this instead of a raw memcmp so name stamping cannot defeat the
+        // duplicate-SysEx guard.
+        bool candidateDiffersFromLive(const PatchModel& candidate) const;
         void freezeExportBasename(const PatchModel& snapshot);
         MutatorActionResult runSessionExport(const juce::File& sessionFolder, bool clearExisting);
         void applySelectionFromApvts();

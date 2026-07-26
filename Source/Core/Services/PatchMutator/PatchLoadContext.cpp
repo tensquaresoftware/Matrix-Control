@@ -34,7 +34,7 @@ namespace Core
     juce::String PatchLoadContext::computeExportBasename(const juce::String& patchName) const
     {
         if (origin == Origin::kComputerFile)
-            return computeComputerBasename();
+            return computeComputerBasename(patchName);
 
         return computeDeviceBasename(patchName);
     }
@@ -50,8 +50,13 @@ namespace Core
         return name + " @ " + location;
     }
 
-    juce::String PatchLoadContext::computeComputerBasename() const
+    juce::String PatchLoadContext::computeComputerBasename(const juce::String& patchName) const
     {
+        const auto name = PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty(patchName);
+
+        if (name.isNotEmpty())
+            return name + " @ " + juce::String(kSyxFileLocationLabel);
+
         const auto stem = PatchFileNameSanitizer::sanitizeOsFileStem(fileStem);
         return stem + " @ " + juce::String(kSyxFileLocationLabel);
     }

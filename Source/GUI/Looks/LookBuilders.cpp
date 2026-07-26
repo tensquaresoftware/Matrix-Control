@@ -151,11 +151,18 @@ namespace TSS
 
     PatchNameDisplayLook patchNameDisplayLookFromSkin(const ISkin& skin)
     {
+        // Secondary Mutator/Compare label at 50% opacity; primary idle/hover alphas
+        // (80% / 100%) are applied in PatchNameDisplay paint for the editability affordance.
+        constexpr float kSecondaryTextAlpha = 0.50f;
+        constexpr float kSecondaryFontHeightRatio = 0.7f;
+
         PatchNameDisplayLook look;
         look.background = skin.getColour(SkinColourId::kPatchNameDisplayBackground);
         look.border = skin.getColour(SkinColourId::kPatchNameDisplayBorder);
         look.text = skin.getColour(SkinColourId::kPatchNameDisplayText);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kPatchName);
+        look.secondaryText = look.text.withAlpha(kSecondaryTextAlpha);
+        look.secondaryFont = look.font.withHeight(look.font.getHeight() * kSecondaryFontHeightRatio);
         return look;
     }
 

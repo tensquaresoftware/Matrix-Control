@@ -69,7 +69,7 @@ public:
 
     void runTest() override
     {
-        mutate_emptyHistory_createsM00();
+        mutate_preservesUserPatchName();
         mutate_gapAllocation();
         mutate_limitBlocks();
         mutate_noOpRecipe_blocked();
@@ -82,7 +82,7 @@ public:
         mutate_neverDeletesRoots();
 
         retry_emptyHistory_blocked();
-        retry_firstRetry_createsR00();
+        retry_firstRetry_preservesParentPatchName();
         retry_usesParentSnapshot_notResult();
         retry_fromSelectedRetry_usesThatEntryParentSnapshot();
         retry_gapAllocation();
@@ -113,9 +113,13 @@ public:
         mutate_secondRoot_doesNotOverwriteInitialSnapshot();
         mutate_firstRoot_freezesExportBasename();
         resetSessionForPatchLoad_clearsFrozenBasename();
+        refreshFrozenExportBasename_afterRename_updatesBasename();
+        refreshFrozenExportBasename_noFrozenBasename_noOp();
         export_withFrozenBasename_createsSessionSubfolder();
         export_existingSessionFolder_requestsCollisionModal();
         exportResolved_keep_writesIndexedFolder();
+        export_writesLiveUserName_notMxxLabel();
+        export_afterRename_createsNewFolderKeepsOld();
         compare_emptyHistory_blocked();
         compare_enter_auditionsInitialSnapshot();
         compare_enter_setsCompareActive();
@@ -337,12 +341,13 @@ private:
         return patch;
     }
 
-    void mutate_emptyHistory_createsM00()
+    void mutate_preservesUserPatchName()
     {
-        beginTest("mutate_emptyHistory_createsM00");
+        beginTest("mutate_preservesUserPatchName");
 
         EngineHarness harness;
         harness.setRecipe(100, 100, true);
+        harness.model.setName("WARMPAD");
 
         const auto result = harness.engine.mutate();
         expect(result.success);
@@ -350,9 +355,10 @@ private:
 
         const auto entry = harness.engine.getEntry(0);
         expect(entry.has_value());
-        expect(entry->result[0] == static_cast<juce::uint8>('M'));
-        expect(entry->result[1] == static_cast<juce::uint8>('0'));
-        expect(entry->result[2] == static_cast<juce::uint8>('0'));
+
+        Core::PatchModel resultModel;
+        resultModel.loadFrom(entry->result.data());
+        expectEquals(resultModel.getName(), juce::String("WARMPAD"));
     }
 
     void mutate_gapAllocation()
@@ -542,15 +548,16 @@ private:
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
 
-    void retry_firstRetry_createsR00()
+    void retry_firstRetry_preservesParentPatchName()
     {
-        beginTest("retry_firstRetry_createsR00");
+        beginTest("retry_firstRetry_preservesParentPatchName");
 
         EngineHarness harness;
         harness.setRecipe(100, 100, true);
 
         auto m00 = makeDistinctBuffer(41);
         auto m00Parent = makeDistinctBuffer(42);
+        m00Parent.setName("COLDPAD");
         Core::MutationNaming::applyPatchName(m00, 0);
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
@@ -560,13 +567,10 @@ private:
 
         const auto retryEntry = harness.store().getEntry(0, 0);
         expect(retryEntry.has_value());
-        expect(retryEntry->result[0] == static_cast<juce::uint8>('M'));
-        expect(retryEntry->result[1] == static_cast<juce::uint8>('0'));
-        expect(retryEntry->result[2] == static_cast<juce::uint8>('0'));
-        expect(retryEntry->result[3] == static_cast<juce::uint8>('-'));
-        expect(retryEntry->result[4] == static_cast<juce::uint8>('R'));
-        expect(retryEntry->result[5] == static_cast<juce::uint8>('0'));
-        expect(retryEntry->result[6] == static_cast<juce::uint8>('0'));
+
+        Core::PatchModel retryResultModel;
+        retryResultModel.loadFrom(retryEntry->result.data());
+        expectEquals(retryResultModel.getName(), juce::String("COLDPAD"));
     }
 
     void retry_usesParentSnapshot_notResult()
@@ -987,7 +991,12 @@ private:
         harness.engine.auditionSelectedHistoryEntry();
 
         expectEquals(countPatchSysExMessages(harness.queue), 1);
-        expect(std::memcmp(harness.model.data(), m00.data(), Core::PatchModel::kBufferSize) == 0);
+        // Audition stamps the live model's name onto the pushed buffer (name SSOT stays
+        // the editor, not the historical entry) — the params should still match m00.
+        Core::PatchModel expected;
+        expected.loadFrom(m00.data());
+        expected.setName(juce::String());
+        expect(std::memcmp(harness.model.data(), expected.data(), Core::PatchModel::kBufferSize) == 0);
     }
 
     void audition_selectedRetry_sendsSysExOnce()
@@ -1011,7 +1020,11 @@ private:
         harness.engine.auditionSelectedHistoryEntry();
 
         expectEquals(countPatchSysExMessages(harness.queue), 1);
-        expect(std::memcmp(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize) == 0);
+        // Audition stamps the live model's name onto the pushed buffer — compare params only.
+        Core::PatchModel expected;
+        expected.loadFrom(r00.data());
+        expected.setName(juce::String());
+        expect(std::memcmp(harness.model.data(), expected.data(), Core::PatchModel::kBufferSize) == 0);
     }
 
     void audition_idempotent_skipsDuplicateSysEx()
@@ -1137,6 +1150,35 @@ private:
         expect(! harness.store().hasFrozenExportBasename());
     }
 
+    void refreshFrozenExportBasename_afterRename_updatesBasename()
+    {
+        beginTest("refreshFrozenExportBasename_afterRename_updatesBasename");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(1, 73); });
+        harness.model.setName("WARMPAD");
+
+        expect(harness.engine.mutate().success);
+        expectEquals(harness.store().getFrozenExportBasename(), juce::String("WARMPAD @ B1P73"));
+
+        harness.engine.refreshFrozenExportBasename("COLDPAD");
+        expectEquals(harness.store().getFrozenExportBasename(), juce::String("COLDPAD @ B1P73"));
+    }
+
+    void refreshFrozenExportBasename_noFrozenBasename_noOp()
+    {
+        beginTest("refreshFrozenExportBasename_noFrozenBasename_noOp");
+
+        EngineHarness harness;
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(1, 73); });
+
+        harness.engine.refreshFrozenExportBasename("COLDPAD");
+        expect(! harness.store().hasFrozenExportBasename());
+    }
+
     void export_withFrozenBasename_createsSessionSubfolder()
     {
         beginTest("export_withFrozenBasename_createsSessionSubfolder");
@@ -1199,6 +1241,60 @@ private:
 
         expect(result.success);
         expect(tempDir.getChildFile("OB-VOX @ B8P25-2").isDirectory());
+
+        tempDir.deleteRecursively();
+    }
+
+    void export_writesLiveUserName_notMxxLabel()
+    {
+        beginTest("export_writesLiveUserName_notMxxLabel");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(8, 25); });
+        harness.model.setName("WARMPAD");
+        expect(harness.engine.mutate().success);
+
+        const auto tempDir = makeTempExportDir();
+        expect(harness.engine.exportHistory(tempDir).success);
+
+        const auto exportedFile = tempDir.getChildFile("WARMPAD @ B8P25")
+                                       .getChildFile("M00")
+                                       .getChildFile("M00.syx");
+        expect(exportedFile.existsAsFile());
+
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        expect(harness.patchFileService.loadPatchSysExFile(exportedFile, packed).success);
+
+        Core::PatchModel decoded;
+        decoded.loadFrom(packed);
+        expectEquals(decoded.getName(), juce::String("WARMPAD"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void export_afterRename_createsNewFolderKeepsOld()
+    {
+        beginTest("export_afterRename_createsNewFolderKeepsOld");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        harness.engine.setPatchLoadContextProvider(
+            []() { return Core::PatchLoadContext::deviceMemory(1, 73); });
+        harness.model.setName("WARMPAD");
+        expect(harness.engine.mutate().success);
+
+        const auto tempDir = makeTempExportDir();
+        expect(harness.engine.exportHistory(tempDir).success);
+        expect(tempDir.getChildFile("WARMPAD @ B1P73").isDirectory());
+
+        harness.model.setName("COLDPAD");
+        harness.engine.refreshFrozenExportBasename("COLDPAD");
+
+        expect(harness.engine.exportHistory(tempDir).success);
+        expect(tempDir.getChildFile("COLDPAD @ B1P73").isDirectory());
+        expect(tempDir.getChildFile("WARMPAD @ B1P73").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -1294,13 +1390,19 @@ private:
         expect(harness.store().insertRetry(0, 0, r00, m00Parent));
 
         std::memcpy(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize);
+        const auto liveNameBeforeCompare = harness.model.getName();
 
         harness.proc.apvts.state.setProperty(MutatorState::kSelectedMutateRootIndex, 0, nullptr);
         harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 0, nullptr);
         harness.engine.applySelectionFromApvts();
 
         expect(harness.engine.toggleCompare().success);
-        expect(std::memcmp(harness.model.data(), m00Parent.data(), Core::PatchModel::kBufferSize) == 0);
+        // Entering Compare swaps in the initial snapshot's params but keeps the
+        // currently-displayed name (name SSOT is the live model, not the historical entry).
+        Core::PatchModel expectedOnEnter;
+        expectedOnEnter.loadFrom(m00Parent.data());
+        expectedOnEnter.setName(liveNameBeforeCompare);
+        expect(std::memcmp(harness.model.data(), expectedOnEnter.data(), Core::PatchModel::kBufferSize) == 0);
 
         expect(harness.engine.toggleCompare().success);
         expect(std::memcmp(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize) == 0);
@@ -1446,11 +1548,16 @@ private:
         harness.proc.apvts.state.setProperty(MutatorState::kSelectedRetryIndex, 2, nullptr);
 
         std::memcpy(harness.model.data(), r02.data(), Core::PatchModel::kBufferSize);
+        const auto liveNameBeforeDelete = harness.model.getName();
 
         expect(harness.engine.deleteSelected().success);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 1);
-        expect(std::memcmp(harness.model.data(), r00.data(), Core::PatchModel::kBufferSize) == 0);
+        // Re-audition after delete stamps the name that was live before the delete.
+        Core::PatchModel expectedAfterDelete;
+        expectedAfterDelete.loadFrom(r00.data());
+        expectedAfterDelete.setName(liveNameBeforeDelete);
+        expect(std::memcmp(harness.model.data(), expectedAfterDelete.data(), Core::PatchModel::kBufferSize) == 0);
     }
 
     void delete_retry_firstRetry_fallsBackToRootOnly()
@@ -1892,13 +1999,18 @@ private:
         harness.engine.applySelectionFromApvts();
 
         std::memcpy(harness.model.data(), m99Parent.data(), Core::PatchModel::kBufferSize);
+        const auto liveNameBeforeDefrag = harness.model.getName();
 
         expect(harness.engine.defragHistory().success);
         expectEquals(countPatchSysExMessages(harness.queue), 1);
 
         const auto entry = harness.store().getEntry(0);
         expect(entry.has_value());
-        expect(std::memcmp(harness.model.data(), entry->result.data(), Core::PatchModel::kBufferSize) == 0);
+        // Re-audition after defrag stamps the name that was live before the defrag.
+        Core::PatchModel expectedAfterDefrag;
+        expectedAfterDefrag.loadFrom(entry->result.data());
+        expectedAfterDefrag.setName(liveNameBeforeDefrag);
+        expect(std::memcmp(harness.model.data(), expectedAfterDefrag.data(), Core::PatchModel::kBufferSize) == 0);
     }
 
     void defrag_successFooter()

@@ -1,31 +1,14 @@
 #include "Core/Services/PatchMutator/HistoryDefragService.h"
 
-#include <cstring>
 #include <map>
 
-#include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
-#include "Core/Services/PatchMutator/MutationNaming.h"
 
 namespace Core
 {
 
 namespace
 {
-
-    PatchModel bufferToModel(const std::array<juce::uint8, PatchModel::kBufferSize>& buffer)
-    {
-        PatchModel model;
-        model.loadFrom(buffer.data());
-        return model;
-    }
-
-    void applyNamedResult(MutationEntry& entry, int rootIndex, int retryIndex)
-    {
-        auto model = bufferToModel(entry.result);
-        MutationNaming::applyPatchName(model, rootIndex, retryIndex);
-        std::memcpy(entry.result.data(), model.data(), entry.result.size());
-    }
 
     std::optional<std::pair<int, int>> captureSelectedIndices(const MutationHistoryStore& store,
                                                               int selectedMutateRootIndex,
@@ -112,7 +95,8 @@ HistoryDefragResult HistoryDefragService::defrag(MutationHistoryStore& store,
         bucket.rootEntry = *oldRootEntry;
         bucket.rootEntry.rootIndex = newRoot;
         bucket.rootEntry.retryIndex = MutationHistoryStore::kRootOnly;
-        applyNamedResult(bucket.rootEntry, newRoot, MutationHistoryStore::kRootOnly);
+        // Bytes 0-7 (the musical patch name) are left untouched — Mxx is a display/stem
+        // label only, never rewritten into the packed buffer.
         bucket.hasRootEntry = true;
 
         const auto oldRetries = store.getSortedRetryIndices(oldRoot);
@@ -131,7 +115,6 @@ HistoryDefragResult HistoryDefragService::defrag(MutationHistoryStore& store,
             auto entry = *retryEntry;
             entry.rootIndex = newRoot;
             entry.retryIndex = newRetry;
-            applyNamedResult(entry, newRoot, newRetry);
             bucket.retries.emplace(newRetry, entry);
         }
 

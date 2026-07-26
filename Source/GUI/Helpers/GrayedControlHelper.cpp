@@ -88,6 +88,12 @@ namespace TSS::GrayedControlHelper
         apvts.state.setProperty("uiMessageSeverity", "warning", nullptr);
     }
 
+    void setFooterErrorMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message)
+    {
+        apvts.state.setProperty("uiMessageText", message, nullptr);
+        apvts.state.setProperty("uiMessageSeverity", "error", nullptr);
+    }
+
     void setGrayedClickHandler(juce::Component& component,
                                bool grayed,
                                std::function<void()> showFooter)
