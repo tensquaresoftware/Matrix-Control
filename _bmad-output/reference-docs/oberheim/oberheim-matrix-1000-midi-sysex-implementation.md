@@ -4,14 +4,7 @@ project: Matrix-Control
 title: Oberheim Matrix-1000
 author: Guillaume DUPONT
 created: 2025-10-25
-updated: 2026-07-17
-notes: |
-  2026-07-17: Re-verified MIDI Summary / SysEx pages against official Matrix-1000 Owner's Manual PDF
-  (scanned pages ~41–56). Firm fixes: Omni Mode On data byte 00H; Active Sensing status FEH;
-  restore literal header byte 0 after opcode 0DH; remove length note wrongly attached under 0EH;
-  restore Global Parameter bytes 166–168 (incl. Group Mode Enable); Device ID rev-3 ASCII 30H ('0');
-  Table 3 unused destination code 0; minor typos (order / received); 0BH wording aligned to manual
-  (path / val / dest). Ambiguities retained as printed — see ## Verification notes.
+updated: 2026-07-26
 ---
 
 # Oberheim Matrix-1000
@@ -75,6 +68,8 @@ The general algorithm for transmission is:
 
 ### 01H - Single Patch Data
 
+Data dump for one Single Patch: on receipt, stores into slot `<number>` of the current bank; the unit also emits this same format when dumping (after `04H`).
+
 `F0H 10H 06H 01H <number> <data> <checksum> F7H`
 
 `<number>` = destination patch number (0-99)
@@ -89,6 +84,8 @@ Note: A gap of at least 10 ms should be allowed between patches when sending mul
 
 ### 03H - Master Parameter Data
 
+Data dump for the master/global parameter block: same payload format both directions — host→unit write, and unit→host dump after `04H` type 0 or 3. (Unlike `01H`, the printed manual has no explicit “on receipt” note for this opcode.)
+
 `F0H 10H 06H 03H <version> <data> <checksum> F7H`
 
 `<version>` = 03H for Matrix-1000
@@ -98,6 +95,8 @@ Note: A gap of at least 10 ms should be allowed between patches when sending mul
 `<checksum>` = checksum of packed `<data>`
 
 ### 04H - Request Data
+
+Asks the Matrix-1000 to transmit dumps (`01H` / master / edit buffer / request-all stream) according to `<type>` — does not itself carry patch data.
 
 `F0H 10H 06H 04H <type> <number> F7H`
 
@@ -111,11 +110,13 @@ Note: A gap of at least 10 ms should be allowed between patches when sending mul
 = 0 when `<type>` = 0 or 3  
 = number of patch requested when `<type>` = 1
 
-Note: When all patches are requested, 100 patches from the current bank are transmitted in ascending order using individual Single Patch messages (code 01 above). This is followed by 50 dummy "split" patches for compatibility with the "Request All" function of the Matrix-6. Each of these splits has the form F0H 10H 06H 02H <36 bytes of data> F7H. For further information on this format, see the Matrix-6 MIDI Specification. All patches are transmitted with ten msec between patches.
+Note: When all patches are requested, 100 patches from the current bank are transmitted in ascending order using individual Single Patch messages (code 01 above). This is followed by 50 dummy "split" patches for compatibility with the "Request All" function of the Matrix-6/6R. Each of these splits has the form F0H 10H 06H 02H <36 bytes of data> F7H. For further information on this format, see the Matrix-6/6R MIDI Specification. All patches are transmitted with ten msec between patches.
 
-> **Implementer note:** These Matrix-1000 dummy `02H` frames are **not** the full Matrix-6/6R Split Patch message (`02H <number> <nybble data> <checksum> F7H`). Treat them as M-6-compat padding in a Request-All stream, not as parseable Split dumps.
+> **Implementer note:** These Matrix-1000 dummy `02H` frames are **not** the full Matrix-6/6R Split Patch message (`02H <number> <nybble data> <checksum> F7H`). Treat them as Matrix-6/6R compatibility padding in a Request-All stream, not as parseable Split dumps.
 
 ### 06H - Remote Parameter Edit
+
+Host→unit only: sets one patch parameter to `<value>` by remote parameter number (`0–99`).
 
 `F0H 10H 06H 06H <parameter> <value> F7H`
 
@@ -128,6 +129,8 @@ Note: All values are sign extended from bit 6 into bit 7 except for parameter 12
 > **Implementer note (as printed contradiction):** The same manual lists remote-edit parameters as `0–99`, maps VCF Initial Frequency to front-panel parameter **21** (packed byte 26), and uses packed byte **121** for MM Bus 5 destination. Treat “parameter 121 (VCF Frequency)” as a likely typesetting error for **21**; do not use 121 as the remote-edit ID for VCF frequency.
 
 ### 07H - Set Group Mode
+
+Host→unit: puts the receiving unit into Group Mode with group size `<number>` and role `<ID>` (0 = master, 1–5 = slave); that unit then re-transmits this message with `<ID>` incremented.
 
 `F0H 10H 06H 07H <number> <ID> F7H`
 
@@ -143,6 +146,8 @@ Note: On receipt of this message, the unit enters group mode with its unit numbe
 
 ### 0AH - Set Bank
 
+Host→unit only: selects bank `<bank>` (0–9) and enables Bank Lock.
+
 `F0H 10H 06H 0AH <bank> F7H`
 
 `<bank>` = bank number to select (0-9)
@@ -150,6 +155,8 @@ Note: On receipt of this message, the unit enters group mode with its unit numbe
 Note: On receipt of this message, the unit will change banks and enable the bank lock.
 
 ### 0BH - Remote Parameter Edit (Matrix Modulation)
+
+Host→unit only: sets or deletes one Matrix Modulation path (`<path>`, `<source>`, `<val>`, `<dest>`; source or dest `0` deletes the path).
 
 `F0H 10H 06H 0BH <path> <source> <val> <dest> F7H`
 
@@ -169,11 +176,15 @@ Note: The value is sign extended from bit 6 into bit 7. Range checking should be
 
 ### 0CH - Unlock Bank
 
+Host→unit only: disables Bank Lock.
+
 `F0H 10H 06H 0CH F7H`
 
 On receipt of this message, Bank Lock will be disabled.
 
 ### 0DH - Single Patch Data to Edit Buffer
+
+Host→unit data dump: on receipt, loads one Single Patch into the edit buffer only (does not store to a numbered memory slot — contrast `01H`).
 
 `F0H 10H 06H 0DH 0 <data> <checksum> F7H`
 
@@ -190,6 +201,8 @@ Note: On receipt, this data will be stored into the edit buffer.
 Note: Wait at least ten msec after sending a patch to the Matrix-1000.
 
 ### 0EH - Store Edit Buffer
+
+Host→unit only: stores the edit buffer to patch `<number>` in bank `<bank>`; `<ID>` selects the Group Mode target (`0` if Group Mode off, unit ID, or `7FH` for any unit).
 
 `F0H 10H 06H 0EH <number> <bank> <ID> F7H`
 

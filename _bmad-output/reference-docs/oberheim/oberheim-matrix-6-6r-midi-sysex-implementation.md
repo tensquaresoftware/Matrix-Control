@@ -5,14 +5,7 @@ title: Oberheim Matrix-6/6R
 firmware: Applies to version 2.13 or later
 author: Guillaume DUPONT
 created: 2026-05-28
-updated: 2026-07-17
-notes: |
-  2026-07-17: Re-checked against https://www.youngmonkey.ca/nose/audio_tech/synth/Oberheim-Matrix6R.html
-  (community transcription; not an official Oberheim PDF). Confidence: nuanced.
-  Firm MD fixes: Split Balance OCR `P31` → `-31` (symmetric with `+31` in same source line);
-  Local Control data-byte notation aligned to source (`0ccccccc`); Active Sensing data column FEH.
-  No other firm opcode/format mismatches found. Ambiguities retained with existing
-  `(to be confirmed on hardware)` markers. Companion M-1000 comparison table is editorial.
+updated: 2026-07-26
 ---
 
 # Oberheim Matrix-6/6R
@@ -29,7 +22,7 @@ notes: |
 
 ## Introduction
 
-This document describes the MIDI implementation of the Matrix-6 6-Voice Polyphonic Synthesizer keyboard unit and Matrix-6R rack mount unit. This document assumes that the reader is familiar with both the Matrix-6 or Matrix-6R and the MIDI 1.0 Specification. Unless otherwise noted, this description applies equally to the Matrix-6 and Matrix-6R. The abbreviation **M-6** is used to refer to both.
+This document describes the MIDI implementation of the Matrix-6 6-Voice Polyphonic Synthesizer keyboard unit and Matrix-6R rack mount unit. This document assumes that the reader is familiar with both the Matrix-6 or Matrix-6R and the MIDI 1.0 Specification. Unless otherwise noted, this description applies equally to both. Throughout this document, **Matrix-6/6R** means either or both units; **Matrix-6** or **Matrix-6R** alone is used only when a difference between keyboard and rack matters.
 
 ### Notation
 
@@ -43,7 +36,7 @@ Some simple notation is used as shorthand in this document:
 
 ### Parameter Names
 
-M-6 parameter names are written just as in the Matrix-6 and 6R Owner's Manual, with the addition of an initial letter before the Patch Number to indicate on which page the parameter appears:
+Matrix-6/6R parameter names are written just as in the Matrix-6 and Matrix-6R Owner's Manual, with the addition of an initial letter before the Patch Number to indicate on which page the parameter appears:
 
 | Prefix | Page        | Description                                    |
 | ------ | ----------- | ---------------------------------------------- |
@@ -98,9 +91,9 @@ A feature often uses more than one parameter on more than one Page. The user sho
 
 ## SysEx Data Format
 
-The M-6 uses System Exclusive messages to send Patches from one unit to another and to allow one M-6 to be the "front panel" for another when editing Patches and setting parameters.
+The Matrix-6/6R uses System Exclusive messages to send Patches from one unit to another and to allow one Matrix-6/6R to be the "front panel" for another when editing Patches and setting parameters.
 
-For any System Exclusive messages to be generated or recognized, the parameter **M04 SYSTEM EXCLUSIVE** must be ON. The Master Edit page parameter **M10 SEND DATA** is used to send a Single Patch, Split Patch, or the Master Edit parameter set via MIDI to another device. If the M-6 is in Single Patch mode, **M10 SEND DATA** sends the currently selected Single Patch. If the M-6 is in Split Patch mode, **M10 SEND DATA** sends the currently selected Split Patch. The parameter **M11 SEND ALL** sends all of the M-6's 100 Single Patches, 50 Split Patches, and the set of Master Edit parameters to another device. A SEND ALL operation takes about **12 seconds** to complete. Patch transmission can also be triggered via opcode **`04H`** (see below) or from the front panel (**M10 SEND DATA**).
+For any System Exclusive messages to be generated or recognized, the parameter **M04 SYSTEM EXCLUSIVE** must be ON. The Master Edit page parameter **M10 SEND DATA** is used to send a Single Patch, Split Patch, or the Master Edit parameter set via MIDI to another device. If the Matrix-6/6R is in Single Patch mode, **M10 SEND DATA** sends the currently selected Single Patch. If the Matrix-6/6R is in Split Patch mode, **M10 SEND DATA** sends the currently selected Split Patch. The parameter **M11 SEND ALL** sends all of the Matrix-6/6R's 100 Single Patches, 50 Split Patches, and the set of Master Edit parameters to another device. A SEND ALL operation takes about **12 seconds** to complete. Patch transmission can also be triggered via opcode **`04H`** (see below) or from the front panel (**M10 SEND DATA**).
 
 ### Matrix-6/6R vs Matrix-1000
 
@@ -111,28 +104,28 @@ Shared Oberheim family conventions; differences that matter for cross-instrument
 | Single Patch dump (`01H`) | 134 packed bytes | Same layout |
 | Master dump (`03H`) | 236 packed bytes | 172 packed bytes |
 | SysEx inter-message gap | **20 ms** minimum | **10 ms** minimum |
-| Request all (`04H` type 0) | 100 patches + **50 real splits** + master | 100 patches + **50 dummy splits** (M-6 compat) + master |
+| Request all (`04H` type 0) | 100 patches + **50 real splits** + master | 100 patches + **50 dummy splits** (Matrix-6/6R compatibility) + master |
 | Remote edit (`06H`) | Spec: non-negative values only `(to be confirmed on hardware)` | Sign-extended from bit 6 (except param 121) |
 | Extra opcodes | `00H` legacy request, `02H` split, `05H` remote edit prefix | `07H`–`0EH` group/bank/edit buffer, `0BH` Matrix Mod bus |
 | Device Inquiry | Not documented | `F0H 7EH … 06H 01H` |
 
 ### General Format
 
-All System Exclusive messages generated and recognized by the M-6 have the same general structure: a **Lead-In** (header), an **Operation** (opcode + data bytes), and an **End of Exclusive** status byte. There can only be one operation in the System Exclusive message.
+All System Exclusive messages generated and recognized by the Matrix-6/6R have the same general structure: a **Lead-In** (header), an **Operation** (opcode + data bytes), and an **End of Exclusive** status byte. There can only be one operation in the System Exclusive message.
 
-There are two valid Lead-In formats. One is specific to the Matrix-6 and Matrix-6R; one is used for compatibility with the Matrix-12 and Xpander synthesizers. They differ only in the device ID (`06H` for the M-6, `02H` for the Matrix-12 and Xpander). Unless otherwise noted, the M-6 will recognize System Exclusive messages sent with either Lead-In, and will always generate the M-6 specific format on transmission.
+There are two valid Lead-In formats. One is specific to the Matrix-6 and Matrix-6R; one is used for compatibility with the Matrix-12 and Xpander synthesizers. They differ only in the device ID (`06H` for the Matrix-6/6R, `02H` for the Matrix-12 and Xpander). Unless otherwise noted, the Matrix-6/6R will recognize System Exclusive messages sent with either Lead-In, and will always generate the Matrix-6/6R-specific format on transmission.
 
 | Byte  | Function                                                                |
 | ----- | ----------------------------------------------------------------------- |
 | `F0H` | System Exclusive byte                                                   |
 | `10H` | Oberheim ID code                                                        |
-| `dd`  | Device ID: `06H` for M-6, `02H` for Matrix-12/Xpander                   |
+| `dd`  | Device ID: `06H` for Matrix-6/6R, `02H` for Matrix-12/Xpander                   |
 |       | Opcode (0–127) + data bytes (0–`7FH`)                                   |
 | `F7H` | End of System Exclusive (EOX)                                           |
 
-The M-6 always generates an EOX byte to end its System Exclusive transmissions, and will recognize any Status message except Real-time messages as ending a received System Exclusive message. Any System Exclusive message which contains a manufacturer ID other than `10H`, or a device ID other than `06H` or `02H`, or an illegal opcode, is ignored.
+The Matrix-6/6R always generates an EOX byte to end its System Exclusive transmissions, and will recognize any Status message except Real-time messages as ending a received System Exclusive message. Any System Exclusive message which contains a manufacturer ID other than `10H`, or a device ID other than `06H` or `02H`, or an illegal opcode, is ignored.
 
-The M-6 always waits **20 mSec** after sending an EOX byte before sending any other data. Conversely, System Exclusive data sent to the M-6 — particularly Patch dumps — should be separated by at least 20 mSec.
+The Matrix-6/6R always waits **20 mSec** after sending an EOX byte before sending any other data. Conversely, System Exclusive data sent to the Matrix-6/6R — particularly Patch dumps — should be separated by at least 20 mSec.
 
 All "data" in patch and parameter dumps is unpacked for transmission. The general algorithm for transmission is:
 
@@ -148,6 +141,8 @@ All "data" in patch and parameter dumps is unpacked for transmission. The genera
 
 ### 00H - Single Patch Request (Legacy)
 
+Request only (legacy v1.xx): asks the Matrix-6/6R to dump one Single Patch; prefer `04H`.
+
 `F0H 10H 06H 00H <number> F7H`
 
 `<number>` = requested Single Patch Number (0–99)
@@ -155,6 +150,8 @@ All "data" in patch and parameter dumps is unpacked for transmission. The genera
 Note: For downward compatibility with version 1.xx only. Prefer opcode `04H` (see below).
 
 ### 01H - Single Patch Data
+
+Data dump for one Single Patch: on receipt, replaces Patch `<number>` in storage (if not protected); the unit also emits this same format when dumping (after `04H` or front-panel Send / Send All).
 
 `F0H 10H 06H 01H <number> <data> <checksum> F7H`
 
@@ -166,9 +163,11 @@ Note: For downward compatibility with version 1.xx only. Prefer opcode `04H` (se
 
 When more than one Patch is being transmitted at a time (in a "Send All" operation), each Patch is sent as a separate System Exclusive message.
 
-On receipt, the M-6 checks that hardware protect is not on and the Patch whose number is in the message is not protected. It then replaces the Patch in M-6 Patch storage with the Patch received. If the checksum does not match, the Patch is ignored.
+On receipt, the Matrix-6/6R checks that hardware protect is not on and the Patch whose number is in the message is not protected. It then replaces the Patch in Matrix-6/6R Patch storage with the Patch received. If the checksum does not match, the Patch is ignored.
 
 ### 02H - Split Patch Data
+
+Data dump for one Split Patch: same payload format both directions — host→unit write, and unit→host dump after `04H` or front-panel Send / Send All. (Unlike `01H`, the printed source has no explicit “on receipt” note for this opcode.)
 
 `F0H 10H 06H 02H <number> <data> <checksum> F7H`
 
@@ -180,6 +179,8 @@ On receipt, the M-6 checks that hardware protect is not on and the Patch whose n
 
 ### 03H - Master Parameter Data
 
+Data dump for the Master Edit / global parameter block: same payload format both directions — host→unit write, and unit→host dump after `04H` or front-panel Send / Send All. (Unlike `01H`, the printed source has no explicit “on receipt” note for this opcode.)
+
 `F0H 10H 06H 03H <data> <checksum> F7H`
 
 `<data>` = master parameter data unpacked to two nibbles per byte (see *Global Parameters Data Format*)
@@ -187,6 +188,8 @@ On receipt, the M-6 checks that hardware protect is not on and the Patch whose n
 `<checksum>` = sum of packed (not transmitted) `<data>`
 
 ### 04H - Request Data
+
+Asks the Matrix-6/6R to transmit dumps (`01H` / `02H` / `03H` / dump-all stream) according to `<type>` — does not itself carry patch data.
 
 `F0H 10H 06H 04H <type> <number> F7H`
 
@@ -200,19 +203,23 @@ On receipt, the M-6 checks that hardware protect is not on and the Patch whose n
 = 0 when `<type>` = 0 or 3  
 = patch number when `<type>` = 1 (0–99) or 2 (0–49)
 
-This message is used by an external device to request the M-6 to dump one or all of its Patches via MIDI. This is usually used in a "closed loop" MIDI configuration: the MIDI Out of the M-6 goes to the MIDI In of the other device, and the MIDI Out of the other device goes to the MIDI In of the M-6.
+This message is used by an external device to request the Matrix-6/6R to dump one or all of its Patches via MIDI. This is usually used in a "closed loop" MIDI configuration: the MIDI Out of the Matrix-6/6R goes to the MIDI In of the other device, and the MIDI Out of the other device goes to the MIDI In of the Matrix-6/6R.
 
-When a **DUMP ALL** command is received (`<type>` = 0), the M-6 will dump all of its internal data as separate Patches, Splits and Master parameter blocks. Each item in the stream has its own System Exclusive header and EOX command. If it is desired to transfer this data to a remote data storage device, the user should be required to tell the device when the transfer is done (> 1 second after the "10 SEND ALL" message reappears on the M-6's display) or the device should assume more data will be incoming until a timeout of > 500 mSec with no further incoming data has occurred.
+When a **DUMP ALL** command is received (`<type>` = 0), the Matrix-6/6R will dump all of its internal data as separate Patches, Splits and Master parameter blocks. Each item in the stream has its own System Exclusive header and EOX command. If it is desired to transfer this data to a remote data storage device, the user should be required to tell the device when the transfer is done (> 1 second after the "10 SEND ALL" message reappears on the Matrix-6/6R's display) or the device should assume more data will be incoming until a timeout of > 500 mSec with no further incoming data has occurred.
 
 The total number of bytes transmitted in response to the dump all command is approximately **29K bytes** including headers, checksums and EOX marks. All data (excluding headers, checksums and EOX marks) is transmitted nybble-wise, so judicious use of space could store all the transmitted data in as little as 15K bytes.
 
 ### 05H - Enter Remote Edit Mode
 
+Host→unit only: selects Quick Patch Edit mode; use as a prefix before remote `06H` parameter changes.
+
 `F0H 10H 06H 05H F7H`
 
-This operation selects the Quick mode of the Patch Edit function on the M-6. The M-6 must be in Patch Edit mode in order to act upon parameter change commands. This command should be used as a prefix to any remote editing commands.
+This operation selects the Quick mode of the Patch Edit function on the Matrix-6/6R. The Matrix-6/6R must be in Patch Edit mode in order to act upon parameter change commands. This command should be used as a prefix to any remote editing commands.
 
 ### 06H - Change Parameter
+
+Host→unit only: changes one parameter on the current Page to `<value>` (requires Quick Patch Edit mode; see `05H`).
 
 `F0H 10H 06H 06H <parameter> <value> F7H`
 
@@ -220,13 +227,13 @@ This operation selects the Quick mode of the Patch Edit function on the M-6. The
 
 `<value>` = new parameter value; must be within correct range for current parameter. The source spec states that negative values are not supported `(to be confirmed on hardware — the Matrix-1000 accepts sign-extended values on the same opcode)`.
 
-If the value specified is out of range for the parameter, the operation is ignored. This operation implicitly selects the specified parameter as the current parameter, just as does the Select Parameter operation. The M-6 must be in QUICK Patch Edit mode to perform this operation.
+If the value specified is out of range for the parameter, the operation is ignored. This operation implicitly selects the specified parameter as the current parameter, just as does the Select Parameter operation. The Matrix-6/6R must be in QUICK Patch Edit mode to perform this operation.
 
 Remote editing is an alternative to transmitting the entire Patch in its edited form. It can be performed much more quickly than retransmitting the entire Patch, and any currently gated sounds will continue playing through the remote edit operation.
 
 ### Xpander Compatibility (Device ID `02H`)
 
-For compatibility with the Oberheim Xk Keyboard Controller, Matrix-12 and Xpander, the following codes are recognized (receive only; the M-6 cannot generate them):
+For compatibility with the Oberheim Xk Keyboard Controller, Matrix-12 and Xpander, the following codes are recognized (receive only; the Matrix-6/6R cannot generate them):
 
 **Single Patch Mode** — `F0H 10H 02H 0DH 01H F7H`
 
@@ -563,18 +570,18 @@ This section describes how incoming MIDI Note On and Note Off messages are handl
 
 This section describes the handling and generation of MIDI and keyboard Note On and Note Off messages when the synthesizer is in MIDI Poly Mode. The next section describes note handling when the unit is in MIDI Mono Mode.
 
-If the parameter **M01 OMNI MODE** is ON, then the M-6 will respond to any MIDI Note messages on any MIDI Channel, 1–16 inclusive. If **M01 OMNI MODE** is OFF, then the M-6 responds to MIDI messages only on its Basic Channel.
+If the parameter **M01 OMNI MODE** is ON, then the Matrix-6/6R will respond to any MIDI Note messages on any MIDI Channel, 1–16 inclusive. If **M01 OMNI MODE** is OFF, then the Matrix-6/6R responds to MIDI messages only on its Basic Channel.
 
 #### Note On / Key Press Handling
 
-Whenever a note comes in, either from MIDI or the keyboard, the M-6 checks to see if there are any ungated internal Voices available to play the note. If there are one or more voices available, then the unit picks one based on the current keyboard assignment mode (**P48 KEYBOARD MODE**), as follows:
+Whenever a note comes in, either from MIDI or the keyboard, the Matrix-6/6R checks to see if there are any ungated internal Voices available to play the note. If there are one or more voices available, then the unit picks one based on the current keyboard assignment mode (**P48 KEYBOARD MODE**), as follows:
 
 - If parameter **P48 KEYBOARD MODE** is **ROTATE**, the next ungated Voice in sequence is picked.
 - If **P48 KEYBOARD MODE** is **REASSIGN**, a check is made to see if any of the ungated Voices last played a note of the same pitch as one now being assigned. If so, that Voice receives the note. If no such Voices exist, it proceeds just as with ROTATE.
 
-In either case, once we have a Voice to which to assign the note, the Voice's pitch is updated to the new note's value, the Voice is gated, and both a single and multi trigger are generated on the Voice. If the note came from the keyboard, a MIDI Out message for the same note (with appropriate Attack Velocity) is generated. If the note which has been assigned internally came from MIDI, no MIDI Out message is generated. Note that since the only source of notes on the **MATRIX-6R** is MIDI, MIDI Out messages are never generated for notes which are played by one of the MATRIX-6R's internal Voices.
+In either case, once we have a Voice to which to assign the note, the Voice's pitch is updated to the new note's value, the Voice is gated, and both a single and multi trigger are generated on the Voice. If the note came from the keyboard, a MIDI Out message for the same note (with appropriate Attack Velocity) is generated. If the note which has been assigned internally came from MIDI, no MIDI Out message is generated. Note that since the only source of notes on the **Matrix-6R** is MIDI, MIDI Out messages are never generated for notes which are played by one of the Matrix-6R's internal Voices.
 
-If all of the available internal Voices of the M-6 are gated, then special handling is required. This handling involves two parameters: **P48 KEYBOARD MODE** and **M13 SPILLOVER**. There is a variation REASSIGN mode available on **P48 KEYBOARD MODE**: **REAROB** (Reassign-Rob). When this is selected, the M-6 is said to be in "rob" mode. This allows already gated internal Voices to be "robbed" of their current note in order to play new notes. **M13 SPILLOVER**, which is ON or OFF, indicates that any notes which cannot be played by internal Voices should be "spilled-over" out MIDI: that is, MIDI Out messages should be generated, on the Basic Channel of the unit + 2, to allow an external synthesizer to play the notes. This allows, for example, a MATRIX-6 and a Matrix-6R to be used together as a single, 12-Voice synthesizer.
+If all of the available internal Voices of the Matrix-6/6R are gated, then special handling is required. This handling involves two parameters: **P48 KEYBOARD MODE** and **M13 SPILLOVER**. There is a variation REASSIGN mode available on **P48 KEYBOARD MODE**: **REAROB** (Reassign-Rob). When this is selected, the Matrix-6/6R is said to be in "rob" mode. This allows already gated internal Voices to be "robbed" of their current note in order to play new notes. **M13 SPILLOVER**, which is ON or OFF, indicates that any notes which cannot be played by internal Voices should be "spilled-over" out MIDI: that is, MIDI Out messages should be generated, on the Basic Channel of the unit + 2, to allow an external synthesizer to play the notes. This allows, for example, a Matrix-6 and a Matrix-6R to be used together as a single, 12-Voice synthesizer.
 
 The interaction between these two parameters, and what MIDI Output results is as follows:
 
@@ -596,7 +603,7 @@ If the note was assigned to MIDI, then a matching Note Off message is generated 
 
 ### MIDI Mono Mode
 
-In Mono Mode, individual Voices are assigned directly to particular MIDI Channels. This effectively divides up the M-6 into multiple monophonic synthesizers, one per Voice. The Voices are assigned one-to-one with MIDI channels starting at the Basic Channel. Assuming all six Voices are available (if we are in Split Mode, there may be fewer), notes on the Basic Channel would be assigned to Voice 1, notes on the Basic Channel +1 would be assigned to Voice 2, etc. Thus, the unit is receiving on a "band" of Channels six wide. If the Basic Channel selection reaches the end (Channel 16), it wraps around and starts again on Channel 1. Even if the parameter **M01 OMNI MODE** is ON, the unit will only respond to messages on the appropriate Channel, as described above. Mode3: Omni On/Mono is not supported.
+In Mono Mode, individual Voices are assigned directly to particular MIDI Channels. This effectively divides up the Matrix-6/6R into multiple monophonic synthesizers, one per Voice. The Voices are assigned one-to-one with MIDI channels starting at the Basic Channel. Assuming all six Voices are available (if we are in Split Mode, there may be fewer), notes on the Basic Channel would be assigned to Voice 1, notes on the Basic Channel +1 would be assigned to Voice 2, etc. Thus, the unit is receiving on a "band" of Channels six wide. If the Basic Channel selection reaches the end (Channel 16), it wraps around and starts again on Channel 1. Even if the parameter **M01 OMNI MODE** is ON, the unit will only respond to messages on the appropriate Channel, as described above. Mode3: Omni On/Mono is not supported.
 
 If, while in Mono Mode, a second Note On message is received on the Channel which a Voice is monitoring, and the Voice is already playing a note for which a Note Off has not yet been received, the new note will "rob" the Voice from the old note, and a multi (but not single) trigger will be generated. The Note Off message for the old note will not ungate the Voice. Only the Note Off message which matches the new note will remove the gate.
 
@@ -616,11 +623,11 @@ When a MIDI Note Off message is received on a particular MIDI Channel, the gate 
 
 When a key is released, and the matching Note On was assigned to an internal Voice, that Voice becomes ungated. A MIDI Note Off message is generated on the Channel assigned to the Voice.
 
-In Mono Mode, the M-6 supports multiple Note Off messages for a single Note On message; this allows multiple updates of the Release Velocity, as is often done by guitar controllers. The Note Off updates the pitch and Release Velocity of the note, and generates a multi trigger.
+In Mono Mode, the Matrix-6/6R supports multiple Note Off messages for a single Note On message; this allows multiple updates of the Release Velocity, as is often done by guitar controllers. The Note Off updates the pitch and Release Velocity of the note, and generates a multi trigger.
 
 ### Unison Mode
 
-The M-6 has a Unison Mode in which all of the internal Voices (or, if we are in Split mode, all of the Voices assigned to the side of the keyboard which is in Unison Mode) play each note played. Thus, the M-6 is effectively a monophonic synthesizer using six Voices and 12 oscillators. Unison Mode is controlled by parameter **P48 KEYBOARD MODE**. If this parameter is set to **UNISON**, all of the Voices will play any incoming note. The Unison Mode priority is strictly Low Note Priority: the lowest note received, on either MIDI or from the keyboard, will be assigned to the Voices, robbing the Voices from the previous note, if any. If a note is robbed, a multi trigger but not a single trigger will be generated.
+The Matrix-6/6R has a Unison Mode in which all of the internal Voices (or, if we are in Split mode, all of the Voices assigned to the side of the keyboard which is in Unison Mode) play each note played. Thus, the Matrix-6/6R is effectively a monophonic synthesizer using six Voices and 12 oscillators. Unison Mode is controlled by parameter **P48 KEYBOARD MODE**. If this parameter is set to **UNISON**, all of the Voices will play any incoming note. The Unison Mode priority is strictly Low Note Priority: the lowest note received, on either MIDI or from the keyboard, will be assigned to the Voices, robbing the Voices from the previous note, if any. If a note is robbed, a multi trigger but not a single trigger will be generated.
 
 When in Unison Mode, the unit effectively behaves as if it had only one internal Voice. Thus, Spillover (if parameter **M13 SPILLOVER** is ON) will occur after the first, not the sixth, note is assigned to internal Voices.
 
@@ -634,11 +641,11 @@ Usually, Unison Mode is used with MIDI Poly mode, with either Omni Off or On.
 
 ## Controllers
 
-Controllers, from the point of view of the M-6, are internal "registers" which hold values put into them. Controllers can be set by one of two sources: a hardware device, such as the lever labelled "1" on the Matrix-6, or via a MIDI controller change message sent by some other device. Some controllers can only be set by MIDI. For example, the logical controller Lever 2 exists on the Matrix-6R, although it has no physical Lever 2. It is set by another device sending a MIDI controller change message to the appropriate controller number.
+Controllers, from the point of view of the Matrix-6/6R, are internal "registers" which hold values put into them. Controllers can be set by one of two sources: a hardware device, such as the lever labelled "1" on the Matrix-6, or via a MIDI controller change message sent by some other device. Some controllers can only be set by MIDI. For example, the logical controller Lever 2 exists on the Matrix-6R, although it has no physical Lever 2. It is set by another device sending a MIDI controller change message to the appropriate controller number.
 
 Local controllers are always summed with controller values received from MIDI.
 
-With the exception of lever 1, all of the controllers in the M-6 have associated controller numbers which can be changed by the user and their defaults are given below.
+With the exception of lever 1, all of the controllers in the Matrix-6/6R have associated controller numbers which can be changed by the user and their defaults are given below.
 
 ### Local and Global Controllers
 
@@ -646,13 +653,13 @@ Controllers can be either Local or Global. A **Global Controller** is one which 
 
 When a MIDI Controller change message is received on a particular MIDI Channel for a Local Controller, the values which are updated are those which belong to Voices which are receiving on that Channel. When a MIDI Controller change message is received for a Global Controller on any Channel which the unit is listening to, the value for the parameter is updated for all six Voices in the instrument.
 
-Local Controllers are useful for guitar controllers, which can send separate Pitch Bend messages for each string on separate Channels. The M-6 can properly respond to such messages.
+Local Controllers are useful for guitar controllers, which can send separate Pitch Bend messages for each string on separate Channels. The Matrix-6/6R can properly respond to such messages.
 
-In the M-6, **Lever 1**, **Pedal 1**, and **Pressure** are Local. All other Controllers are Global.
+In the Matrix-6/6R, **Lever 1**, **Pedal 1**, and **Pressure** are Local. All other Controllers are Global.
 
 ### Controller Parameters
 
-The parameter **M02 CONTROLLERS** controls the handling of MIDI Controller change messages. When **M02 CONTROLLERS** is ON, Controller messages are generated whenever the hardware Controllers on the M-6 are changed, and Controller change messages via MIDI are recognized and used to update the internal Controller values. When **M02 CONTROLLERS** is OFF, Controller messages are not generated, and no Controller change message are recognized from MIDI.
+The parameter **M02 CONTROLLERS** controls the handling of MIDI Controller change messages. When **M02 CONTROLLERS** is ON, Controller messages are generated whenever the hardware Controllers on the Matrix-6/6R are changed, and Controller change messages via MIDI are recognized and used to update the internal Controller values. When **M02 CONTROLLERS** is OFF, Controller messages are not generated, and no Controller change message are recognized from MIDI.
 
 ### Default Controller Assignments
 
@@ -664,9 +671,9 @@ The parameter **M02 CONTROLLERS** controls the handling of MIDI Controller chang
 | Lever 2         | 1                           | Controls both lever 2 and 3                   |
 | Lever 3         | 2                           | The "away" half of lever 2                    |
 
-These Controllers are available as modulation sources on both the Matrix-6 and Matrix-6R. On the Matrix-6, Pedal 1 and Pedal 2 correspond to the hardware footpedals and Lever 1 and Lever 2 correspond to the hardware levers. These Controllers produce numeric values as their output which are used to modulate the Voices in the M-6.
+These Controllers are available as modulation sources on both the Matrix-6 and Matrix-6R. On the Matrix-6, Pedal 1 and Pedal 2 correspond to the hardware footpedals and Lever 1 and Lever 2 correspond to the hardware levers. These Controllers produce numeric values as their output which are used to modulate the Voices in the Matrix-6/6R.
 
-**Pedal 1**, in hardware, is a continuous controller with range 0 through 127. **Pedal 2**, in hardware, is a switch and is either open or closed. The M-6 automatically adapts to the type of footswitch (normally open or normally closed) when it is first turned on. The "normal" position corresponds to a numeric value of 0; the "active" position always corresponds to a numeric value of 127. Although Pedal 2 is a switch in hardware, and is always transmitted as either 0 or 127, it can be set to any of its 128 possible values by a Controller change command from MIDI.
+**Pedal 1**, in hardware, is a continuous controller with range 0 through 127. **Pedal 2**, in hardware, is a switch and is either open or closed. The Matrix-6/6R automatically adapts to the type of footswitch (normally open or normally closed) when it is first turned on. The "normal" position corresponds to a numeric value of 0; the "active" position always corresponds to a numeric value of 127. Although Pedal 2 is a switch in hardware, and is always transmitted as either 0 or 127, it can be set to any of its 128 possible values by a Controller change command from MIDI.
 
 **Lever 1** (the Pitch Bender) produces a continuous range of values, with the lowest value (0) being generated when Lever 1 is pulled all the way towards the user, the median value (127) being generated when the lever is at the center position, and the highest value (255) being generated when the lever is pushed all the way away from the user. Lever 1 on both MIDI transmit and receive is permanently assigned to the Channel Pitch Bend function.
 
@@ -682,15 +689,15 @@ Assuming that parameter **M02 CONTROLLERS** is ON, a MIDI message for a Controll
 
 ### MIDI Messages Recognized
 
-Assuming that parameter **M02 CONTROLLERS** is ON, MIDI Controller Change messages which apply to a Controller Number to which an internal M-6 Controller is assigned are recognized and updated. Controller change messages are recognized on any of the MIDI channels to which the M-6 is listening. If the Controller being changed is specific to particular Voices rather than Global to the entire instrument, then the Controller Change message will only update the Controller values for those Voices which are listening to the MIDI Channel on which it was received.
+Assuming that parameter **M02 CONTROLLERS** is ON, MIDI Controller Change messages which apply to a Controller Number to which an internal Matrix-6/6R Controller is assigned are recognized and updated. Controller change messages are recognized on any of the MIDI channels to which the Matrix-6/6R is listening. If the Controller being changed is specific to particular Voices rather than Global to the entire instrument, then the Controller Change message will only update the Controller values for those Voices which are listening to the MIDI Channel on which it was received.
 
 ---
 
 ## Split Mode
 
-The M-6 supports a Split Mode, where the unit can play two Patches simultaneously. The Patches are assigned to the Upper and Lower areas of the keyboard (with a programmable Split Point dividing the keyboard in two). The Patches are called the "Upper" and "Lower" Patches.
+The Matrix-6/6R supports a Split Mode, where the unit can play two Patches simultaneously. The Patches are assigned to the Upper and Lower areas of the keyboard (with a programmable Split Point dividing the keyboard in two). The Patches are called the "Upper" and "Lower" Patches.
 
-When in Split, the unit's six Voices can be assigned as: **6/0** (all Lower, none Upper), **4/2**, **2/4**, or **0/6** (all Upper, none Lower). Thus, Split mode effectively divides the unit up into two independent synthesizers, each with a certain number of the M-6's six Voices.
+When in Split, the unit's six Voices can be assigned as: **6/0** (all Lower, none Upper), **4/2**, **2/4**, or **0/6** (all Upper, none Lower). Thus, Split mode effectively divides the unit up into two independent synthesizers, each with a certain number of the Matrix-6/6R's six Voices.
 
 When in Split mode, the unit has two Basic Channels: the Basic Channel for the overall unit (Channel N) is the Channel on which the Lower keyboard responds to MIDI commands, and the Upper keyboard responds on the next higher MIDI Channel, N + 1. MIDI Output generated by the Lower section goes out on Channel N, and that generated by the Upper area goes out on channel N + 1. Spillover works similarly: Spillover from the Lower goes out on Channel N + 2, and from the Upper on N + 1 + 2, or Channel N + 3.
 
@@ -708,31 +715,31 @@ Remember that Master Edit parameters affect both Patches in Split mode, since Ma
 
 ### Patch Changes
 
-The M-6 can both send and receive MIDI Patch Change messages. If parameter **M03 PATCH CHANGES** is ON, a MIDI Patch Change message will be sent any time the current Patch or current Split is changed, either from the M-6's front panel or via MIDI. The current Patch or Split will also be changed any time a Patch Change message is received via MIDI when **M03 PATCH CHANGES** is ON. The M-6 ignores commands to change to a Patch Number greater than 99 when in Single mode, and greater than 49 in Split mode.
+The Matrix-6/6R can both send and receive MIDI Patch Change messages. If parameter **M03 PATCH CHANGES** is ON, a MIDI Patch Change message will be sent any time the current Patch or current Split is changed, either from the Matrix-6/6R's front panel or via MIDI. The current Patch or Split will also be changed any time a Patch Change message is received via MIDI when **M03 PATCH CHANGES** is ON. The Matrix-6/6R ignores commands to change to a Patch Number greater than 99 when in Single mode, and greater than 49 in Split mode.
 
 Patch Change messages, both on receive and transmit, are affected by the parameters **M15 PATCH MAP** and **M16 P MAP EDIT**. See the next section for details.
 
 ### Patch Mapping
 
-The M-6 can translate incoming and outgoing Patch Change messages such that a particular incoming message can select a different Patch on the M-6, and that selecting a particular Patch on the M-6 can generate a Patch Change message different from the one selected on the sending unit. The parameters which control this feature are **M15 PATCH MAP** and **M16 P MAP EDIT**. When **M15 PATCH MAP** is ON, this feature enables the translating incoming and outgoing Patches through the Patch Map. When off, all incoming and outgoing Patches are acted on and transmitted exactly as they appear. **M16 P MAP EDIT** is used to change the values of the Patch Map, and is described in more detail in the Matrix-6R Owner's Manual, 1st Edition.
+The Matrix-6/6R can translate incoming and outgoing Patch Change messages such that a particular incoming message can select a different Patch on the Matrix-6/6R, and that selecting a particular Patch on the Matrix-6/6R can generate a Patch Change message different from the one selected on the sending unit. The parameters which control this feature are **M15 PATCH MAP** and **M16 P MAP EDIT**. When **M15 PATCH MAP** is ON, this feature enables the translating incoming and outgoing Patches through the Patch Map. When off, all incoming and outgoing Patches are acted on and transmitted exactly as they appear. **M16 P MAP EDIT** is used to change the values of the Patch Map, and is described in more detail in the Matrix-6R Owner's Manual, 1st Edition.
 
 ### Echo
 
-If parameter **M12 MIDI ECHO** is ON, all MIDI data received in the M-6's MIDI In port is immediately retransmitted out the MIDI Out port. MIDI data is retransmitted regardless of what Channel it is being sent on. All of the M-6's internally generated MIDI messages are also transmitted out the MIDI Out port, thus allowing the M-6 to serve as a "MIDI mixer," combining its own data with that from the unit connected to the MIDI In port.
+If parameter **M12 MIDI ECHO** is ON, all MIDI data received in the Matrix-6/6R's MIDI In port is immediately retransmitted out the MIDI Out port. MIDI data is retransmitted regardless of what Channel it is being sent on. All of the Matrix-6/6R's internally generated MIDI messages are also transmitted out the MIDI Out port, thus allowing the Matrix-6/6R to serve as a "MIDI mixer," combining its own data with that from the unit connected to the MIDI In port.
 
-System Exclusive data is not retransmitted out the MIDI Out port, whether or not the System Exclusive data is recognized by the M-6 itself.
+System Exclusive data is not retransmitted out the MIDI Out port, whether or not the System Exclusive data is recognized by the Matrix-6/6R itself.
 
-Since MIDI Note messages which are received by the M-6 on the M-6's Basic Channel are never transmitted out MIDI Out by the Voice assignment logic, there is no possibility of multiple Note Ons or Offs being generated on the M-6's Basic Channel from a single Note On or Off message received on the MIDI In port in Echo mode. Only the message generated by the Echo will be sent out the MIDI Out port. If the unit is in Spillover mode, however, there is the possibility that a Note On or Off command will be both echoed out on the Basic Channel and transmitted out the MIDI Out port on the Basic Channel + 2 as part of the Spillover operation. Furthermore, as all MIDI data regardless of Channel is echoed, it is possible that the Spillover messages generated on the Basic Channel + 2 might conflict with other messages if the unit or units plugged into the MIDI In port are also transmitting on the Basic Channel + 2 of the M-6.
+Since MIDI Note messages which are received by the Matrix-6/6R on the Matrix-6/6R's Basic Channel are never transmitted out MIDI Out by the Voice assignment logic, there is no possibility of multiple Note Ons or Offs being generated on the Matrix-6/6R's Basic Channel from a single Note On or Off message received on the MIDI In port in Echo mode. Only the message generated by the Echo will be sent out the MIDI Out port. If the unit is in Spillover mode, however, there is the possibility that a Note On or Off command will be both echoed out on the Basic Channel and transmitted out the MIDI Out port on the Basic Channel + 2 as part of the Spillover operation. Furthermore, as all MIDI data regardless of Channel is echoed, it is possible that the Spillover messages generated on the Basic Channel + 2 might conflict with other messages if the unit or units plugged into the MIDI In port are also transmitting on the Basic Channel + 2 of the Matrix-6/6R.
 
-To avoid these problems, simply reserve the "band" of four Channels starting with the M-6's Basic Channel to the M-6 and any units set to receive spilled-over notes from it. If Split mode is not going to be used, the band need only be three Channels wide.
+To avoid these problems, simply reserve the "band" of four Channels starting with the Matrix-6/6R's Basic Channel to the Matrix-6/6R and any units set to receive spilled-over notes from it. If Split mode is not going to be used, the band need only be three Channels wide.
 
 ### Running Status
 
-The M-6 correctly interprets Running ("Implied") Status on all incoming messages, and generates Running Status on all output Channel Voice Messages when possible.
+The Matrix-6/6R correctly interprets Running ("Implied") Status on all incoming messages, and generates Running Status on all output Channel Voice Messages when possible.
 
 ### Note Attack/Release Velocity
 
-Since the M-6 supports both Attack and Release Velocity on all notes, the M-6 always transmits a Note Off as a separate Note Off message (`8bH 0kkkkkkk 0vvvvvvv`) rather than as a Note On with zero Velocity (`9bH 0kkkkkkk 0`). Both forms are correctly handled as MIDI In messages.
+Since the Matrix-6/6R supports both Attack and Release Velocity on all notes, the Matrix-6/6R always transmits a Note Off as a separate Note Off message (`8bH 0kkkkkkk 0vvvvvvv`) rather than as a Note On with zero Velocity (`9bH 0kkkkkkk 0`). Both forms are correctly handled as MIDI In messages.
 
 ### Local Control
 
@@ -742,21 +749,21 @@ Parameter **M05 LOCAL CONTROL** is always set to ON upon power-up and reset.
 
 ### Active Sensing
 
-The M-6 supports MIDI Active Sensing, both on transmission and reception. If the parameter **M14 ACT SENSE** is ON, the M-6 does the following:
+The Matrix-6/6R supports MIDI Active Sensing, both on transmission and reception. If the parameter **M14 ACT SENSE** is ON, the Matrix-6/6R does the following:
 
-- If 240 milliseconds passes with no activity on the M-6's MIDI Out port, the M-6 generates an Active Sense message (status `FEH`)
-- Once an Active Sense message is received, if 360 milliseconds passes with no activity on the M-6's MIDI In port, the M-6 performs an All Notes Off operation
+- If 240 milliseconds passes with no activity on the Matrix-6/6R's MIDI Out port, the Matrix-6/6R generates an Active Sense message (status `FEH`)
+- Once an Active Sense message is received, if 360 milliseconds passes with no activity on the Matrix-6/6R's MIDI In port, the Matrix-6/6R performs an All Notes Off operation
 - Any received message on any port counts as "activity" for the purposes of active sensing
 
-If parameter **M14 ACT SENSE** is OFF, then no Active Sensing messages are generated by the M-6, and the M-6 does not turn off notes until a matching Note On command, or an explicit All Notes Off command, is received.
+If parameter **M14 ACT SENSE** is OFF, then no Active Sensing messages are generated by the Matrix-6/6R, and the Matrix-6/6R does not turn off notes until a matching Note On command, or an explicit All Notes Off command, is received.
 
 ### Tune Request
 
-The M-6 responds to incoming Tune Request messages by tuning the high frequency oscillators (HFOs). It will transmit a Tune Request message whenever the tune command is given via the second column button in MASTER mode. Note that the Tune Request message is not associated with the M-6's CALIBRATE function.
+The Matrix-6/6R responds to incoming Tune Request messages by tuning the high frequency oscillators (HFOs). It will transmit a Tune Request message whenever the tune command is given via the second column button in MASTER mode. Note that the Tune Request message is not associated with the Matrix-6/6R's CALIBRATE function.
 
 ---
 
-## MIDI Volume for Matrix-6 & Matrix-6R
+## MIDI Volume for Matrix-6/6R
 
 > **Addendum (non-Oberheim):** User/community recipe — not part of the official Matrix-6/6R MIDI specification.
 
