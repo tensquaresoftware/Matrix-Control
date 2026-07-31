@@ -15,7 +15,7 @@ namespace TSS
 class SettingsPanel : public juce::Component
 {
 public:
-    static constexpr int kDesignWidth = 280;
+    static constexpr int kDesignWidth = 300;
     static constexpr int kDesignHeight = 390;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
