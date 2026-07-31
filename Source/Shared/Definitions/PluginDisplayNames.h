@@ -84,6 +84,8 @@ namespace PluginDisplayNames
         constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY :";
         constexpr const char* kAudioFromLabel          = "AUDIO FROM :";
         constexpr const char* kInputGainLabel          = "INPUT GAIN :";
+        constexpr const char* kGeneralSection          = "GENERAL";
+        constexpr const char* kMatrix1000Section       = "MATRIX-1000";
         constexpr const char* kMasterOperationsSection = "MASTER OPERATIONS";
         constexpr const char* kPoliciesSection         = "POLICIES";
         constexpr const char* kDefragSection           = "DEFRAG";
@@ -98,6 +100,9 @@ namespace PluginDisplayNames
         constexpr const char* kMutatorDeleteWarningLabel       = "MUTATOR DEL :";
         constexpr const char* kMutatorDeleteWarnAlways         = "WARN ALWAYS";
         constexpr const char* kMutatorDeleteNeverWarn          = "NEVER WARN";
+        constexpr const char* kPatchNameDisplayLabel           = "PATCH NAME DISPLAY :";
+        constexpr const char* kPatchNameDisplayMusicalNames    = "MUSICAL NAMES";
+        constexpr const char* kPatchNameDisplayHardwareNames   = "HARDWARE NAMES";
     }
 
     namespace Dialogs

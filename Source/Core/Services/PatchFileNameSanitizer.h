@@ -35,6 +35,9 @@ namespace Core
         // Oberheim ROM placeholder names embedded in factory dumps (e.g. "BNK4: 05").
         static bool isOberheimBankPlaceholderName(const juce::String& nameFromBytes) noexcept;
 
+        // Synthesize the Matrix-1000-style slot label "BNKx: yy" (bank 0-9, patch 0-99).
+        static juce::String formatOberheimBankPlaceholderName(int bank, int patchNumber);
+
         // Location label shared by Mutator export folders and empty-name patch fallback: "B1-P23".
         static juce::String formatBankPatchLabel(int bank, int patchNumber);
 

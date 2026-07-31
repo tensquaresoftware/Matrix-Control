@@ -23,6 +23,8 @@ namespace PluginIDs
             "settingsUnsavedEditWarningPolicy";
         constexpr const char* kMutatorDeleteWarningPolicy =
             "settingsMutatorDeleteWarningPolicy";
+        constexpr const char* kPatchNameDisplayMode =
+            "settingsPatchNameDisplayMode";
 
         namespace NameReconciliationPolicy
         {
@@ -44,6 +46,13 @@ namespace PluginIDs
             constexpr int kWarnAlways = 1;
             constexpr int kNeverWarn = 2;
             constexpr int kDefault = kWarnAlways;
+        }
+
+        namespace PatchNameDisplayMode
+        {
+            constexpr int kMusicalNames = 1;
+            constexpr int kHardwareNames = 2;
+            constexpr int kDefault = kMusicalNames;
         }
 
         namespace SkinVariants

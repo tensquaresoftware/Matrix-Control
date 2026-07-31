@@ -20,6 +20,7 @@ public:
         bankExportFileStem_omitsNameWhenSanitizedEmpty();
         bankExportFileStem_clampsOutOfRangeSlots();
         formatBankPatchLabel_usesHyphenatedBxPyy();
+        formatOberheimBankPlaceholderName_matchesBnkPattern();
         resolvePatchNameOrBankPatchFallback_keepsUsableNames();
         nameFromBankExportStem_extractsNameAfterSlot();
         isOberheimBankPlaceholderName_detectsBnkPattern();
@@ -132,6 +133,18 @@ private:
                      juce::String("B9-P99"));
         expectEquals(Core::PatchFileNameSanitizer::formatBankPatchLabel(-3, 150),
                      juce::String("B0-P99"));
+    }
+
+    void formatOberheimBankPlaceholderName_matchesBnkPattern()
+    {
+        beginTest("formatOberheimBankPlaceholderName_matchesBnkPattern");
+
+        expectEquals(Core::PatchFileNameSanitizer::formatOberheimBankPlaceholderName(0, 12),
+                     juce::String("BNK0: 12"));
+        expectEquals(Core::PatchFileNameSanitizer::formatOberheimBankPlaceholderName(4, 5),
+                     juce::String("BNK4: 05"));
+        expect(Core::PatchFileNameSanitizer::isOberheimBankPlaceholderName(
+            Core::PatchFileNameSanitizer::formatOberheimBankPlaceholderName(2, 0)));
     }
 
     void resolvePatchNameOrBankPatchFallback_keepsUsableNames()

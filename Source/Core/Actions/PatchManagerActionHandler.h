@@ -76,6 +76,14 @@ namespace Core
         // Drops in-memory scan before APVTS replaceState so valueTreeRedirected cannot flash a stale list.
         void discardComputerPatchesScanCacheQuietly();
 
+        // Re-resolve the editor Patch Name from the last device dump (or a synthesized BNK
+        // placeholder on banked devices) using the current Patch Name Display Settings mode.
+        void reapplyDisplayedPatchName();
+
+        // Persist a musical overlay for the current Internal bank/patch when the name is usable
+        // and not an Oberheim BNK placeholder (inline rename / STORE paths).
+        void rememberCurrentOverlayFromModel();
+
         // Requests the current patch from the synth (async dump) and mirrors it into the editor
         // (PatchModel + APVTS) as a patch load. Rolls back Internal coordinates on failure.
         // Prefer the prior-coordinates overload when APVTS / lock state were already advanced
@@ -88,6 +96,11 @@ namespace Core
                                         bool priorBanksLocked);
 
     private:
+        enum class PatchNameResolvePurpose
+        {
+            kDisplay,
+            kExportMusical
+        };
         struct InternalCoordinatesSnapshot
         {
             int bank = 0;
@@ -237,7 +250,11 @@ namespace Core
         void reloadPatchNameOverlayFromApvts();
         void persistPatchNameOverlayToApvts();
         void rememberOverlayName(int bank, int patch, const juce::String& name);
-        void applyResolvedPatchName(PatchModel& model, int bank, int patch, const DeviceMemoryLimits& limits);
+        void applyResolvedPatchName(PatchModel& model,
+                                    int bank,
+                                    int patch,
+                                    const DeviceMemoryLimits& limits,
+                                    PatchNameResolvePurpose purpose);
 
         BankTransferState bankTransfer_;
         std::uint64_t bankTransferGeneration_ = 0;
@@ -248,6 +265,12 @@ namespace Core
         BankTransferProgressPresenter bankTransferProgress_;
         PatchNameOverlayStore patchNameOverlay_;
         bool patchNameOverlayLoaded_ = false;
+        juce::String lastDeviceDumpRawName_;
+        int lastDeviceDumpBank_ = -1;
+        int lastDeviceDumpPatch_ = -1;
+        bool hasLastDeviceDumpRawName_ = false;
+
+        void clearLastDeviceDumpRawName();
 
         juce::AudioProcessorValueTreeState& apvts_;
         DeviceMemoryLimitsSupplier deviceMemoryLimits_;

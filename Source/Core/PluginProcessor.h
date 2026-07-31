@@ -112,7 +112,7 @@ public:
     const Core::PatchNameSyncer& getPatchNameSyncer() const noexcept { return *patchNameSyncer_; }
 
     // Patch Name inline rename gate: computer-file origin is always editable; device origin
-    // follows the same ROM gate as PASTE/STORE (DeviceMemoryLimits::isPasteStoreAllowed).
+    // follows ROM + Hardware Names (banked Matrix-1000) rules; Compare always blocks.
     bool canEditPatchName() const;
 
     // Applies a committed rename from the Patch Name inline editor: model + APVTS + dirty
@@ -120,6 +120,9 @@ public:
     // Empty / all-spaces name is a no-op (belt-and-suspenders — the widget already keeps
     // the previous name on an empty commit).
     void commitPatchNameRename(const juce::String& newName);
+
+    // Re-resolve displayed Patch Name after Patch Name Display Settings changes (device origin).
+    void refreshPatchNameDisplayForSettingsMode();
 
     bool setMidiInputPort(const juce::String& deviceId);
     bool setMidiOutputPort(const juce::String& deviceId);
@@ -295,6 +298,7 @@ private:
     void initializeNameReconciliationPolicyProperty();
     void initializeUnsavedEditWarningPolicyProperty();
     void initializeMutatorDeleteWarningPolicyProperty();
+    void initializePatchNameDisplayModeProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();

@@ -980,3 +980,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-delete-confirmation.md`
   summary: No automated coverage for NEVER WARN bypass or Don't-ask-again policy write (editor/UI path).
   evidence: Blind Hunter; handler Cancel/Continue covered; Settings/policy persistence remains manual UAT.
+
+## Deferred from: quick-dev spec-patch-name-display-settings (2026-07-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-settings.md`
+  summary: Optional second Settings control Patch Name Export (Hardware vs Musical names in Bank Utility / export stems), deferred to avoid confusing Display×Export combinations.
+  evidence: Product scenario review; Display-only ships first; exports remain musical until a dedicated follow-up.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-settings.md`
+  summary: Patch Mutator export folder/basename still uses the current model patch name, so Hardware Names display can yield BNK-style Mutator export stems until a dedicated musical resolve at freeze/export time.
+  evidence: Blind Hunter; Bank Utility export path already forces musical resolve; Mutator freeze uses patchModel_->getName().

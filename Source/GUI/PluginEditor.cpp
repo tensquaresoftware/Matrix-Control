@@ -22,6 +22,7 @@
 #include "Skins/Skin.h"
 #include "Factories/WidgetFactory.h"
 #include "Shared/Definitions/PluginIDs.h"
+#include "Core/Services/PatchNameDisplayMode.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -1430,6 +1431,19 @@ void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
             nullptr);
     }
     panel.getMutatorDeleteWarningPolicyCombo().setSelectedId(mutatorDeletePolicy, juce::dontSendNotification);
+
+    const int patchNameDisplayRaw = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
+        PluginIDs::Settings::kPatchNameDisplayMode,
+        PluginIDs::Settings::PatchNameDisplayMode::kDefault));
+    const int patchNameDisplayMode = Core::PatchNameDisplay::normalize(patchNameDisplayRaw);
+    if (patchNameDisplayMode != patchNameDisplayRaw)
+    {
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kPatchNameDisplayMode,
+            patchNameDisplayMode,
+            nullptr);
+    }
+    panel.getPatchNameDisplayModeCombo().setSelectedId(patchNameDisplayMode, juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -1467,6 +1481,21 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
             PluginIDs::Settings::kMutatorDeleteWarningPolicy,
             selectedId,
             nullptr);
+    };
+
+    panel.getPatchNameDisplayModeCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::PatchNameDisplayMode;
+
+        const int selectedId = panel.getPatchNameDisplayModeCombo().getSelectedId();
+        if (selectedId != kMusicalNames && selectedId != kHardwareNames)
+            return;
+
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kPatchNameDisplayMode,
+            selectedId,
+            nullptr);
+        pluginProcessor.refreshPatchNameDisplayForSettingsMode();
     };
 }
 

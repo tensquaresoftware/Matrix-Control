@@ -1,18 +1,23 @@
 #include "SettingsPanel.h"
 
+#include "Core/Audio/HardwareLatency.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinValues.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
-#include "Core/Audio/HardwareLatency.h"
 
 using TSS::SkinColourId;
 
 SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     : skin_(&skin)
     , isPluginMode_(isPluginMode)
-    , hardwareLatencyLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kHardwareLatencyLabel)
+    , generalSectionLabel_(kContentWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                           PluginDisplayNames::Settings::kGeneralSection)
+    , generalSectionSeparator_(kContentWidth_, kSeparatorHeight_,
+                               TSS::horizontalSeparatorLookFromSkin(skin))
+    , hardwareLatencyLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                            PluginDisplayNames::Settings::kHardwareLatencyLabel)
     , hardwareLatencySlider_(kSliderWidth_, kControlHeight_, TSS::sliderLookFromSkin(skin),
                              TSS::SliderConfig{
                                  Core::HardwareLatency::kMinMs,
@@ -23,24 +28,45 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
                                  {},
                                  {},
                                  {}})
-    , masterOpsLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kMasterOperationsSection)
-    , masterOpsPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
-    , policiesLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kPoliciesSection)
-    , nameReconciliationPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::comboBoxLookFromSkin(skin))
-    , unsavedEditWarningLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kUnsavedEditWarningLabel)
-    , unsavedEditWarningPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::comboBoxLookFromSkin(skin))
-    , mutatorDeleteWarningLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kMutatorDeleteWarningLabel)
-    , mutatorDeleteWarningPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::comboBoxLookFromSkin(skin))
-    , defragLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kDefragSection)
-    , defragPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
-    , loggingLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kLoggingSection)
-    , loggingPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_, TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
+    , masterOpsLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                      PluginDisplayNames::Settings::kMasterOperationsSection)
+    , masterOpsPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                            TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
+    , policiesLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                     PluginDisplayNames::Settings::kPoliciesSection)
+    , nameReconciliationPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                                     TSS::comboBoxLookFromSkin(skin))
+    , unsavedEditWarningLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                               PluginDisplayNames::Settings::kUnsavedEditWarningLabel)
+    , unsavedEditWarningPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                                     TSS::comboBoxLookFromSkin(skin))
+    , mutatorDeleteWarningLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                                 PluginDisplayNames::Settings::kMutatorDeleteWarningLabel)
+    , mutatorDeleteWarningPolicyCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                                       TSS::comboBoxLookFromSkin(skin))
+    , defragLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                   PluginDisplayNames::Settings::kDefragSection)
+    , defragPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                         TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
+    , loggingLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                    PluginDisplayNames::Settings::kLoggingSection)
+    , loggingPlaceholder_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                          TSS::labelLookFromSkin(skin), PluginDisplayNames::Settings::kComingSoon)
+    , matrix1000SectionLabel_(kContentWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                              PluginDisplayNames::Settings::kMatrix1000Section)
+    , matrix1000SectionSeparator_(kContentWidth_, kSeparatorHeight_,
+                                  TSS::horizontalSeparatorLookFromSkin(skin))
+    , patchNameDisplayLabel_(kLabelWidth_, kControlHeight_, TSS::labelLookFromSkin(skin),
+                             PluginDisplayNames::Settings::kPatchNameDisplayLabel)
+    , patchNameDisplayModeCombo_(kContentWidth_ - kLabelWidth_ - kGap_, kControlHeight_,
+                                 TSS::comboBoxLookFromSkin(skin))
 {
     setOpaque(true);
 
+    addAndMakeVisible(generalSectionLabel_);
+    addAndMakeVisible(generalSectionSeparator_);
     addAndMakeVisible(hardwareLatencyLabel_);
     addAndMakeVisible(hardwareLatencySlider_);
-
     addAndMakeVisible(masterOpsLabel_);
     addAndMakeVisible(masterOpsPlaceholder_);
     addAndMakeVisible(policiesLabel_);
@@ -53,6 +79,10 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     addAndMakeVisible(defragPlaceholder_);
     addAndMakeVisible(loggingLabel_);
     addAndMakeVisible(loggingPlaceholder_);
+    addAndMakeVisible(matrix1000SectionLabel_);
+    addAndMakeVisible(matrix1000SectionSeparator_);
+    addAndMakeVisible(patchNameDisplayLabel_);
+    addAndMakeVisible(patchNameDisplayModeCombo_);
 
     using namespace PluginIDs::Settings::NameReconciliationPolicy;
     nameReconciliationPolicyCombo_.addItem(PluginDisplayNames::Settings::kNameReconciliationPreferInternal,
@@ -73,6 +103,12 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
         PluginDisplayNames::Settings::kMutatorDeleteNeverWarn,
         PluginIDs::Settings::MutatorDeleteWarningPolicy::kNeverWarn);
 
+    using namespace PluginIDs::Settings::PatchNameDisplayMode;
+    patchNameDisplayModeCombo_.addItem(PluginDisplayNames::Settings::kPatchNameDisplayMusicalNames,
+                                       kMusicalNames);
+    patchNameDisplayModeCombo_.addItem(PluginDisplayNames::Settings::kPatchNameDisplayHardwareNames,
+                                       kHardwareNames);
+
     setPluginMode(isPluginMode);
 }
 
@@ -88,6 +124,26 @@ void SettingsPanel::resized()
     layoutContent(getLocalBounds().reduced(padding));
 }
 
+void SettingsPanel::layoutSectionHeader(juce::Rectangle<int>& bounds,
+                                        TSS::Label& title,
+                                        TSS::HorizontalSeparator& separator,
+                                        int controlHeight,
+                                        int separatorHeight,
+                                        int rowGap)
+{
+    const int titleGap = juce::roundToInt(static_cast<float>(kSectionTitleGap_) * uiScale_);
+
+    auto titleRow = bounds.removeFromTop(controlHeight);
+    title.setBounds(titleRow);
+    title.setUiScale(uiScale_);
+    bounds.removeFromTop(titleGap);
+
+    auto sepRow = bounds.removeFromTop(separatorHeight);
+    separator.setBounds(sepRow);
+    separator.setUiScale(uiScale_);
+    bounds.removeFromTop(rowGap);
+}
+
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 {
     const int rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
@@ -95,6 +151,8 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     const int labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
     const int sliderWidth = juce::roundToInt(static_cast<float>(kSliderWidth_) * uiScale_);
     const int controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
+    const int separatorHeight = juce::roundToInt(static_cast<float>(kSeparatorHeight_) * uiScale_);
+    const int comboWidth = bounds.getWidth() - labelWidth - gap;
 
     auto layoutRow = [&](TSS::Label& label, juce::Component& control, int controlWidth)
     {
@@ -119,6 +177,9 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
         bounds.removeFromTop(rowGap);
     };
 
+    layoutSectionHeader(bounds, generalSectionLabel_, generalSectionSeparator_,
+                        controlHeight, separatorHeight, rowGap);
+
     if (isPluginMode_)
     {
         layoutRow(hardwareLatencyLabel_, hardwareLatencySlider_, sliderWidth);
@@ -126,11 +187,17 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     }
 
     layoutPlaceholderRow(masterOpsLabel_, masterOpsPlaceholder_);
-    layoutRow(policiesLabel_, nameReconciliationPolicyCombo_, bounds.getWidth() - labelWidth - gap);
-    layoutRow(unsavedEditWarningLabel_, unsavedEditWarningPolicyCombo_, bounds.getWidth() - labelWidth - gap);
-    layoutRow(mutatorDeleteWarningLabel_, mutatorDeleteWarningPolicyCombo_, bounds.getWidth() - labelWidth - gap);
+    layoutRow(policiesLabel_, nameReconciliationPolicyCombo_, comboWidth);
+    layoutRow(unsavedEditWarningLabel_, unsavedEditWarningPolicyCombo_, comboWidth);
+    layoutRow(mutatorDeleteWarningLabel_, mutatorDeleteWarningPolicyCombo_, comboWidth);
     layoutPlaceholderRow(defragLabel_, defragPlaceholder_);
     layoutPlaceholderRow(loggingLabel_, loggingPlaceholder_);
+
+    bounds.removeFromTop(rowGap);
+
+    layoutSectionHeader(bounds, matrix1000SectionLabel_, matrix1000SectionSeparator_,
+                        controlHeight, separatorHeight, rowGap);
+    layoutRow(patchNameDisplayLabel_, patchNameDisplayModeCombo_, comboWidth);
 }
 
 void SettingsPanel::setSkin(TSS::ISkin& skin)
@@ -138,19 +205,28 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     skin_ = &skin;
 
     const auto labelLook = TSS::labelLookFromSkin(skin);
+    const auto separatorLook = TSS::horizontalSeparatorLookFromSkin(skin);
+    const auto comboLook = TSS::comboBoxLookFromSkin(skin);
+
+    generalSectionLabel_.setLook(labelLook);
+    generalSectionSeparator_.setLook(separatorLook);
     hardwareLatencyLabel_.setLook(labelLook);
     masterOpsLabel_.setLook(labelLook);
     masterOpsPlaceholder_.setLook(labelLook);
     policiesLabel_.setLook(labelLook);
-    nameReconciliationPolicyCombo_.setLook(TSS::comboBoxLookFromSkin(skin));
+    nameReconciliationPolicyCombo_.setLook(comboLook);
     unsavedEditWarningLabel_.setLook(labelLook);
-    unsavedEditWarningPolicyCombo_.setLook(TSS::comboBoxLookFromSkin(skin));
+    unsavedEditWarningPolicyCombo_.setLook(comboLook);
     mutatorDeleteWarningLabel_.setLook(labelLook);
-    mutatorDeleteWarningPolicyCombo_.setLook(TSS::comboBoxLookFromSkin(skin));
+    mutatorDeleteWarningPolicyCombo_.setLook(comboLook);
     defragLabel_.setLook(labelLook);
     defragPlaceholder_.setLook(labelLook);
     loggingLabel_.setLook(labelLook);
     loggingPlaceholder_.setLook(labelLook);
+    matrix1000SectionLabel_.setLook(labelLook);
+    matrix1000SectionSeparator_.setLook(separatorLook);
+    patchNameDisplayLabel_.setLook(labelLook);
+    patchNameDisplayModeCombo_.setLook(comboLook);
 
     hardwareLatencySlider_.setLook(TSS::sliderLookFromSkin(skin));
 

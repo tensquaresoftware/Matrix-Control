@@ -169,6 +169,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchFileService.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
     Source/Core/Services/PatchNameOverlayStore.cpp
+    Source/Core/Services/PatchNameResolver.cpp
     Source/Core/Services/BankImportPlanner.cpp
     Source/Core/Services/PatchNameEditRules.cpp
     Source/Core/Services/Matrix1000FactoryPatchNames.cpp
@@ -391,6 +392,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchFileServiceTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
         Tests/Unit/PatchNameOverlayStoreTests.cpp
+        Tests/Unit/PatchNameResolverTests.cpp
         Tests/Unit/BankImportPlannerTests.cpp
         Tests/Unit/PatchNameEditRulesTests.cpp
         Tests/Unit/PatchFileNameReconcilerTests.cpp
@@ -451,6 +453,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchFileService.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
         Source/Core/Services/PatchNameOverlayStore.cpp
+        Source/Core/Services/PatchNameResolver.cpp
         Source/Core/Services/BankImportPlanner.cpp
         Source/Core/Services/PatchNameEditRules.cpp
         Source/Core/Services/Matrix1000FactoryPatchNames.cpp

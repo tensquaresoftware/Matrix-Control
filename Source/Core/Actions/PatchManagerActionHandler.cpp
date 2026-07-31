@@ -17,7 +17,9 @@
 #include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchFileServiceFooter.h"
+#include "Core/Services/PatchNameDisplayMode.h"
 #include "Core/Services/PatchNameOverlayStore.h"
+#include "Core/Services/PatchNameResolver.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -157,43 +159,99 @@ namespace Core
 
     void PatchManagerActionHandler::rememberOverlayName(int bank, int patch, const juce::String& name)
     {
+        if (! PatchFileNameSanitizer::isUsablePatchName(name)
+            || PatchFileNameSanitizer::isOberheimBankPlaceholderName(name))
+            return;
+
         loadPatchNameOverlayFromApvts();
         patchNameOverlay_.remember(bank, patch, name);
         persistPatchNameOverlayToApvts();
     }
 
+    void PatchManagerActionHandler::clearLastDeviceDumpRawName()
+    {
+        hasLastDeviceDumpRawName_ = false;
+        lastDeviceDumpRawName_.clear();
+        lastDeviceDumpBank_ = -1;
+        lastDeviceDumpPatch_ = -1;
+    }
+
+    void PatchManagerActionHandler::rememberCurrentOverlayFromModel()
+    {
+        if (patchModel_ == nullptr)
+            return;
+
+        const auto limits = deviceMemoryLimits_();
+        rememberOverlayName(getCurrentBank(limits), getCurrentPatch(limits), patchModel_->getName());
+    }
+
     void PatchManagerActionHandler::applyResolvedPatchName(PatchModel& model,
                                                            int bank,
                                                            int patch,
-                                                           const DeviceMemoryLimits& limits)
+                                                           const DeviceMemoryLimits& limits,
+                                                           PatchNameResolvePurpose purpose)
     {
         loadPatchNameOverlayFromApvts();
 
-        // ROM: factory table wins over hardware BNK placeholders.
-        if (limits.isRomBank(bank))
-        {
-            const auto factoryName = Matrix1000FactoryPatchNames::nameFor(bank, patch);
-            if (factoryName.isNotEmpty())
-            {
-                model.setName(factoryName);
-                return;
-            }
-        }
+        const bool isRom = limits.isRomBank(bank);
+        const auto factoryName = isRom ? Matrix1000FactoryPatchNames::nameFor(bank, patch)
+                                       : juce::String();
+        const auto overlayName = patchNameOverlay_.lookup(bank, patch);
 
-        const auto deviceName = model.getName();
-        if (PatchFileNameSanitizer::isOberheimBankPlaceholderName(deviceName)
-            || ! PatchFileNameSanitizer::isUsablePatchName(deviceName))
+        const auto mode = [&]()
         {
-            const auto overlay = patchNameOverlay_.lookup(bank, patch);
-            if (overlay.isNotEmpty())
-            {
-                model.setName(overlay);
-                return;
-            }
-        }
+            if (purpose == PatchNameResolvePurpose::kExportMusical)
+                return PatchNameResolver::Mode::kMusical;
 
-        if (! PatchFileNameSanitizer::isUsablePatchName(deviceName))
-            model.setName(PatchFileNameSanitizer::formatBankPatchLabel(bank, patch));
+            const int modeId = PatchNameDisplay::normalize(static_cast<int>(
+                apvts_.state.getProperty(PluginIDs::Settings::kPatchNameDisplayMode,
+                                         PluginIDs::Settings::PatchNameDisplayMode::kDefault)));
+
+            return PatchNameDisplay::isHardwareNames(modeId) ? PatchNameResolver::Mode::kHardware
+                                                             : PatchNameResolver::Mode::kMusical;
+        }();
+
+        model.setName(PatchNameResolver::resolve(model.getName(),
+                                                 bank,
+                                                 patch,
+                                                 isRom,
+                                                 factoryName,
+                                                 overlayName,
+                                                 mode));
+    }
+
+    void PatchManagerActionHandler::reapplyDisplayedPatchName()
+    {
+        if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
+            return;
+
+        if (pendingDeviceLoad_.has_value())
+            return;
+
+        if (! hasLastDeviceDumpRawName_)
+            return;
+
+        const auto limits = deviceMemoryLimits_();
+        const int bank = getCurrentBank(limits);
+        const int patch = getCurrentPatch(limits);
+
+        if (bank != lastDeviceDumpBank_ || patch != lastDeviceDumpPatch_)
+            return;
+
+        const bool wasDirty = dirtyPatchTracker_ != nullptr
+            && dirtyPatchTracker_->isDirty(*patchModel_);
+
+        patchModel_->setName(lastDeviceDumpRawName_);
+        applyResolvedPatchName(*patchModel_,
+                               bank,
+                               patch,
+                               limits,
+                               PatchNameResolvePurpose::kDisplay);
+        pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
+
+        // Display-only re-resolve must not invent unsaved edits.
+        if (dirtyPatchTracker_ != nullptr && ! wasDirty)
+            dirtyPatchTracker_->captureSnapshot(*patchModel_);
     }
 
     void PatchManagerActionHandler::handleAction(const juce::String& propertyId, const juce::var&)
@@ -371,6 +429,7 @@ namespace Core
             return;
 
         abandonPendingDeviceLoad();
+        clearLastDeviceDumpRawName();
 
         const auto result = patchInitService_->initFullPatch();
 
@@ -422,6 +481,7 @@ namespace Core
             return;
 
         abandonPendingDeviceLoad();
+        clearLastDeviceDumpRawName();
 
         const auto sourceLabel = clipboardService_->getFullPatchSourceLabel().isNotEmpty()
             ? clipboardService_->getFullPatchSourceLabel()
@@ -657,6 +717,7 @@ namespace Core
 
         pendingBrowserRestoreOnCancel_.reset();
         abandonPendingDeviceLoad();
+        clearLastDeviceDumpRawName();
 
         if (hooks_.setPatchLoadContext)
             hooks_.setPatchLoadContext(
@@ -1167,7 +1228,15 @@ namespace Core
 
                 patchModel_->loadFrom(dump.data());
                 patchModel_->normalizeNameEncoding();
-                applyResolvedPatchName(*patchModel_, bank, patch, limits);
+                lastDeviceDumpRawName_ = patchModel_->getName();
+                lastDeviceDumpBank_ = bank;
+                lastDeviceDumpPatch_ = patch;
+                hasLastDeviceDumpRawName_ = true;
+                applyResolvedPatchName(*patchModel_,
+                                       bank,
+                                       patch,
+                                       limits,
+                                       PatchNameResolvePurpose::kDisplay);
 
                 pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
                 captureCleanSnapshot();
@@ -1666,7 +1735,8 @@ namespace Core
                 self->applyResolvedPatchName(dumpedPatch,
                                              self->bankTransfer_.bank,
                                              slot,
-                                             self->bankTransfer_.limits);
+                                             self->bankTransfer_.limits,
+                                             PatchNameResolvePurpose::kExportMusical);
 
                 const auto nameForFile = dumpedPatch.getName();
                 const auto stem = PatchFileNameSanitizer::bankExportFileStem(slot, nameForFile);
@@ -2156,8 +2226,14 @@ namespace Core
         if (haveWrittenCurrentSlot && patchModel_ != nullptr && apvtsPatchMapper_ != nullptr)
         {
             abandonPendingDeviceLoad();
+            clearLastDeviceDumpRawName();
             patchModel_->loadFrom(writtenCurrentSlot.data());
             patchModel_->normalizeNameEncoding();
+            applyResolvedPatchName(*patchModel_,
+                                   importedBank,
+                                   currentPatch,
+                                   limits,
+                                   PatchNameResolvePurpose::kDisplay);
             pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
             captureCleanSnapshot();
 

@@ -46,6 +46,7 @@
 #include "Core/Services/ClipboardService.h"
 #include "Core/Services/DirtyPatchTracker.h"
 #include "Core/Services/UnsavedEditWarningPolicy.h"
+#include "Core/Services/PatchNameDisplayMode.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
@@ -381,6 +382,7 @@ PluginProcessor::PluginProcessor()
     initializeNameReconciliationPolicyProperty();
     initializeUnsavedEditWarningPolicyProperty();
     initializeMutatorDeleteWarningPolicyProperty();
+    initializePatchNameDisplayModeProperty();
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();
@@ -1274,6 +1276,17 @@ void PluginProcessor::initializeMutatorDeleteWarningPolicyProperty()
     }
 }
 
+void PluginProcessor::initializePatchNameDisplayModeProperty()
+{
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kPatchNameDisplayMode))
+    {
+        apvts.state.setProperty(
+            PluginIDs::Settings::kPatchNameDisplayMode,
+            PluginIDs::Settings::PatchNameDisplayMode::kDefault,
+            nullptr);
+    }
+}
+
 void PluginProcessor::syncHardwareLatencyFromState()
 {
     const auto property = apvts.state.getProperty(PluginIDs::Settings::kHardwareLatencyMs, Core::HardwareLatency::kMinMs);
@@ -2106,7 +2119,35 @@ bool PluginProcessor::canEditPatchName() const
         apvts.state.getProperty(InternalPatches::kCurrentBankNumber, limits.minBankNumber()));
 
     // Spec gate is ROM vs writable — use isRomBank directly (not PASTE/STORE helpers).
-    return ! limits.isRomBank(bank);
+    if (limits.isRomBank(bank))
+        return false;
+
+    // Hardware Names + device memory on banked Matrix-1000: names are not durable via SysEx.
+    const int displayMode = Core::PatchNameDisplay::normalize(static_cast<int>(
+        apvts.state.getProperty(PluginIDs::Settings::kPatchNameDisplayMode,
+                               PluginIDs::Settings::PatchNameDisplayMode::kDefault)));
+    if (Core::PatchNameDisplay::isHardwareNames(displayMode) && limits.hasBankConcept())
+        return false;
+
+    return true;
+}
+
+void PluginProcessor::refreshPatchNameDisplayForSettingsMode()
+{
+    notifyNonParameterStateChanged();
+
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
+    if (static_cast<bool>(apvts.state.getProperty(MutatorState::kCompareActive, false)))
+        return;
+
+    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kComputerFile)
+        return;
+
+    if (patchManagerActionHandler_ == nullptr)
+        return;
+
+    patchManagerActionHandler_->reapplyDisplayedPatchName();
 }
 
 void PluginProcessor::commitPatchNameRename(const juce::String& newName)
@@ -2122,6 +2163,13 @@ void PluginProcessor::commitPatchNameRename(const juce::String& newName)
 
     patchModel_->setName(newName);
     patchNameSyncer_->bufferToApvts();
+
+    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kDeviceMemory
+        && patchManagerActionHandler_ != nullptr
+        && getResolvedDeviceMemoryLimits().hasBankConcept())
+    {
+        patchManagerActionHandler_->rememberCurrentOverlayFromModel();
+    }
 
     if (patchMutatorEngine_ != nullptr)
         patchMutatorEngine_->refreshFrozenExportBasename(patchModel_->getName());

@@ -118,6 +118,14 @@ namespace Core
         return nameFromBytes.trim().toUpperCase().startsWith("BNK");
     }
 
+    juce::String PatchFileNameSanitizer::formatOberheimBankPlaceholderName(int bank, int patchNumber)
+    {
+        const int clampedBank = juce::jlimit(0, 9, bank);
+        const int clampedPatch = juce::jlimit(0, 99, patchNumber);
+        return "BNK" + juce::String(clampedBank) + ": "
+            + juce::String(clampedPatch).paddedLeft('0', 2);
+    }
+
     bool PatchFileNameSanitizer::isUsablePatchName(const juce::String& nameFromBytes) noexcept
     {
         return nameFromBytes.trim().isNotEmpty();
