@@ -109,6 +109,12 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
     patchNameDisplayModeCombo_.addItem(PluginDisplayNames::Settings::kPatchNameDisplayHardwareNames,
                                        kHardwareNames);
 
+    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
+    nameReconciliationPolicyCombo_.setPopupMenuLook(popupLook);
+    unsavedEditWarningPolicyCombo_.setPopupMenuLook(popupLook);
+    mutatorDeleteWarningPolicyCombo_.setPopupMenuLook(popupLook);
+    patchNameDisplayModeCombo_.setPopupMenuLook(popupLook);
+
     setPluginMode(isPluginMode);
 }
 
@@ -207,6 +213,7 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     const auto labelLook = TSS::labelLookFromSkin(skin);
     const auto separatorLook = TSS::horizontalSeparatorLookFromSkin(skin);
     const auto comboLook = TSS::comboBoxLookFromSkin(skin);
+    const auto popupLook = TSS::popupMenuLookFromSkin(skin);
 
     generalSectionLabel_.setLook(labelLook);
     generalSectionSeparator_.setLook(separatorLook);
@@ -215,10 +222,13 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     masterOpsPlaceholder_.setLook(labelLook);
     policiesLabel_.setLook(labelLook);
     nameReconciliationPolicyCombo_.setLook(comboLook);
+    nameReconciliationPolicyCombo_.setPopupMenuLook(popupLook);
     unsavedEditWarningLabel_.setLook(labelLook);
     unsavedEditWarningPolicyCombo_.setLook(comboLook);
+    unsavedEditWarningPolicyCombo_.setPopupMenuLook(popupLook);
     mutatorDeleteWarningLabel_.setLook(labelLook);
     mutatorDeleteWarningPolicyCombo_.setLook(comboLook);
+    mutatorDeleteWarningPolicyCombo_.setPopupMenuLook(popupLook);
     defragLabel_.setLook(labelLook);
     defragPlaceholder_.setLook(labelLook);
     loggingLabel_.setLook(labelLook);
@@ -227,6 +237,7 @@ void SettingsPanel::setSkin(TSS::ISkin& skin)
     matrix1000SectionSeparator_.setLook(separatorLook);
     patchNameDisplayLabel_.setLook(labelLook);
     patchNameDisplayModeCombo_.setLook(comboLook);
+    patchNameDisplayModeCombo_.setPopupMenuLook(popupLook);
 
     hardwareLatencySlider_.setLook(TSS::sliderLookFromSkin(skin));
 

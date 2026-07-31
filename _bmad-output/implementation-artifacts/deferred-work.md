@@ -990,3 +990,21 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-name-display-settings.md`
   summary: Patch Mutator export folder/basename still uses the current model patch name, so Hardware Names display can yield BNK-style Mutator export stems until a dedicated musical resolve at freeze/export time.
   evidence: Blind Hunter; Bank Utility export path already forces musical resolve; Mutator freeze uses patchModel_->getName().
+
+## Deferred from: quick-dev spec-settings-combobox-popup-display (2026-07-31)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-combobox-popup-display.md`
+  summary: Settings ComboBoxes still never receive setUiScale; non-1.0 UI scale may leave popup item metrics/fonts unscaled.
+  evidence: Blind Hunter; layoutRow only scales sliders; pre-existing, not introduced by popup-look wiring.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-combobox-popup-display.md`
+  summary: Default PopupMenuLook remains transparent on hand-built TSS::ComboBox; forgetting setPopupMenuLook can silently recreate blank/brown popups elsewhere.
+  evidence: Blind Hunter; hardening the default look would touch shared popup infrastructure (Ask First in this spec).
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-combobox-popup-display.md`
+  summary: Skin switch while a Settings combo popup is open leaves the open menu with stale colours until dismiss/reopen.
+  evidence: Edge Case Hunter; setPopupMenuLook only updates stored look; same pattern as Header/WidgetFactory; AC covers reopen after skin change.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-settings-combobox-popup-display.md`
+  summary: No automated assertion that Settings ComboBoxes receive a non-default PopupMenuLook after ctor/setSkin.
+  evidence: Blind Hunter; verification remains build + manual UAT for this UI wiring fix.
