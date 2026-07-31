@@ -124,7 +124,7 @@ namespace PluginDisplayNames
 
         namespace MasterInitConfirm
         {
-            constexpr const char* kTitle = "Reset master module?";
+            constexpr const char* kTitle = "RESET MASTER MODULE?";
             constexpr const char* kBodyTemplate =
                 "This will reset all parameters in the {MODULE} module to init defaults and send a full master SysEx to the synth. Other master modules will not be changed.";
             constexpr const char* kConfirm = "Reset";
@@ -173,11 +173,35 @@ namespace PluginDisplayNames
             constexpr const char* kContinue = "Continue";
         }
 
+        namespace BankExportOverwriteConfirm
+        {
+            constexpr const char* kTitle = "Replace export folder?";
+            constexpr const char* kBody =
+                "An export folder already exists at this location.\n\n"
+                "Continue will delete that folder completely, recreate it empty, "
+                "then export a fresh copy of the bank.\n\n"
+                "Cancel leaves the existing folder untouched.";
+            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kContinue = "Continue";
+        }
+
         namespace BankTransferProgress
         {
-            constexpr const char* kExportTitle = "Exporting bank";
-            constexpr const char* kImportTitle = "Importing bank";
-            constexpr const char* kCancel      = "Cancel";
+            constexpr const char* kExportTitle = "EXPORTING BANK TO DISK";
+            constexpr const char* kImportTitle = "IMPORTING BANK";
+            constexpr const char* kCancel      = "CANCEL";
+            constexpr const char* kDestinationFolderLabel = "Destination folder :";
+            constexpr const char* kSourceFolderLabel = "Source folder :";
+
+            inline juce::String formatExportProgressMessage(int bank)
+            {
+                return "Exporting bank " + juce::String(bank) + " :";
+            }
+
+            inline juce::String formatExportProgressMessageNoBank()
+            {
+                return "Exporting patches :";
+            }
         }
     }
 
@@ -921,9 +945,9 @@ namespace PluginDisplayNames
             constexpr const char* kImportRestoreFailedFooterMessage =
                 "Import cancelled - the device could not be fully restored. Check the connection and try again.";
             constexpr const char* kExportingMessage = "Exporting bank to disk...";
-            constexpr const char* kImportingReadingMessage = "Reading current bank from device...";
-            constexpr const char* kImportingWritingMessage = "Writing patches to device...";
-            constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device to its prior state...";
+            constexpr const char* kImportingReadingMessage = "Reading bank safety copy from device :";
+            constexpr const char* kImportingWritingMessage = "Writing patches to the device :";
+            constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device :";
 
             namespace StandaloneWidgets
             {
@@ -945,9 +969,16 @@ namespace PluginDisplayNames
 
             namespace FooterMessages
             {
-                inline juce::String formatExportSuccess(const juce::String& folderName)
+                inline juce::String formatExportSuccess(bool hasBankConcept,
+                                                        int bank,
+                                                        const juce::String& folderPath)
                 {
-                    return "Exported 100 patches to " + folderName;
+                    const auto savedClause = "100 patches saved to " + folderPath + ".";
+
+                    if (hasBankConcept)
+                        return "Bank " + juce::String(bank) + " exported successfully : " + savedClause;
+
+                    return "Patches exported successfully : " + savedClause;
                 }
 
                 inline juce::String formatImportSuccess(int found, int valid, int imported)

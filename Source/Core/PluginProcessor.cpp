@@ -1185,6 +1185,12 @@ void PluginProcessor::setBankImportConfirmGate(BankImportConfirmGate gate)
         patchManagerActionHandler_->setBankImportConfirmGate(std::move(gate));
 }
 
+void PluginProcessor::setBankExportOverwriteConfirmGate(BankImportConfirmGate gate)
+{
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->setBankExportOverwriteConfirmGate(std::move(gate));
+}
+
 void PluginProcessor::setBankTransferProgressPresenter(Core::BankTransferProgressPresenter presenter)
 {
     if (patchManagerActionHandler_ != nullptr)

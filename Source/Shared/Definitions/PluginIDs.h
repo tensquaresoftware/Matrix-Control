@@ -538,6 +538,9 @@ namespace PluginIDs
             {
                 constexpr const char* kSelectedBank = "patchManagerSelectedBank";
                 constexpr const char* kBanksLocked = "patchManagerBanksLocked";
+                // Persisted last OS folder pickers (plugin state) — parent for EXPORT, source for IMPORT.
+                constexpr const char* kExportParentFolderPath = "bankUtilityExportParentFolderPath";
+                constexpr const char* kImportFolderPath = "bankUtilityImportFolderPath";
                 // Musical names for RAM slots — Matrix firmware rewrites SysEx name bytes to BNK.
                 constexpr const char* kPatchNameOverlay = "patchManagerPatchNameOverlay";
             }

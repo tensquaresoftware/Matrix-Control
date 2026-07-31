@@ -17,6 +17,7 @@
 #include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchFileServiceFooter.h"
+#include "Core/Services/PatchNameOverlayStore.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -119,6 +120,80 @@ namespace Core
         , pickNameReconciliation_(std::move(pickNameReconciliation))
         , hooks_(std::move(hooks))
     {
+        loadPatchNameOverlayFromApvts();
+    }
+
+    void PatchManagerActionHandler::loadPatchNameOverlayFromApvts()
+    {
+        if (patchNameOverlayLoaded_)
+            return;
+
+        reloadPatchNameOverlayFromApvts();
+    }
+
+    void PatchManagerActionHandler::reloadPatchNameOverlayFromApvts()
+    {
+        using namespace PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
+
+        patchNameOverlay_.replaceFromValueTree(apvts_.state.getChildWithName(kPatchNameOverlay));
+        patchNameOverlayLoaded_ = true;
+    }
+
+    void PatchManagerActionHandler::persistPatchNameOverlayToApvts()
+    {
+        using namespace PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
+
+        const auto existing = apvts_.state.getChildWithName(kPatchNameOverlay);
+        if (existing.isValid())
+            apvts_.state.removeChild(existing, nullptr);
+
+        juce::ValueTree named { kPatchNameOverlay };
+        const auto entries = patchNameOverlay_.toValueTree();
+        for (int i = 0; i < entries.getNumChildren(); ++i)
+            named.appendChild(entries.getChild(i).createCopy(), nullptr);
+
+        apvts_.state.appendChild(named, nullptr);
+    }
+
+    void PatchManagerActionHandler::rememberOverlayName(int bank, int patch, const juce::String& name)
+    {
+        loadPatchNameOverlayFromApvts();
+        patchNameOverlay_.remember(bank, patch, name);
+        persistPatchNameOverlayToApvts();
+    }
+
+    void PatchManagerActionHandler::applyResolvedPatchName(PatchModel& model,
+                                                           int bank,
+                                                           int patch,
+                                                           const DeviceMemoryLimits& limits)
+    {
+        loadPatchNameOverlayFromApvts();
+
+        // ROM: factory table wins over hardware BNK placeholders.
+        if (limits.isRomBank(bank))
+        {
+            const auto factoryName = Matrix1000FactoryPatchNames::nameFor(bank, patch);
+            if (factoryName.isNotEmpty())
+            {
+                model.setName(factoryName);
+                return;
+            }
+        }
+
+        const auto deviceName = model.getName();
+        if (PatchFileNameSanitizer::isOberheimBankPlaceholderName(deviceName)
+            || ! PatchFileNameSanitizer::isUsablePatchName(deviceName))
+        {
+            const auto overlay = patchNameOverlay_.lookup(bank, patch);
+            if (overlay.isNotEmpty())
+            {
+                model.setName(overlay);
+                return;
+            }
+        }
+
+        if (! PatchFileNameSanitizer::isUsablePatchName(deviceName))
+            model.setName(PatchFileNameSanitizer::formatBankPatchLabel(bank, patch));
     }
 
     void PatchManagerActionHandler::handleAction(const juce::String& propertyId, const juce::var&)
@@ -414,6 +489,9 @@ namespace Core
 
         midiManager_->sendPatch(static_cast<juce::uint8>(getCurrentPatch(limits)), patchModel_->data());
 
+        // Matrix-1000 rewrites name bytes to BNK on store — keep the editor name in the overlay.
+        rememberOverlayName(currentBank, getCurrentPatch(limits), patchModel_->getName());
+
         // sendPatch is void and may no-op when outbound is blocked — only clear dirty on a real send.
         if (midiManager_->isEditorOutboundAllowed())
             captureCleanSnapshot();
@@ -490,6 +568,7 @@ namespace Core
             bumpScanRevision();
 
         pendingBrowserRestoreOnCancel_.reset();
+        reloadPatchNameOverlayFromApvts();
     }
 
     void PatchManagerActionHandler::discardComputerPatchesScanCacheQuietly()
@@ -1088,13 +1167,7 @@ namespace Core
 
                 patchModel_->loadFrom(dump.data());
                 patchModel_->normalizeNameEncoding();
-
-                if (limits.isRomBank(bank))
-                {
-                    const auto factoryName = Matrix1000FactoryPatchNames::nameFor(bank, patch);
-                    if (factoryName.isNotEmpty())
-                        patchModel_->setName(factoryName);
-                }
+                applyResolvedPatchName(*patchModel_, bank, patch, limits);
 
                 pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
                 captureCleanSnapshot();
@@ -1346,6 +1419,11 @@ namespace Core
         bankImportConfirmGate_ = std::move(gate);
     }
 
+    void PatchManagerActionHandler::setBankExportOverwriteConfirmGate(BankImportConfirmGate gate)
+    {
+        bankExportOverwriteConfirmGate_ = std::move(gate);
+    }
+
     void PatchManagerActionHandler::setBankTransferProgressPresenter(BankTransferProgressPresenter presenter)
     {
         bankTransferProgress_ = std::move(presenter);
@@ -1364,20 +1442,48 @@ namespace Core
 
     int PatchManagerActionHandler::bankTransferWriteDelayMs() const
     {
+        // MidiOutput::sendMessageNow returns before the UART finishes. A 275-byte patch SysEx
+        // needs ~90ms on the wire @ 31.25 kbaud; Oberheim also wants ≥10ms between patches after
+        // reception. Spacing only by the inter-SysEx profile (10–20ms) therefore delivers
+        // back-to-back stores that the Matrix can silently drop — leaving RAM names as BNK0:xx
+        // while the UI reports a successful import.
+        constexpr int kPatchSysExWireMs = 100;
+        constexpr int kMatrixStoreGapMs = 20;
         const int profileDelayMs = midiManager_ != nullptr ? midiManager_->getRequiredSysExDelayMs() : 0;
-        return juce::jmax(20, profileDelayMs + 5);
+        return juce::jmax(kPatchSysExWireMs + kMatrixStoreGapMs,
+                          profileDelayMs + kPatchSysExWireMs);
     }
 
     void PatchManagerActionHandler::requestBankTransferCancel(std::uint64_t generation)
     {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
         if (bankTransfer_.kind == BankTransferState::Kind::kNone || bankTransfer_.generation != generation)
+            return;
+
+        // Restore-in-progress cannot be cancelled (Cancel is already disabled in the UI).
+        if (bankTransfer_.isRestoring)
             return;
 
         bankTransfer_.cancelRequested = true;
 
-        // Unblock a pending dump so cancel is observed promptly (callback / timeout path).
+        // Drops any pending dump callback without invoking it — we must finish the UI ourselves
+        // when the transfer was waiting on requestDeviceDump.
         if (midiManager_ != nullptr)
             midiManager_->cancelPendingSysExRequest();
+
+        if (bankTransfer_.kind == BankTransferState::Kind::kExport)
+        {
+            finishBankExport(false, kExportCancelledFooterMessage, "warning");
+            return;
+        }
+
+        // Import write already started: a delayed write step will observe cancelRequested and restore.
+        if (bankTransfer_.importWrittenCount > 0)
+            return;
+
+        // Snapshot / pre-write: dump callback will never arrive — close cleanly with no device restore.
+        finishBankImport(kImportCancelledFooterMessage, "warning");
     }
 
     int PatchManagerActionHandler::getSelectedBankForTransfer(const DeviceMemoryLimits& limits) const
@@ -1424,7 +1530,21 @@ namespace Core
 
         const juce::File folder = parentFolder.getChildFile(childName);
         const bool folderExisted = folder.isDirectory();
-        if (! folderExisted && ! folder.createDirectory())
+
+        // Second export to the same destination — replace the folder entirely for a clean export.
+        if (folderExisted)
+        {
+            if (! bankExportOverwriteConfirmGate_ || ! bankExportOverwriteConfirmGate_())
+                return;
+
+            if (! folder.deleteRecursively())
+            {
+                publishBankTransferFooter(kFolderNotWritableFooterMessage, "warning");
+                return;
+            }
+        }
+
+        if (! folder.createDirectory())
         {
             publishBankTransferFooter(kFolderNotWritableFooterMessage, "warning");
             return;
@@ -1438,15 +1558,23 @@ namespace Core
         bankTransfer_.bank = bank;
         bankTransfer_.targetFolder = folder;
         bankTransfer_.childFolderDisplayName = childName;
-        bankTransfer_.createdTargetFolderThisRun = ! folderExisted;
+        bankTransfer_.createdTargetFolderThisRun = true;
+        bankTransfer_.hasBankConcept = hasBankConcept;
 
         const auto generation = bankTransfer_.generation;
 
         if (bankTransferProgress_.show)
         {
+            using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+            const auto progressMessage = hasBankConcept
+                ? formatExportProgressMessage(bank)
+                : formatExportProgressMessageNoBank();
+
             bankTransferProgress_.show(
                 juce::String(kExportTitle),
-                juce::String(kExportingMessage),
+                progressMessage,
+                folder.getFullPathName(),
                 bankTransfer_.totalSlots,
                 [this, generation] { requestBankTransferCancel(generation); });
         }
@@ -1459,7 +1587,22 @@ namespace Core
                 return;
             }
 
-            midiManager_->sendSetBank(bank);
+            if (patchSelectionMidiSync_ != nullptr)
+                patchSelectionMidiSync_->sendSetBank(bank, limits);
+            else
+                midiManager_->sendSetBank(bank);
+
+            // Brief settle so the device finishes bank change before the first dump request.
+            const int settleMs = MidiRequestTiming::deviceSettleMs(
+                midiManager_->getRequiredSysExDelayMs());
+            juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+            juce::Timer::callAfterDelay(settleMs,
+                [weakThis, generation]
+                {
+                    if (auto* self = weakThis.get())
+                        self->exportNextSlot(0, generation);
+                });
+            return;
         }
 
         exportNextSlot(0, generation);
@@ -1481,7 +1624,10 @@ namespace Core
         if (slot >= bankTransfer_.totalSlots)
         {
             finishBankExport(true,
-                             BankFooterMessages::formatExportSuccess(bankTransfer_.childFolderDisplayName),
+                             BankFooterMessages::formatExportSuccess(
+                                 bankTransfer_.hasBankConcept,
+                                 bankTransfer_.bank,
+                                 bankTransfer_.targetFolder.getFullPathName()),
                              "info");
             return;
         }
@@ -1516,13 +1662,20 @@ namespace Core
 
                 PatchModel dumpedPatch;
                 dumpedPatch.loadFrom(dump.data());
-                const auto stem = PatchFileNameSanitizer::bankExportFileStem(slot, dumpedPatch.getName());
+                dumpedPatch.normalizeNameEncoding();
+                self->applyResolvedPatchName(dumpedPatch,
+                                             self->bankTransfer_.bank,
+                                             slot,
+                                             self->bankTransfer_.limits);
+
+                const auto nameForFile = dumpedPatch.getName();
+                const auto stem = PatchFileNameSanitizer::bankExportFileStem(slot, nameForFile);
                 const auto file = self->bankTransfer_.targetFolder.getChildFile(
                     PatchFileNameSanitizer::ensureSyxExtension(stem));
 
                 const bool existedBefore = file.existsAsFile();
                 const auto saveResult = self->patchFileService_->savePatchSysExFile(
-                    file, dump.data(), *self->sysExEncoder_, slot);
+                    file, dumpedPatch.data(), *self->sysExEncoder_, slot);
                 if (! saveResult.success)
                 {
                     self->finishBankExport(false, saveResult.errorMessage, "warning");
@@ -1626,45 +1779,57 @@ namespace Core
         bankTransfer_.bank = bank;
         bankTransfer_.importFoundCount = found;
 
-        const auto generation = bankTransfer_.generation;
-
-        // Show progress before the synchronous disk read so the UI is not frozen without feedback.
-        if (bankTransferProgress_.show)
-        {
-            bankTransferProgress_.show(
-                juce::String(kImportTitle),
-                juce::String(kImportingReadingMessage),
-                juce::jmax(1, cappedValidCount),
-                [this, generation] { requestBankTransferCancel(generation); });
-        }
-
         for (int i = 0; i < cappedValidCount; ++i)
         {
-            if (bankTransfer_.cancelRequested)
-            {
-                finishBankImport(kImportCancelledFooterMessage, "warning");
-                return;
-            }
-
             const auto file = scan.folder.getChildFile(scan.sortedValidFileNames[i]);
             PackedPatchBuffer packed {};
             const auto loadResult = patchFileService_->loadPatchSysExFile(file, packed.data());
-            if (loadResult.success)
-                bankTransfer_.importPatches.push_back(packed);
+            if (! loadResult.success)
+                continue;
+
+            // Prefer payload name; if the file still carries Oberheim "BNKx:yy" placeholders
+            // (or a blank name), recover the musical name from the Bank Utility export filename.
+            PatchModel importedPatch;
+            importedPatch.loadFrom(packed.data());
+            importedPatch.normalizeNameEncoding();
+
+            const auto payloadName = importedPatch.getName();
+            if (! PatchFileNameSanitizer::isUsablePatchName(payloadName)
+                || PatchFileNameSanitizer::isOberheimBankPlaceholderName(payloadName))
+            {
+                const auto fromFile = PatchFileNameSanitizer::nameFromBankExportStem(
+                    file.getFileNameWithoutExtension());
+                if (fromFile.isNotEmpty())
+                    importedPatch.setName(fromFile);
+            }
+
+            std::memcpy(packed.data(), importedPatch.data(), packed.size());
+            bankTransfer_.importPatches.push_back(packed);
         }
 
         bankTransfer_.importValidCount = static_cast<int>(bankTransfer_.importPatches.size());
 
         if (bankTransfer_.importValidCount <= 0)
         {
-            finishBankImport(BankFooterMessages::formatImportNoValidFiles(found), "warning");
+            const auto message = BankFooterMessages::formatImportNoValidFiles(found);
+            bankTransfer_ = BankTransferState {};
+            publishBankTransferFooter(message, "warning");
             return;
         }
 
         bankTransfer_.totalSlots = bankTransfer_.importValidCount;
 
-        if (bankTransferProgress_.update)
-            bankTransferProgress_.update(0);
+        const auto generation = bankTransfer_.generation;
+
+        if (bankTransferProgress_.show)
+        {
+            bankTransferProgress_.show(
+                juce::String(kImportTitle),
+                juce::String(kImportingReadingMessage),
+                folder.getFullPathName(),
+                bankTransfer_.totalSlots,
+                [this, generation] { requestBankTransferCancel(generation); });
+        }
 
         if (hasBankConcept)
         {
@@ -1674,7 +1839,28 @@ namespace Core
                 return;
             }
 
-            midiManager_->sendSetBank(bank);
+            // Keep Internal Patches / Bank Utility bank aligned with the import target, and
+            // update PatchSelectionMidiSync so later patch navigations do not send a stale Set Bank.
+            apvts_.state.setProperty(
+                PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
+                bank,
+                nullptr);
+
+            if (patchSelectionMidiSync_ != nullptr)
+                patchSelectionMidiSync_->sendSetBank(bank, limits);
+            else
+                midiManager_->sendSetBank(bank);
+
+            const int settleMs = MidiRequestTiming::deviceSettleMs(
+                midiManager_->getRequiredSysExDelayMs());
+            juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+            juce::Timer::callAfterDelay(settleMs,
+                [weakThis, generation]
+                {
+                    if (auto* self = weakThis.get())
+                        self->beginBankImportSnapshot(generation);
+                });
+            return;
         }
 
         beginBankImportSnapshot(generation);
@@ -1769,10 +1955,18 @@ namespace Core
         bankTransfer_.completedSlots = 0;
         bankTransfer_.importWrittenCount = 0;
 
-        if (bankTransferProgress_.setMessage)
+        if (bankTransferProgress_.beginSecondaryPhase)
+        {
+            bankTransferProgress_.beginSecondaryPhase(
+                juce::String(kImportingWritingMessage),
+                bankTransfer_.importValidCount);
+        }
+        else if (bankTransferProgress_.setMessage)
+        {
             bankTransferProgress_.setMessage(juce::String(kImportingWritingMessage));
-        if (bankTransferProgress_.update)
-            bankTransferProgress_.update(0);
+            if (bankTransferProgress_.update)
+                bankTransferProgress_.update(0);
+        }
 
         writeNextImportSlot(0, generation);
     }
@@ -1807,10 +2001,18 @@ namespace Core
             return;
         }
 
-        midiManager_->sendPatch(static_cast<juce::uint8>(slot),
-                                bankTransfer_.importPatches[static_cast<size_t>(slot)].data());
-        ++bankTransfer_.importWrittenCount;
+        const auto* packed = bankTransfer_.importPatches[static_cast<size_t>(slot)].data();
+        midiManager_->sendPatch(static_cast<juce::uint8>(slot), packed);
 
+        // Firmware keeps params but rewrites names to BNK — remember the musical name for the UI.
+        {
+            PatchModel imported;
+            imported.loadFrom(packed);
+            imported.normalizeNameEncoding();
+            rememberOverlayName(bankTransfer_.bank, slot, imported.getName());
+        }
+
+        ++bankTransfer_.importWrittenCount;
         bankTransfer_.completedSlots = slot + 1;
         if (bankTransferProgress_.update)
             bankTransferProgress_.update(bankTransfer_.completedSlots);
@@ -1853,10 +2055,20 @@ namespace Core
 
         if (bankTransferProgress_.setCancelEnabled)
             bankTransferProgress_.setCancelEnabled(false);
-        if (bankTransferProgress_.setMessage)
-            bankTransferProgress_.setMessage(juce::String(kImportingRestoringMessage));
-        if (bankTransferProgress_.update)
-            bankTransferProgress_.update(0);
+
+        if (bankTransferProgress_.beginSecondaryPhase)
+        {
+            bankTransferProgress_.beginSecondaryPhase(
+                juce::String(kImportingRestoringMessage),
+                juce::jmax(1, static_cast<int>(bankTransfer_.deviceSnapshot.size())));
+        }
+        else
+        {
+            if (bankTransferProgress_.setMessage)
+                bankTransferProgress_.setMessage(juce::String(kImportingRestoringMessage));
+            if (bankTransferProgress_.update)
+                bankTransferProgress_.update(0);
+        }
 
         restoreNextSnapshotSlot(0, generation);
     }
@@ -1880,8 +2092,27 @@ namespace Core
             return;
         }
 
-        midiManager_->sendPatch(static_cast<juce::uint8>(slot),
-                                bankTransfer_.deviceSnapshot[static_cast<size_t>(slot)].data());
+        const auto* packed = bankTransfer_.deviceSnapshot[static_cast<size_t>(slot)].data();
+        midiManager_->sendPatch(static_cast<juce::uint8>(slot), packed);
+
+        // Restore overlay to the pre-import name when it was musical; drop BNK placeholders.
+        {
+            PatchModel snapped;
+            snapped.loadFrom(packed);
+            snapped.normalizeNameEncoding();
+            const auto name = snapped.getName();
+            if (PatchFileNameSanitizer::isUsablePatchName(name)
+                && ! PatchFileNameSanitizer::isOberheimBankPlaceholderName(name))
+            {
+                rememberOverlayName(bankTransfer_.bank, slot, name);
+            }
+            else
+            {
+                loadPatchNameOverlayFromApvts();
+                patchNameOverlay_.forget(bankTransfer_.bank, slot);
+                persistPatchNameOverlayToApvts();
+            }
+        }
 
         bankTransfer_.completedSlots = slot + 1;
         if (bankTransferProgress_.update)
@@ -1901,8 +2132,59 @@ namespace Core
         if (bankTransferProgress_.hide)
             bankTransferProgress_.hide();
 
+        const auto limits = bankTransfer_.limits;
+        const int importedBank = bankTransfer_.bank;
+        const int currentPatch = getCurrentPatch(limits);
+        const bool importSucceeded = severity == "info";
+        const bool deviceMayHaveChanged = importSucceeded
+            || bankTransfer_.isRestoring
+            || bankTransfer_.importWrittenCount > 0;
+
+        PackedPatchBuffer writtenCurrentSlot {};
+        const bool haveWrittenCurrentSlot = importSucceeded
+            && currentPatch >= 0
+            && currentPatch < bankTransfer_.importWrittenCount
+            && currentPatch < static_cast<int>(bankTransfer_.importPatches.size());
+
+        if (haveWrittenCurrentSlot)
+            writtenCurrentSlot = bankTransfer_.importPatches[static_cast<size_t>(currentPatch)];
+
         bankTransfer_ = BankTransferState {};
         publishBankTransferFooter(footerMessage, severity);
+
+        // Show what we just wrote right away (names included), then verify with a settled dump.
+        if (haveWrittenCurrentSlot && patchModel_ != nullptr && apvtsPatchMapper_ != nullptr)
+        {
+            abandonPendingDeviceLoad();
+            patchModel_->loadFrom(writtenCurrentSlot.data());
+            patchModel_->normalizeNameEncoding();
+            pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
+            captureCleanSnapshot();
+
+            if (hooks_.setPatchLoadContext)
+                hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(importedBank, currentPatch));
+
+            if (hooks_.onPatchLoaded)
+                hooks_.onPatchLoaded();
+        }
+
+        if (! deviceMayHaveChanged || ! isDeviceDumpAvailable())
+            return;
+
+        // After 100 stores the Matrix may ignore dump requests for a short while; also let the
+        // outbound queue finish so we do not race the last write.
+        const int profileDelayMs = midiManager_ != nullptr ? midiManager_->getRequiredSysExDelayMs() : 0;
+        const int settleMs = juce::jmax(250, MidiRequestTiming::deviceSettleMs(profileDelayMs));
+        juce::WeakReference<PatchManagerActionHandler> weakThis(this);
+        juce::Timer::callAfterDelay(settleMs,
+            [weakThis, limits]
+            {
+                if (auto* self = weakThis.get())
+                {
+                    if (self->isDeviceDumpAvailable())
+                        self->loadCurrentPatchFromDevice(limits);
+                }
+            });
     }
 
 } // namespace Core

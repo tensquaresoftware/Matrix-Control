@@ -1,5 +1,6 @@
 #include "BankTransferProgressDialog.h"
 
+#include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Skins/Skin.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -20,7 +21,7 @@ BankTransferProgressDialog::BankTransferProgressDialog(TSS::ISkin& skin)
 
     cancelButton_.onClick = [this]
     {
-        if (onCancelRequested_)
+        if (onCancelRequested_ && cancelButton_.isEnabled())
             onCancelRequested_();
     };
     cancelButton_.setMouseClickGrabsKeyboardFocus(false);
@@ -31,27 +32,80 @@ BankTransferProgressDialog::~BankTransferProgressDialog() = default;
 
 void BankTransferProgressDialog::prepareForShow(const juce::String& title,
                                                 const juce::String& message,
+                                                const juce::String& detail,
                                                 int totalSteps,
-                                                std::function<void()> onCancelRequested)
+                                                std::function<void()> onCancelRequested,
+                                                ContentLayout layout)
 {
+    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+    using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
     title_ = title;
-    message_ = message;
-    totalSteps_ = juce::jmax(1, totalSteps);
-    completedSteps_ = 0;
+    detail_ = detail;
+    primaryMessage_ = message;
+    primaryTotalSteps_ = juce::jmax(1, totalSteps);
+    primaryCompletedSteps_ = 0;
+    secondaryLaneActive_ = false;
+    secondaryCompletedSteps_ = 0;
+
+    // Prefer explicit layout; fall back to title so existing call sites keep working.
+    contentLayout_ = layout;
+    if (layout == ContentLayout::Import
+        && title == juce::String(kExportTitle))
+        contentLayout_ = ContentLayout::Export;
+
+    if (contentLayout_ == ContentLayout::Import)
+    {
+        // Fixed dual-lane height from the start; secondary stays grayed until activated.
+        secondaryMessage_ = juce::String(kImportingWritingMessage);
+        secondaryTotalSteps_ = primaryTotalSteps_;
+    }
+    else
+    {
+        secondaryMessage_.clear();
+        secondaryTotalSteps_ = 1;
+    }
+
     onCancelRequested_ = std::move(onCancelRequested);
     setCancelEnabled(static_cast<bool>(onCancelRequested_));
+    resized();
+    repaint();
+}
+
+void BankTransferProgressDialog::beginSecondaryPhase(const juce::String& message, int totalSteps)
+{
+    primaryCompletedSteps_ = primaryTotalSteps_;
+    secondaryLaneActive_ = true;
+    secondaryMessage_ = message;
+    secondaryTotalSteps_ = juce::jmax(1, totalSteps);
+    secondaryCompletedSteps_ = 0;
+    resized();
     repaint();
 }
 
 void BankTransferProgressDialog::setProgress(int completedSteps)
 {
-    completedSteps_ = juce::jlimit(0, totalSteps_, completedSteps);
+    if (secondaryLaneActive_)
+        secondaryCompletedSteps_ = juce::jlimit(0, secondaryTotalSteps_, completedSteps);
+    else
+        primaryCompletedSteps_ = juce::jlimit(0, primaryTotalSteps_, completedSteps);
+
     repaint();
 }
 
 void BankTransferProgressDialog::setMessage(const juce::String& message)
 {
-    message_ = message;
+    if (secondaryLaneActive_)
+        secondaryMessage_ = message;
+    else
+        primaryMessage_ = message;
+
+    repaint();
+}
+
+void BankTransferProgressDialog::setDetail(const juce::String& detail)
+{
+    detail_ = detail;
     repaint();
 }
 
@@ -81,20 +135,148 @@ int BankTransferProgressDialog::getBorderThickness() const
     return juce::roundToInt(static_cast<float>(kBorderThickness_) * uiScale_);
 }
 
+int BankTransferProgressDialog::getDesignContentHeight() const noexcept
+{
+    return contentLayout_ == ContentLayout::Import ? kDesignHeightDual : kDesignHeightSingle;
+}
+
 juce::Rectangle<int> BankTransferProgressDialog::getDialogBounds() const
 {
     const int border = getBorderThickness();
     const int dialogWidth = juce::roundToInt(static_cast<float>(kDesignWidth) * uiScale_) + border * 2;
-    const int dialogHeight = juce::roundToInt(static_cast<float>(kDesignHeight) * uiScale_)
+    const int dialogHeight = juce::roundToInt(static_cast<float>(getDesignContentHeight()) * uiScale_)
                              + juce::roundToInt(static_cast<float>(kTitleBarHeight_) * uiScale_)
                              + border * 2;
 
     return getLocalBounds().withSizeKeepingCentre(dialogWidth, dialogHeight);
 }
 
-float BankTransferProgressDialog::getProgressFraction() const noexcept
+void BankTransferProgressDialog::paintProgressBar(juce::Graphics& g,
+                                                    juce::Rectangle<int> bounds,
+                                                    float fraction,
+                                                    bool enabled) const
 {
-    return juce::jlimit(0.0f, 1.0f, static_cast<float>(completedSteps_) / static_cast<float>(totalSteps_));
+    g.setColour(skin_->getColour(enabled ? SkinColourId::kSliderTrackEnabled
+                                         : SkinColourId::kSliderTrackDisabled));
+    g.fillRect(bounds);
+
+    if (enabled)
+    {
+        auto fillBar = bounds.withWidth(
+            juce::roundToInt(static_cast<float>(bounds.getWidth()) * fraction));
+        g.setColour(skin_->getColour(SkinColourId::kSliderValueBarEnabled));
+        g.fillRect(fillBar);
+    }
+
+    const int percent = enabled ? juce::roundToInt(fraction * 100.0f) : 0;
+    g.setColour(skin_->getColour(enabled ? SkinColourId::kSliderTextEnabled
+                                         : SkinColourId::kSliderTextDisabled));
+    g.drawText(juce::String(percent) + juce::String(PluginDisplayNames::Units::kPercent),
+               bounds,
+               juce::Justification::centred,
+               false);
+}
+
+juce::Rectangle<int> BankTransferProgressDialog::paintFolderHeader(juce::Graphics& g,
+                                                                   juce::Rectangle<int> body,
+                                                                   const juce::Font& bodyFont,
+                                                                   const juce::String& folderLabel) const
+{
+    const float em = bodyFont.getHeight();
+    const int gap1em = juce::roundToInt(em);
+    const int lineHeight = juce::jmax(1, juce::roundToInt(em));
+
+    g.setFont(bodyFont);
+    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
+
+    {
+        auto labelLine = body.removeFromTop(lineHeight);
+        g.drawText(folderLabel, labelLine, juce::Justification::centredLeft, false);
+    }
+
+    if (detail_.isNotEmpty())
+    {
+        auto pathLine = body.removeFromTop(lineHeight);
+        const auto fittedPath = TSS::TextFitHelpers::fitWithAsciiEllipsis(
+            detail_, bodyFont, static_cast<float>(pathLine.getWidth()), true);
+        g.drawText(fittedPath, pathLine, juce::Justification::centredLeft, false);
+    }
+
+    body.removeFromTop(gap1em);
+    return body;
+}
+
+void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g,
+                                                  juce::Rectangle<int>& body,
+                                                  const juce::Font& bodyFont,
+                                                  const juce::String& message,
+                                                  int completedSteps,
+                                                  int totalSteps,
+                                                  bool enabled) const
+{
+    const float em = bodyFont.getHeight();
+    const int gapHalfEm = juce::roundToInt(em * 0.5f);
+    const int lineHeight = juce::jmax(1, juce::roundToInt(em));
+    const int barHeight = juce::roundToInt(16.0f * uiScale_);
+
+    g.setFont(bodyFont);
+    g.setColour(enabled ? skin_->getColour(SkinColourId::kDarkPanelText)
+                        : skin_->getColour(SkinColourId::kSliderTextDisabled));
+
+    {
+        auto progressLabel = body.removeFromTop(lineHeight);
+        g.drawText(message, progressLabel, juce::Justification::centredLeft, false);
+    }
+
+    body.removeFromTop(gapHalfEm);
+
+    auto progressBar = body.removeFromTop(barHeight);
+    const float fraction = juce::jlimit(
+        0.0f,
+        1.0f,
+        static_cast<float>(completedSteps) / static_cast<float>(juce::jmax(1, totalSteps)));
+    paintProgressBar(g, progressBar, fraction, enabled);
+}
+
+void BankTransferProgressDialog::paintExportBody(juce::Graphics& g,
+                                                   juce::Rectangle<int> body,
+                                                   const juce::Font& bodyFont) const
+{
+    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+    body = paintFolderHeader(g, body, bodyFont, juce::String(kDestinationFolderLabel));
+    paintPhaseLane(g,
+                   body,
+                   bodyFont,
+                   primaryMessage_,
+                   primaryCompletedSteps_,
+                   primaryTotalSteps_,
+                   true);
+}
+
+void BankTransferProgressDialog::paintImportBody(juce::Graphics& g,
+                                                   juce::Rectangle<int> body,
+                                                   const juce::Font& bodyFont) const
+{
+    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+    body = paintFolderHeader(g, body, bodyFont, juce::String(kSourceFolderLabel));
+    paintPhaseLane(g,
+                   body,
+                   bodyFont,
+                   primaryMessage_,
+                   primaryCompletedSteps_,
+                   primaryTotalSteps_,
+                   true);
+
+    body.removeFromTop(juce::roundToInt(bodyFont.getHeight()));
+    paintPhaseLane(g,
+                   body,
+                   bodyFont,
+                   secondaryMessage_,
+                   secondaryCompletedSteps_,
+                   secondaryTotalSteps_,
+                   secondaryLaneActive_);
 }
 
 void BankTransferProgressDialog::paint(juce::Graphics& g)
@@ -120,33 +302,21 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
     g.setFont(skin_->getBaseFontBold().withHeight(skin_->getBaseFontBold().getHeight() * uiScale_));
     g.drawText(title_, titleBar, juce::Justification::centred, false);
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    auto textArea = content.reduced(padding);
-    textArea.removeFromBottom(juce::roundToInt(60.0f * uiScale_));
+    // Custom modal scheme: exactly 1em under the title, then content (no extra top padding).
+    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
+    const int padX = juce::roundToInt(12.0f * uiScale_);
+    const int bottomReserve = juce::roundToInt(40.0f * uiScale_);
 
-    g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
-    g.drawFittedText(message_, textArea, juce::Justification::topLeft, 2);
+    auto body = content;
+    body.removeFromTop(gapUnderTitle);
+    body = body.withTrimmedLeft(padX).withTrimmedRight(padX);
+    body.removeFromBottom(bottomReserve);
 
-    auto barArea = content.reduced(padding);
-    barArea.removeFromBottom(juce::roundToInt(36.0f * uiScale_));
-    auto progressBar = barArea.removeFromBottom(juce::roundToInt(16.0f * uiScale_));
-
-    g.setColour(skin_->getColour(SkinColourId::kBodyPanelBackground));
-    g.fillRect(progressBar);
-
-    auto fillBar = progressBar.withWidth(juce::roundToInt(
-        static_cast<float>(progressBar.getWidth()) * getProgressFraction()));
-    g.setColour(skin_->getColour(SkinColourId::kModuleHeaderLineBlue));
-    g.fillRect(fillBar);
-
-    g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
-    g.drawRect(progressBar, 1);
-
-    const int percent = juce::roundToInt(getProgressFraction() * 100.0f);
-    g.drawText(juce::String(percent) + juce::String(PluginDisplayNames::Units::kPercent),
-              progressBar,
-              juce::Justification::centred,
-              false);
+    if (contentLayout_ == ContentLayout::Export)
+        paintExportBody(g, body, bodyFont);
+    else
+        paintImportBody(g, body, bodyFont);
 }
 
 void BankTransferProgressDialog::resized()
@@ -160,4 +330,15 @@ void BankTransferProgressDialog::resized()
 
     auto buttonRow = inner.reduced(padding).removeFromBottom(buttonHeight);
     cancelButton_.setBounds(buttonRow.removeFromRight(buttonWidth));
+}
+
+bool BankTransferProgressDialog::keyPressed(const juce::KeyPress& key)
+{
+    if (key == juce::KeyPress::escapeKey && cancelButton_.isEnabled() && onCancelRequested_)
+    {
+        onCancelRequested_();
+        return true;
+    }
+
+    return false;
 }

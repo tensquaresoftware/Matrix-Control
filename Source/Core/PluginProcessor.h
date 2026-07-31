@@ -208,6 +208,7 @@ public:
     using BankImportConfirmGate = std::function<bool()>;
 
     void setBankImportConfirmGate(BankImportConfirmGate gate);
+    void setBankExportOverwriteConfirmGate(BankImportConfirmGate gate);
     void setBankTransferProgressPresenter(Core::BankTransferProgressPresenter presenter);
 
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }

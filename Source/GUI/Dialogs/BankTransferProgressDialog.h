@@ -9,27 +9,43 @@ namespace TSS
     class ISkin;
 }
 
-// Blocking modal overlay for Bank Utility EXPORT/IMPORT: title, waiting-text message, a linear
-// progress bar, and a Cancel button. Modeled on MasterInitConfirmDialog (dim overlay + boxed
-// dialog) but with a determinate progress readout instead of static confirm text.
+// Blocking modal overlay for Bank Utility EXPORT/IMPORT.
+// Export uses a destination-folder + single progress lane layout.
+// Import always shows both lanes at fixed height: primary (safety snapshot) active first,
+// secondary (write/restore) grayed until beginSecondaryPhase activates it.
 class BankTransferProgressDialog : public juce::Component
 {
 public:
+    enum class ContentLayout
+    {
+        Export,
+        Import
+    };
+
     static constexpr int kDesignWidth = 420;
-    static constexpr int kDesignHeight = 120;
+    static constexpr int kDesignHeightSingle = 160;
+    // Dual = single + section gap (1em) + phase lane (label + 0.5em + bar), keeping the same
+    // leftover gap above Cancel as the export modal.
+    static constexpr int kDesignHeightDual = 212;
 
     explicit BankTransferProgressDialog(TSS::ISkin& skin);
     ~BankTransferProgressDialog() override;
 
-    // onCancelRequested is empty while cancellation is not offered (e.g. while restoring a
-    // snapshot after Cancel) — the Cancel button is disabled in that case.
+    // detail is typically an absolute folder path (may be empty).
     void prepareForShow(const juce::String& title,
                         const juce::String& message,
+                        const juce::String& detail,
                         int totalSteps,
-                        std::function<void()> onCancelRequested);
+                        std::function<void()> onCancelRequested,
+                        ContentLayout layout = ContentLayout::Import);
+
+    // Activates the secondary lane (import write / restore) and starts its progress at 0.
+    void beginSecondaryPhase(const juce::String& message, int totalSteps);
+
+    // Updates the active lane (primary until secondary is active, then secondary).
     void setProgress(int completedSteps);
     void setMessage(const juce::String& message);
-    // Disables Cancel (e.g. once a restore-on-cancel is in flight and can no longer be aborted).
+    void setDetail(const juce::String& detail);
     void setCancelEnabled(bool enabled);
 
     void setSkin(TSS::ISkin& skin);
@@ -37,20 +53,48 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    bool keyPressed(const juce::KeyPress& key) override;
 
 private:
     int getBorderThickness() const;
+    int getDesignContentHeight() const noexcept;
     juce::Rectangle<int> getDialogBounds() const;
-    float getProgressFraction() const noexcept;
+    void paintProgressBar(juce::Graphics& g,
+                          juce::Rectangle<int> bounds,
+                          float fraction,
+                          bool enabled) const;
+    // Shared folder block: label, path, then 1em before the next section.
+    // Caller supplies a body that already starts 1em below the title (no extra top gap here).
+    juce::Rectangle<int> paintFolderHeader(juce::Graphics& g,
+                                           juce::Rectangle<int> body,
+                                           const juce::Font& bodyFont,
+                                           const juce::String& folderLabel) const;
+    void paintPhaseLane(juce::Graphics& g,
+                        juce::Rectangle<int>& body,
+                        const juce::Font& bodyFont,
+                        const juce::String& message,
+                        int completedSteps,
+                        int totalSteps,
+                        bool enabled) const;
+    void paintExportBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
+    void paintImportBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
 
     std::function<void()> onCancelRequested_;
     TSS::ISkin* skin_;
+    ContentLayout contentLayout_ = ContentLayout::Import;
     juce::String title_;
-    juce::String message_;
-    int totalSteps_ = 1;
-    int completedSteps_ = 0;
-    float uiScale_ = 1.0f;
+    juce::String detail_;
 
+    juce::String primaryMessage_;
+    int primaryTotalSteps_ = 1;
+    int primaryCompletedSteps_ = 0;
+
+    juce::String secondaryMessage_;
+    int secondaryTotalSteps_ = 1;
+    int secondaryCompletedSteps_ = 0;
+    bool secondaryLaneActive_ = false;
+
+    float uiScale_ = 1.0f;
     juce::TextButton cancelButton_;
 
     inline constexpr static int kTitleBarHeight_ = 28;

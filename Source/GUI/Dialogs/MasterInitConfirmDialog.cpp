@@ -118,11 +118,17 @@ void MasterInitConfirmDialog::paint(juce::Graphics& g)
                juce::Justification::centred,
                false);
 
-    const int padding = juce::roundToInt(12.0f * uiScale_);
-    auto textArea = content.reduced(padding);
+    // Custom modal scheme: exactly 1em under the title, then body copy (no extra top padding).
+    const auto bodyFont = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
+    const int gapUnderTitle = juce::roundToInt(bodyFont.getHeight());
+    const int padX = juce::roundToInt(12.0f * uiScale_);
+
+    auto textArea = content;
+    textArea.removeFromTop(gapUnderTitle);
+    textArea = textArea.withTrimmedLeft(padX).withTrimmedRight(padX);
     textArea.removeFromBottom(juce::roundToInt(36.0f * uiScale_));
 
-    g.setFont(skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_));
+    g.setFont(bodyFont);
     g.drawFittedText(formatBodyText(), textArea, juce::Justification::topLeft, 6);
 }
 

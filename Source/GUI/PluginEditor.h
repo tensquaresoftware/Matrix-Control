@@ -59,6 +59,7 @@ private:
     void closeMasterInitConfirmDialog();
     void showBankTransferProgressDialog(const juce::String& title,
                                         const juce::String& message,
+                                        const juce::String& detail,
                                         int totalSteps,
                                         std::function<void()> onCancelRequested);
     void hideBankTransferProgressDialog();

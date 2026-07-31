@@ -14,6 +14,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileNameReconciler.h"
+#include "Core/Services/PatchNameOverlayStore.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
 class MidiManager;
@@ -67,6 +68,7 @@ namespace Core
         void setBankExportFolderPicker(PatchFolderPicker picker);
         void setBankImportFolderPicker(PatchFolderPicker picker);
         void setBankImportConfirmGate(BankImportConfirmGate gate);
+        void setBankExportOverwriteConfirmGate(BankImportConfirmGate gate);
         void setBankTransferProgressPresenter(BankTransferProgressPresenter presenter);
 
         void rescanPersistedComputerPatchesFolder();
@@ -196,6 +198,7 @@ namespace Core
             int completedSlots = 0;
             DeviceMemoryLimits limits { DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kUnknown) };
             int bank = 0;
+            bool hasBankConcept = false;
 
             // EXPORT-only.
             juce::File targetFolder;
@@ -230,13 +233,21 @@ namespace Core
         void requestBankTransferCancel(std::uint64_t generation);
         void publishBankTransferFooter(const juce::String& message, const juce::String& severity);
         int bankTransferWriteDelayMs() const;
+        void loadPatchNameOverlayFromApvts();
+        void reloadPatchNameOverlayFromApvts();
+        void persistPatchNameOverlayToApvts();
+        void rememberOverlayName(int bank, int patch, const juce::String& name);
+        void applyResolvedPatchName(PatchModel& model, int bank, int patch, const DeviceMemoryLimits& limits);
 
         BankTransferState bankTransfer_;
         std::uint64_t bankTransferGeneration_ = 0;
         PatchFolderPicker bankExportFolderPicker_;
         PatchFolderPicker bankImportFolderPicker_;
         BankImportConfirmGate bankImportConfirmGate_;
+        BankImportConfirmGate bankExportOverwriteConfirmGate_;
         BankTransferProgressPresenter bankTransferProgress_;
+        PatchNameOverlayStore patchNameOverlay_;
+        bool patchNameOverlayLoaded_ = false;
 
         juce::AudioProcessorValueTreeState& apvts_;
         DeviceMemoryLimitsSupplier deviceMemoryLimits_;
