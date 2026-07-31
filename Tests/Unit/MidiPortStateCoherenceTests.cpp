@@ -33,8 +33,6 @@ public:
         beginTest("footer constants — Unknown and conflict copy are distinct");
         expect(juce::String(PluginDisplayNames::FooterPanel::kUnsupportedMatrixDeviceFooter)
                != juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));
-        expect(juce::String(PluginDisplayNames::FooterPanel::kUnsupportedMatrixDeviceFooter)
-               != juce::String(PluginDisplayNames::MasterEditSection::kUnsupportedDeviceFooterMessage));
         expect(PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter != nullptr);
 
         beginTest("clearMidiFromKeyboardFromConflictFooterIfPresent — exact-string clear only");

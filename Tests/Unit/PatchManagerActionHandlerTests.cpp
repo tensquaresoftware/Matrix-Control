@@ -482,9 +482,8 @@ private:
 
         harness.handler.handleAction(InternalPatches::kPastePatch, juce::var());
 
-        const auto footer = harness.proc.apvts.state.getProperty("uiMessageText").toString();
-        expect(footer == PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage);
-        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        // ROM gating is visual-only — no warning footer.
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isEmpty());
         expect(harness.queue.isEmpty());
     }
 
@@ -531,8 +530,7 @@ private:
 
         harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
 
-        const auto footer = harness.proc.apvts.state.getProperty("uiMessageText").toString();
-        expect(footer == PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage);
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isEmpty());
         expect(harness.queue.isEmpty());
     }
 
@@ -609,9 +607,8 @@ private:
 
         harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
 
-        const auto footer = harness.proc.apvts.state.getProperty("uiMessageText").toString();
-        expect(footer == PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage);
-        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isEmpty());
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString().isEmpty());
         expect(harness.queue.isEmpty());
     }
 

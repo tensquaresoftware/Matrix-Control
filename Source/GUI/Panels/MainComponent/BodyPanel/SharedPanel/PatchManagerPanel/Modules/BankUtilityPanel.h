@@ -70,8 +70,6 @@ private:
     void refreshSelectedBankHighlight();
     void refreshImportExportEnabled();
     void setBankUtilityGrayed(bool grayed);
-    void showMatrix1000OnlyFooterMessage();
-    void clearMatrix1000OnlyFooterIfPresent();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankUtilityPanel)
 };

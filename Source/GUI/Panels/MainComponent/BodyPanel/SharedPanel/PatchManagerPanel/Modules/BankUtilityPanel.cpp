@@ -118,7 +118,6 @@ void BankUtilityPanel::refreshDeviceGating()
 
 void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 {
-    const bool wasGrayed = bankUtilityGrayed_;
     bankUtilityGrayed_ = grayed;
 
     // Child-level lock (Master Edit pattern). Do not touch this panel's alpha/intercepts —
@@ -139,14 +138,6 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 
     if (grayed)
         giveAwayKeyboardFocus();
-
-    if (wasGrayed != grayed)
-    {
-        if (grayed)
-            showMatrix1000OnlyFooterMessage();
-        else
-            clearMatrix1000OnlyFooterIfPresent();
-    }
 
     refreshSelectedBankHighlight();
     repaint();
@@ -225,25 +216,6 @@ void BankUtilityPanel::refreshSelectedBankHighlight()
             button->setLook(accentLook);
         }
     }
-}
-
-void BankUtilityPanel::showMatrix1000OnlyFooterMessage()
-{
-    TSS::GrayedControlHelper::setFooterInfoMessage(
-        apvts_,
-        PluginDisplayNames::PatchManagerSection::BankUtilityModule::kMatrix1000OnlyFooterMessage);
-}
-
-void BankUtilityPanel::clearMatrix1000OnlyFooterIfPresent()
-{
-    if (apvts_.state.getProperty("uiMessageText").toString()
-        != juce::String(PluginDisplayNames::PatchManagerSection::BankUtilityModule::kMatrix1000OnlyFooterMessage))
-    {
-        return;
-    }
-
-    apvts_.state.setProperty("uiMessageText", juce::String(), nullptr);
-    apvts_.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
 }
 
 void BankUtilityPanel::resized()

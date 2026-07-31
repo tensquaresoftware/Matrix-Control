@@ -31,8 +31,6 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
-    void mouseEnter(const juce::MouseEvent& event) override;
-
     // juce::ValueTree::Listener
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                  const juce::Identifier& property) override;
@@ -84,7 +82,6 @@ private:
     void applyPatchNumberRange(const Core::DeviceMemoryLimits& limits);
     void updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank);
     void wirePasteStoreButton(TSS::Button* button, const juce::Identifier& actionPropertyId, bool functionallyEnabled);
-    void showRomBlockedFooterMessage();
 
     bool bankNumberVisible_ = true;
     bool clipboardPasteEnabled_ = false;

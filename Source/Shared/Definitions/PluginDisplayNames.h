@@ -193,7 +193,6 @@ namespace PluginDisplayNames
         constexpr const char* kPaste = "P"; // Paste buttons
         constexpr const char* kIncompatiblePasteFooter =
             "Clipboard contents are not compatible with this module.";
-        constexpr const char* kPasteNotAvailableFooter = "Paste is not available.";
         constexpr const char* kNothingToPasteFooter = "Nothing to paste.";
         constexpr const char* kPasteFailedFooter = "Paste failed.";
     }
@@ -507,10 +506,6 @@ namespace PluginDisplayNames
     namespace MasterEditSection
     {
         constexpr const char* kName = "MASTER EDIT";
-        constexpr const char* kMatrix6PatchOnlyFooterMessage =
-            "MASTER EDIT is Matrix-1000 only. Matrix-6/6R use PATCH workflows.";
-        constexpr const char* kUnsupportedDeviceFooterMessage =
-            "MASTER EDIT requires a detected Matrix-1000. This device type is not supported for MASTER.";
 
         namespace MidiModule
         {
@@ -911,8 +906,6 @@ namespace PluginDisplayNames
         namespace BankUtilityModule
         {
             constexpr const char* kName = "BANK UTILITY";
-            constexpr const char* kMatrix1000OnlyFooterMessage =
-                "Bank selection is available on Matrix-1000 only. Matrix-6/6R have no patch banks.";
             constexpr const char* kUnlockBankFooterMessage =
                 "Synth bank lock released - use front panel for 3-digit entry; plugin bank/patch unchanged.";
             constexpr const char* kMatrix6ExportFolderName = "PATCHES";
@@ -974,8 +967,6 @@ namespace PluginDisplayNames
         namespace InternalPatchesModule
         {
             constexpr const char* kName = "INTERNAL PATCHES";
-            constexpr const char* kRomBankPasteStoreFooterMessage =
-                "Init, Paste and Store are not available on ROM banks 2-9.";
 
             namespace StandaloneWidgets
             {

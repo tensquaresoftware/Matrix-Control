@@ -10,7 +10,6 @@
 #include "GUI/Widgets/ModulationBusHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ModulationBusCell.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -76,13 +75,9 @@ private:
         }
         else
         {
+            // Grayed appearance alone — no "Paste is not available" footer.
+            TSS::GrayedControlHelper::clearGrayedClickHandler(pasteButton_);
             pasteButton_.onClick = nullptr;
-            TSS::GrayedControlHelper::setGrayedClickHandler(pasteButton_, true, [this]
-            {
-                TSS::GrayedControlHelper::setFooterWarningMessage(
-                    apvts_,
-                    PluginDisplayNames::ShortLabels::kPasteNotAvailableFooter);
-            });
         }
     }
 

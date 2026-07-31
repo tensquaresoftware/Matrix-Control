@@ -1270,11 +1270,7 @@ namespace Core
 
     void PatchManagerActionHandler::propagateRomBlockedFooter()
     {
-        apvts_.state.setProperty(
-            "uiMessageText",
-            juce::String(PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage),
-            nullptr);
-        apvts_.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
+        // ROM Init/Paste/Store are grayed in the UI; no warning footer (avoids false alarms).
     }
 
     int PatchManagerActionHandler::getCurrentBank(const DeviceMemoryLimits& limits) const

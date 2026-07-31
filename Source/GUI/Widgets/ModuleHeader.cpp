@@ -8,7 +8,6 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
@@ -72,13 +71,9 @@ namespace TSS
             }
             else
             {
+                // Grayed appearance alone — no "Paste is not available" footer.
+                GrayedControlHelper::clearGrayedClickHandler(pasteButton_);
                 pasteButton_.onClick = nullptr;
-                GrayedControlHelper::setGrayedClickHandler(pasteButton_, true, [this]
-                {
-                    GrayedControlHelper::setFooterWarningMessage(
-                        apvts_,
-                        PluginDisplayNames::ShortLabels::kPasteNotAvailableFooter);
-                });
             }
         }
 

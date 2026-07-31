@@ -180,18 +180,9 @@ namespace
         const auto deviceType = DeviceTypeRegistry::fromApvtsProperty(
             apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
 
+        // MASTER EDIT is grayed when unavailable — consume the action with no footer.
         if (! isMasterEditAllowed(deviceDetected, deviceType))
-        {
-            const auto* footerMessage = MatrixDeviceTypes::isMatrix6Family(deviceType)
-                ? PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage
-                : PluginDisplayNames::MasterEditSection::kUnsupportedDeviceFooterMessage;
-            apvts_.state.setProperty(
-                "uiMessageText",
-                juce::String(footerMessage),
-                nullptr);
-            apvts_.state.setProperty("uiMessageSeverity", juce::String("info"), nullptr);
             return true;
-        }
 
         if (hooks_.setSuppressMasterSysEx)
             hooks_.setSuppressMasterSysEx(true);

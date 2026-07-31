@@ -17,7 +17,6 @@
 #include "GUI/Widgets/ModuleHeader.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
@@ -34,14 +33,6 @@ namespace
             if (auto* child = root.getChildComponent(i))
                 setSubtreeKeyboardInteractionEnabled(*child, enabled);
         }
-    }
-
-    const char* masterBlockedFooterMessage(MatrixDeviceTypes::Type deviceType)
-    {
-        if (MatrixDeviceTypes::isMatrix6Family(deviceType))
-            return PluginDisplayNames::MasterEditSection::kMatrix6PatchOnlyFooterMessage;
-
-        return PluginDisplayNames::MasterEditSection::kUnsupportedDeviceFooterMessage;
     }
 }
 
@@ -135,24 +126,6 @@ void MasterEditPanel::setMasterEditGrayed(bool grayed)
         giveAwayKeyboardFocus();
 
     repaint();
-}
-
-void MasterEditPanel::showMatrix6PatchOnlyFooterMessage()
-{
-    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
-        apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-    TSS::GrayedControlHelper::setFooterInfoMessage(apvts_, masterBlockedFooterMessage(deviceType));
-}
-
-void MasterEditPanel::mouseDown(const juce::MouseEvent& event)
-{
-    if (! masterEditGrayed_)
-    {
-        juce::Component::mouseDown(event);
-        return;
-    }
-
-    showMatrix6PatchOnlyFooterMessage();
 }
 
 void MasterEditPanel::paint(juce::Graphics& g)

@@ -24,24 +24,6 @@
 
 namespace
 {
-    void setFooterWarningMessage(juce::AudioProcessorValueTreeState& apvts, const juce::String& message)
-    {
-        apvts.state.setProperty("uiMessageText", message, nullptr);
-        apvts.state.setProperty("uiMessageSeverity", juce::String("warning"), nullptr);
-    }
-
-    void clearRomBlockedFooterIfPresent(juce::AudioProcessorValueTreeState& apvts)
-    {
-        if (apvts.state.getProperty("uiMessageText").toString()
-            != juce::String(PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage))
-        {
-            return;
-        }
-
-        apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
-        apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
-    }
-
     void dispatchTimestampAction(juce::AudioProcessorValueTreeState& apvts, const juce::Identifier& propertyId)
     {
         apvts.state.setProperty(propertyId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -162,18 +144,6 @@ void InternalPatchesPanel::valueTreeRedirected(juce::ValueTree&)
         false));
     refreshDeviceLimits();
     syncNumberBoxesFromApvts();
-}
-
-void InternalPatchesPanel::mouseEnter(const juce::MouseEvent& event)
-{
-    if (! romPasteStoreBlocked_)
-        return;
-
-    const auto* component = event.eventComponent;
-    if (component == initPatchButton_.get()
-        || component == pastePatchButton_.get()
-        || component == storePatchButton_.get())
-        showRomBlockedFooterMessage();
 }
 
 void InternalPatchesPanel::resized()
@@ -350,7 +320,6 @@ void InternalPatchesPanel::applyPatchNumberRange(const Core::DeviceMemoryLimits&
 
 void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank)
 {
-    const bool wasBlocked = romPasteStoreBlocked_;
     romPasteStoreBlocked_ = ! limits.isPasteStoreAllowed(currentBank);
     const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
         PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
@@ -371,20 +340,6 @@ void InternalPatchesPanel::updatePasteStoreEnabled(const Core::DeviceMemoryLimit
 
     if (pasteFeedbackBinding_ != nullptr)
         pasteFeedbackBinding_->refresh();
-
-    if (wasBlocked && ! romPasteStoreBlocked_)
-        clearRomBlockedFooterIfPresent(apvts_);
-
-    if (romPasteStoreBlocked_)
-    {
-        const bool mouseAlreadyOverGatedButton =
-            (initPatchButton_ != nullptr && initPatchButton_->isMouseOver())
-            || (pastePatchButton_ != nullptr && pastePatchButton_->isMouseOver())
-            || (storePatchButton_ != nullptr && storePatchButton_->isMouseOver());
-
-        if (mouseAlreadyOverGatedButton)
-            showRomBlockedFooterMessage();
-    }
 }
 
 void InternalPatchesPanel::wirePasteStoreButton(TSS::Button* button,
@@ -396,10 +351,11 @@ void InternalPatchesPanel::wirePasteStoreButton(TSS::Button* button,
 
     if (romPasteStoreBlocked_)
     {
+        // Grayed state alone signals unavailability — no warning footer on click/hover.
         button->setInactiveAppearance(true);
-        button->setEnabled(true);
+        button->setEnabled(false);
         button->setAlpha(1.0f);
-        button->onClick = [this] { showRomBlockedFooterMessage(); };
+        button->onClick = nullptr;
         return;
     }
 
@@ -410,13 +366,6 @@ void InternalPatchesPanel::wirePasteStoreButton(TSS::Button* button,
     {
         dispatchTimestampAction(apvts_, actionPropertyId);
     };
-}
-
-void InternalPatchesPanel::showRomBlockedFooterMessage()
-{
-    setFooterWarningMessage(
-        apvts_,
-        PluginDisplayNames::PatchManagerSection::InternalPatchesModule::kRomBankPasteStoreFooterMessage);
 }
 
 void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)

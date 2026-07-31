@@ -30,7 +30,6 @@ public:
     void paint(juce::Graphics& g) override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
-    void mouseDown(const juce::MouseEvent& event) override;
 
     void setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
@@ -56,7 +55,6 @@ private:
 
     void refreshDeviceGating();
     void setMasterEditGrayed(bool grayed);
-    void showMatrix6PatchOnlyFooterMessage();
     void applyGrayedToChild(juce::Component* child, bool grayed);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterEditPanel)
