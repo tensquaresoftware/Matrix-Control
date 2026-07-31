@@ -168,7 +168,7 @@ private:
         expectEquals(processor.apvts.state.getProperty("uiMessageText").toString(),
                      juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));
         expectEquals(processor.apvts.state.getProperty("uiMessageSeverity").toString(),
-                     juce::String("info"));
+                     juce::String("error"));
 
         processor.apvts.state.setProperty("deviceDetected", true, nullptr);
         processor.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,

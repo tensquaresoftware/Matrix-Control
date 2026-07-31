@@ -43,7 +43,7 @@ namespace PluginDisplayNames
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =
-            "No synth detected - check MIDI cables, MIDI From / MIDI To, and power-cycle the Matrix.";
+            "No synth detected - check MIDI cables, Editor MIDI From / MIDI To options, and power-cycle your Matrix synth.";
 
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =

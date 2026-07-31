@@ -81,10 +81,10 @@ namespace TSS
 
         if (deviceLocked)
         {
-            const auto* message = deviceDetected
-                                      ? FooterCopy::kUnsupportedMatrixDeviceFooter
-                                      : FooterCopy::kDeviceLockGuidance;
-            GrayedControlHelper::setFooterInfoMessage(apvts_, message);
+            if (deviceDetected)
+                GrayedControlHelper::setFooterInfoMessage(apvts_, FooterCopy::kUnsupportedMatrixDeviceFooter);
+            else
+                GrayedControlHelper::setFooterErrorMessage(apvts_, FooterCopy::kDeviceLockGuidance);
             return;
         }
 

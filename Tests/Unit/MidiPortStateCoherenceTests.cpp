@@ -51,7 +51,7 @@ public:
             state.setProperty("uiMessageText",
                               PluginDisplayNames::FooterPanel::kDeviceLockGuidance,
                               nullptr);
-            state.setProperty("uiMessageSeverity", "info", nullptr);
+            state.setProperty("uiMessageSeverity", "error", nullptr);
             Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
             expectEquals(state.getProperty("uiMessageText").toString(),
                          juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));

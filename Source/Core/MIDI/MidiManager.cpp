@@ -31,7 +31,9 @@ namespace
                                   ? PluginDisplayNames::FooterPanel::kUnsupportedMatrixDeviceFooter
                                   : PluginDisplayNames::FooterPanel::kDeviceLockGuidance;
         apvts.state.setProperty("uiMessageText", juce::String(message), nullptr);
-        apvts.state.setProperty("uiMessageSeverity", "info", nullptr);
+        apvts.state.setProperty("uiMessageSeverity",
+                               deviceDetected ? "info" : "error",
+                               nullptr);
     }
 
     Core::MidiActivityTracker::Path pathForOutboundMessage(
