@@ -7,11 +7,6 @@ namespace Core
     namespace
     {
         constexpr const char* kSyxFileLocationLabel = "SyxFile";
-
-        juce::String formatBankPatch(int bank, int patch)
-        {
-            return juce::String::formatted("B%dP%02d", bank, patch);
-        }
     } // namespace
 
     PatchLoadContext PatchLoadContext::deviceMemory(int bank, int patch)
@@ -41,7 +36,7 @@ namespace Core
 
     juce::String PatchLoadContext::computeDeviceBasename(const juce::String& patchName) const
     {
-        const auto location = formatBankPatch(bank, patch);
+        const auto location = PatchFileNameSanitizer::formatBankPatchLabel(bank, patch);
         const auto name = PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty(patchName);
 
         if (name.isEmpty())

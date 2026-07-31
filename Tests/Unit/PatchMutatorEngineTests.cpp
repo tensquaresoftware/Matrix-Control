@@ -1131,7 +1131,7 @@ private:
         harness.model.setName("OB-VOX");
 
         expect(harness.engine.mutate().success);
-        expectEquals(harness.store().getFrozenExportBasename(), juce::String("OB-VOX @ B8P25"));
+        expectEquals(harness.store().getFrozenExportBasename(), juce::String("OB-VOX @ B8-P25"));
     }
 
     void resetSessionForPatchLoad_clearsFrozenBasename()
@@ -1161,10 +1161,10 @@ private:
         harness.model.setName("WARMPAD");
 
         expect(harness.engine.mutate().success);
-        expectEquals(harness.store().getFrozenExportBasename(), juce::String("WARMPAD @ B1P73"));
+        expectEquals(harness.store().getFrozenExportBasename(), juce::String("WARMPAD @ B1-P73"));
 
         harness.engine.refreshFrozenExportBasename("COLDPAD");
-        expectEquals(harness.store().getFrozenExportBasename(), juce::String("COLDPAD @ B1P73"));
+        expectEquals(harness.store().getFrozenExportBasename(), juce::String("COLDPAD @ B1-P73"));
     }
 
     void refreshFrozenExportBasename_noFrozenBasename_noOp()
@@ -1195,8 +1195,8 @@ private:
 
         expect(result.success);
         expect(! result.exportCollisionModalRequested);
-        expect(tempDir.getChildFile("OB-VOX @ B8P25").isDirectory());
-        expect(tempDir.getChildFile("OB-VOX @ B8P25").getChildFile("M00").isDirectory());
+        expect(tempDir.getChildFile("OB-VOX @ B8-P25").isDirectory());
+        expect(tempDir.getChildFile("OB-VOX @ B8-P25").getChildFile("M00").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -1213,7 +1213,7 @@ private:
         expect(harness.engine.mutate().success);
 
         const auto tempDir = makeTempExportDir();
-        expect(tempDir.getChildFile("OB-VOX @ B8P25").createDirectory());
+        expect(tempDir.getChildFile("OB-VOX @ B8-P25").createDirectory());
 
         const auto result = harness.engine.exportHistory(tempDir);
         expect(result.exportCollisionModalRequested);
@@ -1234,13 +1234,13 @@ private:
         expect(harness.engine.mutate().success);
 
         const auto tempDir = makeTempExportDir();
-        expect(tempDir.getChildFile("OB-VOX @ B8P25").createDirectory());
+        expect(tempDir.getChildFile("OB-VOX @ B8-P25").createDirectory());
 
         const auto result = harness.engine.exportHistoryResolved(
             tempDir, Core::ExportCollisionResolution::kKeep);
 
         expect(result.success);
-        expect(tempDir.getChildFile("OB-VOX @ B8P25-2").isDirectory());
+        expect(tempDir.getChildFile("OB-VOX @ B8-P25-2").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -1259,7 +1259,7 @@ private:
         const auto tempDir = makeTempExportDir();
         expect(harness.engine.exportHistory(tempDir).success);
 
-        const auto exportedFile = tempDir.getChildFile("WARMPAD @ B8P25")
+        const auto exportedFile = tempDir.getChildFile("WARMPAD @ B8-P25")
                                        .getChildFile("M00")
                                        .getChildFile("M00.syx");
         expect(exportedFile.existsAsFile());
@@ -1287,14 +1287,14 @@ private:
 
         const auto tempDir = makeTempExportDir();
         expect(harness.engine.exportHistory(tempDir).success);
-        expect(tempDir.getChildFile("WARMPAD @ B1P73").isDirectory());
+        expect(tempDir.getChildFile("WARMPAD @ B1-P73").isDirectory());
 
         harness.model.setName("COLDPAD");
         harness.engine.refreshFrozenExportBasename("COLDPAD");
 
         expect(harness.engine.exportHistory(tempDir).success);
-        expect(tempDir.getChildFile("COLDPAD @ B1P73").isDirectory());
-        expect(tempDir.getChildFile("WARMPAD @ B1P73").isDirectory());
+        expect(tempDir.getChildFile("COLDPAD @ B1-P73").isDirectory());
+        expect(tempDir.getChildFile("WARMPAD @ B1-P73").isDirectory());
 
         tempDir.deleteRecursively();
     }

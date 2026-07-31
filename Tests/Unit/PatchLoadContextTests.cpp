@@ -23,7 +23,7 @@ private:
         beginTest("deviceNamed_buildsNameAtLocation");
 
         const auto context = Core::PatchLoadContext::deviceMemory(8, 25);
-        expectEquals(context.computeExportBasename("OB-VOX"), juce::String("OB-VOX @ B8P25"));
+        expectEquals(context.computeExportBasename("OB-VOX"), juce::String("OB-VOX @ B8-P25"));
     }
 
     void deviceBlankName_locationOnly()
@@ -31,8 +31,8 @@ private:
         beginTest("deviceBlankName_locationOnly");
 
         const auto context = Core::PatchLoadContext::deviceMemory(0, 0);
-        expectEquals(context.computeExportBasename("   "), juce::String("B0P00"));
-        expectEquals(context.computeExportBasename(""), juce::String("B0P00"));
+        expectEquals(context.computeExportBasename("   "), juce::String("B0-P00"));
+        expectEquals(context.computeExportBasename(""), juce::String("B0-P00"));
     }
 
     void deviceOsStrippedName_keepsSpaces()
@@ -40,7 +40,7 @@ private:
         beginTest("deviceOsStrippedName_keepsSpaces");
 
         const auto context = Core::PatchLoadContext::deviceMemory(2, 52);
-        expectEquals(context.computeExportBasename("BS ETAK*"), juce::String("BS ETAK @ B2P52"));
+        expectEquals(context.computeExportBasename("BS ETAK*"), juce::String("BS ETAK @ B2-P52"));
     }
 
     void deviceUnsanitizableName_locationOnly()
@@ -49,7 +49,7 @@ private:
 
         const auto context = Core::PatchLoadContext::deviceMemory(1, 77);
         // '*' '?' '"' ':' are OS-forbidden and strip to empty.
-        expectEquals(context.computeExportBasename("*?:"), juce::String("B1P77"));
+        expectEquals(context.computeExportBasename("*?:"), juce::String("B1-P77"));
     }
 
     void computerFile_currentNameAtSyxFile()

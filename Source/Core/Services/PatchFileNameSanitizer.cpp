@@ -86,6 +86,53 @@ namespace Core
         return slotLabel + " - " + sanitizedName;
     }
 
+    juce::String PatchFileNameSanitizer::formatBankPatchLabel(int bank, int patchNumber)
+    {
+        const int clampedBank = juce::jlimit(0, 9, bank);
+        const int clampedPatch = juce::jlimit(0, 99, patchNumber);
+        return "B" + juce::String(clampedBank) + "-P" + juce::String(clampedPatch).paddedLeft('0', 2);
+    }
+
+    juce::String PatchFileNameSanitizer::nameFromBankExportStem(juce::String stem)
+    {
+        stem = stripPathAndSyxExtension(std::move(stem)).trim();
+
+        // "Pxx - Name" or "Pxx-Name" (tolerant), else slot-only "Pxx".
+        if (stem.length() >= 3
+            && stem[0] == 'P'
+            && juce::CharacterFunctions::isDigit(stem[1])
+            && juce::CharacterFunctions::isDigit(stem[2]))
+        {
+            auto remainder = stem.substring(3).trim();
+            if (remainder.startsWithChar('-'))
+                remainder = remainder.substring(1).trim();
+
+            return sanitizeOsPathSegmentOrEmpty(remainder);
+        }
+
+        return {};
+    }
+
+    bool PatchFileNameSanitizer::isOberheimBankPlaceholderName(const juce::String& nameFromBytes) noexcept
+    {
+        return nameFromBytes.trim().toUpperCase().startsWith("BNK");
+    }
+
+    bool PatchFileNameSanitizer::isUsablePatchName(const juce::String& nameFromBytes) noexcept
+    {
+        return nameFromBytes.trim().isNotEmpty();
+    }
+
+    juce::String PatchFileNameSanitizer::resolvePatchNameOrBankPatchFallback(const juce::String& nameFromBytes,
+                                                                            int bank,
+                                                                            int patchNumber)
+    {
+        if (isUsablePatchName(nameFromBytes))
+            return nameFromBytes.trimEnd();
+
+        return formatBankPatchLabel(bank, patchNumber);
+    }
+
     juce::String PatchFileNameSanitizer::stripOsForbiddenChars(juce::String text)
     {
         for (int i = text.length(); --i >= 0;)

@@ -532,7 +532,7 @@ private:
         expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 402),
                                 makeParentBuffer(402)));
 
-        const auto sessionFolder = tempDir.getChildFile("OB-VOX @ B8P25");
+        const auto sessionFolder = tempDir.getChildFile("OB-VOX @ B8-P25");
         const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, false, "OB-VOX");
 
         expect(result.success);
@@ -547,7 +547,7 @@ private:
         beginTest("resolveKeepSessionFolder_indexesSuffix");
 
         const auto tempDir = createTempScanDir();
-        const juce::String basename = "OB-VOX @ B3P38";
+        const juce::String basename = "OB-VOX @ B3-P38";
 
         expectEquals(Core::PatchFileService::resolveKeepSessionFolder(tempDir, basename).getFileName(),
                      basename);
@@ -568,7 +568,7 @@ private:
         beginTest("exportSession_overwriteClearsExisting");
 
         const auto tempDir = createTempScanDir();
-        const auto sessionFolder = tempDir.getChildFile("B0P00");
+        const auto sessionFolder = tempDir.getChildFile("B0-P00");
         expect(sessionFolder.createDirectory());
         const auto stale = sessionFolder.getChildFile("stale.txt");
         expect(stale.replaceWithText("stale"));
