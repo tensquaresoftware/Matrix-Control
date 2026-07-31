@@ -1,5 +1,6 @@
 #include "FooterPanel.h"
 
+#include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
@@ -68,11 +69,11 @@ void FooterPanel::paintBadgeAndDetail(juce::Graphics& g,
     bounds.removeFromLeft(badgeWidth + badgeGap);
     g.setFont(font);
     g.setColour(detailColour);
-    g.drawFittedText(detailText,
-                     bounds,
-                     juce::Justification::centredLeft,
-                     1,
-                     1.0f);
+
+    // Prefer start of the message; truncate with ASCII "..." only (no U+2026 mojibake).
+    const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
+        detailText, font, static_cast<float>(bounds.getWidth()), false);
+    g.drawText(fittedDetail, bounds, juce::Justification::centredLeft, false);
 }
 
 void FooterPanel::paint(juce::Graphics& g)
