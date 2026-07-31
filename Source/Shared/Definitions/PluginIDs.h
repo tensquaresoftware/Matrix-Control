@@ -538,6 +538,8 @@ namespace PluginIDs
             {
                 constexpr const char* kSelectedBank = "patchManagerSelectedBank";
                 constexpr const char* kBanksLocked = "patchManagerBanksLocked";
+                // Musical names for RAM slots — Matrix firmware rewrites SysEx name bytes to BNK.
+                constexpr const char* kPatchNameOverlay = "patchManagerPatchNameOverlay";
             }
 
             namespace StandaloneWidgets
