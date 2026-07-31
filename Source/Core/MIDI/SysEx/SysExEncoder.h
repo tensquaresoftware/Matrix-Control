@@ -33,6 +33,10 @@ public:
                                              juce::uint8 amount,
                                              juce::uint8 destination) const;
     juce::MemoryBlock encodeSetBank(juce::uint8 bank) const;
+    // F0 10 06 0E <patch> <bank> <unitId> F7 — commit edit buffer to a bank slot (Matrix-1000).
+    juce::MemoryBlock encodeStoreEditBuffer(juce::uint8 patchNumber,
+                                            juce::uint8 bank,
+                                            juce::uint8 unitId = 0) const;
     static juce::MemoryBlock encodeUnlockBank();
     static size_t unpackBytes(const juce::uint8* bytes, size_t numBytes, juce::uint8* output);
     static juce::uint8 calculateChecksum(const juce::uint8* data, size_t length);

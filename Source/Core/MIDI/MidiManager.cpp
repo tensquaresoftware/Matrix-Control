@@ -299,6 +299,22 @@ void MidiManager::sendPatchToEditBuffer(const juce::uint8* packedData)
     }
 }
 
+void MidiManager::sendStoreEditBuffer(juce::uint8 patchNumber, juce::uint8 bank, juce::uint8 unitId)
+{
+    if (! isEditorOutboundAllowed())
+        return;
+
+    try
+    {
+        auto sysExMessage = sysExEncoder->encodeStoreEditBuffer(patchNumber, bank, unitId);
+        editorPath_.enqueueSysEx(sysExMessage);
+    }
+    catch (const std::exception& e)
+    {
+        updateErrorState(e.what(), "SysEx");
+    }
+}
+
 void MidiManager::sendFullPatchForAudition(const juce::uint8* packedData,
                                            juce::uint8 patchNumber,
                                            bool deviceHasBankConcept)

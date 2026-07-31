@@ -246,6 +246,22 @@ public:
             expect(data[5] == SysExConstants::kSysExEnd);
         }
 
+        beginTest("Store Edit Buffer (0x0E) encoding");
+        {
+            auto message = encoder.encodeStoreEditBuffer(42, 3, 0);
+            expectEquals(static_cast<int>(message.getSize()), 8);
+
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[0] == SysExConstants::kSysExStart);
+            expect(data[1] == SysExConstants::kManufacturerIdOberheim);
+            expect(data[2] == SysExConstants::kDeviceIdMatrix1000);
+            expect(data[3] == SysExConstants::Opcode::kStoreEditBuffer);
+            expect(data[4] == 42);
+            expect(data[5] == 3);
+            expect(data[6] == 0);
+            expect(data[7] == SysExConstants::kSysExEnd);
+        }
+
         beginTest("Unlock Bank (0x0C) encoding");
         {
             auto message = SysExEncoder::encodeUnlockBank();

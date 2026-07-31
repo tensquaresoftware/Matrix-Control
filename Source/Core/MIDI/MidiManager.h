@@ -46,6 +46,8 @@ public:
 
     void sendPatch(juce::uint8 patchNumber, const juce::uint8* packedData);
     void sendPatchToEditBuffer(const juce::uint8* packedData);
+    // Matrix-1000: commit the current edit buffer to bank/patch (opcode 0x0E).
+    void sendStoreEditBuffer(juce::uint8 patchNumber, juce::uint8 bank, juce::uint8 unitId = 0);
     // Full-patch audition to the synth:
     // - Matrix-6/6R: 0x01 to patchNumber
     // - Matrix-1000: 0x0D edit buffer (header F0 10 06 0D 00 … per Oberheim manual)

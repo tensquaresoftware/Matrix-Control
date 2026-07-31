@@ -25,6 +25,7 @@ namespace SysExConstants
         constexpr juce::uint8 kRemoteParameterEditMatrix = 0x0B;
         constexpr juce::uint8 kUnlockBank = 0x0C;
         constexpr juce::uint8 kSinglePatchToEditBuffer = 0x0D;
+        constexpr juce::uint8 kStoreEditBuffer = 0x0E;
     }
 
     // Request types (for opcode 0x04)

@@ -137,6 +137,26 @@ juce::MemoryBlock SysExEncoder::encodeSetBank(juce::uint8 bank) const
     return block;
 }
 
+juce::MemoryBlock SysExEncoder::encodeStoreEditBuffer(juce::uint8 patchNumber,
+                                                      juce::uint8 bank,
+                                                      juce::uint8 unitId) const
+{
+    const juce::uint8 message[] {
+        SysExConstants::kSysExStart,
+        SysExConstants::kManufacturerIdOberheim,
+        SysExConstants::kDeviceIdMatrix1000,
+        SysExConstants::Opcode::kStoreEditBuffer,
+        static_cast<juce::uint8>(patchNumber & 0x7F),
+        static_cast<juce::uint8>(bank & 0x7F),
+        static_cast<juce::uint8>(unitId & 0x7F),
+        SysExConstants::kSysExEnd
+    };
+
+    juce::MemoryBlock block;
+    block.append(message, sizeof(message));
+    return block;
+}
+
 juce::MemoryBlock SysExEncoder::encodeUnlockBank()
 {
     const juce::uint8 message[] {
