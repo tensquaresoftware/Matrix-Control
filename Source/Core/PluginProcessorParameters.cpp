@@ -311,7 +311,9 @@ void PluginProcessor::applyAcceptedPatchNumberChange(const juce::String& paramet
     if (patchManagerActionHandler_ != nullptr)
     {
         patchManagerActionHandler_->loadCurrentPatchFromDevice(
-            limits, priorBank, priorPatchNumber, priorSelectedBank, priorBanksLocked);
+            limits,
+            Core::PatchManagerActionHandler::InternalCoordinatesSnapshot {
+                priorBank, priorPatchNumber, priorSelectedBank, priorBanksLocked });
     }
 }
 

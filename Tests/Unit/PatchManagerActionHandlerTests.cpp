@@ -310,28 +310,29 @@ private:
             , limits(std::move(limitsIn))
             , patchFileService(decoder)
             , patchNameSyncer(proc.apvts, model)
-            , handler(proc.apvts,
-                      [this]() { return limits; },
-                      &model,
-                      &mapper,
-                      &clipboard,
-                      &patchInitService,
-                      &patchSelectionMidiSync,
-                      &midiManager,
-                      &patchFileService,
-                      &patchNameSyncer,
-                      &dirtyPatchTracker,
-                      &sysExEncoder,
-                      [this]() { return pickFolderCallback(); },
-                      [this](juce::File folder, juce::String stem) {
-                          return pickSaveFileCallback(folder, stem);
-                      },
-                      [this](juce::String internalSanitized, juce::String fileSanitized) {
-                          if (pickReconciliationCallback)
-                              return pickReconciliationCallback(internalSanitized, fileSanitized);
-                          return std::optional<Core::NameReconciliationChoice>{};
-                      },
-                      Core::ActionExecutionHooks{
+            , handler(Core::PatchManagerActionHandler::Dependencies {
+                  proc.apvts,
+                  [this]() { return limits; },
+                  &model,
+                  &mapper,
+                  &clipboard,
+                  &patchInitService,
+                  &patchSelectionMidiSync,
+                  &midiManager,
+                  &patchFileService,
+                  &patchNameSyncer,
+                  &dirtyPatchTracker,
+                  &sysExEncoder,
+                  [this]() { return pickFolderCallback(); },
+                  [this](juce::File folder, juce::String stem) {
+                      return pickSaveFileCallback(folder, stem);
+                  },
+                  [this](juce::String internalSanitized, juce::String fileSanitized) {
+                      if (pickReconciliationCallback)
+                          return pickReconciliationCallback(internalSanitized, fileSanitized);
+                      return std::optional<Core::NameReconciliationChoice>{};
+                  } },
+              Core::ActionExecutionHooks{
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,
                           [this](bool suppress) { suppressPatchSysEx = suppress; },
@@ -1116,7 +1117,9 @@ private:
         harness.proc.apvts.state.setProperty(BankUtility::StateProperties::kBanksLocked, true, nullptr);
         harness.dumpFakeState->available = false;
         harness.patchLoadHookState->invoked = false;
-        harness.handler.loadCurrentPatchFromDevice(harness.limits, 1, 10, 1, false);
+        harness.handler.loadCurrentPatchFromDevice(
+            harness.limits,
+            Core::PatchManagerActionHandler::InternalCoordinatesSnapshot { 1, 10, 1, false });
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 10);

@@ -186,37 +186,38 @@ void PluginProcessor::createModuleActionHandler(const Core::ActionExecutionHooks
 void PluginProcessor::createPatchManagerActionHandler(const Core::ActionExecutionHooks& hooks)
 {
     patchManagerActionHandler_ = std::make_unique<Core::PatchManagerActionHandler>(
-        apvts,
-        [this]() { return getResolvedDeviceMemoryLimits(); },
-        patchModel_.get(),
-        apvtsPatchMapper_.get(),
-        clipboardService_.get(),
-        patchInitService_.get(),
-        patchSelectionMidiSync_.get(),
-        midiManager.get(),
-        patchFileService_.get(),
-        patchNameSyncer_.get(),
-        dirtyPatchTracker_.get(),
-        &midiManager->getSysExEncoder(),
-        [this]() -> juce::File
-        {
-            if (patchFolderPicker_)
-                return patchFolderPicker_();
-            return {};
-        },
-        [this](juce::File suggestedFolder, juce::String suggestedStem) -> juce::File
-        {
-            if (patchSaveFilePicker_)
-                return patchSaveFilePicker_(suggestedFolder, suggestedStem);
-            return {};
-        },
-        [this](juce::String internalSanitized, juce::String fileSanitized)
-            -> std::optional<Core::NameReconciliationChoice>
-        {
-            if (patchNameReconciliationPicker_)
-                return patchNameReconciliationPicker_(internalSanitized, fileSanitized);
-            return std::nullopt;
-        },
+        Core::PatchManagerActionHandler::Dependencies {
+            apvts,
+            [this]() { return getResolvedDeviceMemoryLimits(); },
+            patchModel_.get(),
+            apvtsPatchMapper_.get(),
+            clipboardService_.get(),
+            patchInitService_.get(),
+            patchSelectionMidiSync_.get(),
+            midiManager.get(),
+            patchFileService_.get(),
+            patchNameSyncer_.get(),
+            dirtyPatchTracker_.get(),
+            &midiManager->getSysExEncoder(),
+            [this]() -> juce::File
+            {
+                if (patchFolderPicker_)
+                    return patchFolderPicker_();
+                return {};
+            },
+            [this](juce::File suggestedFolder, juce::String suggestedStem) -> juce::File
+            {
+                if (patchSaveFilePicker_)
+                    return patchSaveFilePicker_(suggestedFolder, suggestedStem);
+                return {};
+            },
+            [this](juce::String internalSanitized, juce::String fileSanitized)
+                -> std::optional<Core::NameReconciliationChoice>
+            {
+                if (patchNameReconciliationPicker_)
+                    return patchNameReconciliationPicker_(internalSanitized, fileSanitized);
+                return std::nullopt;
+            } },
         hooks);
 }
 

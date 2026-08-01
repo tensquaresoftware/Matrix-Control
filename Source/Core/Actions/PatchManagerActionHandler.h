@@ -14,6 +14,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/PatchFileNameReconciler.h"
+#include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchNameOverlayStore.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
@@ -45,22 +46,34 @@ namespace Core
         // for the progress-modal presenter type shared with PluginProcessor.
         using BankImportConfirmGate = std::function<bool()>;
 
-        PatchManagerActionHandler(juce::AudioProcessorValueTreeState& apvts,
-                                  DeviceMemoryLimitsSupplier deviceMemoryLimits,
-                                  PatchModel* patchModel,
-                                  ApvtsPatchMapper* apvtsPatchMapper,
-                                  ClipboardService* clipboardService,
-                                  PatchInitService* patchInitService,
-                                  PatchSelectionMidiSync* patchSelectionMidiSync,
-                                  MidiManager* midiManager,
-                                  PatchFileService* patchFileService,
-                                  PatchNameSyncer* patchNameSyncer,
-                                  DirtyPatchTracker* dirtyPatchTracker,
-                                  SysExEncoder* sysExEncoder,
-                                  PatchFolderPicker pickFolder,
-                                  PatchSaveFilePicker pickSaveFile,
-                                  PatchNameReconciliationPicker pickNameReconciliation,
-                                  ActionExecutionHooks hooks);
+        struct Dependencies
+        {
+            juce::AudioProcessorValueTreeState& apvts;
+            DeviceMemoryLimitsSupplier deviceMemoryLimits;
+            PatchModel* patchModel = nullptr;
+            ApvtsPatchMapper* apvtsPatchMapper = nullptr;
+            ClipboardService* clipboardService = nullptr;
+            PatchInitService* patchInitService = nullptr;
+            PatchSelectionMidiSync* patchSelectionMidiSync = nullptr;
+            MidiManager* midiManager = nullptr;
+            PatchFileService* patchFileService = nullptr;
+            PatchNameSyncer* patchNameSyncer = nullptr;
+            DirtyPatchTracker* dirtyPatchTracker = nullptr;
+            SysExEncoder* sysExEncoder = nullptr;
+            PatchFolderPicker pickFolder;
+            PatchSaveFilePicker pickSaveFile;
+            PatchNameReconciliationPicker pickNameReconciliation;
+        };
+
+        struct InternalCoordinatesSnapshot
+        {
+            int bank = 0;
+            int patch = 0;
+            int selectedBank = 0;
+            bool banksLocked = false;
+        };
+
+        PatchManagerActionHandler(Dependencies dependencies, ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 
@@ -90,23 +103,13 @@ namespace Core
         // (NumberBox) so failure can restore the true pre-navigation values.
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits);
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits,
-                                        int priorBank,
-                                        int priorPatch,
-                                        int priorSelectedBank,
-                                        bool priorBanksLocked);
+                                        const InternalCoordinatesSnapshot& priorCoordinates);
 
     private:
         enum class PatchNameResolvePurpose
         {
             kDisplay,
             kExportMusical
-        };
-        struct InternalCoordinatesSnapshot
-        {
-            int bank = 0;
-            int patch = 0;
-            int selectedBank = 0;
-            bool banksLocked = false;
         };
 
         struct PendingDeviceLoad
@@ -141,6 +144,9 @@ namespace Core
         void requestDeviceDump(juce::uint8 patchNumber, ActionExecutionHooks::DeviceDumpCallback onResult);
         void handleUnlockBank(const DeviceMemoryLimits& limits);
         void markBanksLockedInApvts();
+        // Bank Utility EXPORT/IMPORT orchestration (live MIDI dump/write, cancellable).
+        using PackedPatchBuffer = std::array<juce::uint8, PatchModel::kBufferSize>;
+
         void handleInternalPatchInit();
         void handleInternalPatchPaste(const DeviceMemoryLimits& limits);
         void handleInternalPatchStore(const DeviceMemoryLimits& limits);
@@ -148,6 +154,97 @@ namespace Core
         void handleSavePatchAs();
         void handleSavePatchFile();
         void handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits);
+        bool tryHandleInternalPatchNavigation(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        bool tryHandleComputerPatchFileNavigation(const juce::String& propertyId,
+                                                  const DeviceMemoryLimits& limits);
+        bool tryHandleBankButtonSelection(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        bool tryHandleInitPasteStoreActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        bool tryHandleComputerFileActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        bool tryHandleBankTransferActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        bool tryHandleUnlockBankAction(const juce::String& propertyId, const DeviceMemoryLimits& limits);
+        void publishPasteNothingFooter();
+        void publishPasteFailedFooter(const juce::String& sourceLabel, const juce::String& targetLabel);
+        void publishPasteSuccessFooter(const juce::String& sourceLabel, const juce::String& targetLabel);
+        void applyPastedPatchToEditorAndSynth(const DeviceMemoryLimits& limits, int currentBank);
+        bool validateBankExportPrerequisites(const DeviceMemoryLimits& limits);
+        juce::String resolveExportChildFolderName(const DeviceMemoryLimits& limits) const;
+        bool ensureExportChildFolder(const juce::File& parentFolder,
+                                     const juce::String& childName,
+                                     juce::File& outFolder);
+        void initializeBankExportState(const DeviceMemoryLimits& limits,
+                                       const juce::File& folder,
+                                       const juce::String& childName,
+                                       bool createdTargetFolderThisRun);
+        void showBankExportProgress(std::uint64_t generation,
+                                    const juce::File& folder,
+                                    bool hasBankConcept,
+                                    int bank);
+        void beginBankExportDumpLoop(std::uint64_t generation,
+                                     const DeviceMemoryLimits& limits,
+                                     bool hasBankConcept,
+                                     int bank);
+        bool validateExportDumpSlot(int slot,
+                                    std::uint64_t generation,
+                                    const std::vector<juce::uint8>& dump);
+        bool saveExportedDumpToFile(int slot, PatchModel& dumpedPatch);
+        bool prepareBankExportDestination(const DeviceMemoryLimits& limits,
+                                          juce::File& outFolder,
+                                          juce::String& outChildName,
+                                          bool& outCreatedThisRun);
+        void startBankExportTransfer(const DeviceMemoryLimits& limits,
+                                     const juce::File& folder,
+                                     const juce::String& childName,
+                                     bool createdTargetFolderThisRun);
+        bool processExportDumpSlot(int slot, std::uint64_t generation, std::vector<juce::uint8> dump);
+        void applySuccessfulDeviceDump(const DeviceMemoryLimits& limits,
+                                       int bank,
+                                       int patch,
+                                       const std::vector<juce::uint8>& dump);
+
+        struct PendingDeviceDumpResultContext
+        {
+            int bank = 0;
+            int patch = 0;
+            std::uint64_t generation = 0;
+            DeviceMemoryLimits limits { DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kUnknown) };
+            juce::String failFooter;
+        };
+
+        void handlePendingDeviceDumpResult(const PendingDeviceDumpResultContext& context,
+                                           std::vector<juce::uint8> dump);
+        bool loadImportPatchesFromScan(const PatchFolderScanResult& scan, int cappedValidCount);
+
+        struct BankImportFolderSelection
+        {
+            juce::File folder;
+            int foundCount = 0;
+            int cappedValidCount = 0;
+        };
+
+        std::optional<BankImportFolderSelection> resolveBankImportFolderSelection(const DeviceMemoryLimits& limits);
+        bool validateBankImportGate(const DeviceMemoryLimits& limits);
+        std::optional<juce::File> pickBankImportFolder();
+        std::optional<BankImportFolderSelection> scanBankImportSelection(const juce::File& folder);
+        void initializeBankImportState(const DeviceMemoryLimits& limits, int foundCount);
+        void showBankImportProgress(std::uint64_t generation, const juce::File& folder);
+        void scheduleBankImportAfterSetBank(std::uint64_t generation,
+                                            const DeviceMemoryLimits& limits,
+                                            int bank);
+        bool processImportSnapshotDump(int slot, std::uint64_t generation, std::vector<juce::uint8> dump);
+        std::optional<PackedPatchBuffer> takeWrittenCurrentImportSlot(bool importSucceeded,
+                                                                      int currentPatch) const;
+        void startBankImportAfterConfirm(const DeviceMemoryLimits& limits,
+                                         const juce::File& folder,
+                                         int foundCount,
+                                         int cappedValidCount);
+        void applyWrittenImportSlotToEditor(const DeviceMemoryLimits& limits,
+                                            int importedBank,
+                                            int currentPatch,
+                                            const PackedPatchBuffer& writtenCurrentSlot);
+        void schedulePostImportDeviceReload(const DeviceMemoryLimits& limits);
+        void rememberOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed);
+        void restoreOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed);
+
         struct SelectedPatchFileResolution
         {
             enum class Kind
@@ -171,6 +268,10 @@ namespace Core
         bool loadPackedPatchFromFile(const juce::File& file, juce::uint8* packedOut);
         PatchNameReconciliationResult reconcileLoadedPatchName(const juce::File& file);
         std::optional<PatchNameReconciliationResult> decodeAndReconcilePatchFile(const juce::File& file);
+        void commitLoadedComputerPatchFile(const DeviceMemoryLimits& limits,
+                                             int requestedId,
+                                             const juce::File& file,
+                                             const PatchNameReconciliationResult& reconciliation);
         void syncLoadedPatchToApvts();
         void applyLoadedPatchToApvtsAndSynth(const DeviceMemoryLimits& limits);
         void publishLoadFooters(const juce::String& fileName,
@@ -191,9 +292,6 @@ namespace Core
         int getCurrentBank(const DeviceMemoryLimits& limits) const;
         int getCurrentPatch(const DeviceMemoryLimits& limits) const;
         int parseBankButtonIndex(const juce::String& propertyId) const;
-
-        // Bank Utility EXPORT/IMPORT orchestration (live MIDI dump/write, cancellable).
-        using PackedPatchBuffer = std::array<juce::uint8, PatchModel::kBufferSize>;
 
         struct BankTransferState
         {
@@ -251,8 +349,7 @@ namespace Core
         void persistPatchNameOverlayToApvts();
         void rememberOverlayName(int bank, int patch, const juce::String& name);
         void applyResolvedPatchName(PatchModel& model,
-                                    int bank,
-                                    int patch,
+                                    const PatchCoordinates& coordinates,
                                     const DeviceMemoryLimits& limits,
                                     PatchNameResolvePurpose purpose);
 

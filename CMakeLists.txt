@@ -186,6 +186,13 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/ActionPropertyRegistry.cpp
     Source/Core/Actions/ModuleActionHandler.cpp
     Source/Core/Actions/PatchManagerActionHandler.cpp
+    Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
+    Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
+    Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
+    Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
+    Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
+    Source/Core/Actions/PatchManagerActionHandlerBankImport.cpp
+    Source/Core/Actions/PatchManagerActionHandlerBankImportWrite.cpp
     Source/Core/Actions/MutatorActionHandler.cpp
     Source/Core/Factories/ApvtsValidator.cpp
     Source/Core/Factories/ApvtsLayoutBuilder.cpp
@@ -470,6 +477,13 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/ActionPropertyRegistry.cpp
         Source/Core/Actions/ModuleActionHandler.cpp
         Source/Core/Actions/PatchManagerActionHandler.cpp
+        Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
+        Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
+        Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
+        Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
+        Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
+        Source/Core/Actions/PatchManagerActionHandlerBankImport.cpp
+        Source/Core/Actions/PatchManagerActionHandlerBankImportWrite.cpp
         Source/Core/Actions/MutatorActionHandler.cpp
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp
