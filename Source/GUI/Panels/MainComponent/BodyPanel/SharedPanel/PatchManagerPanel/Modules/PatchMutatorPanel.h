@@ -43,6 +43,19 @@ public:
 
 private:
     class ActionEnabledPropertyListener;
+
+    struct SliderLineLayoutArgs
+    {
+        int x = 0;
+        int y = 0;
+        TSS::Label* label = nullptr;
+        TSS::Slider* slider = nullptr;
+        TSS::Button* button = nullptr;
+        TSS::Toggle* const* toggles = nullptr;
+        int toggleCount = 0;
+        int actionButtonWidth = 0;
+    };
+
     PatchMutatorPanelDimensions dims_;
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
@@ -88,39 +101,51 @@ private:
     bool historySelectionHydrating_ = false;
     bool deferHistoryComboRefresh_ = false;
     bool historyComboRefreshScheduled_ = false;
+    bool compareBlinkVisible_ = true;
 
+    // History / recipe / compare (PatchMutatorPanelHistory.cpp).
     void scheduleHistoryComboBoxRefresh();
     void rebuildRetryLabelsCacheFromApvts();
     void pruneRetryLabelsCache();
     static std::map<int, juce::StringArray> parseRetryListsByRoot(const juce::String& encoded);
     static int countFlatHistoryEntries(const juce::ValueTree& state);
+    void refreshHistoryComboBox();
+    void refreshCompareUiState();
+    void applyCompareControlLock(bool compareActive);
+    void applyCompareBlinkState(bool compareActive);
+    void handleHistoryComboSelectionChange();
+    void syncHistorySelectionFromApvts();
+    void addRetryChildrenForPrimary(int primaryId, const juce::StringArray& retryLabelList);
+    static juce::StringArray parsePipeSeparatedList(const juce::String& encodedList);
 
-    void propagateSkinsToControlWidgets(TSS::ISkin& skin);
-    void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
-
+    // Setup (PatchMutatorPanelSetup.cpp).
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void wireHistoryComboBox(TSS::ISkin& skin);
+    void setupHistoryActionButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    std::unique_ptr<TSS::Toggle> makeRecipeToggle(TSS::ISkin& skin,
+                                                  const char* displayName,
+                                                  const char* widgetId);
+    std::unique_ptr<TSS::Slider> makePercentRecipeSlider(TSS::ISkin& skin,
+                                                         const char* widgetId,
+                                                         double fallbackDefault);
     void connectButtonToApvts(TSS::Button* button, const char* widgetId);
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
 
-    void refreshHistoryComboBox();
-    void refreshCompareUiState();
-    void applyCompareControlLock(bool compareActive);
+    // Layout / skin (PatchMutatorPanelLayout.cpp).
+    void propagateSkinsToControlWidgets(TSS::ISkin& skin);
+    void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
+    void applyUiScaleToWidgets(float sf);
+    void layoutSliderLine(const SliderLineLayoutArgs& args);
+    void layoutHistoryLine(int x, int y);
+
+    // Recipe hydrate (PatchMutatorPanel.cpp).
     void refreshRecipeFromApvts();
     void hydrateRecipeTogglesFromApvts(const juce::ValueTree& state);
     static bool isRecipeProperty(const juce::String& propertyName);
-    void syncHistorySelectionFromApvts();
-    void addRetryChildrenForPrimary(int primaryId, const juce::StringArray& retryLabelList);
     void timerCallback() override;
-    static juce::StringArray parsePipeSeparatedList(const juce::String& encodedList);
-
-    bool compareBlinkVisible_ = true;
-
-    void layoutSliderLine(int x, int y, TSS::Label* label, TSS::Slider* slider, TSS::Button* button,
-                          const std::vector<TSS::Toggle*>& toggles, int actionButtonWidth);
-    void layoutHistoryLine(int x, int y);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PatchMutatorPanel)
 };
