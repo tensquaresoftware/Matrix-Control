@@ -431,7 +431,14 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MatrixModBusReorderServiceTests.cpp
         Tests/Unit/MasterModuleInitServiceTests.cpp
         Tests/Unit/PatchModuleInitServiceTests.cpp
-        Tests/Unit/PatchManagerActionHandlerTests.cpp
+        Tests/Unit/PatchManagerActionHandlerTestSupport.cpp
+        Tests/Unit/PatchManagerActionHandlerBasicTests.cpp
+        Tests/Unit/PatchManagerActionHandlerGateTests.cpp
+        Tests/Unit/PatchManagerActionHandlerDeferredGateTests.cpp
+        Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp
+        Tests/Unit/PatchManagerActionHandlerSaveTests.cpp
+        Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
+        Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
         Tests/Unit/PatchNameOverlayStoreTests.cpp

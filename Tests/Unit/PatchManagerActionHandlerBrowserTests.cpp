@@ -1,0 +1,285 @@
+#include "PatchManagerActionHandlerTestSupport.h"
+
+using namespace PatchManagerActionHandlerTestSupport;
+
+class PatchManagerActionHandlerBrowserTests : public juce::UnitTest
+{
+public:
+    PatchManagerActionHandlerBrowserTests() : juce::UnitTest("PatchManagerActionHandlerBrowser") {}
+
+    void runTest() override
+    {
+        testOpenPersistsFolderPath();
+        testOpenCancelledDoesNotPersist();
+        testOpenAutoSelectsAndLoadsFirst();
+        testOpenEmptyFolderNoLoad();
+        testOpenAlreadySelectedFirstReloads();
+        testSessionLoadResetsBrowserWithoutRescan();
+        testRescanPersistedFolderMissingPathWarningFooter();
+        testRescanPersistedFolderEmptyPathNoOp();
+        testRescanPersistedFolderEmptyPathClearsStaleCache();
+        testRescanPersistedFolderNoSysEx();
+        testFolderPathSessionXmlRoundTrip();
+    }
+
+private:
+    void testOpenPersistsFolderPath()
+    {
+        beginTest("open_persistsFolderPath");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kOpenPatchFolder, juce::var());
+
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
+               == tempDir.getFullPathName());
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenCancelledDoesNotPersist()
+    {
+        beginTest("open_cancelled_doesNotPersist");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const juce::String keepPath = "/tmp/keep";
+        harness.proc.apvts.state.setProperty(ComputerPatches::StateProperties::kFolderPath, keepPath, nullptr);
+        harness.pickFolderCallback = []() { return juce::File(); };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kOpenPatchFolder, juce::var());
+
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
+               == keepPath);
+    }
+
+    void testOpenAutoSelectsAndLoadsFirst()
+    {
+        beginTest("open_autoSelectsAndLoadsFirst");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
+        expect(harness.patchFileService.getLastScanResult().sortedValidFileNames[0]
+               == "Patch 5.syx");
+        const auto queued = scanQueue(harness.queue);
+        expect(!queued.patchData);
+        expect(queued.editBufferPatch);
+        expect(harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenEmptyFolderNoLoad()
+    {
+        beginTest("open_emptyFolder_noLoad");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            3,
+            nullptr);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            0);
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
+        expect(harness.queue.isEmpty());
+        expect(! harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenAlreadySelectedFirstReloads()
+    {
+        beginTest("open_alreadySelectedFirst_reloads");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+        expect(harness.patchLoadHookState->invoked);
+
+        harness.patchLoadHookState->invoked = false;
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
+        expect(harness.patchLoadHookState->invoked);
+        const auto queued = scanQueue(harness.queue);
+        expect(!queued.patchData);
+        expect(queued.editBufferPatch);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testSessionLoadResetsBrowserWithoutRescan()
+    {
+        beginTest("sessionLoad_resetsBrowser_withoutRescan");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+        expect(harness.patchFileService.getLastScanResult().validCount > 0);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            1);
+
+        const auto pathBefore = harness.proc.apvts.state.getProperty(
+            ComputerPatches::StateProperties::kFolderPath).toString();
+        const auto revisionBefore = harness.proc.apvts.state.getProperty(
+            ComputerPatches::StateProperties::kScanRevision);
+
+        harness.handler.resetComputerPatchesBrowserAfterSessionLoad();
+
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString()
+               == pathBefore);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile)),
+            0);
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
+        expect(! harness.patchFileService.getLastScanResult().folderUsable);
+        expect(harness.proc.apvts.state.getProperty(ComputerPatches::StateProperties::kScanRevision)
+               != revisionBefore);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testRescanPersistedFolderMissingPathWarningFooter()
+    {
+        beginTest("rescanPersistedFolder_missingPath_warningFooter");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            "/nonexistent/path",
+            nullptr);
+
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        const auto& scan = harness.patchFileService.getLastScanResult();
+        expect(!scan.folderUsable);
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kFolderNotFound));
+        expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
+    }
+
+    void testRescanPersistedFolderEmptyPathNoOp()
+    {
+        beginTest("rescanPersistedFolder_emptyPath_noOp");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.proc.apvts.state.setProperty(ComputerPatches::StateProperties::kFolderPath, juce::String(), nullptr);
+
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
+        expect(!harness.proc.apvts.state.hasProperty(ComputerPatches::StateProperties::kScanRevision));
+    }
+
+    void testRescanPersistedFolderEmptyPathClearsStaleCache()
+    {
+        beginTest("rescanPersistedFolder_emptyPath_clearsStaleCache");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        expect(harness.patchFileService.getLastScanResult().validCount > 0);
+
+        harness.proc.apvts.state.setProperty(ComputerPatches::StateProperties::kFolderPath, juce::String(), nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
+        expect(!harness.patchFileService.getLastScanResult().folderUsable);
+        expect(harness.proc.apvts.state.hasProperty(ComputerPatches::StateProperties::kScanRevision));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testRescanPersistedFolderNoSysEx()
+    {
+        beginTest("rescanPersisted_noSysEx");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        const auto queued = scanQueue(harness.queue);
+        expect(!queued.patchData);
+        expect(harness.queue.isEmpty());
+
+        tempDir.deleteRecursively();
+    }
+
+    void testFolderPathSessionXmlRoundTrip()
+    {
+        beginTest("folderPath_sessionXmlRoundTrip");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const juce::String path = "/tmp/persisted/folder";
+        harness.proc.apvts.state.setProperty(ComputerPatches::StateProperties::kFolderPath, path, nullptr);
+
+        juce::MemoryBlock destData;
+        if (auto xml = harness.proc.apvts.copyState().createXml())
+            juce::AudioProcessor::copyXmlToBinary(*xml, destData);
+
+        TestAudioProcessorPatchManager restored;
+        if (auto xmlState = juce::AudioProcessor::getXmlFromBinary(destData.getData(),
+                                                                   static_cast<int>(destData.getSize())))
+            restored.apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+
+        expect(restored.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString() == path);
+    }
+};
+
+static PatchManagerActionHandlerBrowserTests patchManagerActionHandlerBrowserTests;
