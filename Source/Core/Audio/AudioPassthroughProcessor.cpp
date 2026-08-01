@@ -61,6 +61,94 @@ namespace Core
         peakDisplay_.store(juce::jlimit(0.0f, 1.0f, blockPeak), std::memory_order_relaxed);
     }
 
+    bool AudioPassthroughProcessor::shouldDuplicateMono() const noexcept
+    {
+        const auto mode = static_cast<AudioFromChannelMode>(channelMode_.load(std::memory_order_relaxed));
+        return mode == AudioFromChannelMode::kMonoLeft
+            || mode == AudioFromChannelMode::kMonoRight;
+    }
+
+    void AudioPassthroughProcessor::clearAllOutputChannels(juce::AudioBuffer<float>& output,
+                                                           int numSamples) const noexcept
+    {
+        for (int channel = 0; channel < output.getNumChannels(); ++channel)
+            output.clear(channel, 0, numSamples);
+    }
+
+    void AudioPassthroughProcessor::clearTrailingOutputChannels(juce::AudioBuffer<float>& output,
+                                                                int firstChannel,
+                                                                int numSamples) const noexcept
+    {
+        for (int channel = firstChannel; channel < output.getNumChannels(); ++channel)
+            output.clear(channel, 0, numSamples);
+    }
+
+    float AudioPassthroughProcessor::applyGainAndTrackPeak(float sample,
+                                                           float gainLinear,
+                                                           float& blockPeak) noexcept
+    {
+        if (!std::isfinite(sample))
+            return 0.0f;
+
+        const float scaled = sample * gainLinear;
+
+        if (!std::isfinite(scaled))
+            return 0.0f;
+
+        blockPeak = std::max(blockPeak, std::abs(scaled));
+        return scaled;
+    }
+
+    float AudioPassthroughProcessor::processMonoDuplicate(const ProcessBuffers& buffers,
+                                                          float gainLinear) noexcept
+    {
+        const int sourceChannel = monoSourceChannelIndex_.load(std::memory_order_relaxed);
+
+        if (sourceChannel < 0 || sourceChannel >= buffers.numInputChannelsAvailable)
+        {
+            clearAllOutputChannels(buffers.output, buffers.numSamples);
+            return 0.0f;
+        }
+
+        const float* inputData = buffers.input.getReadPointer(sourceChannel);
+        float blockPeak = 0.0f;
+
+        for (int sample = 0; sample < buffers.numSamples; ++sample)
+        {
+            const float scaled = applyGainAndTrackPeak(inputData[sample], gainLinear, blockPeak);
+
+            for (int outputChannel = 0; outputChannel < buffers.numOutputChannelsToProcess; ++outputChannel)
+                buffers.output.getWritePointer(outputChannel)[sample] = scaled;
+        }
+
+        return blockPeak;
+    }
+
+    float AudioPassthroughProcessor::processMappedChannels(const ProcessBuffers& buffers,
+                                                           float gainLinear) noexcept
+    {
+        float blockPeak = 0.0f;
+
+        for (int outputChannel = 0; outputChannel < buffers.numOutputChannelsToProcess; ++outputChannel)
+        {
+            const int sourceChannel = mapSourceChannel(outputChannel);
+
+            if (sourceChannel < 0 || sourceChannel >= buffers.numInputChannelsAvailable)
+            {
+                buffers.output.clear(outputChannel, 0, buffers.numSamples);
+                continue;
+            }
+
+            const float* inputData = buffers.input.getReadPointer(sourceChannel);
+            float* outputData = buffers.output.getWritePointer(outputChannel);
+
+            for (int sample = 0; sample < buffers.numSamples; ++sample)
+                outputData[sample] = applyGainAndTrackPeak(inputData[sample], gainLinear, blockPeak);
+        }
+
+        return blockPeak;
+    }
+
     void AudioPassthroughProcessor::process(const juce::AudioBuffer<float>& input,
                                             juce::AudioBuffer<float>& output,
                                             float gainLinear) noexcept
@@ -81,90 +169,26 @@ namespace Core
         if (!std::isfinite(gainLinear))
             gainLinear = 0.0f;
 
-        const int numInputChannelsAvailable = juce::jmin(numInputChannels_, input.getNumChannels());
-        const int numOutputChannelsToProcess = juce::jmin(numOutputChannels_, output.getNumChannels());
+        const ProcessBuffers buffers {
+            input,
+            output,
+            numSamples,
+            juce::jmin(numInputChannels_, input.getNumChannels()),
+            juce::jmin(numOutputChannels_, output.getNumChannels())
+        };
 
-        if (!inputBusEnabled_ || numInputChannelsAvailable <= 0)
+        if (!inputBusEnabled_ || buffers.numInputChannelsAvailable <= 0)
         {
-            for (int channel = 0; channel < output.getNumChannels(); ++channel)
-                output.clear(channel, 0, numSamples);
-
+            clearAllOutputChannels(output, numSamples);
             updatePeakLevel(0.0f);
             return;
         }
 
-        float blockPeak = 0.0f;
+        const float blockPeak = shouldDuplicateMono()
+                                    ? processMonoDuplicate(buffers, gainLinear)
+                                    : processMappedChannels(buffers, gainLinear);
 
-        const auto mode = static_cast<AudioFromChannelMode>(channelMode_.load(std::memory_order_relaxed));
-        const bool duplicateMonoToAllOutputs = mode == AudioFromChannelMode::kMonoLeft
-                                            || mode == AudioFromChannelMode::kMonoRight;
-
-        if (duplicateMonoToAllOutputs)
-        {
-            const int sourceChannel = monoSourceChannelIndex_.load(std::memory_order_relaxed);
-
-            if (sourceChannel < 0 || sourceChannel >= numInputChannelsAvailable)
-            {
-                for (int channel = 0; channel < output.getNumChannels(); ++channel)
-                    output.clear(channel, 0, numSamples);
-            }
-            else
-            {
-                const float* inputData = input.getReadPointer(sourceChannel);
-
-                for (int sample = 0; sample < numSamples; ++sample)
-                {
-                    const float raw = inputData[sample];
-                    float scaled = 0.0f;
-
-                    if (std::isfinite(raw))
-                    {
-                        scaled = raw * gainLinear;
-
-                        if (! std::isfinite(scaled))
-                            scaled = 0.0f;
-                        else
-                            blockPeak = std::max(blockPeak, std::abs(scaled));
-                    }
-
-                    for (int outputChannel = 0; outputChannel < numOutputChannelsToProcess; ++outputChannel)
-                        output.getWritePointer(outputChannel)[sample] = scaled;
-                }
-            }
-        }
-        else
-        {
-            for (int outputChannel = 0; outputChannel < numOutputChannelsToProcess; ++outputChannel)
-            {
-                const int sourceChannel = mapSourceChannel(outputChannel);
-
-                if (sourceChannel < 0 || sourceChannel >= numInputChannelsAvailable)
-                {
-                    output.clear(outputChannel, 0, numSamples);
-                    continue;
-                }
-
-                const float* inputData = input.getReadPointer(sourceChannel);
-                float* outputData = output.getWritePointer(outputChannel);
-
-                for (int sample = 0; sample < numSamples; ++sample)
-                {
-                    const float scaled = inputData[sample] * gainLinear;
-
-                    if (!std::isfinite(scaled))
-                        outputData[sample] = 0.0f;
-                    else
-                    {
-                        outputData[sample] = scaled;
-                        blockPeak = std::max(blockPeak, std::abs(scaled));
-                    }
-                }
-            }
-        }
-
-        for (int channel = numOutputChannelsToProcess; channel < output.getNumChannels(); ++channel)
-            output.clear(channel, 0, numSamples);
-
+        clearTrailingOutputChannels(output, buffers.numOutputChannelsToProcess, numSamples);
         updatePeakLevel(blockPeak);
     }
 }

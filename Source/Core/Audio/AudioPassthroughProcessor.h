@@ -30,8 +30,25 @@ namespace Core
         float getPeakLevel() const noexcept { return peakDisplay_.load(std::memory_order_relaxed); }
 
     private:
+        struct ProcessBuffers
+        {
+            const juce::AudioBuffer<float>& input;
+            juce::AudioBuffer<float>& output;
+            int numSamples = 0;
+            int numInputChannelsAvailable = 0;
+            int numOutputChannelsToProcess = 0;
+        };
+
         int mapSourceChannel(int outputChannel) const noexcept;
         void updatePeakLevel(float blockPeak) noexcept;
+        bool shouldDuplicateMono() const noexcept;
+        void clearAllOutputChannels(juce::AudioBuffer<float>& output, int numSamples) const noexcept;
+        void clearTrailingOutputChannels(juce::AudioBuffer<float>& output,
+                                         int firstChannel,
+                                         int numSamples) const noexcept;
+        static float applyGainAndTrackPeak(float sample, float gainLinear, float& blockPeak) noexcept;
+        float processMonoDuplicate(const ProcessBuffers& buffers, float gainLinear) noexcept;
+        float processMappedChannels(const ProcessBuffers& buffers, float gainLinear) noexcept;
 
         std::atomic<float> peakDisplay_{ 0.0f };
         std::atomic<int> channelMode_{ static_cast<int>(AudioFromChannelMode::kStereo) };
