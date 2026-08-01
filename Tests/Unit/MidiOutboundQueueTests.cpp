@@ -7,6 +7,122 @@
 
 #include "Core/MIDI/Queue/MidiOutboundQueue.h"
 
+namespace
+{
+    struct DualProducerStressState
+    {
+        static constexpr int kRealtimeCount { 1000 };
+        static constexpr int kSysExCount { 1000 };
+        static constexpr int kConsumerTimeoutMs { 5000 };
+
+        Core::MidiOutboundQueue queue;
+        std::atomic<int> realtimeEnqueued { 0 };
+        std::atomic<int> sysExEnqueued { 0 };
+        std::atomic<int> realtimeDequeued { 0 };
+        std::atomic<int> sysExDequeued { 0 };
+        std::atomic<bool> producersDone { false };
+        std::mutex seenMutex;
+        std::set<int> seenNotes;
+        std::set<int> seenSysExIds;
+    };
+
+    void enqueueRealtimeMessages(DualProducerStressState& state)
+    {
+        for (int i = 0; i < DualProducerStressState::kRealtimeCount; ++i)
+        {
+            const int channel = (i / 128) + 1;
+            const int note = i % 128;
+            state.queue.enqueueRealtime(juce::MidiMessage::noteOn(channel, note, 0.5f));
+            ++state.realtimeEnqueued;
+        }
+    }
+
+    void enqueueSysExMessages(DualProducerStressState& state)
+    {
+        for (int i = 0; i < DualProducerStressState::kSysExCount; ++i)
+        {
+            juce::MemoryBlock block { "\xf0\x00\x00\xf7", 4 };
+            block[1] = static_cast<char>((i >> 7) & 0x7f);
+            block[2] = static_cast<char>(i & 0x7f);
+            state.queue.enqueueSysEx(std::move(block));
+            ++state.sysExEnqueued;
+        }
+    }
+
+    int realtimeMessageId(const juce::MidiMessage& message)
+    {
+        return (message.getChannel() - 1) * 128 + message.getNoteNumber();
+    }
+
+    int sysExMessageId(const juce::MemoryBlock& data)
+    {
+        return (static_cast<int>(static_cast<juce::uint8>(data[1])) << 7)
+               | static_cast<int>(static_cast<juce::uint8>(data[2]));
+    }
+
+    void recordSeenId(std::mutex& mutex, std::set<int>& ids, int id)
+    {
+        const std::lock_guard<std::mutex> lock(mutex);
+        ids.insert(id);
+    }
+
+    void handleDequeuedMessage(DualProducerStressState& state,
+                               const Core::MidiOutboundQueue::Message& msg,
+                               juce::UnitTest& test)
+    {
+        if (msg.category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
+        {
+            recordSeenId(state.seenMutex, state.seenNotes, realtimeMessageId(msg.midiMessage));
+            ++state.realtimeDequeued;
+            return;
+        }
+
+        test.expect(msg.sysExData.getSize() >= 3);
+        recordSeenId(state.seenMutex, state.seenSysExIds, sysExMessageId(msg.sysExData));
+        ++state.sysExDequeued;
+    }
+
+    bool consumerShouldStop(const DualProducerStressState& state)
+    {
+        return state.producersDone.load()
+               && state.realtimeDequeued.load() >= DualProducerStressState::kRealtimeCount
+               && state.sysExDequeued.load() >= DualProducerStressState::kSysExCount;
+    }
+
+    void runStressConsumer(DualProducerStressState& state, juce::UnitTest& test)
+    {
+        const auto deadline = juce::Time::getMillisecondCounter()
+                              + DualProducerStressState::kConsumerTimeoutMs;
+
+        while (juce::Time::getMillisecondCounter() < deadline)
+        {
+            if (auto msg = state.queue.dequeue())
+            {
+                handleDequeuedMessage(state, *msg, test);
+                continue;
+            }
+
+            if (consumerShouldStop(state))
+                break;
+
+            juce::Thread::sleep(1);
+        }
+    }
+
+    void expectStressCounts(juce::UnitTest& test, const DualProducerStressState& state)
+    {
+        test.expectEquals(state.realtimeEnqueued.load(), DualProducerStressState::kRealtimeCount);
+        test.expectEquals(state.sysExEnqueued.load(), DualProducerStressState::kSysExCount);
+        test.expectEquals(state.realtimeDequeued.load(), DualProducerStressState::kRealtimeCount);
+        test.expectEquals(state.sysExDequeued.load(), DualProducerStressState::kSysExCount);
+        test.expectEquals(static_cast<int>(state.seenNotes.size()),
+                          DualProducerStressState::kRealtimeCount);
+        test.expectEquals(static_cast<int>(state.seenSysExIds.size()),
+                          DualProducerStressState::kSysExCount);
+        test.expect(state.queue.isEmpty());
+    }
+}
+
 class MidiOutboundQueueTests : public juce::UnitTest
 {
 public:
@@ -108,101 +224,18 @@ private:
     {
         beginTest("Dual producer + single consumer stress — no loss under contention");
 
-        Core::MidiOutboundQueue queue;
-        constexpr int kRealtimeCount { 1000 };
-        constexpr int kSysExCount { 1000 };
+        DualProducerStressState state;
 
-        std::atomic<int> realtimeEnqueued { 0 };
-        std::atomic<int> sysExEnqueued { 0 };
-        std::atomic<int> realtimeDequeued { 0 };
-        std::atomic<int> sysExDequeued { 0 };
-        std::atomic<bool> producersDone { false };
-
-        std::mutex seenMutex;
-        std::set<int> seenNotes;
-        std::set<int> seenSysExIds;
-
-        auto realtimeProducer = [&]
-        {
-            for (int i = 0; i < kRealtimeCount; ++i)
-            {
-                const int channel = (i / 128) + 1;
-                const int note = i % 128;
-                queue.enqueueRealtime(juce::MidiMessage::noteOn(channel, note, 0.5f));
-                ++realtimeEnqueued;
-            }
-        };
-
-        auto sysExProducer = [&]
-        {
-            for (int i = 0; i < kSysExCount; ++i)
-            {
-                juce::MemoryBlock block { "\xf0\x00\x00\xf7", 4 };
-                block[1] = static_cast<char>((i >> 7) & 0x7f);
-                block[2] = static_cast<char>(i & 0x7f);
-                queue.enqueueSysEx(std::move(block));
-                ++sysExEnqueued;
-            }
-        };
-
-        auto consumer = [&]
-        {
-            const auto deadline = juce::Time::getMillisecondCounter() + 5000;
-
-            while (juce::Time::getMillisecondCounter() < deadline)
-            {
-                if (auto msg = queue.dequeue())
-                {
-                    if (msg->category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
-                    {
-                        const int id = (msg->midiMessage.getChannel() - 1) * 128
-                                       + msg->midiMessage.getNoteNumber();
-                        {
-                            const std::lock_guard<std::mutex> lock(seenMutex);
-                            seenNotes.insert(id);
-                        }
-                        ++realtimeDequeued;
-                    }
-                    else
-                    {
-                        expect(msg->sysExData.getSize() >= 3);
-                        const int id = (static_cast<int>(static_cast<juce::uint8>(msg->sysExData[1])) << 7)
-                                       | static_cast<int>(static_cast<juce::uint8>(msg->sysExData[2]));
-                        {
-                            const std::lock_guard<std::mutex> lock(seenMutex);
-                            seenSysExIds.insert(id);
-                        }
-                        ++sysExDequeued;
-                    }
-
-                    continue;
-                }
-
-                if (producersDone.load()
-                    && realtimeDequeued.load() >= kRealtimeCount
-                    && sysExDequeued.load() >= kSysExCount)
-                    break;
-
-                juce::Thread::sleep(1);
-            }
-        };
-
-        std::thread consumerThread(consumer);
-        std::thread realtimeThread(realtimeProducer);
-        std::thread sysExThread(sysExProducer);
+        std::thread consumerThread([&state, this] { runStressConsumer(state, *this); });
+        std::thread realtimeThread([&state] { enqueueRealtimeMessages(state); });
+        std::thread sysExThread([&state] { enqueueSysExMessages(state); });
 
         realtimeThread.join();
         sysExThread.join();
-        producersDone.store(true);
+        state.producersDone.store(true);
         consumerThread.join();
 
-        expectEquals(realtimeEnqueued.load(), kRealtimeCount);
-        expectEquals(sysExEnqueued.load(), kSysExCount);
-        expectEquals(realtimeDequeued.load(), kRealtimeCount);
-        expectEquals(sysExDequeued.load(), kSysExCount);
-        expectEquals(static_cast<int>(seenNotes.size()), kRealtimeCount);
-        expectEquals(static_cast<int>(seenSysExIds.size()), kSysExCount);
-        expect(queue.isEmpty());
+        expectStressCounts(*this, state);
     }
 };
 
