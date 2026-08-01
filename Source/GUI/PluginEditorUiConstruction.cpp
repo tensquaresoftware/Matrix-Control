@@ -66,20 +66,25 @@ void PluginEditor::createUiShell()
         });
 
 #if JUCE_DEBUG
-    const auto editorWidth = layoutDimensions_.editor.width;
-    const auto editorHeight = layoutDimensions_.editor.height;
-    testComponent_ = std::make_unique<TestComponent>(
-        *skin_,
-        pluginProcessor.getApvts(),
-        pluginProcessor.getApvts().state,
-        editorWidth,
-        editorHeight);
-    addChildComponent(*testComponent_);
-    testComponent_->setVisible(false);
+    createUiElementsTestComponent();
 #endif
 
     updateSkin();
 }
+
+#if JUCE_DEBUG
+void PluginEditor::createUiElementsTestComponent()
+{
+    testComponent_ = std::make_unique<TestComponent>(TestComponent::Options{
+        *skin_,
+        pluginProcessor.getApvts(),
+        pluginProcessor.getApvts().state,
+        layoutDimensions_.editor.width,
+        layoutDimensions_.editor.height});
+    addChildComponent(*testComponent_);
+    testComponent_->setVisible(false);
+}
+#endif
 
 void PluginEditor::restoreAndWireHeader()
 {

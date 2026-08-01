@@ -40,11 +40,16 @@ class TestTrackGeneratorDisplays;
 class TestComponent : public juce::Component
 {
 public:
-    TestComponent(TSS::ISkin& skin,
-                  juce::AudioProcessorValueTreeState& apvts,
-                  juce::ValueTree& settingsState,
-                  int width,
-                  int height);
+    struct Options
+    {
+        TSS::ISkin& skin;
+        juce::AudioProcessorValueTreeState& apvts;
+        juce::ValueTree& settingsState;
+        int width = 0;
+        int height = 0;
+    };
+
+    explicit TestComponent(Options options);
     ~TestComponent() override;
 
     void setSkin(TSS::ISkin& skin);
@@ -143,6 +148,10 @@ private:
     void updateWidgetLabelLook();
     void repaintVisualDebugLayers();
     void createTestPages(juce::AudioProcessorValueTreeState& apvts);
+    void createBasicWidgetTestPages();
+    void createHeaderAndDisplayTestPages();
+    void createCellAndMenuTestPages(juce::AudioProcessorValueTreeState& apvts);
+    void applySkinToTestPages(TSS::ISkin& skin);
     void populateWidgetSelector();
     void restorePersistedWidgetSelection();
     void persistWidgetSelection(int selectedId);

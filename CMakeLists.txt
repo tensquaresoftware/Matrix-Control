@@ -360,6 +360,7 @@ set(TEST_SANDBOX_SOURCES
     Source/GUI/Tests/TestHierarchicalComboBoxes.cpp
     Source/GUI/Tests/TestColourPickerButton.cpp
     Source/GUI/Tests/TestComponent.cpp
+    Source/GUI/Tests/TestComponentPages.cpp
     Source/GUI/Tests/TestEnvelopeDisplays.cpp
     Source/GUI/Tests/TestGroupLabels.cpp
     Source/GUI/Tests/TestHorizontalSeparators.cpp

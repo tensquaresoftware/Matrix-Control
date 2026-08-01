@@ -181,6 +181,7 @@ private:
     void updateOverlayLayoutsForUiScale(float uiScale);
     void syncStandaloneWindowSize();
 #if JUCE_DEBUG
+    void createUiElementsTestComponent();
     void setUiElementsTestVisible(bool visible);
     void layoutUiElementsTestComponent();
 #endif
