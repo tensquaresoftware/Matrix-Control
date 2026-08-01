@@ -133,6 +133,14 @@ juce_add_binary_data(PluginFonts
 set(PLUGIN_SOURCES
     # Core
     Source/Core/PluginProcessor.cpp
+    Source/Core/PluginProcessorAudio.cpp
+    Source/Core/PluginProcessorClipboard.cpp
+    Source/Core/PluginProcessorConstruction.cpp
+    Source/Core/PluginProcessorGates.cpp
+    Source/Core/PluginProcessorMidiPorts.cpp
+    Source/Core/PluginProcessorParameters.cpp
+    Source/Core/PluginProcessorState.cpp
+    Source/Core/PluginProcessorValueTree.cpp
     Source/Core/Audio/AudioPassthroughProcessor.cpp
     Source/Core/Audio/AudioInputSourceCatalog.cpp
     Source/Core/Audio/HardwareLatency.cpp

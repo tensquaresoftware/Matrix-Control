@@ -26,6 +26,7 @@ class SysExParser;
 
 namespace Core
 {
+    struct ActionExecutionHooks;
     class PatchModel;
     class ApvtsPatchMapper;
     class MasterModel;
@@ -290,6 +291,17 @@ private:
     static BusesProperties makeBusesProperties();
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void validatePluginDescriptorsAtStartup();
+
+    // Construction phases (keep the constructor under the quality-gate thresholds).
+    void createSysExDispatchers();
+    void createInitAndFileServices();
+    void createActionSubsystem();
+    void createPatchMutatorEngine(Core::ActionExecutionHooks& hooks);
+    void createModuleActionHandler(const Core::ActionExecutionHooks& hooks);
+    void createPatchManagerActionHandler(const Core::ActionExecutionHooks& hooks);
+    void createMutatorActionHandler();
+    void finishConstructionSetup();
+
     void initializeMidiPortProperties();
     void initializeAudioProperties();
     void initializeHardwareLatencyProperty();
@@ -303,6 +315,8 @@ private:
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();
     void syncMidiPortsFromStateImpl(bool reportOpenFailures);
+    void syncMidiInputPortFromState(bool reportOpenFailures);
+    void syncMidiOutputPortFromState(bool reportOpenFailures);
     bool arePersistedMidiPortsOpen() const;
     void initializePatchNameProperty();
     bool getInstrumentPathEnabled(const juce::MidiBuffer& midiMessages) const;
@@ -317,7 +331,7 @@ private:
     void enableApvtsLogging();
     void disableApvtsLogging();
     void ensureDevelopmentLoggingStarted();
-    
+
     juce::String getThreadNameForLogging() const;
     static juce::String simplifyThreadNameForLogging(const juce::String& threadName);
     juce::String resolveParameterIdFromTree(juce::ValueTree& tree, const juce::Identifier& property) const;
@@ -326,16 +340,29 @@ private:
     juce::String findParameterIdInDirectTree(juce::ValueTree& tree) const;
     juce::String findParameterIdInParentTree(juce::ValueTree& tree) const;
     juce::String findParameterIdInChildren(juce::ValueTree& changedTree, const juce::var& newValue) const;
-    
+
     void buildChoiceParameterMap();
     std::optional<juce::String> getChoiceLabel(const juce::String& parameterId, int value) const;
     juce::String getChoiceLabelForNumericValue(const juce::String& parameterId, const juce::var& newValue) const;
     void handleBankNumberChange(const juce::String& parameterId);
     void handlePatchNumberChange(const juce::String& parameterId);
+    void trackSuppressedPatchNumberChange(const juce::String& parameterId);
+    bool clampPatchNumberIfOutOfRange(const juce::String& parameterId, int patchNumber, int clampedPatch);
+    void applyAcceptedPatchNumberChange(const juce::String& parameterId, int clampedPatch);
+    void sendPatchSelectionForAcceptedChange(int clampedPatch);
     void updateDevicePatchLoadContext();
     bool confirmPatchContextChangeGate(bool includeUnsavedEditWarning = true);
     bool confirmUnsavedEditGateIfNeeded();
+    bool requireMessageThreadForModalGate() const;
+    bool runMutatorHistoryGateChoice();
     bool runMutatorExportForGate();
+    void publishMutatorExportCancelledFooter();
+    bool resolveMutatorExportCollision(const juce::File& folder, Core::MutatorActionResult& result);
+    void applyRestoredPluginState(juce::ValueTree restoredState);
+    void dispatchPatchOrMatrixModParameterChange(const juce::String& parameterId);
+    void dispatchMasterParameterChange(const juce::String& parameterId);
+    void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
+    void handleDeviceTypePropertyChange(const juce::String& propertyName);
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
     void initializeClipboardFeedbackProperties();
