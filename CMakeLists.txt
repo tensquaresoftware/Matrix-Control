@@ -346,6 +346,7 @@ set(PLUGIN_SOURCES
     # Loggers
     Source/Core/Loggers/MidiLogger.cpp
     Source/Core/Loggers/ApvtsLogger.cpp
+    Source/Core/Loggers/ApvtsLoggerFormatting.cpp
 )
 
 # GUI - Dev test harness (Debug only — D-063 / story U-10)

@@ -25,48 +25,54 @@ public:
         kVerbose = 5
     };
 
+    struct ValueTreePropertyChangeLog
+    {
+        juce::Identifier property;
+        juce::var oldValue;
+        juce::var newValue;
+        juce::String threadName;
+        juce::String choiceLabel;
+    };
+
     static ApvtsLogger& getInstance();
-    
+
     void setLogLevel(LogLevel level);
     void setLogToFile(bool enabled, const juce::File& logFile = juce::File());
     void setLogToConsole(bool enabled);
-    
+
     void logMessage(LogLevel level, const juce::String& message);
-    void logParameterChanged(const juce::String& parameterId, 
-                            float oldValue, 
-                            float newValue,
-                            const juce::String& source = "");
-    
-    void logValueTreePropertyChanged(const juce::Identifier& property,
-                                    const juce::var& oldValue,
-                                    const juce::var& newValue,
-                                    const juce::String& threadName = "",
-                                    const juce::String& choiceLabel = "");
-    
-    void logAttachmentCreated(const juce::String& parameterId, 
-                             const juce::String& widgetType);
-    
+    void logParameterChanged(const juce::String& parameterId,
+                             float oldValue,
+                             float newValue,
+                             const juce::String& source = "");
+
+    void logValueTreePropertyChanged(const ValueTreePropertyChangeLog& change);
+
+    void logAttachmentCreated(const juce::String& parameterId,
+                              const juce::String& widgetType);
+
     void logAttachmentDestroyed(const juce::String& parameterId);
-    
+
     void logStateReplaced();
     void logStateLoaded(const juce::String& source);
-    
+
     void logError(const juce::String& errorMessage);
     void logWarning(const juce::String& warningMessage);
     void logInfo(const juce::String& infoMessage);
     void logDebug(const juce::String& debugMessage);
-    
+
 private:
     static constexpr const char* kLogFilenamePrefix = "apvts-log";
-    
+
     static constexpr int kMinLogLineWidth = 60;
     static constexpr int kLogLineWidth = 80;
-    
+
     static constexpr const char* kLogLevelNames[] = {
         "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
     };
-    
+
     static constexpr int kLogLevelColumnWidth = 9;
+    static constexpr juce::int64 kButtonClickTimestampThresholdMs = 1000000000000LL;
 
     LogLevel currentLogLevel = LogLevel::kInfo;
     bool logToFile = false;
@@ -81,13 +87,14 @@ private:
     ApvtsLogger& operator=(const ApvtsLogger&) = delete;
 
     void writeLog(const juce::String& formattedMessage);
+    void writeNonEmptyLines(const juce::String& multiLineText);
 
     juce::String getTimestamp() const;
     juce::File getDefaultLogDirectory() const;
-    
+
     juce::String generateTimestampedFilename() const;
     juce::String generateSeparatorLine() const;
-    
+
     int getEffectiveLineWidth() const;
     void closeExistingLogFile();
     void writeSessionEndedFooter();
@@ -101,5 +108,26 @@ private:
     void createLogDirectoryIfNeeded(juce::File& logDir) const;
     juce::String formatVarValue(const juce::var& value) const;
     juce::String getCurrentThreadName() const;
-};
 
+    static int findBreakPreferringPunctuation(const juce::String& message, int rangeStart, int rangeEnd);
+    static int findBreakAtSpace(const juce::String& message, int rangeStart, int rangeEnd, bool keepSpace);
+    static int skipLeadingSpaces(const juce::String& message, int position);
+    juce::String wrapFirstLine(const juce::String& prefix,
+                               const juce::String& message,
+                               int availableWidth,
+                               int& messageStart) const;
+    juce::String wrapContinuationLine(const juce::String& message,
+                                      int maxLineWidth,
+                                      int& messageStart) const;
+    juce::String buildParameterChangeContinuation(float oldValue,
+                                                  float newValue,
+                                                  const juce::String& source,
+                                                  const juce::String& threadName) const;
+    bool isButtonClickTimestamp(const juce::var& value) const;
+    juce::String formatPropertyNewValue(const juce::var& newValue,
+                                        const juce::String& choiceLabel,
+                                        bool isButtonClick) const;
+    juce::String buildValueTreePropertyMessage(const ValueTreePropertyChangeLog& change,
+                                               bool isButtonClick,
+                                               const juce::String& newValueStr) const;
+};

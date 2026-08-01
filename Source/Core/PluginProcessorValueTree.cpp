@@ -100,13 +100,13 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
 
     if (shouldUseDevelopmentLogging())
     {
-        ApvtsLogger::getInstance().logValueTreePropertyChanged(
+        ApvtsLogger::getInstance().logValueTreePropertyChanged({
             juce::Identifier(parameterId),
             juce::var(),
             newValue,
             threadName,
             choiceLabel
-        );
+        });
     }
 
     dispatchPatchOrMatrixModParameterChange(parameterId);
