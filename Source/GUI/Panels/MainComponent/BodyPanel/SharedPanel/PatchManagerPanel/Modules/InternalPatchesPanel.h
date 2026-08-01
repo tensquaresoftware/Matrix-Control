@@ -76,6 +76,15 @@ private:
     void setupPastePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupStorePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
 
+    std::unique_ptr<TSS::Button> makeTimestampActionButton(TSS::ISkin& skin,
+                                                           WidgetFactory& widgetFactory,
+                                                           const juce::Identifier& actionId);
+
+    void layoutContentRows(float sf);
+    void layoutBrowserRow(float sf, int row2Y, int buttonH);
+    void applyChildUiScales(float sf);
+    void applyChildLooks(TSS::ISkin& skin);
+
     void refreshDeviceLimits();
     void refreshBankLockIndicator();
     void syncNumberBoxesFromApvts();

@@ -7,7 +7,6 @@
 #include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
@@ -15,8 +14,6 @@
 #include "GUI/Widgets/NumberBox.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
-#include "Shared/Definitions/PluginDescriptors.h"
-#include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include <juce_core/juce_core.h>
@@ -24,9 +21,46 @@
 
 namespace
 {
-    void dispatchTimestampAction(juce::AudioProcessorValueTreeState& apvts, const juce::Identifier& propertyId)
+    void placeOrSkipLeft(juce::Rectangle<int>& row, juce::Component* component, int width)
     {
-        apvts.state.setProperty(propertyId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+        if (component != nullptr)
+            component->setBounds(row.removeFromLeft(width));
+        else
+            row.removeFromLeft(width);
+    }
+
+    struct LayoutMetrics
+    {
+        int moduleHeaderH = 0;
+        int moduleHeaderW = 0;
+        int groupLabelH = 0;
+        int browserGroupW = 0;
+        int memoryGroupW = 0;
+        int buttonH = 0;
+        int columnGap = 0;
+
+        static LayoutMetrics make(const InternalPatchesPanelDimensions& dims, float sf)
+        {
+            LayoutMetrics m;
+            m.moduleHeaderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.moduleHeader.height), sf);
+            m.moduleHeaderW = TSS::ScaledLayout::scaledInt(
+                static_cast<float>(dims.moduleHeader.patchManagerTitleBandWidth), sf);
+            m.groupLabelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.groupLabels.height), sf);
+            m.browserGroupW = TSS::ScaledLayout::scaledInt(
+                static_cast<float>(dims.groupLabels.internalPatchesBrowserWidth), sf);
+            m.memoryGroupW = TSS::ScaledLayout::scaledInt(
+                static_cast<float>(dims.groupLabels.internalPatchesMemoryWidth), sf);
+            m.buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.buttons.height), sf);
+            m.columnGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.layout.columnGap), sf);
+            return m;
+        }
+    };
+
+    template <typename ComponentT>
+    void setOptionalUiScale(ComponentT* component, float sf)
+    {
+        if (component != nullptr)
+            component->setUiScale(sf);
     }
 }
 
@@ -80,7 +114,7 @@ InternalPatchesPanel::InternalPatchesPanel(TSS::ISkin& skin, const InternalPatch
         pastePatchButton_->addMouseListener(this, false);
     if (storePatchButton_)
         storePatchButton_->addMouseListener(this, false);
-    
+
     setSize(dims_.width, dims_.height);
 }
 
@@ -101,7 +135,7 @@ void InternalPatchesPanel::valueTreePropertyChanged(
     const juce::Identifier& property)
 {
     const auto propertyName = property.toString();
-    
+
     // Sync NumberBox from Core state (via APVTS property)
     if (propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber)
     {
@@ -109,7 +143,7 @@ void InternalPatchesPanel::valueTreePropertyChanged(
         if (auto* numberBox = currentBankNumber.get())
             numberBox->setValue(bankNumber);
     }
-    
+
     if (propertyName == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber)
     {
         const int patchNumber = treeWhosePropertyHasChanged.getProperty(property);
@@ -146,66 +180,51 @@ void InternalPatchesPanel::valueTreeRedirected(juce::ValueTree&)
     syncNumberBoxesFromApvts();
 }
 
-void InternalPatchesPanel::resized()
+void InternalPatchesPanel::layoutBrowserRow(float sf, int row2Y, int buttonH)
 {
-    const float sf = uiScale_;
-
-    const int moduleHeaderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
-    const int moduleHeaderW = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth), sf);
-    const int groupLabelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.groupLabels.height), sf);
-    const int browserGroupW = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.groupLabels.internalPatchesBrowserWidth), sf);
-    const int memoryGroupW = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.groupLabels.internalPatchesMemoryWidth), sf);
     const int navButtonW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.initWidth), sf);
     const int bankNumberW = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.numberBoxes.bankNumberWidth), sf);
     const int patchNumberW = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.numberBoxes.patchNumberWidth), sf);
-    const int buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
     const int interGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
-    const int columnGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.columnGap), sf);
-
-    if (moduleHeader)
-        moduleHeader->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
-
-    const int row1Y = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
-
-    if (browserGroupLabel)
-        browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
-
-    const int memoryGroupX = browserGroupW + columnGap;
-    if (memoryGroupLabel)
-        memoryGroupLabel->setBounds(memoryGroupX, row1Y, memoryGroupW, groupLabelH);
-
-    // Row 2 — successive integer strips (fixed widths; bank NumberBox hide reflows patch left)
-    const int row2Y = row1Y + groupLabelH;
 
     auto browserRow = juce::Rectangle<int>(0, row2Y, getWidth(), buttonH);
-    if (loadPreviousPatchButton_)
-        loadPreviousPatchButton_->setBounds(browserRow.removeFromLeft(navButtonW));
-    else
-        browserRow.removeFromLeft(navButtonW);
+
+    placeOrSkipLeft(browserRow, loadPreviousPatchButton_.get(), navButtonW);
     browserRow.removeFromLeft(interGap);
 
-    if (loadNextPatchButton_)
-        loadNextPatchButton_->setBounds(browserRow.removeFromLeft(navButtonW));
-    else
-        browserRow.removeFromLeft(navButtonW);
+    placeOrSkipLeft(browserRow, loadNextPatchButton_.get(), navButtonW);
     browserRow.removeFromLeft(interGap);
 
     if (bankNumberVisible_)
     {
-        if (currentBankNumber)
-            currentBankNumber->setBounds(browserRow.removeFromLeft(bankNumberW));
-        else
-            browserRow.removeFromLeft(bankNumberW);
+        placeOrSkipLeft(browserRow, currentBankNumber.get(), bankNumberW);
         browserRow.removeFromLeft(interGap);
     }
 
     if (currentPatchNumber)
         currentPatchNumber->setBounds(browserRow.removeFromLeft(patchNumberW));
+}
+
+void InternalPatchesPanel::layoutContentRows(float sf)
+{
+    const auto m = LayoutMetrics::make(dims_, sf);
+
+    if (moduleHeader)
+        moduleHeader->setBounds(0, 0, m.moduleHeaderW, m.moduleHeaderH);
+
+    const int row1Y = m.moduleHeaderH;
+    if (browserGroupLabel)
+        browserGroupLabel->setBounds(0, row1Y, m.browserGroupW, m.groupLabelH);
+
+    const int memoryGroupX = m.browserGroupW + m.columnGap;
+    if (memoryGroupLabel)
+        memoryGroupLabel->setBounds(memoryGroupX, row1Y, m.memoryGroupW, m.groupLabelH);
+
+    // Row 2 — successive integer strips (fixed widths; bank NumberBox hide reflows patch left)
+    const int row2Y = row1Y + m.groupLabelH;
+    layoutBrowserRow(sf, row2Y, m.buttonH);
 
     juce::Component* memButtons[] = {
         initPatchButton_.get(), copyPatchButton_.get(),
@@ -214,23 +233,31 @@ void InternalPatchesPanel::resized()
     TSS::placeEqualWidthStrip(memoryGroupX, row2Y, sf,
                               dims_.buttons.internalPatchesInitWidth, dims_.buttons.height,
                               dims_.layout.interControlGap, memButtons, 4);
-
-    if (moduleHeader)             moduleHeader->setUiScale(sf);
-    if (browserGroupLabel)        browserGroupLabel->setUiScale(sf);
-    if (memoryGroupLabel)         memoryGroupLabel->setUiScale(sf);
-    if (currentBankNumber)        currentBankNumber->setUiScale(sf);
-    if (currentPatchNumber)       currentPatchNumber->setUiScale(sf);
-    if (loadPreviousPatchButton_) loadPreviousPatchButton_->setUiScale(sf);
-    if (loadNextPatchButton_)     loadNextPatchButton_->setUiScale(sf);
-    if (initPatchButton_)         initPatchButton_->setUiScale(sf);
-    if (copyPatchButton_)         copyPatchButton_->setUiScale(sf);
-    if (pastePatchButton_)        pastePatchButton_->setUiScale(sf);
-    if (storePatchButton_)        storePatchButton_->setUiScale(sf);
 }
 
-void InternalPatchesPanel::setSkin(TSS::ISkin& skin)
+void InternalPatchesPanel::applyChildUiScales(float sf)
 {
-    skin_ = &skin;
+    setOptionalUiScale(moduleHeader.get(), sf);
+    setOptionalUiScale(browserGroupLabel.get(), sf);
+    setOptionalUiScale(memoryGroupLabel.get(), sf);
+    setOptionalUiScale(currentBankNumber.get(), sf);
+    setOptionalUiScale(currentPatchNumber.get(), sf);
+    setOptionalUiScale(loadPreviousPatchButton_.get(), sf);
+    setOptionalUiScale(loadNextPatchButton_.get(), sf);
+    setOptionalUiScale(initPatchButton_.get(), sf);
+    setOptionalUiScale(copyPatchButton_.get(), sf);
+    setOptionalUiScale(pastePatchButton_.get(), sf);
+    setOptionalUiScale(storePatchButton_.get(), sf);
+}
+
+void InternalPatchesPanel::resized()
+{
+    layoutContentRows(uiScale_);
+    applyChildUiScales(uiScale_);
+}
+
+void InternalPatchesPanel::applyChildLooks(TSS::ISkin& skin)
+{
     if (moduleHeader)
         moduleHeader->setLook(TSS::moduleHeaderLookFromSkin(skin));
     if (browserGroupLabel)
@@ -256,11 +283,17 @@ void InternalPatchesPanel::setSkin(TSS::ISkin& skin)
         storePatchButton_->setLook(TSS::buttonLookFromSkin(skin));
 }
 
+void InternalPatchesPanel::setSkin(TSS::ISkin& skin)
+{
+    skin_ = &skin;
+    applyChildLooks(skin);
+}
+
 void InternalPatchesPanel::setUiScale(float uiScale)
 {
     if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
-    
+
     uiScale_ = uiScale;
     repaint();
 }
@@ -364,169 +397,6 @@ void InternalPatchesPanel::wirePasteStoreButton(TSS::Button* button,
     button->setEnabled(functionallyEnabled);
     button->onClick = [this, actionPropertyId]
     {
-        dispatchTimestampAction(apvts_, actionPropertyId);
+        apvts_.state.setProperty(actionPropertyId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
     };
-}
-
-void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
-{
-    moduleHeader = std::make_unique<TSS::ModuleHeader>(
-        dims_.moduleHeader.patchManagerTitleBandWidth,
-        dims_.moduleHeader.height,
-        TSS::moduleHeaderLookFromSkin(skin),
-        TSS::ModuleHeader::ColourVariant::Blue,
-        widgetFactory.getGroupDisplayName(moduleId),
-        dims_.moduleHeader);
-    addAndMakeVisible(*moduleHeader);
-}
-
-void InternalPatchesPanel::setupBrowserGroupLabel(TSS::ISkin& skin)
-{
-    browserGroupLabel = std::make_unique<TSS::GroupLabel>(
-        dims_.groupLabels.internalPatchesBrowserWidth,
-        dims_.groupLabels.height,
-        TSS::groupLabelLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kBrowser);
-    addAndMakeVisible(*browserGroupLabel);
-}
-
-void InternalPatchesPanel::setupLoadPreviousPatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    loadPreviousPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch,
-        skin,
-        dims_.buttons.height);
-    loadPreviousPatchButton_->onClick = [this]
-    {
-        dispatchTimestampAction(
-            apvts_,
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadPreviousPatch);
-    };
-    addAndMakeVisible(*loadPreviousPatchButton_);
-}
-
-void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    loadNextPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch,
-        skin,
-        dims_.buttons.height);
-    loadNextPatchButton_->onClick = [this]
-    {
-        dispatchTimestampAction(
-            apvts_,
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kLoadNextPatch);
-    };
-    addAndMakeVisible(*loadNextPatchButton_);
-}
-
-void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
-{
-    currentBankNumber = std::make_unique<TSS::NumberBox>(
-        dims_.numberBoxes.bankNumberWidth,
-        dims_.numberBoxes.height,
-        TSS::numberBoxLookFromSkin(skin),
-        false,
-        Matrix1000Limits::kMinBankNumber,
-        Matrix1000Limits::kMaxBankNumber);
-    currentBankNumber->setShowDot(false);
-    addAndMakeVisible(*currentBankNumber);
-}
-
-void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
-{
-    currentPatchNumber = std::make_unique<TSS::NumberBox>(
-        dims_.numberBoxes.patchNumberWidth,
-        dims_.numberBoxes.height,
-        TSS::numberBoxLookFromSkin(skin),
-        true,
-        Matrix1000Limits::kMinPatchNumber,
-        Matrix1000Limits::kMaxPatchNumber);
-    
-    // Push value to APVTS via property (same pattern as buttons)
-    currentPatchNumber->setOnValueChanged([this](int newValue)
-    {
-        // Avoid feedback loop when the value already came from the ValueTree
-        const auto currentPropertyValue = apvts_.state.getProperty(
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber, -1);
-        
-        if (static_cast<int>(currentPropertyValue) != newValue)
-        {
-            apvts_.state.setProperty(PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentPatchNumber,
-                                    newValue,
-                                    nullptr);
-        }
-    });
-    
-    addAndMakeVisible(*currentPatchNumber);
-}
-
-void InternalPatchesPanel::setupMemoryGroupLabel(TSS::ISkin& skin)
-{
-    memoryGroupLabel = std::make_unique<TSS::GroupLabel>(
-        dims_.groupLabels.internalPatchesMemoryWidth,
-        dims_.groupLabels.height,
-        TSS::groupLabelLookFromSkin(skin),
-        PluginDisplayNames::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kMemory);
-    addAndMakeVisible(*memoryGroupLabel);
-}
-
-void InternalPatchesPanel::setupInitPatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    initPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
-        skin,
-        dims_.buttons.height);
-    initPatchButton_->onClick = [this]
-    {
-        dispatchTimestampAction(
-            apvts_,
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch);
-    };
-    addAndMakeVisible(*initPatchButton_);
-}
-
-void InternalPatchesPanel::setupCopyPatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    copyPatchButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
-        skin,
-        dims_.buttons.height);
-    copyPatchButton_->onClick = [this]
-    {
-        dispatchTimestampAction(
-            apvts_,
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch);
-    };
-    addAndMakeVisible(*copyPatchButton_);
-}
-
-void InternalPatchesPanel::setupPastePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    pastePatchButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
-        skin,
-        dims_.buttons.height);
-    pastePatchButton_->onClick = [this]
-    {
-        dispatchTimestampAction(
-            apvts_,
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch);
-    };
-    addAndMakeVisible(*pastePatchButton_);
-}
-
-void InternalPatchesPanel::setupStorePatchButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    storePatchButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
-        skin,
-        dims_.buttons.height);
-    storePatchButton_->onClick = [this]
-    {
-        dispatchTimestampAction(
-            apvts_,
-            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch);
-    };
-    addAndMakeVisible(*storePatchButton_);
 }
