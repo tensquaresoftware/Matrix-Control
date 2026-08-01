@@ -27,11 +27,11 @@ public:
     };
 
     static MidiLogger& getInstance();
-    
+
     void setLogLevel(LogLevel level);
     void setLogToFile(bool enabled, const juce::File& logFile = juce::File());
     void setLogToConsole(bool enabled);
-    
+
     void logMessage(LogLevel level, const juce::String& message);
     void logSysExSent(const juce::MemoryBlock& sysEx, const juce::String& description = "");
     void logSysExReceived(const juce::MemoryBlock& sysEx, const juce::String& description = "");
@@ -40,19 +40,19 @@ public:
     void logError(const juce::String& errorMessage);
     void logWarning(const juce::String& warningMessage);
     void logInfo(const juce::String& infoMessage);
-    
+
     juce::String formatSysExMessage(const juce::MemoryBlock& sysEx) const;
-    
+
 private:
     static constexpr const char* kLogFilenamePrefix = "midi-log";
-    
+
     static constexpr int kMinLogLineWidth = 60;
     static constexpr int kLogLineWidth = 80;
-    
+
     static constexpr const char* kLogLevelNames[] = {
         "NONE", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE"
     };
-    
+
     static constexpr int kLogLevelColumnWidth = 9;
 
     LogLevel currentLogLevel = LogLevel::kInfo;
@@ -69,13 +69,14 @@ private:
 
     void writeLog(const juce::String& formattedMessage);
     void writeLogRaw(const juce::String& message);
+    void writeNonEmptyLines(const juce::String& multiLineText);
 
     juce::String getTimestamp() const;
     juce::File getDefaultLogDirectory() const;
-    
+
     juce::String generateTimestampedFilename() const;
     juce::String generateSeparatorLine() const;
-    
+
     int getEffectiveLineWidth() const;
     void closeExistingLogFile();
     void writeSessionEndedFooter();
@@ -85,7 +86,9 @@ private:
     void writeSessionStartedHeader();
     juce::String formatLogLevelColumn(LogLevel level) const;
     juce::String wrapLogMessage(const juce::String& prefix, const juce::String& message) const;
-    juce::String buildSysExHeaderMessage(const juce::String& direction, const juce::String& description, size_t byteCount) const;
+    juce::String buildSysExHeaderMessage(const juce::String& direction,
+                                         const juce::String& description,
+                                         size_t byteCount) const;
     int calculateBytesPerLine() const;
     juce::String formatHexBytesWithLineWrapping(const juce::MemoryBlock& sysEx) const;
     void insertNewlineIfNeeded(juce::String& hexString, size_t currentIndex, int bytesPerLine) const;
@@ -95,5 +98,15 @@ private:
     juce::String analyzeSysExMessage(const juce::MemoryBlock& sysEx) const;
     juce::uint8 extractChecksumFromSysEx(const juce::MemoryBlock& sysEx) const;
     juce::MemoryBlock addSysExDelimiters(const juce::MemoryBlock& sysEx) const;
-};
 
+    static int findBreakPreferringPunctuation(const juce::String& message, int rangeStart, int rangeEnd);
+    static int findBreakAtSpace(const juce::String& message, int rangeStart, int rangeEnd, bool keepSpace);
+    static int skipLeadingSpaces(const juce::String& message, int position);
+    juce::String wrapFirstLine(const juce::String& prefix,
+                               const juce::String& message,
+                               int availableWidth,
+                               int& messageStart) const;
+    juce::String wrapContinuationLine(const juce::String& message,
+                                      int maxLineWidth,
+                                      int& messageStart) const;
+};

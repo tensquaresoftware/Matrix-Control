@@ -346,6 +346,7 @@ set(PLUGIN_SOURCES
 
     # Loggers
     Source/Core/Loggers/MidiLogger.cpp
+    Source/Core/Loggers/MidiLoggerFormatting.cpp
     Source/Core/Loggers/ApvtsLogger.cpp
     Source/Core/Loggers/ApvtsLoggerFormatting.cpp
 )
@@ -545,6 +546,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExDecoder.cpp
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/Loggers/MidiLogger.cpp
+        Source/Core/Loggers/MidiLoggerFormatting.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
@@ -596,6 +598,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/MIDI/SysEx/SysExEncoder.cpp
         Source/Core/MIDI/SysEx/SysExParser.cpp
         Source/Core/Loggers/MidiLogger.cpp
+        Source/Core/Loggers/MidiLoggerFormatting.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
