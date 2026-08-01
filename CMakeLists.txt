@@ -201,6 +201,10 @@ set(PLUGIN_SOURCES
     Source/Shared/Definitions/PluginDescriptors.cpp
     Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelopes.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelope3.cpp
+    Source/Shared/Definitions/PluginDescriptorsPatchEditLfo.cpp
     Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
     Source/GUI/PluginEditor.cpp
@@ -536,6 +540,10 @@ if(MATRIX_BUILD_TESTS)
         Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelopes.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelope3.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditLfo.cpp
         Source/Shared/Definitions/PluginHelpers.cpp
         Source/Shared/Definitions/PluginVersion.cpp
         Source/Shared/ProjectPaths.cpp
@@ -581,6 +589,10 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Loggers/MidiLogger.cpp
         Source/Shared/Definitions/PluginDescriptors.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchEdit.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditFmRamp.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelopes.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditEnvelope3.cpp
+        Source/Shared/Definitions/PluginDescriptorsPatchEditLfo.cpp
         Source/Shared/Definitions/PluginDescriptorsMasterEdit.cpp
         Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
