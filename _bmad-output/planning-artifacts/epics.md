@@ -88,7 +88,7 @@ NFR-1: Automated test pyramid — Unit tests for SysEx round-trip, checksum, `.s
 NFR-2: SysEx reliability timings — Inter-SysEx delay on unified queue; profile from Device Inquiry EPROM class; DAW automation throttling.
 NFR-3: Thread safety — No SysEx/blocking MIDI on audio thread; APVTS GUI updates on message thread; inbound MIDI never direct repaint.
 NFR-4: Descriptor-driven architecture — Single SSOT in PluginDescriptors; WidgetFactory + ApvtsFactory; boot validators; no duplicate offset tables.
-NFR-5: Code quality limits — Functions ≤15 lines, classes ≤200 lines, explicit names, no magic numbers per `.cursorrules`.
+NFR-5: Code quality gate — Functions ~40 lines (Core) / ~50 (GUI); ≤4 params (our code); cyclomatic ≤10 (GUI ≤12 if justified); nesting ≤4; useful `.cpp` ~400 lines; English naming (`k` constants, `name_` members). Enforced on touched files via `Scripts/quality/lint_touched.py` (+ `.clang-tidy`). Historical debt cleaned separately. Real-time audio safety overrides metrics.
 NFR-6: Documentation — User manual EN+FR; public technical docs; descriptor stack cheat sheet.
 NFR-7: Logging (release) — ApvtsLogger/MidiLogger enableable in release via Settings opt-in; levels and privacy per D-041.
 NFR-8: Platforms & formats — macOS AU+VST3+Standalone; Windows/Linux VST3+Standalone; primary DAW validation Ableton Live 12 Suite.

@@ -28,7 +28,9 @@ Source complète : `CONVENTIONS.md` §5–§6.2, §9. Constitution BMad : `_bmad
 
 ## Fichiers clés (lire avant d'implémenter)
 
-- `CONVENTIONS.md` — standards complets (autoritaire pour litiges de style)
+- `CONVENTIONS.md` — standards complets (autoritaire pour litiges de style) ; §3 = porte qualité chiffrée
+- `Scripts/quality/lint_touched.py` — analyseur sur fichiers C++ touchés (critère de fin de tâche)
+- `.cursor/rules/clean-code.mdc` — guidance légère (pas always-on)
 - `Documentation/Development/software-development-quality-principles.md` — complete design principles reference
 - `Source/Shared/Definitions/PluginDescriptors.h`
 - `Source/GUI/Factories/WidgetFactory.h`

@@ -3,7 +3,7 @@
 **Author:** Guillaume DUPONT
 **Organization:** Ten Square Software
 **Context:** VST/AU plugin development with JUCE (Cursor + Claude Code)
-**Revision date:** 2026-06-19
+**Revision date:** 2026-08-01
 
 ---
 
@@ -43,45 +43,26 @@ This file defines my personal instructions for the AI coding agent. It guides th
 
 ## 2. Process & Workflow
 
-> ⚠️ **MANDATORY BEFORE ANY CODING**
+> Guidance for judgment. **Mechanical thresholds** are enforced by
+> `Scripts/quality/lint_touched.py` (+ optional `.clang-tidy`) — see §3.
+> There is **no** mandatory DESIGN → AUTO-REVIEW redesign loop on every task.
 
-### 2.1 Three-phase workflow
+### 2.1 Lightweight coding loop
 
-**STOP!** Always follow this workflow rigorously:
+Before and while coding:
 
-#### Phase 1: DESIGN (mandatory before touching code)
+- Prefer the **simplest design that works (KISS)**; implement **only the current need (YAGNI)**
+- Ask: **Does this choice make future changes easier (ETC)?**
+- Detect duplication with WET nuance (§3.1 / §6.16) — duplicate once OK; factorize when stable
+- Use explicit, intention-revealing names; one clear responsibility per function/class (soft SRP)
+- **Boy Scout limited to ticket scope** — improve the touched zone; do not rewrite an entire large file for one line
+- End of task: **compile** + relevant tests + **`python3 Scripts/quality/lint_touched.py`** on the diff
 
-- Identify responsibilities (Single Responsibility Principle)
-- Detect potential duplication (Don't Repeat Yourself — see §3.1 and §6.16 for WET nuance)
-- Choose appropriate abstractions (interfaces, base classes) — **only what the current need requires (YAGNI)**
-- Prefer the **simplest design that works (KISS)** over speculative generality
-- Ask: **Does this choice make future changes easier (ETC — Easy to Change)?**
-- Plan classes/functions with explicit, intention-revealing names
-- Estimate method sizes (target: < 15 lines)
-- Ask myself: "Would Uncle Bob be proud of this design?"
-- Mentally sketch the architecture (dependencies, hierarchy)
-
-#### Phase 2: IMPLEMENTATION
-
-- Write code strictly following the Phase 1 design
-- Respect quantifiable limits (see dedicated section below)
-- If a method exceeds 15 lines → **STOP** and extract helpers IMMEDIATELY
-- If I detect duplication (even 3 lines) → evaluate: is it **stable and meaningful**? If yes → extract; if first occurrence → **WET is OK** (see §6.16)
-- If a class exceeds 200 lines → **STOP** and re-evaluate the design (SRP likely violated)
-- Name each function to reveal its intent (no vague `doStuff()` or `process()`)
-
-#### Phase 3: AUTO-REVIEW (before presenting code to Guillaume)
-
-- Reread with a critical "Uncle Bob" eye
-- Verify SOLID for each class (full checklist below)
-- Verify that each function does ONE thing only
-- Verify there is NO duplication
-- Verify names: are they all explicit and reveal intent?
-- If review fails → return to Phase 1 (do not present non-Clean code)
+If the analyser fails: fix the finding. Do not launch a philosophical redesign of unrelated code.
 
 ### 2.2 Exception: Rapid prototyping
 
-If Guillaume explicitly requests a "rapid prototype", "POC", or "spike", I may skip Phase 1 but I MUST propose a Clean refactoring after validation.
+If Guillaume explicitly requests a "rapid prototype", "POC", or "spike", the quality gate on the diff may be deferred until after validation — then bring new code under §3 before merge.
 
 ### 2.3 Document metadata
 
@@ -128,35 +109,22 @@ Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`,
 
 ---
 
-## 3. Quantifiable Limits
+## 3. Quantifiable Limits (quality gate)
 
-> 🚫 **Strict, non-negotiable rules**
+> Realistic thresholds for a JUCE plugin. **Enforced on touched files** by
+> `Scripts/quality/lint_touched.py` (and `.clang-tidy` when used).
+> Historical debt outside the ticket diff is a **separate chore** — not a Boy Scout obligation.
 
-### 3.1 Code metrics - MAXIMUM limits
+### 3.1 Code metrics — MAXIMUM limits
 
-These limits are **HARD LIMITS**, not suggestions:
-
-#### Function/Method: 15 lines MAXIMUM (ideal: 5-10)
-
-- **Exception:** `show()` or orchestration method may go up to 20 lines IF it delegates properly
-- **Beyond that:** extract immediately into helpers with explicit names
-
-#### Class: 200 lines MAXIMUM (ideal: < 150)
-
-- **If exceeded:** probable SRP violation → split into multiple classes
-
-#### Function parameters: 3 MAXIMUM
-
-- **If > 3:** create a struct/class of parameters with explicit names
-
-#### Cyclomatic complexity: < 5 per function (ideal: 1-3)
-
-- **Too many `if`/`switch`** → extract into separate functions or use polymorphism
-
-#### Indentation levels: 2 MAXIMUM
-
-- No `if` nested in `for` nested in `if`
-- **Solution:** early returns, function extraction, guard clauses
+| Metric | Maximum | Notes |
+|---|---|---|
+| Function / method (Core / logic) | **~40 lines** | lizard `nloc` (non-comment) |
+| Function / method (GUI / glue) | **~50 lines** | Path under `Source/GUI/` |
+| Function parameters (**our** code) | **4** | Beyond → options struct; do not rewrite JUCE APIs |
+| Cyclomatic complexity | **10** (GUI up to **12** if justified) | Extract named helpers when exceeded |
+| Nesting depth | **4** | Prefer guards / early returns / RAII |
+| Useful `.cpp` file | **~400 lines** | Large inherited files → dedicated cleanup, not drive-by |
 
 #### Code duplication: extract when stable — WET before premature abstraction
 
@@ -165,96 +133,56 @@ These limits are **HARD LIMITS**, not suggestions:
 - **Third similar occurrence** or confirmed stable duplication → **mandatory extraction** into a common function
 - Use helpers, templates, or utility functions — but only when duplication is real, not imagined
 
-### 3.2 Procedure when I exceed a limit
+#### Real-time audio path (overrides metrics)
 
-1. **DO NOT** continue writing code
-2. **STOP** immediately
-3. Ask me: "Why is this limit exceeded?"
-4. Answer honestly: "Because this function/class does several things"
-5. Apply SRP: extract responsibilities into new functions/classes
-6. Start over with the correct design
+In `processBlock` and equivalents: **no** allocation, dangerous locks, or unsafe logging.
+If a §3 metric conflicts with real-time safety or clarity of the critical path: **safety wins**;
+document a dated, motivated exception (`NOLINT` or comment) rather than obscure the callback.
+
+### 3.2 Procedure when the gate fails on the diff
+
+1. Read the analyser finding (length / params / complexity / nesting / file size)
+2. Fix **that** signal — extract a named helper, simplify branches, or split a new file if the ticket owns that work
+3. Re-run `python3 Scripts/quality/lint_touched.py`
+4. Do **not** refactor untouched historical code “to green the whole tree” in the same ticket
 
 ### 3.3 Warning signs - Indicators of bad design
 
-- I tell myself "this function is a bit long but it's fine" → ❌ **NO**, refactor
-- I see similar code elsewhere → evaluate stability; factorize when duplication is confirmed, not on first copy
-- I can't find a good name for the function → Sign it does too many things
-- I need a comment to explain → Code is not clear enough, rename/refactor
-- I add a comment like "// Part 1", "// Part 2" → Each part = separate function
+- A **new** method at ~70+ lines with deep nesting → simplify before merge
+- Same block copied a third stable time → factorize
+- Abstraction “for later” with no current need → YAGNI, remove
+- Cannot find a good function name → likely too many responsibilities
+- Comment like "// Part 1", "// Part 2" → each part = separate function
 
 ---
 
-## 4. Self-Critique
+## 4. Self-Critique (light)
 
-> ✅ **Mandatory checklist before presenting code**
+> Use as a short sanity pass. **Authoritative finish criteria:** compile + tests +
+> `Scripts/quality/lint_touched.py` on touched files. Do not block presentation on
+> an endless qualitative redesign loop.
 
-Before presenting code to Guillaume, I MUST systematically verify:
+### 4.1 Quick design check
 
-### 4.1 SOLID Check ✓
+- Clear responsibility for new/changed types? (soft SRP)
+- Dependencies: GUI → Core only; no Core → GUI
+- Names reveal intent? (`loadPreset` not `doStuff`)
+- Magic numbers named (`kMaxRetries` not bare `3`)?
+- WET/DRY balanced (§3.1)?
 
-- [ ] **S**ingle Responsibility: Does each class have ONE well-defined responsibility?
-  - Test: can I describe the class in one simple sentence without "and"?
-- [ ] **O**pen/Closed: Is the code extensible without modifying existing classes?
-  - Use of abstractions, interfaces, polymorphism?
-- [ ] **L**iskov Substitution: Are subclasses substitutable without breaking behavior?
-  - Do derived classes respect base class contracts?
-- [ ] **I**nterface Segregation: No "fat" interfaces forcing implementation of useless methods?
-  - Small, focused interfaces?
-- [ ] **D**ependency Inversion: Dependencies toward abstractions, not concrete implementations?
-  - Do high-level modules not depend on low-level details?
+### 4.2 Design principles (see §6.16)
 
-### 4.2 Clean Code Check ✓
+- **KISS / YAGNI / ETC** applied to this ticket
+- **Boy Scout** limited to the modified zone
+- **CQS** when natural — do not force it onto JUCE APIs that read and write together
 
-- [ ] All functions < 15 lines? (ideally < 10)
-  - If NO: extract immediately
-- [ ] All names are explicit and reveal intent?
-  - `calculateTotalPrice()` not `calc()`, `isUserLoggedIn()` not `check()`
-- [ ] No code duplication beyond WET tolerance (see §3.1)?
-  - If stable duplication exists: factorize into common function
-- [ ] Single level of abstraction per function?
-  - No mix of high-level calls + low-level manipulations
-- [ ] No explanatory comments needed?
-  - Code must be self-documenting via names
-- [ ] No magic numbers?
-  - All constants are named: `kMaxRetries` not `3`
-- [ ] No dead or commented code?
-  - Remove, versioning (git) keeps history
+> Full acronym reference: `Documentation/Development/software-development-quality-principles.md`
 
-### 4.3 Architecture & Design Check ✓
+### 4.3 Golden rule
 
-- [ ] Dependencies point in the right direction?
-  - GUI → Core, never Core → GUI
-  - High-level modules → abstractions ← low-level modules
-- [ ] No tight coupling between modules?
-  - Use of interfaces to decouple
-- [ ] Responsibilities clearly separated?
-  - Rendering, business logic, state, coordination: each in its own class
-- [ ] Easily testable?
-  - No hidden dependencies, dependency injection
-
-### 4.4 Readability Check ✓
-
-- [ ] Can a developer discovering the code understand it without explanation?
-- [ ] Do classes and functions have names that document their role?
-- [ ] Is the structure logical and predictable?
-- [ ] Are there no "surprises" or hidden side effects?
-
-### 4.5 Design Principles Check ✓
-
-- [ ] **KISS:** Is this the simplest design that satisfies the current requirement?
-- [ ] **YAGNI:** Did I avoid features, abstractions, or parameters not needed now?
-- [ ] **ETC:** Does this design make the next likely change easier, not harder?
-- [ ] **Boy Scout Rule:** Is the touched code at least slightly cleaner than before?
-- [ ] **CQS:** Do mutating functions avoid returning queried state (and vice versa)?
-
-> Full reference: `Documentation/Development/software-development-quality-principles.md` and §6.16
-
-### 4.6 Golden rule
-
-> ❌ **If ONE ✗ → I do NOT present the code**
->
-> - I refactor first until ALL ✓ are validated
-> - Only then do I present the result to Guillaume
+> The **analyser and the compiler** decide the mechanical bar.
+> If `lint_touched.py` fails on the diff → fix those findings before calling the task done.
+> Untouched historical debt → note or separate chore; do not expand ticket scope.
 
 ---
 
@@ -452,7 +380,7 @@ Prefer inline methods in header only if they are short (< 5 lines)
 - Readable and human-understandable code
 - Names ALWAYS explicit (no cryptic abbreviations)
 - Minimize comments: use only when necessary
-- Refactor blocks > 15 lines into short functions with explicit names rather than adding comments (which can become obsolete)
+- Prefer extracting helpers when a function exceeds §3 thresholds rather than adding comments that can become obsolete
 - Single level of abstraction per function
 - Single responsibility (Single Responsibility Principle)
 - No hidden effects, no modified global state
@@ -500,14 +428,14 @@ Prefer inline methods in header only if they are short (< 5 lines)
 > Full human reference: `Documentation/Development/software-development-quality-principles.md`
 > These principles complement SOLID and Clean Code — they resolve tensions between purity and pragmatism.
 
-#### Simplicity & change (apply in Phase 1 DESIGN)
+#### Simplicity & change (apply when designing)
 
 | Principle | Rule for the agent |
 |---|---|
 | **KISS** | Prefer the simplest design that meets the current requirement and respects §3 limits |
 | **YAGNI** | Do not implement features, abstractions, hooks, or parameters for hypothetical future needs |
 | **ETC** (Easy to Change) | Every design choice should make the next likely change easier, not harder |
-| **Boy Scout Rule** | Leave every touched file slightly cleaner than found (without scope creep) |
+| **Boy Scout Rule** | Leave the **ticket-touched zone** slightly cleaner — do not rewrite whole large files out of scope |
 
 #### Duplication (balance with §3.1)
 
@@ -890,10 +818,11 @@ Prefer many fast unit tests over a few slow integration tests.
 
 ### 8.6 Complexity
 
-- Maintain cyclomatic complexity < 5 per function (ideal: 1-3)
-- If too complex, refactor into sub-functions
-- Avoid > 3 parameters: consider a struct/class of parameters
-- Prefer early returns to reduce nesting
+- Cyclomatic complexity ≤ **10** per function (GUI up to **12** if justified) — see §3
+- If too complex, refactor into named sub-functions
+- Avoid > **4** parameters in our code: consider a struct/class of options
+- Prefer early returns to keep nesting ≤ **4**
+- Day-to-day check: `python3 Scripts/quality/lint_touched.py`
 
 ---
 

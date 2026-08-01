@@ -241,18 +241,23 @@ Do not route editor SysEx through `processBlock()` midiBuffer.
 
 ---
 
-## Clean Code Limits (Hard — Uncle Bob)
+## Code quality gate (realistic — instrumented)
+
+> SSOT: `CONVENTIONS.md` §3. Day-to-day: `python3 Scripts/quality/lint_touched.py` (touched files only). Optional: `.clang-tidy`. Agent summary: `.cursor/rules/clean-code.mdc` (not always-on).
 
 | Metric | Maximum |
 |---|---|
-| Function/method | 15 lines (20 for orchestration `show()`-style only) |
-| Class | 200 lines |
-| Function parameters | 3 (use a struct if more) |
-| Cyclomatic complexity | < 5 |
-| Indentation nesting | 2 levels max |
-| Code duplication | WET OK once — extract when stable (see §6.16) |
+| Function/method (Core / logic) | ~40 lines |
+| Function/method (GUI / glue) | ~50 lines |
+| Function parameters (our code) | 4 |
+| Cyclomatic complexity | 10 (GUI up to 12 if justified) |
+| Nesting depth | 4 |
+| Useful `.cpp` file | ~400 lines |
+| Duplication | WET OK once — extract when stable (see §6.16) |
 
-If a limit is exceeded, **stop and refactor** before continuing.
+Finish criteria for a coding task: **compile** + relevant tests + **lint_touched.py** on the diff. Do not Boy-Scout entire historical files outside the ticket. Real-time audio safety overrides metrics in `processBlock`.
+
+Historical debt: clean on dedicated chores; new/changed code on the diff must pass the gate.
 
 ---
 
@@ -266,7 +271,7 @@ If a limit is exceeded, **stop and refactor** before continuing.
 | **YAGNI** | No speculative features or abstractions |
 | **ETC** | Every choice should make the next change easier |
 | **WET → DRY** | Duplicate once OK; factorize confirmed stable duplication |
-| **Boy Scout** | Leave touched code cleaner than found |
+| **Boy Scout** | Leave the ticket-touched zone slightly cleaner — no whole-file rewrite out of scope |
 | **CQS** | Mutators do not return queried state |
 
 **When principles conflict:** correctness & thread-safety > KISS/YAGNI > SOLID > premature DRY.

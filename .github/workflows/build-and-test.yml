@@ -1,5 +1,6 @@
 # Multi-platform build + Core unit tests (Story 11.1).
 # Story 11.3: draft PR fast tier (macOS only) + ci-success merge gate.
+# Quality gate: lint_touched.py on PR/push diff (anti-drift; no full-tree Boy Scout).
 #
 # Preset choices (CMakeUserPresets.json):
 #   macOS  — macos-debug-arm64   (Ninja, Apple Silicon runner = macos-latest)
@@ -36,8 +37,40 @@ jobs:
           python3 -m pip install -r Scripts/release/requirements-test.txt
           python3 -m pytest Scripts/release/tests/ -q
 
+  quality-gate:
+    name: quality-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Matrix-Control
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install quality-gate dependencies
+        run: python3 -m pip install -r Scripts/quality/requirements.txt
+
+      - name: Lint touched C++ (quality gate)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="origin/${{ github.base_ref }}"
+            git fetch origin "${{ github.base_ref }}" --depth=1 || true
+            python3 Scripts/quality/lint_touched.py --base "$BASE_REF"
+          else
+            # Push to main: analyse files changed in this push range when available
+            BEFORE="${{ github.event.before }}"
+            if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
+              && git rev-parse --verify "$BEFORE" >/dev/null 2>&1; then
+              python3 Scripts/quality/lint_touched.py --base "$BEFORE"
+            else
+              python3 Scripts/quality/lint_touched.py --base "HEAD~1"
+            fi
+          fi
+
   resolve-ci-tier:
-    needs: release-script-tests
+    needs: [release-script-tests, quality-gate]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -80,7 +113,7 @@ jobs:
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
 
   build-and-test:
-    needs: [release-script-tests, resolve-ci-tier]
+    needs: [release-script-tests, quality-gate, resolve-ci-tier]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -156,10 +189,11 @@ jobs:
 
   ci-success:
     name: ci-success
-    needs: [release-script-tests, resolve-ci-tier, build-and-test]
+    needs: [release-script-tests, quality-gate, resolve-ci-tier, build-and-test]
     if: >-
       always() &&
       needs.release-script-tests.result == 'success' &&
+      needs.quality-gate.result == 'success' &&
       needs.resolve-ci-tier.result == 'success' &&
       needs.build-and-test.result == 'success'
     runs-on: ubuntu-latest

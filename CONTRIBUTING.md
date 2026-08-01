@@ -289,18 +289,26 @@ python3 -m pytest Scripts/release/tests/ -q
 
 ## Code Style Guidelines
 
-Matrix-Control follows the principles of **Clean Code** (Robert C. Martin) and **Clean Architecture**. If you are not familiar with these, the short version is: write code that reads like well-structured prose, with clear intent and no surprises.
+Matrix-Control follows Clean Code / Clean Architecture **principles** with a **realistic, instrumented quality gate** (not extreme line counts). Details: `CONVENTIONS.md` §3.
 
 Concretely:
 
-- **Naming** — use descriptive, intention-revealing names. Avoid abbreviations unless they are universally understood (e.g. `MIDI`, `SysEx`, `AU`).
-- **Functions** — keep them short and focused on a single responsibility.
-- **Comments** — prefer self-documenting code over comments. When a comment is necessary, explain *why*, not *what*.
-- **SOLID principles** — apply where relevant, particularly single responsibility and dependency inversion.
-- **No magic numbers** — use named constants, especially for MIDI parameter indices and SysEx byte positions.
-- **Formatting** — follow the existing indentation and brace style of the surrounding code. A `.clang-format` file will be added to the project in a future update.
+- **Naming** — descriptive, intention-revealing names. Avoid cryptic abbreviations (MIDI / SysEx / AU are fine). Constants `kPascalCase`; instance members `name_`.
+- **Functions** — one clear responsibility; stay within gate thresholds (~40 Core / ~50 GUI lines, complexity ≤10, nesting ≤4, ≤4 params in our code).
+- **Comments** — prefer self-documenting code. When needed, explain *why*, not *what*.
+- **SOLID** — apply where relevant (especially SRP and dependency direction GUI → Core).
+- **No magic numbers** — named constants for MIDI indices and SysEx positions.
+- **Formatting** — match surrounding Allman / 4-space style.
+- **Before finishing a change** — compile, run relevant tests, then:
 
-When in doubt, look at the existing `Source/Core` code as a reference.
+```bash
+python3 -m pip install -r Scripts/quality/requirements.txt
+python3 Scripts/quality/lint_touched.py
+```
+
+The script only judges **touched** C++ under `Source/` and `Tests/`. Untouched historical files are out of scope for that ticket.
+
+When in doubt, look at existing `Source/Core` code and `CONVENTIONS.md`.
 
 ------
 
