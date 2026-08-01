@@ -87,16 +87,18 @@ private:
                                       ++matrixModDispatchCount;
                                       matrixModDispatchedBuses.push_back(static_cast<int>(bus));
                                   })
-            , handler(proc.apvts,
-                      &model,
-                      &mapper,
-                      &clipboard,
-                      nullptr,
-                      nullptr,
-                      nullptr,
-                      &patchDispatcher,
-                      &matrixModDispatcher,
-                      nullptr,
+            , handler(Core::ModuleActionHandler::Dependencies {
+                          proc.apvts,
+                          &model,
+                          &mapper,
+                          &clipboard,
+                          nullptr,
+                          nullptr,
+                          nullptr,
+                          &patchDispatcher,
+                          &matrixModDispatcher,
+                          nullptr
+                      },
                       Core::ActionExecutionHooks{
                           [this](bool suppress) { suppressMatrixModSysEx = suppress; },
                           nullptr,

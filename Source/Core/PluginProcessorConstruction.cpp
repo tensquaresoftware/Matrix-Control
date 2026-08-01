@@ -167,19 +167,21 @@ void PluginProcessor::createPatchMutatorEngine(Core::ActionExecutionHooks& hooks
 void PluginProcessor::createModuleActionHandler(const Core::ActionExecutionHooks& hooks)
 {
     moduleActionHandler_ = std::make_unique<Core::ModuleActionHandler>(
-        apvts,
-        patchModel_.get(),
-        apvtsPatchMapper_.get(),
-        clipboardService_.get(),
-        matrixModInitService_.get(),
-        masterModuleInitService_.get(),
-        patchModuleInitService_.get(),
-        patchParameterSysExDispatcher_.get(),
-        matrixModBusParameterSysExDispatcher_.get(),
-        [this]()
-        {
-            refreshClipboardPasteEnabledProperties();
-            armClipboardFeedbackSession();
+        Core::ModuleActionHandler::Dependencies {
+            apvts,
+            patchModel_.get(),
+            apvtsPatchMapper_.get(),
+            clipboardService_.get(),
+            matrixModInitService_.get(),
+            masterModuleInitService_.get(),
+            patchModuleInitService_.get(),
+            patchParameterSysExDispatcher_.get(),
+            matrixModBusParameterSysExDispatcher_.get(),
+            [this]()
+            {
+                refreshClipboardPasteEnabledProperties();
+                armClipboardFeedbackSession();
+            }
         },
         hooks);
 }

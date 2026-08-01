@@ -8,11 +8,11 @@
 #include "Core/Actions/IActionHandler.h"
 #include "Core/Init/InitTemplateLoader.h"
 #include "Core/Init/MasterModuleInitService.h"
+#include "Core/Services/ClipboardService.h"
 
 namespace Core
 {
     class ApvtsPatchMapper;
-    class ClipboardService;
     class MatrixModBusParameterSysExDispatcher;
     class MatrixModInitService;
     class PatchModel;
@@ -24,17 +24,21 @@ namespace Core
     public:
         using RefreshPasteMirrorsCallback = std::function<void()>;
 
-        ModuleActionHandler(juce::AudioProcessorValueTreeState& apvts,
-                            PatchModel* patchModel,
-                            ApvtsPatchMapper* apvtsPatchMapper,
-                            ClipboardService* clipboardService,
-                            MatrixModInitService* matrixModInitService,
-                            MasterModuleInitService* masterModuleInitService,
-                            PatchModuleInitService* patchModuleInitService,
-                            PatchParameterSysExDispatcher* patchParameterSysExDispatcher,
-                            MatrixModBusParameterSysExDispatcher* matrixModBusParameterSysExDispatcher,
-                            RefreshPasteMirrorsCallback refreshPasteMirrors,
-                            ActionExecutionHooks hooks);
+        struct Dependencies
+        {
+            juce::AudioProcessorValueTreeState& apvts;
+            PatchModel* patchModel = nullptr;
+            ApvtsPatchMapper* apvtsPatchMapper = nullptr;
+            ClipboardService* clipboardService = nullptr;
+            MatrixModInitService* matrixModInitService = nullptr;
+            MasterModuleInitService* masterModuleInitService = nullptr;
+            PatchModuleInitService* patchModuleInitService = nullptr;
+            PatchParameterSysExDispatcher* patchParameterSysExDispatcher = nullptr;
+            MatrixModBusParameterSysExDispatcher* matrixModBusParameterSysExDispatcher = nullptr;
+            RefreshPasteMirrorsCallback refreshPasteMirrors;
+        };
+
+        ModuleActionHandler(Dependencies dependencies, ActionExecutionHooks hooks);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 
@@ -44,8 +48,22 @@ namespace Core
         bool handleClipboardCopy(const juce::String& propertyId);
         bool handleClipboardPaste(const juce::String& propertyId);
         bool handlePatchModuleInit(const juce::String& propertyId);
+
+        bool copyFullInternalPatch();
+        bool copyMatrixModulationSection();
+        bool copyPatchModule(PatchModuleKind moduleKind, bool shapeOnlyIntent);
+        void clearEnvelopeShapeOnlyFlag();
+
+        bool pasteMatrixModulationSection();
+        bool pastePatchModule(PatchModuleKind moduleKind);
+        void publishPasteBlockedFooter(const juce::String& sourceLabel,
+                                       const juce::String& targetName);
+        void pushMatrixModulationToApvtsAndSysEx();
+        void pushModuleToApvtsAndSysEx(const juce::String& moduleGroupId);
+
         void propagateInitTemplateFooterMessage(const InitTemplateLoadResult& result);
         int parseMatrixModBusInitIndex(const juce::String& propertyId) const;
+        bool hasClipboardPipeline() const;
 
         juce::AudioProcessorValueTreeState& apvts_;
         PatchModel* patchModel_;
