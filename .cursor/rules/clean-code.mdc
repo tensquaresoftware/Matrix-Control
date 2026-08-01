@@ -15,7 +15,8 @@ Short guidance. **Numbers are enforced by the analyser**, not by an agent redesi
 - **WET → DRY** — duplicating once is OK; factorize when the pattern is stable (~2nd–3rd time).
 - **Boy Scout (scoped)** — improve the zone changed for the ticket; do **not** clean an entire large file because one line moved.
 - **English everywhere** in code and UI strings.
-- **Naming** — camelCase locals/methods; PascalCase types; `kPascalCase` constants; instance members `name_`; no `m` prefix plus `_`.
+- **Naming** — camelCase locals/methods; PascalCase types; `kPascalCase` constants; instance members `name_`; no `m` prefix plus `_`. Names must reveal intent (`loadPreset`, not `doStuff` / `process2`).
+- **Names over narrative comments** — do not paper over a vague function with a comment that describes what it does; rename or extract instead. Comments only for *why* / non-obvious constraints (including dated real-time exceptions), never as a substitute for a clear name.
 
 ## Thresholds (source of truth = analyser)
 

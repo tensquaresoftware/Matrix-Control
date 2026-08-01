@@ -293,9 +293,9 @@ Matrix-Control follows Clean Code / Clean Architecture **principles** with a **r
 
 Concretely:
 
-- **Naming** — descriptive, intention-revealing names. Avoid cryptic abbreviations (MIDI / SysEx / AU are fine). Constants `kPascalCase`; instance members `name_`.
+- **Naming** — descriptive, intention-revealing names. Avoid cryptic abbreviations (MIDI / SysEx / AU are fine). Constants `kPascalCase`; instance members `name_`. Prefer a better name or a small extracted helper over a comment that narrates *what* the function does.
 - **Functions** — one clear responsibility; stay within gate thresholds (~40 Core / ~50 GUI lines, complexity ≤10, nesting ≤4, ≤4 params in our code).
-- **Comments** — prefer self-documenting code. When needed, explain *why*, not *what*.
+- **Comments** — prefer self-documenting code. When a comment is necessary, explain *why* (or a non-obvious constraint), not *what*.
 - **SOLID** — apply where relevant (especially SRP and dependency direction GUI → Core).
 - **No magic numbers** — named constants for MIDI indices and SysEx positions.
 - **Formatting** — match surrounding Allman / 4-space style.

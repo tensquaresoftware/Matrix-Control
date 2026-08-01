@@ -54,7 +54,7 @@ Before and while coding:
 - Prefer the **simplest design that works (KISS)**; implement **only the current need (YAGNI)**
 - Ask: **Does this choice make future changes easier (ETC)?**
 - Detect duplication with WET nuance (§3.1 / §6.16) — duplicate once OK; factorize when stable
-- Use explicit, intention-revealing names; one clear responsibility per function/class (soft SRP)
+- Use explicit, intention-revealing names; one clear responsibility per function/class (soft SRP). Do **not** use a descriptive comment as a substitute for a better function/method name — rename or extract; comments explain *why*, not *what*
 - **Boy Scout limited to ticket scope** — improve the touched zone; do not rewrite an entire large file for one line
 - End of task: **compile** + relevant tests + **`python3 Scripts/quality/lint_touched.py`** on the diff
 
@@ -378,8 +378,8 @@ Prefer inline methods in header only if they are short (< 5 lines)
 > Simplicity and pragmatism: see §6.16 (KISS, YAGNI, WET/DRY, ETC, Boy Scout, CQS)
 
 - Readable and human-understandable code
-- Names ALWAYS explicit (no cryptic abbreviations)
-- Minimize comments: use only when necessary
+- Names ALWAYS explicit (no cryptic abbreviations) — a name must reveal role without reading the whole body
+- Minimize comments: use only when necessary; **never** as a crutch for a vague name (Uncle Bob: rename/extract instead of narrating *what* the code does)
 - Prefer extracting helpers when a function exceeds §3 thresholds rather than adding comments that can become obsolete
 - Single level of abstraction per function
 - Single responsibility (Single Responsibility Principle)
@@ -632,8 +632,8 @@ if (auto* f = getFoo())
 
 - For short one- or two-line comments, prefer `//` over `/* */`
 - Always leave space before text in `//` comment: `// yes!` not `//no!`
-- Code names must be self-documenting (avoid comments)
-- Use comments only to explain "why", not "how"
+- Code names must be self-documenting (avoid comments that narrate *what* a function does — rename or extract instead)
+- Use comments only to explain "why", not "how" / "what"
 - For complex public APIs, consider Doxygen/Javadoc style comments
 
 ### 7.13 Macros
