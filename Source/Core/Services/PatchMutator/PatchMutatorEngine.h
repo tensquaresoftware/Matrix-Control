@@ -14,7 +14,7 @@
 class MidiManager;
 class SysExEncoder;
 
-class PatchMutatorEngineTests;
+class PatchMutatorEngineTestAccess;
 
 namespace Core
 {
@@ -119,7 +119,7 @@ namespace Core
                                               int retryIndex = MutationHistoryStore::kRootOnly) const;
 
     private:
-        friend class ::PatchMutatorEngineTests;
+        friend class ::PatchMutatorEngineTestAccess;
 
         struct FlatHistoryEntry
         {

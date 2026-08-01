@@ -403,7 +403,15 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutationNamingTests.cpp
         Tests/Unit/HistoryDefragServiceTests.cpp
         Tests/Unit/MutationAlgorithmTests.cpp
-        Tests/Unit/PatchMutatorEngineTests.cpp
+        Tests/Unit/PatchMutatorEngineTestSupport.cpp
+        Tests/Unit/PatchMutatorEngineMutateTests.cpp
+        Tests/Unit/PatchMutatorEngineRetryTests.cpp
+        Tests/Unit/PatchMutatorEngineSyncAuditionTests.cpp
+        Tests/Unit/PatchMutatorEngineCompareSnapshotTests.cpp
+        Tests/Unit/PatchMutatorEngineDeleteClearTests.cpp
+        Tests/Unit/PatchMutatorEngineDefragTests.cpp
+        Tests/Unit/PatchMutatorEngineExportTests.cpp
+        Tests/Unit/PatchMutatorEngineEnabledResetAdvanceTests.cpp
         Tests/Unit/PatchLoadContextTests.cpp
         Tests/Unit/Matrix1000FactoryPatchNamesTests.cpp
         Tests/Unit/MutatorRecipePersistenceTests.cpp
