@@ -107,6 +107,14 @@ public:
     void run() override;
 
 private:
+    struct OutboundIdlePollArgs
+    {
+        std::uint64_t token = 0;
+        int settleMs = 0;
+        juce::uint32 idleStartMs = 0;
+        int outboundIdleTimeoutMs = 0;
+    };
+
     juce::AudioProcessorValueTreeState& apvts;
 
     std::unique_ptr<MidiInputPort> inputMidiPort;
@@ -131,8 +139,16 @@ private:
     bool isMasterEditOutboundAllowed() const;
 
     void stopMidiInputCallbacks();
+    bool openMidiInputPort(const juce::String& deviceId, bool reportOpenFailure);
+    bool openMidiOutputPort(const juce::String& deviceId, bool reportOpenFailure);
     void wakeConsumer() noexcept;
     bool processOutboundQueue();
+    bool handleOutboundMessage(Core::MidiOutboundQueue::Message& msg);
+    bool tryDispatchPendingSysEx();
+    bool isEditorSysExAllowed(const juce::MemoryBlock& sysEx) const;
+    void notifyOutboundActivity(const Core::MidiOutboundQueue::Message& msg);
+    bool isOutboundQueueIdle() const noexcept;
+    bool hasOutboundIdleTimedOut(const OutboundIdlePollArgs& args) const noexcept;
     bool canSendSysExNow() const noexcept;
     void sendQueuedSysEx(const juce::MemoryBlock& sysExMessage, const juce::String& description);
     void dispatchRealtimeMessage(const Core::MidiOutboundQueue::Message& msg);
@@ -149,14 +165,16 @@ private:
                                               size_t expectedPackedSize,
                                               const juce::String& requestDescription,
                                               juce::uint8 patchNumber = 0);
+    std::vector<juce::uint8> decodeSysExPackedData(juce::uint8 requestType,
+                                                   const juce::MemoryBlock& response,
+                                                   size_t expectedPackedSize,
+                                                   const juce::String& requestDescription);
     void sendArmedSinglePatchRequest(juce::uint8 patchNumber, std::uint64_t token);
     void armAsyncSinglePatchCapture(std::uint64_t token);
+    void scheduleAsyncPatchTimeout(std::uint64_t token);
     void finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::uint8> packed);
-    void pollOutboundIdleThenRequest(juce::uint8 patchNumber,
-                                     std::uint64_t token,
-                                     int settleMs,
-                                     juce::uint32 idleStartMs,
-                                     int outboundIdleTimeoutMs);
+    void pollOutboundIdleThenRequest(juce::uint8 patchNumber, OutboundIdlePollArgs args);
+    void scheduleOrSendArmedPatchRequest(juce::uint8 patchNumber, const OutboundIdlePollArgs& args);
     std::vector<juce::uint8> decodePackedPatchResponse(const juce::MemoryBlock& response,
                                                        const juce::String& requestDescription);
     // Quiet decode for async capture: returns empty for non-patch / corrupt SysEx without
@@ -166,11 +184,11 @@ private:
     void clearDeviceDetectionAfterPortLoss();
     void clearLastInquiryPortPair() noexcept;
     bool armAsyncDeviceInquiryCapture(std::uint64_t token);
+    void handleAsyncDeviceInquiryResponse(std::uint64_t token, const juce::MemoryBlock& response);
     void sendArmedDeviceInquiry(std::uint64_t token);
-    void pollOutboundIdleThenDeviceInquiry(std::uint64_t token,
-                                           int settleMs,
-                                           juce::uint32 idleStartMs,
-                                           int outboundIdleTimeoutMs);
+    void scheduleDeviceInquiryTimeout(std::uint64_t token);
+    void pollOutboundIdleThenDeviceInquiry(OutboundIdlePollArgs args);
+    void scheduleOrSendArmedDeviceInquiry(const OutboundIdlePollArgs& args);
     void finishAsyncDeviceInquirySuccess(std::uint64_t token,
                                          const DeviceIdInfo& info,
                                          MatrixDeviceTypes::Type deviceType);
