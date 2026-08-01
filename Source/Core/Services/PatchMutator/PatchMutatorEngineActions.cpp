@@ -1,0 +1,226 @@
+// Extracted from PatchMutatorEngine.cpp for modular maintenance.
+// MUTATE / RETRY / COMPARE / DELETE / CLEAR / RESET session actions.
+
+#include "Core/Services/PatchMutator/PatchMutatorEngine.h"
+#include "Core/Services/PatchMutator/PatchMutatorEngineInternal.h"
+
+#include "Core/Models/PatchModel.h"
+#include "Core/Services/PatchMutator/MutationNaming.h"
+
+using namespace PatchMutatorEngineInternal;
+
+namespace Core
+{
+
+MutatorActionResult PatchMutatorEngine::mutate()
+{
+    applySelectionFromApvts();
+
+    if (historyStore_.isRootSlotsFull() || historyStore_.isRootIndexExhausted())
+        return makeHistoryLimitResult();
+
+    const auto recipe = buildRecipeFromApvts();
+    if (const auto recipeError = validateMutationRecipe(recipe))
+        return *recipeError;
+
+    const PatchModel auditionBuffer = resolveAuditionBuffer();
+
+    if (! historyStore_.hasInitialSnapshot())
+    {
+        historyStore_.setInitialSnapshot(auditionBuffer);
+        freezeExportBasename(auditionBuffer);
+    }
+
+    PatchModel parentSnapshot;
+    parentSnapshot.loadFrom(auditionBuffer.data());
+
+    PatchModel working;
+    working.loadFrom(auditionBuffer.data());
+
+    if (! applyRecipeMutation(working, recipe))
+        return makeWarningResult(kNoMutationChangeFooterMessage);
+
+    const auto rootIndexOpt = historyStore_.peekNextRootIndex();
+    if (! rootIndexOpt.has_value())
+        return makeHistoryLimitResult();
+
+    const int rootIndex = *rootIndexOpt;
+
+    if (! historyStore_.insertRoot(rootIndex, working, parentSnapshot))
+        return makeHistoryLimitResult();
+
+    pushResultToEditorAndSynth(working);
+
+    selectedRootIndex_ = rootIndex;
+    selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    syncHistoryUiProperties(apvts_);
+
+    return makeSuccessResult();
+}
+
+MutatorActionResult PatchMutatorEngine::retry()
+{
+    applySelectionFromApvts();
+
+    int rootIndex = -1;
+    if (const auto preError = validateRetryPreconditions(rootIndex))
+        return *preError;
+
+    const auto selectedEntry = resolveSelectedEntryForRetry(rootIndex);
+    if (! selectedEntry.has_value())
+        return makeWarningResult(kNoSelectionFooterMessage);
+
+    const auto recipe = buildRecipeFromApvts();
+    if (const auto recipeError = validateMutationRecipe(recipe))
+        return *recipeError;
+
+    PatchModel parentSnapshot;
+    parentSnapshot.loadFrom(selectedEntry->parentSnapshot.data());
+
+    PatchModel working;
+    working.loadFrom(selectedEntry->parentSnapshot.data());
+
+    if (! applyRecipeMutation(working, recipe))
+        return makeWarningResult(kNoMutationChangeFooterMessage);
+
+    const auto retryIndexOpt = historyStore_.peekNextRetryIndex(rootIndex);
+    if (! retryIndexOpt.has_value())
+        return makeHistoryLimitResult();
+
+    const int retryIndex = *retryIndexOpt;
+
+    if (! historyStore_.insertRetry(rootIndex, retryIndex, working, parentSnapshot))
+        return makeHistoryLimitResult();
+
+    pushResultToEditorAndSynth(working);
+
+    selectedRetryIndex_ = retryIndex;
+    syncHistoryUiProperties(apvts_);
+
+    return makeSuccessResult();
+}
+
+MutatorActionResult PatchMutatorEngine::exitCompareMode()
+{
+    auto& state = apvts_.state;
+    state.setProperty(MutatorState::kCompareActive, false, nullptr);
+    {
+        SuppressMutatorHistorySelectionDebounceGuard suppressGuard(hooks_);
+        state.setProperty(MutatorState::kSelectedMutateRootIndex, compareSavedMutateRootIndex_, nullptr);
+        state.setProperty(MutatorState::kSelectedRetryIndex, compareSavedRetryIndex_, nullptr);
+    }
+    applySelectionFromApvts();
+
+    const PatchModel auditionModel = resolveAuditionBuffer();
+    if (candidateDiffersFromLive(auditionModel))
+        pushResultToEditorAndSynth(auditionModel);
+
+    clearCompareLockedFooterIfPresent(apvts_);
+    return makeSuccessResult();
+}
+
+MutatorActionResult PatchMutatorEngine::enterCompareMode()
+{
+    if (historyStore_.isEmpty())
+        return makeWarningResult(kEmptyHistoryFooterMessage);
+
+    if (! historyStore_.hasInitialSnapshot())
+        return makeWarningResult(kNoInitialSnapshotFooterMessage);
+
+    compareSavedMutateRootIndex_ = selectedRootIndex_;
+    compareSavedRetryIndex_ = selectedRetryIndex_;
+
+    apvts_.state.setProperty(MutatorState::kCompareActive, true, nullptr);
+
+    const PatchModel initialSnapshot = historyStore_.getInitialSnapshot();
+    if (candidateDiffersFromLive(initialSnapshot))
+        pushResultToEditorAndSynth(initialSnapshot);
+
+    MutatorActionResult result = makeSuccessResult();
+    result.footerMessage = CompareMessages::kCompareLockedFooter;
+    result.footerSeverity = kFooterSeverityInfo;
+    return result;
+}
+
+MutatorActionResult PatchMutatorEngine::toggleCompare()
+{
+    applySelectionFromApvts();
+
+    if (readBoolProperty(apvts_.state, MutatorState::kCompareActive, false))
+        return exitCompareMode();
+
+    return enterCompareMode();
+}
+
+MutatorActionResult PatchMutatorEngine::deleteSelected()
+{
+    applySelectionFromApvts();
+
+    if (historyStore_.isEmpty())
+        return makeWarningResult(kEmptyHistoryFooterMessage);
+
+    const int mutateRootIndex = selectedRootIndex_;
+    if (mutateRootIndex < 0 || ! historyStore_.hasRoot(mutateRootIndex))
+        return makeWarningResult(kNoSelectionFooterMessage);
+
+    forceExitCompare();
+
+    const int retryIndex = selectedRetryIndex_;
+    int newMutateRootIndex = mutateRootIndex;
+    int newRetryIndex = MutationHistoryStore::kRootOnly;
+    MutatorActionResult result;
+
+    if (retryIndex != MutationHistoryStore::kRootOnly && historyStore_.hasRetry(mutateRootIndex, retryIndex))
+    {
+        std::tie(newMutateRootIndex, newRetryIndex) = resolveSelectionAfterDelete(mutateRootIndex, retryIndex, true);
+
+        if (! historyStore_.deleteRetry(mutateRootIndex, retryIndex))
+            return makeWarningResult(kNoSelectionFooterMessage);
+    }
+    else
+    {
+        std::tie(newMutateRootIndex, newRetryIndex) = resolveSelectionAfterDelete(mutateRootIndex,
+                                                                                  MutationHistoryStore::kRootOnly,
+                                                                                  false);
+
+        if (! historyStore_.deleteRoot(mutateRootIndex))
+            return makeWarningResult(kNoSelectionFooterMessage);
+
+        result.footerMessage = kRootDeleteCascadeFooterPrefix
+                               + MutationNaming::formatRootLabel(mutateRootIndex)
+                               + kRootDeleteCascadeFooterSuffix;
+        result.footerSeverity = kFooterSeverityInfo;
+    }
+
+    selectedRootIndex_ = newMutateRootIndex;
+    selectedRetryIndex_ = newRetryIndex;
+    syncHistoryUiProperties(apvts_);
+    auditionAfterHistoryMutation();
+
+    result.success = true;
+    return result;
+}
+
+MutatorActionResult PatchMutatorEngine::clearHistory()
+{
+    forceExitCompare();
+    historyStore_.clear();
+    selectedRootIndex_ = -1;
+    selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    syncHistoryUiProperties(apvts_);
+    auditionAfterHistoryMutation();
+    return makeSuccessResult();
+}
+
+MutatorActionResult PatchMutatorEngine::resetSessionForPatchLoad()
+{
+    forceExitCompare();
+    historyStore_.clear();
+    historyStore_.clearInitialSnapshot();
+    selectedRootIndex_ = -1;
+    selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    syncHistoryUiProperties(apvts_);
+    return makeSuccessResult();
+}
+
+} // namespace Core

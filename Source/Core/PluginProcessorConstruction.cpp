@@ -136,16 +136,17 @@ void PluginProcessor::createActionSubsystem()
 void PluginProcessor::createPatchMutatorEngine(Core::ActionExecutionHooks& hooks)
 {
     patchMutatorEngine_ = std::make_unique<Core::PatchMutatorEngine>(
-        patchModel_.get(),
-        apvtsPatchMapper_.get(),
-        patchNameSyncer_.get(),
-        midiManager.get(),
-        apvts,
-        hooks,
-        [this]() { return getCurrentPatchNumberForMutator(); },
-        [this]() { return getResolvedDeviceMemoryLimits(); },
-        patchFileService_.get(),
-        &midiManager->getSysExEncoder());
+        Core::PatchMutatorEngine::Dependencies {
+            patchModel_.get(),
+            apvtsPatchMapper_.get(),
+            patchNameSyncer_.get(),
+            midiManager.get(),
+            apvts,
+            [this]() { return getCurrentPatchNumberForMutator(); },
+            [this]() { return getResolvedDeviceMemoryLimits(); },
+            patchFileService_.get(),
+            &midiManager->getSysExEncoder() },
+        hooks);
 
     patchMutatorEngine_->setPatchLoadContextProvider([this]() { return patchLoadContext_; });
 

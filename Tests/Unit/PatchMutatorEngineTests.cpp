@@ -209,22 +209,14 @@ private:
             , midiManager(proc.apvts, queue, tracker)
             , decoder(parser)
             , patchFileService(decoder)
-            , engine(&model,
-                     &mapper,
-                     &patchNameSyncer,
-                     &midiManager,
-                     proc.apvts,
-                     Core::ActionExecutionHooks{
-                         [this](bool suppress) { suppressMatrixModSysEx = suppress; },
-                         nullptr,
-                         [this](bool suppress) { suppressPatchSysEx = suppress; },
-                         nullptr,
-                         nullptr,
-                         {} },
-                     [this]() { return currentPatchNumber; },
-                     [this]() { return deviceLimits; },
-                     &patchFileService,
-                     &midiManager.getSysExEncoder())
+            , engine(Core::PatchMutatorEngine::Dependencies {
+                         &model, &mapper, &patchNameSyncer, &midiManager, proc.apvts,
+                         [this]() { return currentPatchNumber; },
+                         [this]() { return deviceLimits; },
+                         &patchFileService, &midiManager.getSysExEncoder() },
+                     Core::ActionExecutionHooks {
+                         .setSuppressMatrixModSysEx = [this](bool s) { suppressMatrixModSysEx = s; },
+                         .setSuppressPatchSysEx = [this](bool s) { suppressPatchSysEx = s; } })
         {
             proc.apvts.state.setProperty("deviceDetected", true, nullptr);
             proc.apvts.state.setProperty("deviceType", "Matrix-1000", nullptr);

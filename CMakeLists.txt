@@ -169,6 +169,8 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchMutator/HistoryDefragService.cpp
     Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
+    Source/Core/Services/PatchMutator/PatchMutatorEngineActions.cpp
+    Source/Core/Services/PatchMutator/PatchMutatorEngineHistory.cpp
     Source/Core/Services/PatchMutator/PatchLoadContext.cpp
     Source/Core/Util/ComboboxPatchSendDebouncer.cpp
     Source/Core/Services/ClipboardPasteEnabledResolver.cpp
@@ -477,6 +479,8 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchMutator/HistoryDefragService.cpp
         Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
+        Source/Core/Services/PatchMutator/PatchMutatorEngineActions.cpp
+        Source/Core/Services/PatchMutator/PatchMutatorEngineHistory.cpp
         Source/Core/Services/PatchMutator/PatchLoadContext.cpp
         Source/Core/Util/ComboboxPatchSendDebouncer.cpp
         Source/Core/Factories/ApvtsFactory.cpp

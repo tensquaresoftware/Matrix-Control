@@ -71,16 +71,20 @@ namespace Core
     class PatchMutatorEngine final : public PatchMutatorEnginePort
     {
     public:
-        PatchMutatorEngine(PatchModel* patchModel,
-                           ApvtsPatchMapper* apvtsPatchMapper,
-                           PatchNameSyncer* patchNameSyncer,
-                           MidiManager* midiManager,
-                           juce::AudioProcessorValueTreeState& apvts,
-                           ActionExecutionHooks hooks,
-                           std::function<int()> getCurrentPatchNumber,
-                           std::function<DeviceMemoryLimits()> getDeviceMemoryLimits,
-                           PatchFileService* patchFileService = nullptr,
-                           SysExEncoder* sysExEncoder = nullptr);
+        struct Dependencies
+        {
+            PatchModel* patchModel = nullptr;
+            ApvtsPatchMapper* apvtsPatchMapper = nullptr;
+            PatchNameSyncer* patchNameSyncer = nullptr;
+            MidiManager* midiManager = nullptr;
+            juce::AudioProcessorValueTreeState& apvts;
+            std::function<int()> getCurrentPatchNumber;
+            std::function<DeviceMemoryLimits()> getDeviceMemoryLimits;
+            PatchFileService* patchFileService = nullptr;
+            SysExEncoder* sysExEncoder = nullptr;
+        };
+
+        PatchMutatorEngine(Dependencies dependencies, ActionExecutionHooks hooks);
 
         MutatorActionResult mutate() override;
         MutatorActionResult retry() override;
@@ -117,7 +121,20 @@ namespace Core
     private:
         friend class ::PatchMutatorEngineTests;
 
+        struct FlatHistoryEntry
+        {
+            int rootIndex = -1;
+            int retryIndex = MutationHistoryStore::kRootOnly;
+        };
+
+        static MutatorActionResult makeWarningResult(const char* message);
+        static MutatorActionResult makeHistoryLimitResult();
+        static MutatorActionResult makeSuccessResult();
+
         MutationRecipe buildRecipeFromApvts() const;
+        std::optional<MutatorActionResult> validateMutationRecipe(const MutationRecipe& recipe) const;
+        std::optional<MutatorActionResult> validateRetryPreconditions(int& outRootIndex) const;
+        bool applyRecipeMutation(PatchModel& working, const MutationRecipe& recipe);
         // resolveAuditionBuffer: empty history -> live editor; selectedRootIndex_ < 0 -> highest sorted root
         // (root-only); missing entry at selection -> root-only entry or live editor fallback.
         // MUTATE-only — returns selected entry result, not parentSnapshot (D-083).
@@ -136,10 +153,20 @@ namespace Core
         MutatorActionResult runSessionExport(const juce::File& sessionFolder, bool clearExisting);
         void applySelectionFromApvts();
         void forceExitCompare();
+        MutatorActionResult exitCompareMode();
+        MutatorActionResult enterCompareMode();
         std::pair<int, int> resolveSelectionAfterDelete(int rootIndex,
                                                         int retryIndex,
                                                         bool isRetryDelete);
         void auditionAfterHistoryMutation();
+        juce::Array<FlatHistoryEntry> buildFlatHistoryEntries() const;
+        static int indexOfFlatHistoryEntry(const juce::Array<FlatHistoryEntry>& flat,
+                                           int rootIndex,
+                                           int retryIndex);
+        void commitHistorySelectionToApvts();
+        void clearEmptyHistoryUi(juce::AudioProcessorValueTreeState& apvts);
+        void writeHistoryListMirrors(juce::ValueTree& state);
+        void writeSelectedHistoryUi(juce::ValueTree& state, const juce::Array<int>& roots);
         static bool readBoolProperty(const juce::ValueTree& state,
                                      const juce::Identifier& propertyId,
                                      bool defaultValue);
