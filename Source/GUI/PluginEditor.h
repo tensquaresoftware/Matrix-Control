@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -36,20 +37,102 @@ public:
     bool keyPressed(const juce::KeyPress& key) override;
 
 private:
-    class HeaderRefreshTimer;
-    class ClipboardFeedbackPhaseTimer;
+    // Nested runtime timers; bodies live in PluginEditorTimers.cpp.
+    class HeaderRefreshTimer : private juce::Timer
+    {
+    public:
+        HeaderRefreshTimer(PluginProcessor& processor, HeaderPanel& headerPanel, PluginEditor& owner);
+
+    private:
+        void timerCallback() override;
+
+        PluginProcessor& processor_;
+        HeaderPanel& headerPanel_;
+        PluginEditor& owner_;
+        int audioFromRefreshAttempts_ = 0;
+    };
+
+    class ClipboardFeedbackPhaseTimer : private juce::Timer,
+                                        private juce::ValueTree::Listener
+    {
+    public:
+        explicit ClipboardFeedbackPhaseTimer(juce::AudioProcessorValueTreeState& apvts);
+        ~ClipboardFeedbackPhaseTimer() override;
+
+    private:
+        void timerCallback() override;
+        void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+        void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+        void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+        void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+        void valueTreeParentChanged(juce::ValueTree&) override {}
+        void valueTreeRedirected(juce::ValueTree&) override;
+        void syncTimerFromState();
+
+        juce::ValueTree state_;
+    };
+
+    // Bank Utility EXPORT/IMPORT progress modal request (see BankTransferProgressPresenter).
+    struct BankTransferProgressShowRequest
+    {
+        juce::String title;
+        juce::String message;
+        juce::String detail;
+        int totalSteps = 0;
+        std::function<void()> onCancelRequested;
+    };
+
+    // ---- Construction phases (see PluginEditor.cpp ctor for call order) ----
+    void wirePatchAndMutatorBindings();
+    void wireBankTransferBindings();
+    void createUiShell();
+    void restoreAndWireHeader();
+    void attachEditorRuntimeListeners();
+
+    // wirePatchAndMutatorBindings() sub-bindings (PluginEditorPatchBindings.cpp).
+    void setPatchFolderPickerBinding();
+    void setMutatorExportFolderPickerBinding();
+    void setMutatorDefragLimitGateBinding();
+    void setMutatorExportCollisionGateBinding();
+    void setMutatorHistoryGateBinding();
+    void setUnsavedEditConfirmGateBinding();
+    void setMutatorFlushConfirmGateBinding();
+    void setMutatorDeleteConfirmGateBinding();
+    void setPatchSaveFilePickerBinding();
+    void setPatchNameReconciliationPickerBinding();
+
+    // wireBankTransferBindings() sub-bindings (PluginEditorBankBindings.cpp).
+    void setBankExportFolderPickerBinding();
+    void setBankImportFolderPickerBinding();
+    void setBankImportConfirmGateBinding();
+    void setBankExportOverwriteConfirmGateBinding();
+    void wireBankTransferProgressPresenter();
+    void configureBankTransferProgressShowAndUpdate(Core::BankTransferProgressPresenter& presenter);
+    void configureBankTransferProgressMessaging(Core::BankTransferProgressPresenter& presenter);
+
+    // attachEditorRuntimeListeners() sub-binding (PluginEditorUiConstruction.cpp).
+    void wireHeaderRuntimeControls(HeaderPanel& headerPanel);
 
     void refreshAudioFromCombo(HeaderPanel* headerOverride = nullptr);
+    void applyAudioCatalogToHeader(HeaderPanel& header,
+                                   const juce::StringArray& names,
+                                   const juce::StringArray& ids,
+                                   juce::String sourceIdToRestore);
+    void applyAudioCatalogWithoutHeader(const juce::StringArray& ids, juce::String sourceIdToRestore);
     void attachStandaloneAudioDeviceListener();
     void detachStandaloneAudioDeviceListener();
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
+    void syncMidiPortSelectionFromState(const juce::String& propertyName);
+    void scheduleAudioFromRefreshIfNeeded(const juce::String& propertyName);
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
     void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
     void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override;
+
+    bool isEscapeBlockedByOverlay() const;
 
     void openSettingsWindow();
     void closeSettingsWindow();
@@ -57,11 +140,7 @@ private:
     void closeAboutWindow();
     void openMasterInitConfirmDialog(const juce::String& moduleDisplayName, std::function<void()> onConfirm);
     void closeMasterInitConfirmDialog();
-    void showBankTransferProgressDialog(const juce::String& title,
-                                        const juce::String& message,
-                                        const juce::String& detail,
-                                        int totalSteps,
-                                        std::function<void()> onCancelRequested);
+    void showBankTransferProgressDialog(const BankTransferProgressShowRequest& request);
     void hideBankTransferProgressDialog();
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
@@ -99,6 +178,7 @@ private:
     void updateSkin();
     void applyUiScale(float uiScale);
     void syncUiScaleFromEditor();
+    void updateOverlayLayoutsForUiScale(float uiScale);
     void syncStandaloneWindowSize();
 #if JUCE_DEBUG
     void setUiElementsTestVisible(bool visible);

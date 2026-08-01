@@ -204,6 +204,16 @@ set(PLUGIN_SOURCES
     Source/Shared/Definitions/PluginDescriptorsMatrixModulation.cpp
     Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
     Source/GUI/PluginEditor.cpp
+    Source/GUI/PluginEditorAlerts.cpp
+    Source/GUI/PluginEditorTimers.cpp
+    Source/GUI/PluginEditorPatchBindings.cpp
+    Source/GUI/PluginEditorBankBindings.cpp
+    Source/GUI/PluginEditorUiConstruction.cpp
+    Source/GUI/PluginEditorWindows.cpp
+    Source/GUI/PluginEditorSettings.cpp
+    Source/GUI/PluginEditorSkinScale.cpp
+    Source/GUI/PluginEditorHeader.cpp
+    Source/GUI/PluginEditorAudio.cpp
     Source/GUI/About/AboutPanel.cpp
     Source/GUI/About/AboutWindow.cpp
     Source/GUI/Dialogs/BankTransferProgressDialog.cpp

@@ -1,0 +1,91 @@
+// Extracted from PluginEditor.cpp for modular maintenance.
+// Method bodies for the HeaderRefreshTimer + ClipboardFeedbackPhaseTimer nested classes
+// (declared as private members of PluginEditor in PluginEditor.h).
+
+#include "PluginEditor.h"
+#include "PluginEditorInternal.h"
+
+#include "Core/Audio/AudioPassthroughProcessor.h"
+#include "Core/MIDI/MidiActivityTracker.h"
+#include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
+#include "Shared/Definitions/PluginIDs.h"
+
+PluginEditor::HeaderRefreshTimer::HeaderRefreshTimer(PluginProcessor& processor,
+                                                      HeaderPanel& headerPanel,
+                                                      PluginEditor& owner)
+    : processor_(processor)
+    , headerPanel_(headerPanel)
+    , owner_(owner)
+{
+    startTimerHz(30);
+}
+
+void PluginEditor::HeaderRefreshTimer::timerCallback()
+{
+    if (processor_.isStandalone())
+    {
+        if (audioFromRefreshAttempts_ < 60)
+        {
+            const auto names = processor_.getAudioInputSourceNames();
+
+            if (names.isEmpty())
+            {
+                ++audioFromRefreshAttempts_;
+                owner_.refreshAudioFromCombo();
+            }
+        }
+
+        headerPanel_.getPeakIndicator().setLevel(
+            processor_.getAudioPassthroughProcessor().getPeakLevel());
+    }
+
+    const auto& tracker = processor_.getMidiActivityTracker();
+    headerPanel_.getInstrumentActivityLed().setLevel(
+        tracker.getActivityLevel(Core::MidiActivityTracker::Path::kInstrument));
+    headerPanel_.getEditorActivityLed().setLevel(
+        tracker.getActivityLevel(Core::MidiActivityTracker::Path::kMidiFromInbound));
+    headerPanel_.getMidiToActivityLed().setLevel(
+        tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound));
+}
+
+PluginEditor::ClipboardFeedbackPhaseTimer::ClipboardFeedbackPhaseTimer(juce::AudioProcessorValueTreeState& apvts)
+    : state_(apvts.state)
+{
+    state_.addListener(this);
+    syncTimerFromState();
+}
+
+PluginEditor::ClipboardFeedbackPhaseTimer::~ClipboardFeedbackPhaseTimer()
+{
+    state_.removeListener(this);
+    stopTimer();
+}
+
+void PluginEditor::ClipboardFeedbackPhaseTimer::timerCallback()
+{
+    const bool copyLit = static_cast<bool>(
+        state_.getProperty(PluginIDs::ClipboardFeedback::kCopyLit, true));
+    state_.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, ! copyLit, nullptr);
+}
+
+void PluginEditor::ClipboardFeedbackPhaseTimer::valueTreePropertyChanged(juce::ValueTree&,
+                                                                         const juce::Identifier& property)
+{
+    if (property.toString() == PluginIDs::ClipboardFeedback::kActive)
+        syncTimerFromState();
+}
+
+void PluginEditor::ClipboardFeedbackPhaseTimer::valueTreeRedirected(juce::ValueTree&)
+{
+    syncTimerFromState();
+}
+
+void PluginEditor::ClipboardFeedbackPhaseTimer::syncTimerFromState()
+{
+    const bool active = static_cast<bool>(
+        state_.getProperty(PluginIDs::ClipboardFeedback::kActive, false));
+    if (active)
+        startTimerHz(2);
+    else
+        stopTimer();
+}
