@@ -23,6 +23,21 @@
 
 namespace
 {
+    namespace SelectBankIds = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
+
+    constexpr const char* kSelectBankIds[BankUtilityPanel::kBankCount] = {
+        SelectBankIds::kSelectBank0,
+        SelectBankIds::kSelectBank1,
+        SelectBankIds::kSelectBank2,
+        SelectBankIds::kSelectBank3,
+        SelectBankIds::kSelectBank4,
+        SelectBankIds::kSelectBank5,
+        SelectBankIds::kSelectBank6,
+        SelectBankIds::kSelectBank7,
+        SelectBankIds::kSelectBank8,
+        SelectBankIds::kSelectBank9,
+    };
+
     void setSubtreeKeyboardInteractionEnabled(juce::Component& root, bool enabled)
     {
         root.setWantsKeyboardFocus(enabled);
@@ -43,6 +58,30 @@ namespace
         TSS::GrayedControlHelper::applyGrayedAppearance(*child, grayed);
         child->setInterceptsMouseClicks(! grayed, ! grayed);
         setSubtreeKeyboardInteractionEnabled(*child, ! grayed);
+    }
+
+    void setOptionalUiScale(TSS::Label* label, float sf)
+    {
+        if (label != nullptr)
+            label->setUiScale(sf);
+    }
+
+    void setOptionalUiScale(TSS::ModuleHeader* header, float sf)
+    {
+        if (header != nullptr)
+            header->setUiScale(sf);
+    }
+
+    void setOptionalUiScale(TSS::Button* button, float sf)
+    {
+        if (button != nullptr)
+            button->setUiScale(sf);
+    }
+
+    void setOptionalLook(TSS::Button* button, const TSS::ButtonLook& look)
+    {
+        if (button != nullptr)
+            button->setLook(look);
     }
 }
 
@@ -125,16 +164,9 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
     applyGrayedToChild(bankUtilityModuleHeader_.get(), grayed);
     applyGrayedToChild(bankSelectorLabel_.get(), grayed);
     applyGrayedToChild(unlockBankButton_.get(), grayed);
-    applyGrayedToChild(selectBank0Button_.get(), grayed);
-    applyGrayedToChild(selectBank1Button_.get(), grayed);
-    applyGrayedToChild(selectBank2Button_.get(), grayed);
-    applyGrayedToChild(selectBank3Button_.get(), grayed);
-    applyGrayedToChild(selectBank4Button_.get(), grayed);
-    applyGrayedToChild(selectBank5Button_.get(), grayed);
-    applyGrayedToChild(selectBank6Button_.get(), grayed);
-    applyGrayedToChild(selectBank7Button_.get(), grayed);
-    applyGrayedToChild(selectBank8Button_.get(), grayed);
-    applyGrayedToChild(selectBank9Button_.get(), grayed);
+
+    for (auto& button : selectBankButtons_)
+        applyGrayedToChild(button.get(), grayed);
 
     if (grayed)
         giveAwayKeyboardFocus();
@@ -185,28 +217,12 @@ void BankUtilityPanel::refreshSelectedBankHighlight()
         PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
         0));
 
-    TSS::Button* const buttons[] = {
-        selectBank0Button_.get(),
-        selectBank1Button_.get(),
-        selectBank2Button_.get(),
-        selectBank3Button_.get(),
-        selectBank4Button_.get(),
-        selectBank5Button_.get(),
-        selectBank6Button_.get(),
-        selectBank7Button_.get(),
-        selectBank8Button_.get(),
-        selectBank9Button_.get(),
-    };
+    for (auto& button : selectBankButtons_)
+        setOptionalLook(button.get(), normalBankLook_);
 
-    for (int index = 0; index < 10; ++index)
+    if (!bankUtilityGrayed_ && selected >= 0 && selected < kBankCount)
     {
-        if (auto* button = buttons[index])
-            button->setLook(normalBankLook_);
-    }
-
-    if (!bankUtilityGrayed_ && selected >= 0 && selected < 10)
-    {
-        if (auto* button = buttons[selected])
+        if (auto* button = selectBankButtons_[static_cast<size_t>(selected)].get())
         {
             auto accentLook = normalBankLook_;
             const auto selectedRed = juce::Colour(ColourChart::kRed);
@@ -218,10 +234,8 @@ void BankUtilityPanel::refreshSelectedBankHighlight()
     }
 }
 
-void BankUtilityPanel::resized()
+void BankUtilityPanel::layoutContentRows(float sf)
 {
-    const float sf = uiScale_;
-
     const int moduleHeaderHeight = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
     const int moduleHeaderWidth = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth), sf);
@@ -248,10 +262,10 @@ void BankUtilityPanel::resized()
     if (auto* label = bankSelectorLabel_.get())
         label->setBounds(0, shortControlY, labelWidth, labelHeight);
 
-    juce::Component* row1Banks[] = {
-        selectBank0Button_.get(), selectBank1Button_.get(), selectBank2Button_.get(),
-        selectBank3Button_.get(), selectBank4Button_.get()
-    };
+    juce::Component* row1Banks[5] = {};
+    for (int i = 0; i < 5; ++i)
+        row1Banks[i] = selectBankButtons_[static_cast<size_t>(i)].get();
+
     const int row1AfterBanksX = TSS::placeEqualWidthStrip(labelWidth + rowGap, row1Y, sf,
                               dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
                               dims_.layout.interControlGap, row1Banks, 5);
@@ -265,32 +279,44 @@ void BankUtilityPanel::resized()
     if (auto* button = unlockBankButton_.get())
         button->setBounds(0, row2Y, lockButtonWidth, buttonHeight);
 
-    juce::Component* row2Banks[] = {
-        selectBank5Button_.get(), selectBank6Button_.get(), selectBank7Button_.get(),
-        selectBank8Button_.get(), selectBank9Button_.get()
-    };
+    juce::Component* row2Banks[5] = {};
+    for (int i = 0; i < 5; ++i)
+        row2Banks[i] = selectBankButtons_[static_cast<size_t>(i + 5)].get();
+
     const int row2AfterBanksX = TSS::placeEqualWidthStrip(lockButtonWidth + rowGap, row2Y, sf,
                               dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
                               dims_.layout.interControlGap, row2Banks, 5);
 
     if (auto* button = exportBankButton_.get())
         button->setBounds(row2AfterBanksX + rowGap, row2Y, exportButtonWidth, buttonHeight);
+}
 
-    if (bankSelectorLabel_)      bankSelectorLabel_->setUiScale(sf);
-    if (bankUtilityModuleHeader_) bankUtilityModuleHeader_->setUiScale(sf);
-    if (unlockBankButton_)       unlockBankButton_->setUiScale(sf);
-    if (selectBank0Button_)      selectBank0Button_->setUiScale(sf);
-    if (selectBank1Button_)      selectBank1Button_->setUiScale(sf);
-    if (selectBank2Button_)      selectBank2Button_->setUiScale(sf);
-    if (selectBank3Button_)      selectBank3Button_->setUiScale(sf);
-    if (selectBank4Button_)      selectBank4Button_->setUiScale(sf);
-    if (selectBank5Button_)      selectBank5Button_->setUiScale(sf);
-    if (selectBank6Button_)      selectBank6Button_->setUiScale(sf);
-    if (selectBank7Button_)      selectBank7Button_->setUiScale(sf);
-    if (selectBank8Button_)      selectBank8Button_->setUiScale(sf);
-    if (selectBank9Button_)      selectBank9Button_->setUiScale(sf);
-    if (importBankButton_)       importBankButton_->setUiScale(sf);
-    if (exportBankButton_)       exportBankButton_->setUiScale(sf);
+void BankUtilityPanel::applyChildUiScales(float sf)
+{
+    setOptionalUiScale(bankSelectorLabel_.get(), sf);
+    setOptionalUiScale(bankUtilityModuleHeader_.get(), sf);
+    setOptionalUiScale(unlockBankButton_.get(), sf);
+    setOptionalUiScale(importBankButton_.get(), sf);
+    setOptionalUiScale(exportBankButton_.get(), sf);
+
+    for (auto& button : selectBankButtons_)
+        setOptionalUiScale(button.get(), sf);
+}
+
+void BankUtilityPanel::resized()
+{
+    layoutContentRows(uiScale_);
+    applyChildUiScales(uiScale_);
+}
+
+void BankUtilityPanel::applyNormalLookToActionButtons()
+{
+    setOptionalLook(unlockBankButton_.get(), normalBankLook_);
+    setOptionalLook(importBankButton_.get(), normalBankLook_);
+    setOptionalLook(exportBankButton_.get(), normalBankLook_);
+
+    for (auto& button : selectBankButtons_)
+        setOptionalLook(button.get(), normalBankLook_);
 }
 
 void BankUtilityPanel::setSkin(TSS::ISkin& skin)
@@ -303,33 +329,8 @@ void BankUtilityPanel::setSkin(TSS::ISkin& skin)
 
     if (bankSelectorLabel_)
         bankSelectorLabel_->setLook(TSS::labelLookFromSkin(skin));
-    if (selectBank0Button_)
-        selectBank0Button_->setLook(normalBankLook_);
-    if (selectBank1Button_)
-        selectBank1Button_->setLook(normalBankLook_);
-    if (selectBank2Button_)
-        selectBank2Button_->setLook(normalBankLook_);
-    if (selectBank3Button_)
-        selectBank3Button_->setLook(normalBankLook_);
-    if (selectBank4Button_)
-        selectBank4Button_->setLook(normalBankLook_);
-    if (unlockBankButton_)
-        unlockBankButton_->setLook(normalBankLook_);
-    if (selectBank5Button_)
-        selectBank5Button_->setLook(normalBankLook_);
-    if (selectBank6Button_)
-        selectBank6Button_->setLook(normalBankLook_);
-    if (selectBank7Button_)
-        selectBank7Button_->setLook(normalBankLook_);
-    if (selectBank8Button_)
-        selectBank8Button_->setLook(normalBankLook_);
-    if (selectBank9Button_)
-        selectBank9Button_->setLook(normalBankLook_);
-    if (importBankButton_)
-        importBankButton_->setLook(normalBankLook_);
-    if (exportBankButton_)
-        exportBankButton_->setLook(normalBankLook_);
 
+    applyNormalLookToActionButtons();
     refreshSelectedBankHighlight();
 }
 
@@ -337,7 +338,7 @@ void BankUtilityPanel::setUiScale(float uiScale)
 {
     if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
-    
+
     uiScale_ = uiScale;
     repaint();
 }
@@ -365,6 +366,30 @@ void BankUtilityPanel::setupBankSelectorLabel(TSS::ISkin& skin)
     addAndMakeVisible(*bankSelectorLabel_);
 }
 
+void BankUtilityPanel::setupUnlockBankButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
+{
+    unlockBankButton_ = std::make_unique<TSS::Button>(
+        dims_.buttons.patchManagerUnlockBankWidth,
+        dims_.buttons.height,
+        TSS::buttonLookFromSkin(skin),
+        widgetFactory.getStandaloneWidgetDisplayName(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank).value_or(""));
+    unlockBankButton_->onClick = [this]
+    {
+        if (bankUtilityGrayed_)
+            return;
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+            juce::Time::getCurrentTime().toMilliseconds(),
+            nullptr);
+        TSS::GrayedControlHelper::setFooterInfoMessage(
+            apvts_,
+            PluginDisplayNames::PatchManagerSection::BankUtilityModule::kUnlockBankFooterMessage);
+    };
+    addAndMakeVisible(*unlockBankButton_);
+}
+
 void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
     const auto makeBankAction = [this](const char* propertyId)
@@ -380,115 +405,27 @@ void BankUtilityPanel::setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& w
         };
     };
 
-    selectBank0Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0).value_or(""));
-    selectBank0Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0);
-    addAndMakeVisible(*selectBank0Button_);
-
-    selectBank1Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1).value_or(""));
-    selectBank1Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1);
-    addAndMakeVisible(*selectBank1Button_);
-
-    selectBank2Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2).value_or(""));
-    selectBank2Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2);
-    addAndMakeVisible(*selectBank2Button_);
-
-    selectBank3Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3).value_or(""));
-    selectBank3Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank3);
-    addAndMakeVisible(*selectBank3Button_);
-
-    selectBank4Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4).value_or(""));
-    selectBank4Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank4);
-    addAndMakeVisible(*selectBank4Button_);
-
-    unlockBankButton_ = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerUnlockBankWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank).value_or(""));
-    unlockBankButton_->onClick = [this]
+    const auto look = TSS::buttonLookFromSkin(skin);
+    const auto createBankButton = [&](int bankIndex)
     {
-        if (bankUtilityGrayed_)
-            return;
-
-        apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-            juce::Time::getCurrentTime().toMilliseconds(),
-            nullptr);
-        TSS::GrayedControlHelper::setFooterInfoMessage(
-            apvts_,
-            PluginDisplayNames::PatchManagerSection::BankUtilityModule::kUnlockBankFooterMessage);
+        const auto* widgetId = kSelectBankIds[bankIndex];
+        auto& button = selectBankButtons_[static_cast<size_t>(bankIndex)];
+        button = std::make_unique<TSS::Button>(
+            dims_.buttons.patchManagerBankSelectWidth,
+            dims_.buttons.height,
+            look,
+            widgetFactory.getStandaloneWidgetDisplayName(widgetId).value_or(""));
+        button->onClick = makeBankAction(widgetId);
+        addAndMakeVisible(*button);
     };
-    addAndMakeVisible(*unlockBankButton_);
 
-    selectBank5Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5).value_or(""));
-    selectBank5Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank5);
-    addAndMakeVisible(*selectBank5Button_);
+    for (int i = 0; i < 5; ++i)
+        createBankButton(i);
 
-    selectBank6Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6).value_or(""));
-    selectBank6Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank6);
-    addAndMakeVisible(*selectBank6Button_);
+    setupUnlockBankButton(skin, widgetFactory);
 
-    selectBank7Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7).value_or(""));
-    selectBank7Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7);
-    addAndMakeVisible(*selectBank7Button_);
-
-    selectBank8Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8).value_or(""));
-    selectBank8Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8);
-    addAndMakeVisible(*selectBank8Button_);
-
-    selectBank9Button_     = std::make_unique<TSS::Button>(
-        dims_.buttons.patchManagerBankSelectWidth,
-        dims_.buttons.height,
-        TSS::buttonLookFromSkin(skin),
-        widgetFactory.getStandaloneWidgetDisplayName(PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9).value_or(""));
-    selectBank9Button_->onClick = makeBankAction(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9);
-    addAndMakeVisible(*selectBank9Button_);
+    for (int i = 5; i < kBankCount; ++i)
+        createBankButton(i);
 }
 
 void BankUtilityPanel::setupImportExportButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory)

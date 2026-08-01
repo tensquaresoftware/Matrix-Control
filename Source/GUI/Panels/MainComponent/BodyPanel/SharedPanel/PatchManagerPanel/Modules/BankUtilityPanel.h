@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <memory>
 
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -37,6 +38,8 @@ public:
     void valueTreeParentChanged(juce::ValueTree&) override {}
     void valueTreeRedirected(juce::ValueTree&) override;
 
+    static constexpr int kBankCount = 10;
+
 private:
     BankUtilityPanelDimensions dims_;
     TSS::ISkin* skin_;
@@ -48,16 +51,7 @@ private:
     std::unique_ptr<TSS::ModuleHeader> bankUtilityModuleHeader_;
     std::unique_ptr<TSS::Label> bankSelectorLabel_;
     std::unique_ptr<TSS::Button> unlockBankButton_;
-    std::unique_ptr<TSS::Button> selectBank0Button_;
-    std::unique_ptr<TSS::Button> selectBank1Button_;
-    std::unique_ptr<TSS::Button> selectBank2Button_;
-    std::unique_ptr<TSS::Button> selectBank3Button_;
-    std::unique_ptr<TSS::Button> selectBank4Button_;
-    std::unique_ptr<TSS::Button> selectBank5Button_;
-    std::unique_ptr<TSS::Button> selectBank6Button_;
-    std::unique_ptr<TSS::Button> selectBank7Button_;
-    std::unique_ptr<TSS::Button> selectBank8Button_;
-    std::unique_ptr<TSS::Button> selectBank9Button_;
+    std::array<std::unique_ptr<TSS::Button>, kBankCount> selectBankButtons_;
     std::unique_ptr<TSS::Button> importBankButton_;
     std::unique_ptr<TSS::Button> exportBankButton_;
 
@@ -65,6 +59,11 @@ private:
     void setupBankSelectorLabel(TSS::ISkin& skin);
     void setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupImportExportButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupUnlockBankButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+
+    void layoutContentRows(float sf);
+    void applyChildUiScales(float sf);
+    void applyNormalLookToActionButtons();
 
     void refreshDeviceGating();
     void refreshSelectedBankHighlight();
