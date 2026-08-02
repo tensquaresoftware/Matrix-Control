@@ -28,6 +28,14 @@ namespace TSS
         static void show(HierarchicalComboBox& owner);
 
     private:
+        struct PanelBorderEdgeFlags
+        {
+            bool left = true;
+            bool top = true;
+            bool right = true;
+            bool bottom = true;
+        };
+
         inline constexpr static float kThumbInsetBase_ = 2.0f;
         inline constexpr static float kWheelScrollFactorContent_ = 100.0f;
         inline constexpr static float kLabelWidthPadding_ = 8.0f;
@@ -82,10 +90,13 @@ namespace TSS
         void drawPanelBorderEdges(juce::Graphics& g,
                                   juce::Rectangle<float> panel,
                                   float thickness,
-                                  bool drawLeft,
-                                  bool drawTop,
-                                  bool drawRight,
-                                  bool drawBottom) const;
+                                  PanelBorderEdgeFlags edges) const;
+        void paintPrimaryColumn(juce::Graphics& g,
+                                juce::Rectangle<float> primaryPanel,
+                                juce::Rectangle<float> primaryContent) const;
+        void paintSecondaryColumn(juce::Graphics& g,
+                                  juce::Rectangle<float> primaryPanel,
+                                  juce::Rectangle<float> secondaryPanel) const;
         juce::Rectangle<float> getPrimaryPanelBounds() const;
         juce::Rectangle<float> getSecondaryPanelBounds() const;
         juce::Rectangle<float> getPrimaryContentBounds() const;

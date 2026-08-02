@@ -320,6 +320,8 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/ComboBoxControlPainter.cpp
     Source/GUI/Widgets/HierarchicalComboBox.cpp
     Source/GUI/Widgets/HierarchicalPopupMenu.cpp
+    Source/GUI/Widgets/HierarchicalPopupMenuLayout.cpp
+    Source/GUI/Widgets/HierarchicalPopupMenuPainting.cpp
     Source/GUI/Widgets/Toggle.cpp
     Source/GUI/Widgets/EnvelopeDisplay.cpp
     Source/GUI/Widgets/GroupLabel.cpp
