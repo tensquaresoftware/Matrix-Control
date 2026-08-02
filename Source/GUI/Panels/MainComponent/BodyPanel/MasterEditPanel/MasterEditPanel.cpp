@@ -55,7 +55,14 @@ MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensio
           .moduleHeaderDims = dims_.moduleHeader,
           .parameterCellDims = dims_.parameterCell}))
     , vibratoPanel_(std::make_unique<VibratoPanel>(skin, dims_.childModuleWidth, dims_.vibratoPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
-    , miscPanel_(std::make_unique<MiscPanel>(skin, dims_.childModuleWidth, dims_.miscPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
+    , miscPanel_(std::make_unique<MiscPanel>(MiscPanel::Config{
+          .skin = skin,
+          .width = dims_.childModuleWidth,
+          .height = dims_.miscPanelHeight,
+          .widgetFactory = widgetFactory,
+          .apvts = apvts,
+          .moduleHeaderDims = dims_.moduleHeader,
+          .parameterCellDims = dims_.parameterCell}))
 {
     setOpaque(true);
     addAndMakeVisible(*sectionHeader_);
