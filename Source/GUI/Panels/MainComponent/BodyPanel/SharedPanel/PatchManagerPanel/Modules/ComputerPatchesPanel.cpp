@@ -3,7 +3,6 @@
 #include "Core/Services/PatchFileService.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
-#include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/GroupLabel.h"
@@ -23,30 +22,73 @@ namespace
     {
         return juce::File::createFileWithoutCheckingPath(fileName).getFileNameWithoutExtension();
     }
+
+    void placeOrSkipLeft(juce::Rectangle<int>& row, juce::Component* component, int width)
+    {
+        if (component != nullptr)
+            component->setBounds(row.removeFromLeft(width));
+        else
+            row.removeFromLeft(width);
+    }
+
+    struct LayoutMetrics
+    {
+        int moduleHeaderH = 0;
+        int moduleHeaderW = 0;
+        int groupLabelH = 0;
+        int browserGroupW = 0;
+        int storageGroupW = 0;
+        int buttonH = 0;
+        int columnGap = 0;
+
+        static LayoutMetrics make(const ComputerPatchesPanelDimensions& dims, float sf)
+        {
+            LayoutMetrics m;
+            m.moduleHeaderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.moduleHeader.height), sf);
+            m.moduleHeaderW = TSS::ScaledLayout::scaledInt(
+                static_cast<float>(dims.moduleHeader.patchManagerTitleBandWidth), sf);
+            m.groupLabelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.groupLabels.height), sf);
+            m.browserGroupW = TSS::ScaledLayout::scaledInt(
+                static_cast<float>(dims.groupLabels.computerPatchesBrowserWidth), sf);
+            m.storageGroupW = TSS::ScaledLayout::scaledInt(
+                static_cast<float>(dims.groupLabels.computerPatchesStorageWidth), sf);
+            m.buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.buttons.height), sf);
+            m.columnGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims.layout.columnGap), sf);
+            return m;
+        }
+    };
+
+    template <typename ComponentT>
+    void setOptionalUiScale(ComponentT* component, float sf)
+    {
+        if (component != nullptr)
+            component->setUiScale(sf);
+    }
+
+    void dispatchTimestampAction(juce::AudioProcessorValueTreeState& apvts, const juce::Identifier& propertyId)
+    {
+        apvts.state.setProperty(propertyId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
+    }
 }
 
-ComputerPatchesPanel::ComputerPatchesPanel(TSS::ISkin& skin,
-                                           const ComputerPatchesPanelDimensions& dims,
-                                           WidgetFactory& widgetFactory,
-                                           juce::AudioProcessorValueTreeState& apvts,
-                                           const Core::PatchFileService& patchFileService)
-    : dims_(dims)
-    , skin_(&skin)
-    , apvts_(apvts)
-    , patchFileService_(patchFileService)
+ComputerPatchesPanel::ComputerPatchesPanel(const Config& config)
+    : dims_(config.dims)
+    , skin_(&config.skin)
+    , apvts_(config.apvts)
+    , patchFileService_(config.patchFileService)
 {
     setOpaque(false);
-    setupModuleHeader(skin, widgetFactory, ComputerPatchesIds::kGroupId);
+    setupModuleHeader(config.skin, config.widgetFactory, ComputerPatchesIds::kGroupId);
 
-    setupBrowserGroupLabel(skin);
-    setupLoadPreviousPatchFileButton(skin, widgetFactory);
-    setupLoadNextPatchFileButton(skin, widgetFactory);
-    setupSelectPatchFileComboBox(skin);
+    setupBrowserGroupLabel(config.skin);
+    setupLoadPreviousPatchFileButton(config.skin, config.widgetFactory);
+    setupLoadNextPatchFileButton(config.skin, config.widgetFactory);
+    setupSelectPatchFileComboBox(config.skin);
 
-    setupStorageGroupLabel(skin);
-    setupOpenPatchFolderButton(skin, widgetFactory);
-    setupSavePatchFileAsButton(skin, widgetFactory);
-    setupSavePatchFileButton(skin, widgetFactory);
+    setupStorageGroupLabel(config.skin);
+    setupOpenPatchFolderButton(config.skin, config.widgetFactory);
+    setupSavePatchFileAsButton(config.skin, config.widgetFactory);
+    setupSavePatchFileButton(config.skin, config.widgetFactory);
 
     apvts_.state.addListener(this);
     refreshPatchFileComboBox();
@@ -146,92 +188,115 @@ void ComputerPatchesPanel::clearPatchFileSelectionProperty()
     apvts_.state.setProperty(ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile, 0, nullptr);
 }
 
-void ComputerPatchesPanel::resized()
+void ComputerPatchesPanel::handleSelectPatchFileChanged()
 {
-    const float sf = uiScale_;
+    auto* comboBox = selectPatchFileComboBox_.get();
+    if (comboBox == nullptr)
+        return;
 
-    const int moduleHeaderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
-    const int moduleHeaderW = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.moduleHeader.patchManagerTitleBandWidth), sf);
-    const int groupLabelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.groupLabels.height), sf);
-    const int browserGroupW = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.groupLabels.computerPatchesBrowserWidth), sf);
-    const int storageGroupW = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dims_.groupLabels.computerPatchesStorageWidth), sf);
+    const int selectedId = comboBox->getSelectedId();
+    if (selectedId >= 1)
+    {
+        using namespace PluginIDs::PatchManagerSection::ComputerPatchesModule;
+
+        const int previousId = static_cast<int>(apvts_.state.getProperty(
+            StandaloneWidgets::kSelectPatchFile, 0));
+        if (previousId >= 1 && previousId != selectedId)
+        {
+            apvts_.state.setProperty(
+                StateProperties::kSelectPatchCancelBaseline,
+                previousId,
+                nullptr);
+        }
+
+        apvts_.state.setProperty(StandaloneWidgets::kSelectPatchFile, selectedId, nullptr);
+    }
+
+    setNavigationButtonsEnabled(selectedId >= 1);
+}
+
+void ComputerPatchesPanel::layoutBrowserRow(float sf, int row2Y, int buttonH)
+{
     const int navButtonW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.initWidth), sf);
     const int comboBoxW = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.comboBoxes.patchManagerComputerPatchesWidth), sf);
+    const int interGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
+
+    auto browserRow = juce::Rectangle<int>(0, row2Y, getWidth(), buttonH);
+
+    placeOrSkipLeft(browserRow, loadPreviousPatchFileButton_.get(), navButtonW);
+    browserRow.removeFromLeft(interGap);
+
+    placeOrSkipLeft(browserRow, loadNextPatchFileButton_.get(), navButtonW);
+    browserRow.removeFromLeft(interGap);
+
+    if (selectPatchFileComboBox_)
+        selectPatchFileComboBox_->setBounds(browserRow.removeFromLeft(comboBoxW));
+}
+
+void ComputerPatchesPanel::layoutStorageRow(float sf, int row2Y, int buttonH, int storageGroupX)
+{
     const int loadButtonW = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.buttons.computerPatchesLoadWidth), sf);
     const int saveButtonW = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.buttons.computerPatchesSaveWidth), sf);
     const int saveAsButtonW = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dims_.buttons.computerPatchesSaveAsWidth), sf);
-    const int buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
     const int interGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
-    const int columnGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.columnGap), sf);
-
-    if (moduleHeader_)
-        moduleHeader_->setBounds(0, 0, moduleHeaderW, moduleHeaderH);
-
-    const int row1Y = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.moduleHeader.height), sf);
-
-    if (browserGroupLabel)
-        browserGroupLabel->setBounds(0, row1Y, browserGroupW, groupLabelH);
-
-    const int storageGroupX = browserGroupW + columnGap;
-    if (storageGroupLabel)
-        storageGroupLabel->setBounds(storageGroupX, row1Y, storageGroupW, groupLabelH);
-
-    // Row 2 — successive integer strips (fixed widths; no remainder absorption)
-    const int row2Y = row1Y + groupLabelH;
-
-    auto browserRow = juce::Rectangle<int>(0, row2Y, getWidth(), buttonH);
-    if (loadPreviousPatchFileButton_)
-        loadPreviousPatchFileButton_->setBounds(browserRow.removeFromLeft(navButtonW));
-    else
-        browserRow.removeFromLeft(navButtonW);
-    browserRow.removeFromLeft(interGap);
-
-    if (loadNextPatchFileButton_)
-        loadNextPatchFileButton_->setBounds(browserRow.removeFromLeft(navButtonW));
-    else
-        browserRow.removeFromLeft(navButtonW);
-    browserRow.removeFromLeft(interGap);
-
-    if (selectPatchFileComboBox_)
-        selectPatchFileComboBox_->setBounds(browserRow.removeFromLeft(comboBoxW));
 
     auto storageRow = juce::Rectangle<int>(storageGroupX, row2Y, getWidth() - storageGroupX, buttonH);
-    if (openPatchFolderButton_)
-        openPatchFolderButton_->setBounds(storageRow.removeFromLeft(loadButtonW));
-    else
-        storageRow.removeFromLeft(loadButtonW);
+
+    placeOrSkipLeft(storageRow, openPatchFolderButton_.get(), loadButtonW);
     storageRow.removeFromLeft(interGap);
 
-    if (savePatchFileAsButton_)
-        savePatchFileAsButton_->setBounds(storageRow.removeFromLeft(saveAsButtonW));
-    else
-        storageRow.removeFromLeft(saveAsButtonW);
+    placeOrSkipLeft(storageRow, savePatchFileAsButton_.get(), saveAsButtonW);
     storageRow.removeFromLeft(interGap);
 
-    if (savePatchFileButton_)
-        savePatchFileButton_->setBounds(storageRow.removeFromLeft(saveButtonW));
-
-    if (moduleHeader_)                  moduleHeader_->setUiScale(sf);
-    if (browserGroupLabel)              browserGroupLabel->setUiScale(sf);
-    if (storageGroupLabel)              storageGroupLabel->setUiScale(sf);
-    if (loadPreviousPatchFileButton_)   loadPreviousPatchFileButton_->setUiScale(sf);
-    if (loadNextPatchFileButton_)       loadNextPatchFileButton_->setUiScale(sf);
-    if (selectPatchFileComboBox_)       selectPatchFileComboBox_->setUiScale(sf);
-    if (openPatchFolderButton_)         openPatchFolderButton_->setUiScale(sf);
-    if (savePatchFileAsButton_)         savePatchFileAsButton_->setUiScale(sf);
-    if (savePatchFileButton_)           savePatchFileButton_->setUiScale(sf);
+    placeOrSkipLeft(storageRow, savePatchFileButton_.get(), saveButtonW);
 }
 
-void ComputerPatchesPanel::setSkin(TSS::ISkin& skin)
+void ComputerPatchesPanel::layoutContentRows(float sf)
 {
-    skin_ = &skin;
+    const auto m = LayoutMetrics::make(dims_, sf);
+
+    if (moduleHeader_)
+        moduleHeader_->setBounds(0, 0, m.moduleHeaderW, m.moduleHeaderH);
+
+    const int row1Y = m.moduleHeaderH;
+    if (browserGroupLabel)
+        browserGroupLabel->setBounds(0, row1Y, m.browserGroupW, m.groupLabelH);
+
+    const int storageGroupX = m.browserGroupW + m.columnGap;
+    if (storageGroupLabel)
+        storageGroupLabel->setBounds(storageGroupX, row1Y, m.storageGroupW, m.groupLabelH);
+
+    // Row 2 — successive integer strips (fixed widths; no remainder absorption)
+    const int row2Y = row1Y + m.groupLabelH;
+    layoutBrowserRow(sf, row2Y, m.buttonH);
+    layoutStorageRow(sf, row2Y, m.buttonH, storageGroupX);
+}
+
+void ComputerPatchesPanel::applyChildUiScales(float sf)
+{
+    setOptionalUiScale(moduleHeader_.get(), sf);
+    setOptionalUiScale(browserGroupLabel.get(), sf);
+    setOptionalUiScale(storageGroupLabel.get(), sf);
+    setOptionalUiScale(loadPreviousPatchFileButton_.get(), sf);
+    setOptionalUiScale(loadNextPatchFileButton_.get(), sf);
+    setOptionalUiScale(selectPatchFileComboBox_.get(), sf);
+    setOptionalUiScale(openPatchFolderButton_.get(), sf);
+    setOptionalUiScale(savePatchFileAsButton_.get(), sf);
+    setOptionalUiScale(savePatchFileButton_.get(), sf);
+}
+
+void ComputerPatchesPanel::resized()
+{
+    layoutContentRows(uiScale_);
+    applyChildUiScales(uiScale_);
+}
+
+void ComputerPatchesPanel::applyChildLooks(TSS::ISkin& skin)
+{
     if (moduleHeader_)
         moduleHeader_->setLook(TSS::moduleHeaderLookFromSkin(skin));
     if (browserGroupLabel)
@@ -244,6 +309,7 @@ void ComputerPatchesPanel::setSkin(TSS::ISkin& skin)
         selectPatchFileComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
         selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
     }
+
     if (loadPreviousPatchFileButton_)
         loadPreviousPatchFileButton_->setLook(TSS::buttonLookFromSkin(skin));
     if (loadNextPatchFileButton_)
@@ -256,13 +322,33 @@ void ComputerPatchesPanel::setSkin(TSS::ISkin& skin)
         savePatchFileButton_->setLook(TSS::buttonLookFromSkin(skin));
 }
 
+void ComputerPatchesPanel::setSkin(TSS::ISkin& skin)
+{
+    skin_ = &skin;
+    applyChildLooks(skin);
+}
+
 void ComputerPatchesPanel::setUiScale(float uiScale)
 {
     if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
-    
+
     uiScale_ = uiScale;
     repaint();
+}
+
+std::unique_ptr<TSS::Button> ComputerPatchesPanel::makeTimestampActionButton(
+    TSS::ISkin& skin,
+    WidgetFactory& widgetFactory,
+    const juce::Identifier& actionId)
+{
+    auto button = widgetFactory.createStandaloneButton(actionId.toString(), skin, dims_.buttons.height);
+    button->onClick = [this, actionId]
+    {
+        dispatchTimestampAction(apvts_, actionId);
+    };
+    addAndMakeVisible(*button);
+    return button;
 }
 
 void ComputerPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId)
@@ -289,32 +375,18 @@ void ComputerPatchesPanel::setupBrowserGroupLabel(TSS::ISkin& skin)
 
 void ComputerPatchesPanel::setupLoadPreviousPatchFileButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    loadPreviousPatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
+    loadPreviousPatchFileButton_ = makeTimestampActionButton(
         skin,
-        dims_.buttons.height);
-    loadPreviousPatchFileButton_->onClick = [this]
-    {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*loadPreviousPatchFileButton_);
+        widgetFactory,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile);
 }
 
 void ComputerPatchesPanel::setupLoadNextPatchFileButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    loadNextPatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
+    loadNextPatchFileButton_ = makeTimestampActionButton(
         skin,
-        dims_.buttons.height);
-    loadNextPatchFileButton_->onClick = [this]
-    {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*loadNextPatchFileButton_);
+        widgetFactory,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadNextPatchFile);
 }
 
 void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
@@ -325,32 +397,7 @@ void ComputerPatchesPanel::setupSelectPatchFileComboBox(TSS::ISkin& skin)
         TSS::comboBoxLookFromSkin(skin),
         TSS::ComboBox::Style::ButtonLike);
     selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    selectPatchFileComboBox_->onChange = [this]
-    {
-        if (auto* comboBox = selectPatchFileComboBox_.get())
-        {
-            const int selectedId = comboBox->getSelectedId();
-            if (selectedId >= 1)
-            {
-                using namespace PluginIDs::PatchManagerSection::ComputerPatchesModule;
-
-                const int previousId = static_cast<int>(apvts_.state.getProperty(
-                    StandaloneWidgets::kSelectPatchFile, 0));
-                if (previousId >= 1 && previousId != selectedId)
-                {
-                    apvts_.state.setProperty(
-                        StateProperties::kSelectPatchCancelBaseline,
-                        previousId,
-                        nullptr);
-                }
-
-                apvts_.state.setProperty(StandaloneWidgets::kSelectPatchFile,
-                                        selectedId,
-                                        nullptr);
-            }
-            setNavigationButtonsEnabled(selectedId >= 1);
-        }
-    };
+    selectPatchFileComboBox_->onChange = [this] { handleSelectPatchFileChanged(); };
     addAndMakeVisible(*selectPatchFileComboBox_);
 }
 
@@ -366,45 +413,24 @@ void ComputerPatchesPanel::setupStorageGroupLabel(TSS::ISkin& skin)
 
 void ComputerPatchesPanel::setupOpenPatchFolderButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    openPatchFolderButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
+    openPatchFolderButton_ = makeTimestampActionButton(
         skin,
-        dims_.buttons.height);
-    openPatchFolderButton_->onClick = [this]
-    {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*openPatchFolderButton_);
+        widgetFactory,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder);
 }
 
 void ComputerPatchesPanel::setupSavePatchFileAsButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    savePatchFileAsButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
+    savePatchFileAsButton_ = makeTimestampActionButton(
         skin,
-        dims_.buttons.height);
-    savePatchFileAsButton_->onClick = [this]
-    {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*savePatchFileAsButton_);
+        widgetFactory,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs);
 }
 
 void ComputerPatchesPanel::setupSavePatchFileButton(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    savePatchFileButton_ = widgetFactory.createStandaloneButton(
-        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
+    savePatchFileButton_ = makeTimestampActionButton(
         skin,
-        dims_.buttons.height);
-    savePatchFileButton_->onClick = [this]
-    {
-        apvts_.state.setProperty(PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
-                                juce::Time::getCurrentTime().toMilliseconds(),
-                                nullptr);
-    };
-    addAndMakeVisible(*savePatchFileButton_);
+        widgetFactory,
+        PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile);
 }

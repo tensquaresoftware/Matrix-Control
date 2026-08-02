@@ -31,7 +31,8 @@ PatchManagerPanel::PatchManagerPanel(TSS::ISkin& skin,
         TSS::SectionHeader::ColourVariant::Blue))
     , bankUtilityPanel_(std::make_unique<BankUtilityPanel>(skin, dims_.bankUtility, widgetFactory, apvts))
     , internalPatchesPanel_(std::make_unique<InternalPatchesPanel>(skin, dims_.internalPatches, widgetFactory, apvts))
-    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(skin, dims_.computerPatches, widgetFactory, apvts, patchFileService))
+    , computerPatchesPanel_(std::make_unique<ComputerPatchesPanel>(ComputerPatchesPanel::Config{
+          skin, dims_.computerPatches, widgetFactory, apvts, patchFileService}))
     , patchMutatorPanel_(std::make_unique<PatchMutatorPanel>(skin, dims_.patchMutator, widgetFactory, apvts))
 {
     setOpaque(false);

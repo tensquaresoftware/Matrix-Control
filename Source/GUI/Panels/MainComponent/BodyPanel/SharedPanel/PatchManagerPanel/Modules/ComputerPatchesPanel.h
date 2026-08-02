@@ -27,11 +27,16 @@ class ComputerPatchesPanel : public juce::Component,
                              public juce::ValueTree::Listener
 {
 public:
-    ComputerPatchesPanel(TSS::ISkin& skin,
-                         const ComputerPatchesPanelDimensions& dims,
-                         WidgetFactory& widgetFactory,
-                         juce::AudioProcessorValueTreeState& apvts,
-                         const Core::PatchFileService& patchFileService);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        const ComputerPatchesPanelDimensions& dims;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const Core::PatchFileService& patchFileService;
+    };
+
+    explicit ComputerPatchesPanel(const Config& config);
     ~ComputerPatchesPanel() override;
 
     void resized() override;
@@ -76,12 +81,23 @@ private:
     void setupSavePatchFileAsButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupSavePatchFileButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
 
+    std::unique_ptr<TSS::Button> makeTimestampActionButton(TSS::ISkin& skin,
+                                                           WidgetFactory& widgetFactory,
+                                                           const juce::Identifier& actionId);
+
+    void layoutContentRows(float sf);
+    void layoutBrowserRow(float sf, int row2Y, int buttonH);
+    void layoutStorageRow(float sf, int row2Y, int buttonH, int storageGroupX);
+    void applyChildUiScales(float sf);
+    void applyChildLooks(TSS::ISkin& skin);
+
     void refreshPatchFileComboBox();
     void applyEmptySentinel();
     void applySelectSentinel(const juce::StringArray& sortedValidFileNames);
     void syncSelectionFromApvts();
     void setNavigationButtonsEnabled(bool enabled);
     void clearPatchFileSelectionProperty();
+    void handleSelectPatchFileChanged();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComputerPatchesPanel)
 };
