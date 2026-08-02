@@ -11,41 +11,46 @@
 class TestParameterCells::ParameterCellScalePanel : public juce::Component
 {
 public:
-    ParameterCellScalePanel(float scale,
-                            const juce::String& scaleLabelText,
-                            TSS::ISkin& skin,
-                            WidgetFactory& widgetFactory,
-                            juce::AudioProcessorValueTreeState& apvts,
-                            const ParameterCellDimensions& dimensions,
-                            const TSS::LabelLook& labelLook)
-        : scale_(scale)
-        , dimensions_(dimensions)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        TSS::ISkin& skin;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ParameterCellDimensions& dimensions;
+        const TSS::LabelLook& labelLook;
+    };
+
+    explicit ParameterCellScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             dimensions_.labelWidth + dimensions_.controlWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            config.scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
         sliderCell_ = std::make_unique<ParameterCell>(ParameterCell::Config{
-            .skin = skin,
-            .factory = widgetFactory,
+            .skin = config.skin,
+            .factory = config.widgetFactory,
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
             .type = ParameterCell::ParameterType::Slider,
             .moduleType = ParameterCell::ModuleType::PatchEdit,
-            .apvts = apvts,
+            .apvts = config.apvts,
             .dimensions = dimensions_});
         sliderCell_->setUiScale(scale_);
         addAndMakeVisible(*sliderCell_);
 
         comboCell_ = std::make_unique<ParameterCell>(ParameterCell::Config{
-            .skin = skin,
-            .factory = widgetFactory,
+            .skin = config.skin,
+            .factory = config.widgetFactory,
             .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect,
             .type = ParameterCell::ParameterType::ComboBox,
             .moduleType = ParameterCell::ModuleType::PatchEdit,
-            .apvts = apvts,
+            .apvts = config.apvts,
             .dimensions = dimensions_});
         comboCell_->setUiScale(scale_);
         addAndMakeVisible(*comboCell_);
@@ -148,14 +153,14 @@ void TestParameterCells::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ParameterCellScalePanel>(
-            spec.scale,
-            spec.label,
-            *skin_,
-            *widgetFactory_,
-            *apvts_,
-            dimensions_,
-            labelLook);
+        auto panel = std::make_unique<ParameterCellScalePanel>(ParameterCellScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .skin = *skin_,
+            .widgetFactory = *widgetFactory_,
+            .apvts = *apvts_,
+            .dimensions = dimensions_,
+            .labelLook = labelLook});
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }
