@@ -17,8 +17,18 @@ class WidgetFactory;
 class VibratoPanel : public BaseModulePanel
 {
 public:
-    VibratoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit VibratoPanel(const Config& config);
     ~VibratoPanel() override = default;
 
     static ModulePanelLayout createLayout();

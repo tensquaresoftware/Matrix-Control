@@ -54,7 +54,14 @@ MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensio
           .apvts = apvts,
           .moduleHeaderDims = dims_.moduleHeader,
           .parameterCellDims = dims_.parameterCell}))
-    , vibratoPanel_(std::make_unique<VibratoPanel>(skin, dims_.childModuleWidth, dims_.vibratoPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
+    , vibratoPanel_(std::make_unique<VibratoPanel>(VibratoPanel::Config{
+          .skin = skin,
+          .width = dims_.childModuleWidth,
+          .height = dims_.vibratoPanelHeight,
+          .widgetFactory = widgetFactory,
+          .apvts = apvts,
+          .moduleHeaderDims = dims_.moduleHeader,
+          .parameterCellDims = dims_.parameterCell}))
     , miscPanel_(std::make_unique<MiscPanel>(MiscPanel::Config{
           .skin = skin,
           .width = dims_.childModuleWidth,
