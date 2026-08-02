@@ -35,7 +35,14 @@ PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(const Config& config)
           .apvts = config.apvts,
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims}))
-    , env3Panel_(std::make_unique<Env3Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , env3Panel_(std::make_unique<Env3Panel>(Env3Panel::Config{
+          .skin = config.skin,
+          .width = rowDims_.childModuleWidth,
+          .height = rowDims_.childModuleHeight,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims}))
     , lfo1Panel_(std::make_unique<Lfo1Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
     , lfo2Panel_(std::make_unique<Lfo2Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
 {
