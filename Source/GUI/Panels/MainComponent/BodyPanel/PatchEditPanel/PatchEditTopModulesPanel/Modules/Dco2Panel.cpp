@@ -10,10 +10,12 @@ ModulePanelLayout Dco2Panel::createLayout()
 {
     return makePatchEditModuleLayout(
         PluginIDs::PatchEditSection::Dco2Module::kGroupId,
-        PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
-        PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
-        PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
-        PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPasteEnabled,
+        {
+            .initWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
+            .copyWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
+            .pasteWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
+            .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPasteEnabled
+        },
         {
             PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency,
             PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1,

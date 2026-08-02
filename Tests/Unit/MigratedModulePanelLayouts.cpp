@@ -13,10 +13,12 @@ namespace
         return { "Dco1Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Dco1Module::kGroupId,
-                     PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
                          PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequencyModByLfo1,
@@ -36,10 +38,12 @@ namespace
         return { "Dco2Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Dco2Module::kGroupId,
-                     PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Dco2Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequency,
                          PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets::kFrequencyModByLfo1,
@@ -119,10 +123,12 @@ namespace
         return { "Env1Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Envelope1Module::kGroupId,
-                     PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Envelope1Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kDelay,
                          PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets::kAttack,
@@ -142,10 +148,12 @@ namespace
         return { "Env2Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Envelope2Module::kGroupId,
-                     PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay,
                          PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack,
@@ -165,10 +173,12 @@ namespace
         return { "Env3Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Envelope3Module::kGroupId,
-                     PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Envelope3Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kDelay,
                          PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets::kAttack,
@@ -188,10 +198,12 @@ namespace
         return { "Lfo1Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Lfo1Module::kGroupId,
-                     PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Lfo1Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeed,
                          PluginIDs::PatchEditSection::Lfo1Module::ParameterWidgets::kSpeedModByPressure,
@@ -211,10 +223,12 @@ namespace
         return { "Lfo2Panel",
                  makePatchEditModuleLayout(
                      PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
-                     PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
-                     PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
-                     PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
-                     PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPasteEnabled,
+                     {
+                         .initWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
+                         .copyWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
+                         .pasteWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
+                         .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPasteEnabled
+                     },
                      {
                          PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed,
                          PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard,

@@ -5,24 +5,26 @@
 
 namespace
 {
+    struct ModuleLayoutSpec
+    {
+        juce::String moduleGroupId;
+        ModulePanelButtonSet buttonSet = ModulePanelButtonSet::InitCopyPaste;
+        ModulePanelModuleType moduleType = ModulePanelModuleType::PatchEdit;
+        ModulePanelActionWidgetIds actionWidgetIds;
+    };
+
     ModulePanelLayout makeModuleLayout(
-        const juce::String& moduleGroupId,
-        ModulePanelButtonSet buttonSet,
-        ModulePanelModuleType moduleType,
-        const juce::String& initId,
-        const juce::String& copyId,
-        const juce::String& pasteId,
-        const juce::String& pasteEnabledId,
+        const ModuleLayoutSpec& spec,
         std::initializer_list<const char*> orderedParameterIds)
     {
         ModulePanelLayout layout;
-        layout.moduleId = moduleGroupId;
-        layout.buttonSet = buttonSet;
-        layout.moduleType = moduleType;
-        layout.initWidgetId = initId;
-        layout.copyWidgetId = copyId;
-        layout.pasteWidgetId = pasteId;
-        layout.pasteEnabledPropertyId = pasteEnabledId;
+        layout.moduleId = spec.moduleGroupId;
+        layout.buttonSet = spec.buttonSet;
+        layout.moduleType = spec.moduleType;
+        layout.initWidgetId = spec.actionWidgetIds.initWidgetId;
+        layout.copyWidgetId = spec.actionWidgetIds.copyWidgetId;
+        layout.pasteWidgetId = spec.actionWidgetIds.pasteWidgetId;
+        layout.pasteEnabledPropertyId = spec.actionWidgetIds.pasteEnabledPropertyId;
         layout.orderedParameterIds.reserve(orderedParameterIds.size());
 
         for (const auto* parameterId : orderedParameterIds)
@@ -71,20 +73,16 @@ ModulePanelConfig buildModulePanelConfig(const ModulePanelLayout& layout)
 
 ModulePanelLayout makePatchEditModuleLayout(
     const juce::String& moduleGroupId,
-    const juce::String& initId,
-    const juce::String& copyId,
-    const juce::String& pasteId,
-    const juce::String& pasteEnabledId,
+    const ModulePanelActionWidgetIds& actionWidgetIds,
     std::initializer_list<const char*> orderedParameterIds)
 {
     return makeModuleLayout(
-        moduleGroupId,
-        ModulePanelButtonSet::InitCopyPaste,
-        ModulePanelModuleType::PatchEdit,
-        initId,
-        copyId,
-        pasteId,
-        pasteEnabledId,
+        {
+            .moduleGroupId = moduleGroupId,
+            .buttonSet = ModulePanelButtonSet::InitCopyPaste,
+            .moduleType = ModulePanelModuleType::PatchEdit,
+            .actionWidgetIds = actionWidgetIds
+        },
         orderedParameterIds);
 }
 
@@ -94,13 +92,12 @@ ModulePanelLayout makePatchEditInitOnlyModuleLayout(
     std::initializer_list<const char*> orderedParameterIds)
 {
     return makeModuleLayout(
-        moduleGroupId,
-        ModulePanelButtonSet::InitOnly,
-        ModulePanelModuleType::PatchEdit,
-        initId,
-        juce::String(),
-        juce::String(),
-        juce::String(),
+        {
+            .moduleGroupId = moduleGroupId,
+            .buttonSet = ModulePanelButtonSet::InitOnly,
+            .moduleType = ModulePanelModuleType::PatchEdit,
+            .actionWidgetIds = { .initWidgetId = initId }
+        },
         orderedParameterIds);
 }
 
@@ -110,12 +107,11 @@ ModulePanelLayout makeMasterEditModuleLayout(
     std::initializer_list<const char*> orderedParameterIds)
 {
     return makeModuleLayout(
-        moduleGroupId,
-        ModulePanelButtonSet::InitOnly,
-        ModulePanelModuleType::MasterEdit,
-        initId,
-        juce::String(),
-        juce::String(),
-        juce::String(),
+        {
+            .moduleGroupId = moduleGroupId,
+            .buttonSet = ModulePanelButtonSet::InitOnly,
+            .moduleType = ModulePanelModuleType::MasterEdit,
+            .actionWidgetIds = { .initWidgetId = initId }
+        },
         orderedParameterIds);
 }

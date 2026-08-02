@@ -10,10 +10,12 @@ ModulePanelLayout Lfo2Panel::createLayout()
 {
     return makePatchEditModuleLayout(
         PluginIDs::PatchEditSection::Lfo2Module::kGroupId,
-        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
-        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
-        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
-        PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPasteEnabled,
+        {
+            .initWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kInit,
+            .copyWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kCopy,
+            .pasteWidgetId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPaste,
+            .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Lfo2Module::StandaloneWidgets::kPasteEnabled
+        },
         {
             PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeed,
             PluginIDs::PatchEditSection::Lfo2Module::ParameterWidgets::kSpeedModByKeyboard,

@@ -10,6 +10,14 @@
 enum class ModulePanelButtonSet { InitCopyPaste, InitOnly };
 enum class ModulePanelModuleType { PatchEdit, MasterEdit };
 
+struct ModulePanelActionWidgetIds
+{
+    juce::String initWidgetId;
+    juce::String copyWidgetId;
+    juce::String pasteWidgetId;
+    juce::String pasteEnabledPropertyId;
+};
+
 struct ModulePanelLayout
 {
     juce::String moduleId;
@@ -45,10 +53,7 @@ ModulePanelConfig buildModulePanelConfig(const ModulePanelLayout& layout);
 
 ModulePanelLayout makePatchEditModuleLayout(
     const juce::String& moduleGroupId,
-    const juce::String& initId,
-    const juce::String& copyId,
-    const juce::String& pasteId,
-    const juce::String& pasteEnabledId,
+    const ModulePanelActionWidgetIds& actionWidgetIds,
     std::initializer_list<const char*> orderedParameterIds);
 
 ModulePanelLayout makePatchEditInitOnlyModuleLayout(

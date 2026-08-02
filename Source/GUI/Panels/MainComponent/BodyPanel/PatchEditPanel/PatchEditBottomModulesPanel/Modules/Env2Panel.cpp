@@ -10,10 +10,12 @@ ModulePanelLayout Env2Panel::createLayout()
 {
     return makePatchEditModuleLayout(
         PluginIDs::PatchEditSection::Envelope2Module::kGroupId,
-        PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit,
-        PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
-        PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
-        PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPasteEnabled,
+        {
+            .initWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kInit,
+            .copyWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kCopy,
+            .pasteWidgetId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPaste,
+            .pasteEnabledPropertyId = PluginIDs::PatchEditSection::Envelope2Module::StandaloneWidgets::kPasteEnabled
+        },
         {
             PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kDelay,
             PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets::kAttack,
