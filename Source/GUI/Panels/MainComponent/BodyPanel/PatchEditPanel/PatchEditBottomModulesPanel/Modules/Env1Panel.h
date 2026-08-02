@@ -17,8 +17,18 @@ class WidgetFactory;
 class Env1Panel : public BaseModulePanel
 {
 public:
-    Env1Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit Env1Panel(const Config& config);
     ~Env1Panel() override = default;
 
     static ModulePanelLayout createLayout();
