@@ -10,29 +10,34 @@
 
 namespace TSS
 {
+struct EqualWidthStripArgs
+{
+    int startX = 0;
+    int y = 0;
+    float uiScale = 1.0f;
+    int designWidth = 0;
+    int designHeight = 0;
+    int designGap = 0;
+    juce::Component* const* controls = nullptr;
+    int count = 0;
+};
+
 // Places equal-width controls left-to-right starting at startX.
 // Returns X immediately after the last control (no trailing gap).
-inline int placeEqualWidthStrip(int startX,
-                                int y,
-                                float uiScale,
-                                int designWidth,
-                                int designHeight,
-                                int designGap,
-                                juce::Component* const* controls,
-                                int count)
+inline int placeEqualWidthStrip(const EqualWidthStripArgs& args)
 {
-    const int w = ScaledLayout::scaledInt(static_cast<float>(designWidth), uiScale);
-    const int h = ScaledLayout::scaledInt(static_cast<float>(designHeight), uiScale);
-    const int gap = ScaledLayout::scaledInt(static_cast<float>(designGap), uiScale);
+    const int w = ScaledLayout::scaledInt(static_cast<float>(args.designWidth), args.uiScale);
+    const int h = ScaledLayout::scaledInt(static_cast<float>(args.designHeight), args.uiScale);
+    const int gap = ScaledLayout::scaledInt(static_cast<float>(args.designGap), args.uiScale);
 
-    int x = startX;
-    for (int i = 0; i < count; ++i)
+    int x = args.startX;
+    for (int i = 0; i < args.count; ++i)
     {
-        if (controls[i] != nullptr)
-            controls[i]->setBounds(x, y, w, h);
+        if (args.controls[i] != nullptr)
+            args.controls[i]->setBounds(x, args.y, w, h);
 
         x += w;
-        if (i + 1 < count)
+        if (i + 1 < args.count)
             x += gap;
     }
 

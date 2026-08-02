@@ -230,9 +230,16 @@ void InternalPatchesPanel::layoutContentRows(float sf)
         initPatchButton_.get(), copyPatchButton_.get(),
         pastePatchButton_.get(), storePatchButton_.get()
     };
-    TSS::placeEqualWidthStrip(memoryGroupX, row2Y, sf,
-                              dims_.buttons.internalPatchesInitWidth, dims_.buttons.height,
-                              dims_.layout.interControlGap, memButtons, 4);
+    TSS::placeEqualWidthStrip({
+        .startX = memoryGroupX,
+        .y = row2Y,
+        .uiScale = sf,
+        .designWidth = dims_.buttons.internalPatchesInitWidth,
+        .designHeight = dims_.buttons.height,
+        .designGap = dims_.layout.interControlGap,
+        .controls = memButtons,
+        .count = 4,
+    });
 }
 
 void InternalPatchesPanel::applyChildUiScales(float sf)

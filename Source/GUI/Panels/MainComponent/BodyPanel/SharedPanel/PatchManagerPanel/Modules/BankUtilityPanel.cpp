@@ -266,9 +266,16 @@ void BankUtilityPanel::layoutContentRows(float sf)
     for (int i = 0; i < 5; ++i)
         row1Banks[i] = selectBankButtons_[static_cast<size_t>(i)].get();
 
-    const int row1AfterBanksX = TSS::placeEqualWidthStrip(labelWidth + rowGap, row1Y, sf,
-                              dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
-                              dims_.layout.interControlGap, row1Banks, 5);
+    const int row1AfterBanksX = TSS::placeEqualWidthStrip({
+        .startX = labelWidth + rowGap,
+        .y = row1Y,
+        .uiScale = sf,
+        .designWidth = dims_.buttons.patchManagerBankSelectWidth,
+        .designHeight = dims_.buttons.height,
+        .designGap = dims_.layout.interControlGap,
+        .controls = row1Banks,
+        .count = 5,
+    });
 
     if (auto* button = importBankButton_.get())
         button->setBounds(row1AfterBanksX + rowGap, row1Y, importButtonWidth, buttonHeight);
@@ -283,9 +290,16 @@ void BankUtilityPanel::layoutContentRows(float sf)
     for (int i = 0; i < 5; ++i)
         row2Banks[i] = selectBankButtons_[static_cast<size_t>(i + 5)].get();
 
-    const int row2AfterBanksX = TSS::placeEqualWidthStrip(lockButtonWidth + rowGap, row2Y, sf,
-                              dims_.buttons.patchManagerBankSelectWidth, dims_.buttons.height,
-                              dims_.layout.interControlGap, row2Banks, 5);
+    const int row2AfterBanksX = TSS::placeEqualWidthStrip({
+        .startX = lockButtonWidth + rowGap,
+        .y = row2Y,
+        .uiScale = sf,
+        .designWidth = dims_.buttons.patchManagerBankSelectWidth,
+        .designHeight = dims_.buttons.height,
+        .designGap = dims_.layout.interControlGap,
+        .controls = row2Banks,
+        .count = 5,
+    });
 
     if (auto* button = exportBankButton_.get())
         button->setBounds(row2AfterBanksX + rowGap, row2Y, exportButtonWidth, buttonHeight);

@@ -181,9 +181,16 @@ void PatchMutatorPanel::layoutSliderLine(const SliderLineLayoutArgs& args)
     for (int i = 0; i < toggleCount; ++i)
         toggleControls[i] = args.toggles[i];
 
-    TSS::placeEqualWidthStrip(cursorX, args.y, sf,
-                              dims_.toggles.patchMutatorWidth, dims_.toggles.height,
-                              dims_.layout.interControlGap, toggleControls, toggleCount);
+    TSS::placeEqualWidthStrip({
+        .startX = cursorX,
+        .y = args.y,
+        .uiScale = sf,
+        .designWidth = dims_.toggles.patchMutatorWidth,
+        .designHeight = dims_.toggles.height,
+        .designGap = dims_.layout.interControlGap,
+        .controls = toggleControls,
+        .count = toggleCount,
+    });
 }
 
 void PatchMutatorPanel::layoutHistoryLine(int x, int y)
