@@ -1022,5 +1022,5 @@ Original review bullets below remain for history; status for U-10-owned residual
 ## Deferred from: quick-dev spec-footer-synth-version-dot-format (2026-08-02)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-footer-synth-version-dot-format.md`
-  summary: No unit tests for footer device-version display formatting (1234→12.34, 116→1.16, dotted passthrough).
+  summary: ~~No unit tests for footer device-version display formatting (1234→12.34, 116→1.16, dotted passthrough).~~ **Resolved 2026-08-02**: `DeviceVersionDisplayFormatTests` covers the display contract for `TSS::formatDeviceVersionForDisplay`.
   evidence: Blind Hunter; display formatter needs dedicated coverage so CI locks the Vxx.yy contract.

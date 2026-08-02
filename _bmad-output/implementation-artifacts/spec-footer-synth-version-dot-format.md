@@ -21,3 +21,6 @@ route: 'one-shot'
 
 - Wire formatted version into the right-zone device detail string
   [`FooterPanel.cpp:289`](../../Source/GUI/Panels/MainComponent/FooterPanel/FooterPanel.cpp#L289)
+
+- Unit coverage for intent examples and short/whitespace edge cases
+  [`DeviceVersionDisplayFormatTests.cpp:21`](../../Tests/Unit/DeviceVersionDisplayFormatTests.cpp#L21)
