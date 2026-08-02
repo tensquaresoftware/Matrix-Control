@@ -22,17 +22,29 @@ namespace MidiManagerInternal
         bool reportOpenFailure = true;
     };
 
-    // Port open/clear paths wipe the left-zone footer; re-assert FR-2 / Unknown guidance while locked.
+    // Port open/clear paths wipe the left-zone footer; re-assert FR-2 / Unknown / unresponsive guidance.
     inline void clearFooterThenReassertDeviceLockGuidance(juce::AudioProcessorValueTreeState& apvts)
     {
         ExceptionPropagator::clearMessage(apvts);
 
         const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+        const bool deviceMidiUnresponsive = static_cast<bool>(
+            apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
         const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
             apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
 
-        if (Core::isEditorOutboundAllowed(deviceDetected, deviceType))
+        if (! Core::isSectionLocked(deviceDetected, deviceType, false, deviceMidiUnresponsive))
             return;
+
+        if (deviceMidiUnresponsive)
+        {
+            apvts.state.setProperty(
+                "uiMessageText",
+                juce::String(PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance),
+                nullptr);
+            apvts.state.setProperty("uiMessageSeverity", "error", nullptr);
+            return;
+        }
 
         const auto* message = deviceDetected
                                   ? PluginDisplayNames::FooterPanel::kUnsupportedMatrixDeviceFooter

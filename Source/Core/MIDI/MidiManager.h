@@ -225,6 +225,9 @@ private:
                                          const juce::String& errorType);
     /** Abort inquiry start because the outbound queue stayed busy — keep detection state. */
     void softAbortDeviceInquiryOutboundBusy(std::uint64_t token);
+    /** Presence timeout while already detected — keep detection; freeze editor SysEx traffic. */
+    void softAbortDeviceInquiryUnresponsive(std::uint64_t token);
+    void setDeviceMidiUnresponsive(bool unresponsive);
 
     JUCE_DECLARE_WEAK_REFERENCEABLE(MidiManager)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiManager)

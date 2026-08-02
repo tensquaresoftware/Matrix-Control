@@ -5,6 +5,7 @@
 #include "PluginProcessorInternal.h"
 
 #include "Core/Actions/PatchManagerActionHandler.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
@@ -49,6 +50,9 @@ void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
     for (const auto* id : feedbackIds)
         state.removeProperty(id, nullptr);
 
+    // Live MIDI health — never restore a wedged session lock from project state.
+    state.removeProperty(Core::kDeviceMidiUnresponsiveProperty, nullptr);
+
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
 }
@@ -74,6 +78,7 @@ void PluginProcessor::applyRestoredPluginState(juce::ValueTree restoredState)
     // Clear ephemeral mutator state + patch name before replaceState so
     // valueTreeRedirected / PatchNameSyncer never briefly rehydrate a stale name.
     Core::MutatorSessionPersistence::resetEphemeralStateAfterSessionLoad(restoredState);
+    restoredState.setProperty(Core::kDeviceMidiUnresponsiveProperty, false, nullptr);
 
     // Drop in-memory Computer Patches scan before replaceState so redirected panel
     // refresh cannot briefly show the previous session's file list.

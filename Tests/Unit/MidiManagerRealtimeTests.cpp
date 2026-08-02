@@ -239,7 +239,7 @@ private:
 
     void testSendPanicEnqueuesAllNotesOffThenResetControllers()
     {
-        beginTest("sendPanic without midiChannel param clears all 16 channels (123 then 121)");
+        beginTest("sendPanic without midiChannel param clears all 16 channels (120, 123, 121)");
 
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
@@ -248,10 +248,17 @@ private:
 
         manager.sendPanic();
 
-        expectEquals(static_cast<int>(queue.realtimeDepth()), 32);
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 48);
 
         for (int channel = 1; channel <= 16; ++channel)
         {
+            auto allSoundOff = queue.dequeue();
+            expect(allSoundOff.has_value());
+            expect(allSoundOff->midiMessage.isController());
+            expectEquals(allSoundOff->midiMessage.getControllerNumber(), 120);
+            expectEquals(allSoundOff->midiMessage.getControllerValue(), 0);
+            expectEquals(allSoundOff->midiMessage.getChannel(), channel);
+
             auto notesOff = queue.dequeue();
             expect(notesOff.has_value());
             expect(notesOff->midiMessage.isController());

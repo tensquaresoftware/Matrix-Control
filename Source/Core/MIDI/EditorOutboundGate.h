@@ -7,6 +7,9 @@
 
 namespace Core
 {
+    /** APVTS state flag: presence inquiry timed out while the device was still detected. */
+    inline constexpr const char* kDeviceMidiUnresponsiveProperty = "deviceMidiUnresponsive";
+
     /** FR-2 / V1.2: editor SysEx / Program Change only when a supported Matrix is detected.
         Unknown Matrix-family members are connected-but-unsupported (locked).
         Device Inquiry is the unlock path and must bypass this gate (see maySendEditorSysEx). */
@@ -34,23 +37,31 @@ namespace Core
     }
 
     inline bool maySendEditorProgramChange(bool deviceDetected,
-                                           MatrixDeviceTypes::Type deviceType) noexcept
+                                           MatrixDeviceTypes::Type deviceType,
+                                           bool deviceMidiUnresponsive = false) noexcept
     {
-        return isEditorOutboundAllowed(deviceDetected, deviceType);
+        return isEditorOutboundAllowed(deviceDetected, deviceType) && ! deviceMidiUnresponsive;
     }
 
     inline bool maySendEditorSysEx(bool deviceDetected,
                                    MatrixDeviceTypes::Type deviceType,
-                                   const juce::MemoryBlock& sysEx) noexcept
+                                   const juce::MemoryBlock& sysEx,
+                                   bool deviceMidiUnresponsive = false) noexcept
     {
-        return isEditorOutboundAllowed(deviceDetected, deviceType) || isDeviceInquirySysEx(sysEx);
+        if (isDeviceInquirySysEx(sysEx))
+            return true;
+
+        return isEditorOutboundAllowed(deviceDetected, deviceType) && ! deviceMidiUnresponsive;
     }
 
-    /** Panels stay locked while undetected, unsupported (Unknown), or while Mutator Compare is active. */
+    /** Panels stay locked while undetected, unsupported (Unknown), MIDI-unresponsive, or Compare. */
     inline bool isSectionLocked(bool deviceDetected,
                                 MatrixDeviceTypes::Type deviceType,
-                                bool compareActive) noexcept
+                                bool compareActive,
+                                bool deviceMidiUnresponsive = false) noexcept
     {
-        return ! isEditorOutboundAllowed(deviceDetected, deviceType) || compareActive;
+        return ! isEditorOutboundAllowed(deviceDetected, deviceType)
+               || deviceMidiUnresponsive
+               || compareActive;
     }
 }

@@ -16,6 +16,7 @@ namespace
     constexpr float kLockedAlpha = 0.5f;
     const juce::Identifier kDeviceDetectedId("deviceDetected");
     const juce::Identifier kDeviceTypeId(MatrixDeviceTypes::kApvtsPropertyName);
+    const juce::Identifier kDeviceMidiUnresponsiveId(Core::kDeviceMidiUnresponsiveProperty);
 
     void applySectionLock(juce::Component& component, bool locked)
     {
@@ -33,7 +34,8 @@ namespace
     bool isOwnedDeviceLockFooter(const juce::String& text)
     {
         return text == juce::String(FooterCopy::kDeviceLockGuidance)
-            || text == juce::String(FooterCopy::kUnsupportedMatrixDeviceFooter);
+            || text == juce::String(FooterCopy::kUnsupportedMatrixDeviceFooter)
+            || text == juce::String(FooterCopy::kDeviceUnresponsiveGuidance);
     }
 }
 
@@ -62,7 +64,8 @@ namespace TSS
     {
         if (property.toString() == MutatorState::kCompareActive
             || property == kDeviceDetectedId
-            || property == kDeviceTypeId)
+            || property == kDeviceTypeId
+            || property == kDeviceMidiUnresponsiveId)
         {
             apply();
         }
@@ -75,13 +78,17 @@ namespace TSS
 
     void CompareLockBinder::syncDeviceLockFooter(bool deviceDetected,
                                                  MatrixDeviceTypes::Type deviceType,
-                                                 bool compareActive)
+                                                 bool compareActive,
+                                                 bool deviceMidiUnresponsive)
     {
-        const bool deviceLocked = ! Core::isEditorOutboundAllowed(deviceDetected, deviceType);
+        const bool deviceLocked = Core::isSectionLocked(
+            deviceDetected, deviceType, false, deviceMidiUnresponsive);
 
         if (deviceLocked)
         {
-            if (deviceDetected)
+            if (deviceMidiUnresponsive)
+                GrayedControlHelper::setFooterErrorMessage(apvts_, FooterCopy::kDeviceUnresponsiveGuidance);
+            else if (deviceDetected)
                 GrayedControlHelper::setFooterInfoMessage(apvts_, FooterCopy::kUnsupportedMatrixDeviceFooter);
             else
                 GrayedControlHelper::setFooterErrorMessage(apvts_, FooterCopy::kDeviceLockGuidance);
@@ -105,12 +112,20 @@ namespace TSS
             apvts_.state.getProperty(MutatorState::kCompareActive, false));
         const bool deviceDetected = static_cast<bool>(
             apvts_.state.getProperty(kDeviceDetectedId, false));
+        const bool deviceMidiUnresponsive = static_cast<bool>(
+            apvts_.state.getProperty(kDeviceMidiUnresponsiveId, false));
         const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
             apvts_.state.getProperty(kDeviceTypeId));
 
         const bool locked = lockOnCompare_
-                                ? Core::isSectionLocked(deviceDetected, deviceType, compareActive)
-                                : ! Core::isEditorOutboundAllowed(deviceDetected, deviceType);
+                                ? Core::isSectionLocked(deviceDetected,
+                                                        deviceType,
+                                                        compareActive,
+                                                        deviceMidiUnresponsive)
+                                : Core::isSectionLocked(deviceDetected,
+                                                        deviceType,
+                                                        false,
+                                                        deviceMidiUnresponsive);
 
         for (auto& safeComponent : locked_)
         {
@@ -118,6 +133,6 @@ namespace TSS
                 applySectionLock(*component, locked);
         }
 
-        syncDeviceLockFooter(deviceDetected, deviceType, compareActive);
+        syncDeviceLockFooter(deviceDetected, deviceType, compareActive, deviceMidiUnresponsive);
     }
 }

@@ -38,6 +38,21 @@ namespace
         SelectBankIds::kSelectBank9,
     };
 
+    bool isRootSectionLocked(const juce::AudioProcessorValueTreeState& apvts,
+                             MatrixDeviceTypes::Type& deviceTypeOut)
+    {
+        const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected"));
+        const bool deviceMidiUnresponsive = static_cast<bool>(
+            apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
+        deviceTypeOut = Core::DeviceTypeRegistry::fromApvtsProperty(
+            apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+        const bool compareActive = static_cast<bool>(apvts.state.getProperty(
+            PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
+            false));
+        return Core::isSectionLocked(
+            deviceDetected, deviceTypeOut, compareActive, deviceMidiUnresponsive);
+    }
+
     void setSubtreeKeyboardInteractionEnabled(juce::Component& root, bool enabled)
     {
         root.setWantsKeyboardFocus(enabled);
@@ -117,6 +132,7 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
     const auto propertyName = property.toString();
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
         || propertyName == "deviceDetected"
+        || propertyName == Core::kDeviceMidiUnresponsiveProperty
         || propertyName == PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive)
     {
         refreshDeviceGating();
@@ -137,21 +153,14 @@ void BankUtilityPanel::valueTreeRedirected(juce::ValueTree&)
 
 void BankUtilityPanel::refreshDeviceGating()
 {
+    MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown;
+    const bool rootLocked = isRootSectionLocked(apvts_, deviceType);
     const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected"));
-    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
-        apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
-    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
-        PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
-        false));
 
     // Root Compare/device lock already dims this panel via CompareLockBinder — skip child gray
     // so we do not fight panel-level alpha/intercepts or stack to ~0.25 alpha.
-    const bool rootLocked = Core::isSectionLocked(deviceDetected, deviceType, compareActive);
-    const bool shouldGray = ! rootLocked
-        && deviceDetected
-        && ! limits.hasBankConcept();
-    setBankUtilityGrayed(shouldGray);
+    setBankUtilityGrayed(! rootLocked && deviceDetected && ! limits.hasBankConcept());
     refreshImportExportEnabled();
 }
 
@@ -177,14 +186,9 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
 
 void BankUtilityPanel::refreshImportExportEnabled()
 {
-    const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected"));
-    const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
-        apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
+    MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown;
+    const bool rootLocked = isRootSectionLocked(apvts_, deviceType);
     const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
-    const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
-        PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
-        false));
-    const bool rootLocked = Core::isSectionLocked(deviceDetected, deviceType, compareActive);
 
     if (exportBankButton_)
         exportBankButton_->setEnabled(! rootLocked);

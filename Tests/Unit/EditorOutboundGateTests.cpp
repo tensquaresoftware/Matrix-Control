@@ -42,12 +42,17 @@ public:
         expect(Core::maySendEditorSysEx(true, Type::kUnknown, inquiry));
         expect(Core::maySendEditorSysEx(true, Type::kMatrix1000, inquiry));
 
-        beginTest("isSectionLocked — composes detection, Unknown, and Compare");
-        expect(Core::isSectionLocked(false, Type::kMatrix1000, false));
-        expect(Core::isSectionLocked(true, Type::kUnknown, false));
-        expect(Core::isSectionLocked(true, Type::kMatrix1000, true));
-        expect(! Core::isSectionLocked(true, Type::kMatrix1000, false));
-        expect(! Core::isSectionLocked(true, Type::kMatrix6, false));
+        beginTest("maySendEditorProgramChange / SysEx — blocked when MIDI-unresponsive");
+        expect(! Core::maySendEditorProgramChange(true, Type::kMatrix1000, true));
+        expect(! Core::maySendEditorSysEx(true, Type::kMatrix1000, remoteEdit, true));
+        expect(Core::maySendEditorSysEx(true, Type::kMatrix1000, inquiry, true));
+
+        beginTest("isSectionLocked — undetected, Unknown, Compare, and unresponsive");
+        expect(Core::isSectionLocked(false, Type::kMatrix1000, false, false));
+        expect(Core::isSectionLocked(true, Type::kUnknown, false, false));
+        expect(Core::isSectionLocked(true, Type::kMatrix1000, true, false));
+        expect(Core::isSectionLocked(true, Type::kMatrix1000, false, true));
+        expect(! Core::isSectionLocked(true, Type::kMatrix1000, false, false));
     }
 };
 

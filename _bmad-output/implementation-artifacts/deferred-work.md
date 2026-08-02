@@ -1074,3 +1074,21 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
   summary: Tests do not lock fetch-depth:0 on quality-gate checkout; shallow history can still starve three-dot diffs.
   evidence: Blind Hunter; workflow already sets fetch-depth:0; hardening the test lock is optional.
+
+## Deferred from: quick-dev spec-device-unresponsive-presence-sysex-brake (2026-08-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-unresponsive-presence-sysex-brake.md`
+  summary: Non–Device-ID SysEx during inquiry re-arms capture without rescheduling the timeout, so a noisy wire can still trip unresponsive.
+  evidence: Edge Case Hunter; pre-existing inquiry re-arm path; worsened only by soft-abort consequence.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-unresponsive-presence-sysex-brake.md`
+  summary: No MidiManager unit fixture for soft timeout while detected → flag set → clear on success.
+  evidence: Blind Hunter; timer/async capture hard to unit without deeper fakes.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-unresponsive-presence-sysex-brake.md`
+  summary: Host automation can still mutate APVTS while UI is locked; MIDI is dropped so plugin/synth can desync.
+  evidence: Blind Hunter / Edge Case Hunter; same pattern as Compare lock today.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-device-unresponsive-presence-sysex-brake.md`
+  summary: Unsupported-but-detected + timeout prefers unresponsive overload footer over unsupported copy.
+  evidence: Edge Case Hunter; rare Unknown Matrix-family path.

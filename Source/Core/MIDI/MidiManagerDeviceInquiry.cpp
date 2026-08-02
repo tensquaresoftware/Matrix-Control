@@ -5,8 +5,10 @@
 
 #include "Core/Loggers/MidiLogger.h"
 #include "Core/MIDI/DeviceInquiryTrigger.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
 #include "Core/Services/DeviceTypeRegistry.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 void MidiManager::clearDeviceDetectionAfterPortLoss()
 {
@@ -18,6 +20,7 @@ void MidiManager::clearDeviceDetectionAfterPortLoss()
 
     if (! wasDetected && ! hadInquiryPair)
     {
+        setDeviceMidiUnresponsive(false);
         updateDevicePresenceMonitoring();
         return;
     }
@@ -225,6 +228,50 @@ void MidiManager::softAbortDeviceInquiryOutboundBusy(std::uint64_t token)
         "Device Inquiry deferred: outbound MIDI queue still busy (presence will retry)");
 }
 
+void MidiManager::setDeviceMidiUnresponsive(bool unresponsive)
+{
+    const bool previous = static_cast<bool>(
+        apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
+    if (previous == unresponsive)
+        return;
+
+    apvts.state.setProperty(Core::kDeviceMidiUnresponsiveProperty, unresponsive, nullptr);
+
+    if (unresponsive)
+    {
+        apvts.state.setProperty(
+            "uiMessageText",
+            juce::String(PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance),
+            nullptr);
+        apvts.state.setProperty("uiMessageSeverity", "error", nullptr);
+        MidiLogger::getInstance().logWarning(
+            "Matrix synth not responding to Device Inquiry — editor SysEx paused; power-cycle if notes stick");
+        return;
+    }
+
+    if (apvts.state.getProperty("uiMessageText").toString()
+        == PluginDisplayNames::FooterPanel::kDeviceUnresponsiveGuidance)
+    {
+        apvts.state.setProperty("uiMessageText", juce::String(), nullptr);
+        apvts.state.setProperty("uiMessageSeverity", juce::String(), nullptr);
+    }
+}
+
+void MidiManager::softAbortDeviceInquiryUnresponsive(std::uint64_t token)
+{
+    auto expected = token;
+    if (! asyncRequestToken_.compare_exchange_strong(expected, token + 1, std::memory_order_acq_rel))
+        return;
+
+    if (midiReceiver != nullptr)
+        midiReceiver->cancelOneShotSysExCapture();
+
+    asyncSysExCaptureActive_.store(false, std::memory_order_release);
+
+    // Keep deviceDetected / lastInquiry pair / delay profile — silence ≠ unplugged cables.
+    setDeviceMidiUnresponsive(true);
+}
+
 void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
 {
     juce::WeakReference<MidiManager> weakThis(this);
@@ -240,6 +287,15 @@ void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
                 MidiLogger::getInstance().logWarning(
                     "Timeout waiting for SysEx response ("
                     + juce::String(SysExConstants::kDefaultTimeoutMs) + "ms)");
+
+                const bool wasDetected = static_cast<bool>(
+                    self->apvts.state.getProperty("deviceDetected", false));
+                if (wasDetected)
+                {
+                    self->softAbortDeviceInquiryUnresponsive(token);
+                    return;
+                }
+
                 self->finishAsyncDeviceInquiryFailure(token,
                                                       "Timeout waiting for Device ID response",
                                                       "Timeout");

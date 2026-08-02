@@ -33,7 +33,8 @@ namespace TSS
         void apply();
         void syncDeviceLockFooter(bool deviceDetected,
                                   MatrixDeviceTypes::Type deviceType,
-                                  bool compareActive);
+                                  bool compareActive,
+                                  bool deviceMidiUnresponsive);
 
         juce::AudioProcessorValueTreeState& apvts_;
         std::vector<juce::Component::SafePointer<juce::Component>> locked_;

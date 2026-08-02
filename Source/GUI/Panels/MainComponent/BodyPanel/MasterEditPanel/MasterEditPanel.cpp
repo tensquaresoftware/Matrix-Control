@@ -96,6 +96,7 @@ void MasterEditPanel::valueTreePropertyChanged(juce::ValueTree&,
 
     if (propertyName == MatrixDeviceTypes::kApvtsPropertyName
         || propertyName == "deviceDetected"
+        || propertyName == Core::kDeviceMidiUnresponsiveProperty
         || propertyName == MutatorState::kCompareActive)
     {
         refreshDeviceGating();
@@ -110,6 +111,8 @@ void MasterEditPanel::valueTreeRedirected(juce::ValueTree&)
 void MasterEditPanel::refreshDeviceGating()
 {
     const bool deviceDetected = static_cast<bool>(apvts_.state.getProperty("deviceDetected", false));
+    const bool deviceMidiUnresponsive = static_cast<bool>(
+        apvts_.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     const bool compareActive = static_cast<bool>(apvts_.state.getProperty(
@@ -117,7 +120,8 @@ void MasterEditPanel::refreshDeviceGating()
         false));
 
     // Root Compare/device lock already dims the panel — skip child gray to avoid ~0.25 alpha.
-    const bool rootLocked = Core::isSectionLocked(deviceDetected, deviceType, compareActive);
+    const bool rootLocked = Core::isSectionLocked(
+        deviceDetected, deviceType, compareActive, deviceMidiUnresponsive);
     const bool shouldGray = ! rootLocked
         && deviceDetected
         && ! Core::isMasterEditAllowed(deviceDetected, deviceType);

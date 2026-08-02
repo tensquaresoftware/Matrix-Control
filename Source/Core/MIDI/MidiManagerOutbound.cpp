@@ -63,6 +63,11 @@ void MidiManager::sendQueuedSysEx(const juce::MemoryBlock& sysExMessage, const j
 
 void MidiManager::dispatchRealtimeMessage(const Core::MidiOutboundQueue::Message& msg)
 {
+    // Program Change is editor outbound — drop if freeze/gate flipped after enqueue.
+    // Panic CC / notes remain ungated (instrument path).
+    if (msg.midiMessage.isProgramChange() && ! isEditorOutboundAllowed())
+        return;
+
     midiSender->sendMidiMessage(msg.midiMessage);
     activityTracker_.notifyActivity(pathForOutboundMessage(msg));
     activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kOutbound);
@@ -77,9 +82,11 @@ void MidiManager::notifyOutboundActivity(const Core::MidiOutboundQueue::Message&
 bool MidiManager::isEditorSysExAllowed(const juce::MemoryBlock& sysEx) const
 {
     const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const bool deviceMidiUnresponsive = static_cast<bool>(
+        apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-    return Core::maySendEditorSysEx(deviceDetected, deviceType, sysEx);
+    return Core::maySendEditorSysEx(deviceDetected, deviceType, sysEx, deviceMidiUnresponsive);
 }
 
 bool MidiManager::handleOutboundMessage(Core::MidiOutboundQueue::Message& msg)

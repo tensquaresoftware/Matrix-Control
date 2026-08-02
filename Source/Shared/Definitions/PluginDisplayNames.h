@@ -50,6 +50,10 @@ namespace PluginDisplayNames
         constexpr const char* kDeviceLockGuidance =
             "No synth detected - check MIDI cables, Editor MIDI From / MIDI To options, and power-cycle your Matrix synth.";
 
+        // Presence inquiry timed out while still detected — synth likely overloaded, not unplugged.
+        constexpr const char* kDeviceUnresponsiveGuidance =
+            "Synth not responding (often after heavy SysEx edits) - stop editing, power-cycle the Matrix, then click PANIC if a note is still stuck.";
+
         // Connected Oberheim Matrix-family device whose member is not Matrix-1000 / Matrix-6/6R.
         constexpr const char* kUnsupportedMatrixDeviceFooter =
             "Connected Matrix device is not supported - editing is locked. Use MIDI From / MIDI To to change ports.";

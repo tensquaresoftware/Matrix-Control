@@ -31,6 +31,7 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
     outboundQueue_.setWakeConsumerCallback([this] { wakeConsumer(); });
 
     apvts.state.setProperty("deviceDetected", false, nullptr);
+    apvts.state.setProperty(Core::kDeviceMidiUnresponsiveProperty, false, nullptr);
     apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
                             MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kUnknown),
                             nullptr);
@@ -197,12 +198,12 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
 
 void MidiManager::sendPanic()
 {
-    const auto enqueuePanicPair = [this](int channel)
+    const auto enqueuePanicTriple = [this](int channel)
     {
-        // Front-insert is LIFO per call — push Reset (121) first, then Notes Off (123),
-        // so dequeue order is 123 then 121. Thin priority: still via the consumer.
+        // Front-insert is LIFO — push 121, then 123, then 120 so dequeue is 120 → 123 → 121.
         outboundQueue_.enqueueRealtimeFront(juce::MidiMessage::controllerEvent(channel, 121, 0));
         outboundQueue_.enqueueRealtimeFront(juce::MidiMessage::controllerEvent(channel, 123, 0));
+        outboundQueue_.enqueueRealtimeFront(juce::MidiMessage::controllerEvent(channel, 120, 0));
     };
     int channel = 1;
     bool sendAllChannels = true;
@@ -221,11 +222,11 @@ void MidiManager::sendPanic()
     if (sendAllChannels)
     {
         for (int ch = 16; ch >= 1; --ch)
-            enqueuePanicPair(ch);
+            enqueuePanicTriple(ch);
     }
     else
     {
-        enqueuePanicPair(channel);
+        enqueuePanicTriple(channel);
     }
 
     activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kInstrument);
@@ -330,17 +331,21 @@ bool MidiManager::isDeviceDumpAvailable() const
 bool MidiManager::isEditorOutboundAllowed() const
 {
     const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const bool deviceMidiUnresponsive = static_cast<bool>(
+        apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-    return Core::isEditorOutboundAllowed(deviceDetected, deviceType);
+    return Core::maySendEditorProgramChange(deviceDetected, deviceType, deviceMidiUnresponsive);
 }
 
 bool MidiManager::isMasterEditOutboundAllowed() const
 {
     const bool deviceDetected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const bool deviceMidiUnresponsive = static_cast<bool>(
+        apvts.state.getProperty(Core::kDeviceMidiUnresponsiveProperty, false));
     const auto deviceType = Core::DeviceTypeRegistry::fromApvtsProperty(
         apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
-    return Core::isMasterEditAllowed(deviceDetected, deviceType);
+    return Core::isMasterEditAllowed(deviceDetected, deviceType) && ! deviceMidiUnresponsive;
 }
 
 bool MidiManager::waitUntilOutboundQueueIdle(int timeoutMs)
@@ -382,6 +387,7 @@ void MidiManager::updateDeviceStatus(bool detected,
         apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
                                 MatrixDeviceTypes::toApvtsString(deviceType),
                                 nullptr);
+        setDeviceMidiUnresponsive(false);
         MidiLogger::getInstance().logInfo(
             "Matrix synth detected (" + MatrixDeviceTypes::toApvtsString(deviceType)
             + "). Version: " + version);
@@ -391,6 +397,7 @@ void MidiManager::updateDeviceStatus(bool detected,
         apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
                                 MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kUnknown),
                                 nullptr);
+        setDeviceMidiUnresponsive(false);
         MidiLogger::getInstance().logWarning("Matrix synth not detected");
     }
 
