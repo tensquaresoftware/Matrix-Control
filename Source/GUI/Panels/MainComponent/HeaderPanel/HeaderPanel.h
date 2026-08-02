@@ -80,6 +80,8 @@ public:
 
 private:
     void showLogoPopup();
+    void wireLogoCallbacks();
+    void addChildControls(TSS::ISkin& skin);
 
     void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);

@@ -2,12 +2,9 @@
 
 #include <juce_audio_devices/juce_audio_devices.h>
 
-#include "GUI/Widgets/Label.h"
-#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HeaderLogoPopupMenu.h"
 #include "GUI/Skins/Skin.h"
 #include "GUI/Skins/SkinHelpers.h"
-#include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "Shared/Definitions/PluginAudioConstants.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
@@ -89,202 +86,14 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
 {
     setOpaque(true);
-
-    logo_.onPopupRequested = [this] { showLogoPopup(); };
-    logo_.onSettingsRequested = [this]
-    {
-        if (onSettingsRequested)
-            onSettingsRequested();
-    };
-    logo_.onAudioMidiSettingsRequested = [this]
-    {
-        if (isPluginMode_)
-            return;
-
-        if (onAudioMidiSettingsRequested)
-            onAudioMidiSettingsRequested();
-    };
-#if JUCE_DEBUG
-    logo_.onUiTestsToggleRequested = [this]
-    {
-        if (onUiTestsToggleRequested)
-            onUiTestsToggleRequested();
-    };
-#endif
-    logo_.onUiScaleReset = [this]
-    {
-        if (onUiScaleReset)
-            onUiScaleReset();
-    };
-
-    addAndMakeVisible(logo_);
-
-    instrumentActivityLed_.setSkin(skin);
-    addAndMakeVisible(instrumentActivityLed_);
-    addAndMakeVisible(keyboardFromLabel_);
-    keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(keyboardFromComboBox_);
-
-    editorActivityLed_.setSkin(skin);
-    addAndMakeVisible(editorActivityLed_);
-    addAndMakeVisible(midiFromLabel_);
-    midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(midiFromComboBox_);
-
-    midiToActivityLed_.setSkin(skin);
-    addAndMakeVisible(midiToActivityLed_);
-    addAndMakeVisible(midiToLabel_);
-    midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(midiToComboBox_);
-
-    addAndMakeVisible(audioFromLabel_);
-    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    addAndMakeVisible(audioFromComboBox_);
-    addAndMakeVisible(inputGainLabel_);
-    addAndMakeVisible(inputGainSlider_);
-    peakIndicator_.setSkin(skin);
-    addAndMakeVisible(peakIndicator_);
-
+    wireLogoCallbacks();
+    addChildControls(skin);
     populateMidiPortLists();
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
 {
     g.fillAll(skin_->getColour(SkinColourId::kHeaderPanelBackground));
-}
-
-void HeaderPanel::resized()
-{
-    const auto bounds = getLocalBounds();
-    const float sf = uiScale_;
-    const float gap = static_cast<float>(dimensions_.gap) * sf;
-    const float packetExternalGap = static_cast<float>(dimensions_.packetExternalGap) * sf;
-    const float controlHeight = static_cast<float>(dimensions_.controlHeight) * sf;
-    const int panelHeight = bounds.getHeight();
-    const int controlHeightPx = juce::roundToInt(controlHeight);
-    const int contentYOffset = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.contentVerticalOffset), sf);
-    const int controlY = bounds.getY() + (panelHeight - controlHeightPx) / 2 + contentYOffset;
-
-    const float editorMidiFromLabelWidth = static_cast<float>(dimensions_.editorMidiFromLabelWidth) * sf;
-    const float midiToLabelWidth = static_cast<float>(dimensions_.midiToLabelWidth) * sf;
-    const float keyboardFromLabelWidth = static_cast<float>(dimensions_.keyboardFromLabelWidth) * sf;
-    const float audioFromLabelWidth = static_cast<float>(dimensions_.audioFromLabelWidth) * sf;
-    const float inputGainLabelWidth = static_cast<float>(dimensions_.inputGainLabelWidth) * sf;
-    const float portComboWidth = static_cast<float>(dimensions_.portComboBoxWidth) * sf;
-    const float inputGainSliderWidth = static_cast<float>(dimensions_.inputGainSliderWidth) * sf;
-    const float peakIndicatorWidth = static_cast<float>(dimensions_.peakIndicatorWidth) * sf;
-    const float ledSize = static_cast<float>(dimensions_.ledSize) * sf;
-    const int ledSizePx = juce::roundToInt(ledSize);
-    const int ledY = bounds.getY() + (panelHeight - ledSizePx) / 2 + contentYOffset;
-    const float leftPadding = static_cast<float>(dimensions_.leftPadding) * sf;
-    const float logoGapAfter = static_cast<float>(dimensions_.logoGapAfter) * sf;
-    const int logoWidth = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.logoWidth), uiScale_);
-    const int logoHeight = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.logoHeight), uiScale_);
-    const int logoX = juce::roundToInt(static_cast<float>(bounds.getX()) + leftPadding);
-    logo_.setBounds(logoX,
-                     controlY + dimensions_.logoVerticalOffset,
-                     logoWidth,
-                     logoHeight);
-    logo_.setUiScale(uiScale_);
-
-    float x = static_cast<float>(logoX + logoWidth) + logoGapAfter;
-    const int y = controlY;
-    const int h = controlHeightPx;
-    const int ledH = ledSizePx;
-
-    auto placePacketLabel = [&](TSS::Label& label, float labelWidth)
-    {
-        label.setBounds(juce::roundToInt(x), y, juce::roundToInt(labelWidth), h);
-        label.setUiScale(uiScale_);
-        x += labelWidth + gap;
-    };
-
-    auto placePacketCombo = [&](TSS::ComboBox& combo, float comboWidth)
-    {
-        combo.setBounds(juce::roundToInt(x), y, juce::roundToInt(comboWidth), h);
-        combo.setUiScale(uiScale_);
-        x += comboWidth + gap;
-    };
-
-    auto placePacketLed = [&](TSS::Led& led)
-    {
-        led.setBounds(juce::roundToInt(x), ledY, juce::roundToInt(ledSize), ledH);
-        led.setUiScale(uiScale_);
-        x += ledSize + gap;
-    };
-
-    auto placePacketSlider = [&](TSS::Slider& slider, float sliderWidth)
-    {
-        slider.setBounds(juce::roundToInt(x), y, juce::roundToInt(sliderWidth), h);
-        slider.setUiScale(uiScale_);
-        x += sliderWidth + gap;
-    };
-
-    auto placePacketPeak = [&](TSS::PeakIndicator& peak)
-    {
-        peak.setBounds(juce::roundToInt(x), y, juce::roundToInt(peakIndicatorWidth), h);
-        peak.setUiScale(uiScale_);
-        x += peakIndicatorWidth + gap;
-    };
-
-    auto endPacket = [&]()
-    {
-        x += packetExternalGap - gap;
-    };
-
-    placePacketLed(instrumentActivityLed_);
-    placePacketLabel(keyboardFromLabel_, keyboardFromLabelWidth);
-    placePacketCombo(keyboardFromComboBox_, portComboWidth);
-    endPacket();
-
-    placePacketLed(editorActivityLed_);
-    placePacketLabel(midiFromLabel_, editorMidiFromLabelWidth);
-    placePacketCombo(midiFromComboBox_, portComboWidth);
-    endPacket();
-
-    placePacketLed(midiToActivityLed_);
-    placePacketLabel(midiToLabel_, midiToLabelWidth);
-    placePacketCombo(midiToComboBox_, portComboWidth);
-    endPacket();
-
-    if (!isPluginMode_)
-    {
-        placePacketLabel(audioFromLabel_, audioFromLabelWidth);
-        placePacketCombo(audioFromComboBox_, portComboWidth);
-        endPacket();
-
-        placePacketLabel(inputGainLabel_, inputGainLabelWidth);
-        placePacketSlider(inputGainSlider_, inputGainSliderWidth);
-        placePacketPeak(peakIndicator_);
-        endPacket();
-    }
-}
-
-void HeaderPanel::setSkin(TSS::ISkin& skin)
-{
-    skin_ = &skin;
-    logo_.setSkin(skin);
-    midiFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    midiFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
-    midiFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    midiToLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    midiToComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
-    midiToComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    keyboardFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    keyboardFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
-    keyboardFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    editorActivityLed_.setSkin(skin);
-    midiToActivityLed_.setSkin(skin);
-    instrumentActivityLed_.setSkin(skin);
-    audioFromLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    audioFromComboBox_.setLook(TSS::comboBoxLookFromSkin(skin));
-    audioFromComboBox_.setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
-    inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
-    inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
-    peakIndicator_.setSkin(skin);
 }
 
 void HeaderPanel::showLogoPopup()
