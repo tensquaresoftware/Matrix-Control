@@ -42,6 +42,44 @@ namespace
         PatchModuleKind::Lfo1,
         PatchModuleKind::Lfo2,
     };
+
+    void applyModuleModeFeedback(ClipboardFeedbackBlinkState& state,
+                                 const ClipboardService& clipboard) noexcept
+    {
+        const auto source = clipboard.getSourceModuleKind();
+        if (! source.has_value())
+        {
+            state.active = false;
+            return;
+        }
+
+        setModuleCopy(state, *source, true);
+
+        for (const auto target : kAllModules)
+        {
+            if (target == *source)
+                continue;
+
+            if (clipboard.canPasteModule(target))
+                setModulePaste(state, target, true);
+        }
+    }
+
+    void applyMatrixModeFeedback(ClipboardFeedbackBlinkState& state,
+                                 const ClipboardService& clipboard,
+                                 bool crossPatchReady) noexcept
+    {
+        state.matrixModulationCopy = true;
+        state.matrixModulationPaste = crossPatchReady && clipboard.canPasteMatrixModulation();
+    }
+
+    void applyFullPatchModeFeedback(ClipboardFeedbackBlinkState& state,
+                                    const ClipboardService& clipboard,
+                                    bool crossPatchReady) noexcept
+    {
+        state.internalPatchesCopy = true;
+        state.internalPatchesPaste = crossPatchReady && clipboard.canPasteFullPatch();
+    }
 }
 
 ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardService& clipboard,
@@ -62,35 +100,15 @@ ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardService& cli
             break;
 
         case ClipboardMode::Module:
-        {
-            const auto source = clipboard.getSourceModuleKind();
-            if (! source.has_value())
-            {
-                state.active = false;
-                break;
-            }
-
-            setModuleCopy(state, *source, true);
-
-            for (const auto target : kAllModules)
-            {
-                if (target == *source)
-                    continue;
-
-                if (clipboard.canPasteModule(target))
-                    setModulePaste(state, target, true);
-            }
+            applyModuleModeFeedback(state, clipboard);
             break;
-        }
 
         case ClipboardMode::MatrixModulation:
-            state.matrixModulationCopy = true;
-            state.matrixModulationPaste = crossPatchReady && clipboard.canPasteMatrixModulation();
+            applyMatrixModeFeedback(state, clipboard, crossPatchReady);
             break;
 
         case ClipboardMode::FullPatch:
-            state.internalPatchesCopy = true;
-            state.internalPatchesPaste = crossPatchReady && clipboard.canPasteFullPatch();
+            applyFullPatchModeFeedback(state, clipboard, crossPatchReady);
             break;
     }
 
