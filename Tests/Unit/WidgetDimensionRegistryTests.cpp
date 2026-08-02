@@ -25,6 +25,32 @@ namespace
                         + " got " + juce::String(*width));
     }
 
+    void expectPositiveButtonWidth(juce::UnitTest& test,
+                                   const juce::String& widgetId,
+                                   const juce::String& missingLabel,
+                                   const juce::String& nonPositiveLabel)
+    {
+        const auto width = WidgetDimensionRegistry::resolveStandaloneButtonWidth(widgetId);
+        test.expect(width.has_value(), missingLabel + widgetId);
+        if (width.has_value())
+            test.expect(*width > 0, nonPositiveLabel + widgetId);
+    }
+
+    void expectButtonsResolvableInDescriptors(
+        juce::UnitTest& test,
+        const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>& widgets,
+        const juce::String& missingLabel,
+        const juce::String& nonPositiveLabel)
+    {
+        for (const auto& widget : widgets)
+        {
+            if (widget.widgetType != PluginDescriptors::StandaloneWidgetType::kButton)
+                continue;
+
+            expectPositiveButtonWidth(test, widget.widgetId, missingLabel, nonPositiveLabel);
+        }
+    }
+
     void expectAllStandaloneButtonsResolvable(juce::UnitTest& test)
     {
         const std::vector<const std::vector<PluginDescriptors::StandaloneWidgetDescriptor>*> widgetSets = {
@@ -47,126 +73,74 @@ namespace
         };
 
         for (const auto* widgets : widgetSets)
-        {
-            for (const auto& widget : *widgets)
-            {
-                if (widget.widgetType != PluginDescriptors::StandaloneWidgetType::kButton)
-                    continue;
-
-                const auto width = WidgetDimensionRegistry::resolveStandaloneButtonWidth(widget.widgetId);
-                test.expect(width.has_value(),
-                            "Missing registry width for button widgetId: " + widget.widgetId);
-                if (width.has_value())
-                    test.expect(*width > 0,
-                                "Non-positive registry width for button widgetId: " + widget.widgetId);
-            }
-        }
+            expectButtonsResolvableInDescriptors(
+                test,
+                *widgets,
+                "Missing registry width for button widgetId: ",
+                "Non-positive registry width for button widgetId: ");
 
         for (int bus = 0; bus < Matrix1000Limits::kModulationBusCount; ++bus)
-        {
-            for (const auto& widget : PluginDescriptors::MatrixModulationSection::kModulationBusStandaloneWidgets[static_cast<size_t>(bus)])
-            {
-                if (widget.widgetType != PluginDescriptors::StandaloneWidgetType::kButton)
-                    continue;
-
-                const auto width = WidgetDimensionRegistry::resolveStandaloneButtonWidth(widget.widgetId);
-                test.expect(width.has_value(),
-                            "Missing registry width for bus button widgetId: " + widget.widgetId);
-                if (width.has_value())
-                    test.expect(*width > 0,
-                                "Non-positive registry width for bus button widgetId: " + widget.widgetId);
-            }
-        }
+            expectButtonsResolvableInDescriptors(
+                test,
+                PluginDescriptors::MatrixModulationSection::kModulationBusStandaloneWidgets[static_cast<size_t>(bus)],
+                "Missing registry width for bus button widgetId: ",
+                "Non-positive registry width for bus button widgetId: ");
     }
+
+    struct ExplicitButtonWidthCase
+    {
+        const char* widgetId;
+        int expectedWidth;
+        const char* context;
+    };
+
+    constexpr ExplicitButtonWidthCase kExplicitButtonWidthCases[] = {
+        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+          BW::kPatchManagerUnlockBank, "unlock bank" },
+        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
+          BW::kPatchManagerBankSelect, "select bank" },
+        { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
+          BW::kInternalPatchesInit, "internal init" },
+        { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
+          BW::kInternalPatchesCopy, "internal copy" },
+        { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
+          BW::kInternalPatchesPaste, "internal paste" },
+        { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
+          BW::kInternalPatchesStore, "internal store" },
+        { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
+          BW::kComputerPatchesLoad, "computer load" },
+        { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
+          BW::kComputerPatchesSaveAs, "computer save as" },
+        { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
+          BW::kComputerPatchesSave, "computer save" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
+          BW::kPatchMutatorMutate, "mutate" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
+          BW::kPatchMutatorRetry, "retry" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
+          BW::kPatchMutatorCompare, "compare" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
+          BW::kPatchMutatorDelete, "delete" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
+          BW::kPatchMutatorClear, "clear" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
+          BW::kPatchMutatorExport, "export" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
+          BW::kPatchMutatorHistoryNav, "history previous" },
+        { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
+          BW::kPatchMutatorHistoryNav, "history next" },
+        { PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
+          BW::kInit, "dco1 init suffix" },
+        { PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
+          BW::kCopy, "dco1 copy suffix" },
+        { PluginIDs::PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
+          BW::kPaste, "dco1 paste suffix" },
+    };
 
     void expectExplicitButtonWidths(juce::UnitTest& test)
     {
-        using namespace PluginIDs;
-
-        expectButtonWidth(test,
-                          PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-                          BW::kPatchManagerUnlockBank,
-                          "unlock bank");
-        expectButtonWidth(test,
-                          PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
-                          BW::kPatchManagerBankSelect,
-                          "select bank");
-
-        expectButtonWidth(test,
-                          PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
-                          BW::kInternalPatchesInit,
-                          "internal init");
-        expectButtonWidth(test,
-                          PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
-                          BW::kInternalPatchesCopy,
-                          "internal copy");
-        expectButtonWidth(test,
-                          PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
-                          BW::kInternalPatchesPaste,
-                          "internal paste");
-        expectButtonWidth(test,
-                          PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
-                          BW::kInternalPatchesStore,
-                          "internal store");
-
-        expectButtonWidth(test,
-                          PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
-                          BW::kComputerPatchesLoad,
-                          "computer load");
-        expectButtonWidth(test,
-                          PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
-                          BW::kComputerPatchesSaveAs,
-                          "computer save as");
-        expectButtonWidth(test,
-                          PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
-                          BW::kComputerPatchesSave,
-                          "computer save");
-
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
-                          BW::kPatchMutatorMutate,
-                          "mutate");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
-                          BW::kPatchMutatorRetry,
-                          "retry");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
-                          BW::kPatchMutatorCompare,
-                          "compare");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
-                          BW::kPatchMutatorDelete,
-                          "delete");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
-                          BW::kPatchMutatorClear,
-                          "clear");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
-                          BW::kPatchMutatorExport,
-                          "export");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
-                          BW::kPatchMutatorHistoryNav,
-                          "history previous");
-        expectButtonWidth(test,
-                          PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
-                          BW::kPatchMutatorHistoryNav,
-                          "history next");
-
-        expectButtonWidth(test,
-                          PatchEditSection::Dco1Module::StandaloneWidgets::kInit,
-                          BW::kInit,
-                          "dco1 init suffix");
-        expectButtonWidth(test,
-                          PatchEditSection::Dco1Module::StandaloneWidgets::kCopy,
-                          BW::kCopy,
-                          "dco1 copy suffix");
-        expectButtonWidth(test,
-                          PatchEditSection::Dco1Module::StandaloneWidgets::kPaste,
-                          BW::kPaste,
-                          "dco1 paste suffix");
+        for (const auto& c : kExplicitButtonWidthCases)
+            expectButtonWidth(test, c.widgetId, c.expectedWidth, c.context);
     }
 }
 
