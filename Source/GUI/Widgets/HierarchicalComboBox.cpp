@@ -104,14 +104,16 @@ namespace TSS
         const auto enabled = isEnabled() && ! inactiveAppearance_;
         ComboBoxControlPainter::paintClosedState(
             g,
-            *this,
-            getLocalBounds().toFloat(),
-            ComboBoxControlStyle::Standard,
-            look_,
-            uiScale_,
-            getDisplayText(),
-            enabled,
-            ComboBoxClosedControlHelper::shouldShowFocusRing(hasFocus_, isPopupOpen_));
+            {
+                .component = *this,
+                .bounds = getLocalBounds().toFloat(),
+                .style = ComboBoxControlStyle::Standard,
+                .look = look_,
+                .uiScale = uiScale_,
+                .text = getDisplayText(),
+                .enabled = enabled,
+                .hasFocus = ComboBoxClosedControlHelper::shouldShowFocusRing(hasFocus_, isPopupOpen_),
+            });
     }
 
     void HierarchicalComboBox::mouseDown(const juce::MouseEvent& e)

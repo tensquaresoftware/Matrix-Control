@@ -68,55 +68,47 @@ namespace TSS
         }
     }
 
-    void ComboBoxControlPainter::paintClosedState(juce::Graphics& g,
-                                                  const juce::Component& component,
-                                                  juce::Rectangle<float> bounds,
-                                                  ComboBoxControlStyle style,
-                                                  const ComboBoxLook& look,
-                                                  float uiScale,
-                                                  const juce::String& text,
-                                                  bool enabled,
-                                                  bool hasFocus)
+    void ComboBoxControlPainter::paintClosedState(juce::Graphics& g, const ClosedStateArgs& args)
     {
-        const auto backgroundBounds = bounds;
-        g.setColour(backgroundColourForStyle(style, look, enabled));
+        const auto backgroundBounds = args.bounds;
+        g.setColour(backgroundColourForStyle(args.style, args.look, args.enabled));
         g.fillRect(backgroundBounds);
 
-        const auto textBounds = calculateTextBounds(bounds, uiScale);
-        g.setColour(textColourForStyle(style, look, enabled));
-        g.setFont(look.font.withHeight(look.font.getHeight() * uiScale));
-        g.drawText(text, textBounds, juce::Justification::centredLeft, false);
+        const auto textBounds = calculateTextBounds(args.bounds, args.uiScale);
+        g.setColour(textColourForStyle(args.style, args.look, args.enabled));
+        g.setFont(args.look.font.withHeight(args.look.font.getHeight() * args.uiScale));
+        g.drawText(args.text, textBounds, juce::Justification::centredLeft, false);
 
-        g.setColour(triangleColourForStyle(style, look, enabled));
-        const float triangleBaseSize = static_cast<float>(ComboBoxControlMetrics::kTriangleBaseSize) * uiScale;
+        g.setColour(triangleColourForStyle(args.style, args.look, args.enabled));
+        const float triangleBaseSize = static_cast<float>(ComboBoxControlMetrics::kTriangleBaseSize) * args.uiScale;
         const float triangleHeight = triangleBaseSize * ComboBoxControlMetrics::kTriangleHeightFactor;
-        const float rightPad = static_cast<float>(ComboBoxControlMetrics::kRightPadding) * uiScale;
-        const float triangleX = bounds.getRight() - triangleBaseSize - rightPad;
-        const float triangleY = bounds.getCentreY() - triangleHeight * 0.5f;
+        const float rightPad = static_cast<float>(ComboBoxControlMetrics::kRightPadding) * args.uiScale;
+        const float triangleX = args.bounds.getRight() - triangleBaseSize - rightPad;
+        const float triangleY = args.bounds.getCentreY() - triangleHeight * 0.5f;
         g.fillPath(createTrianglePath(triangleX, triangleY, triangleBaseSize));
 
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(component);
+        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(args.component);
 
-        if (style == ComboBoxControlStyle::ButtonLike)
+        if (args.style == ComboBoxControlStyle::ButtonLike)
         {
             const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
                 static_cast<float>(ComboBoxControlMetrics::kBorderThicknessButtonLike),
-                uiScale,
+                args.uiScale,
                 systemDisplayScale,
                 ScaledDrawing::StrokeSnapPolicy::kRound);
-            g.setColour(borderColourForStyle(style, look, enabled));
-            g.drawRect(bounds, thickness);
+            g.setColour(borderColourForStyle(args.style, args.look, args.enabled));
+            g.drawRect(args.bounds, thickness);
             return;
         }
 
-        if (hasFocus)
+        if (args.hasFocus)
         {
             const float thickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
                 static_cast<float>(ComboBoxControlMetrics::kBorderThickness),
-                uiScale,
+                args.uiScale,
                 systemDisplayScale,
                 ScaledDrawing::StrokeSnapPolicy::kRound);
-            g.setColour(look.focusBorder);
+            g.setColour(args.look.focusBorder);
             g.drawRect(backgroundBounds, thickness);
         }
     }

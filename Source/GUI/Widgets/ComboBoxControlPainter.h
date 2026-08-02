@@ -27,14 +27,18 @@ namespace TSS
     class ComboBoxControlPainter
     {
     public:
-        static void paintClosedState(juce::Graphics& g,
-                                     const juce::Component& component,
-                                     juce::Rectangle<float> bounds,
-                                     ComboBoxControlStyle style,
-                                     const ComboBoxLook& look,
-                                     float uiScale,
-                                     const juce::String& text,
-                                     bool enabled,
-                                     bool hasFocus);
+        struct ClosedStateArgs
+        {
+            const juce::Component& component;
+            juce::Rectangle<float> bounds;
+            ComboBoxControlStyle style = ComboBoxControlStyle::Standard;
+            const ComboBoxLook& look;
+            float uiScale = 1.0f;
+            juce::String text;
+            bool enabled = true;
+            bool hasFocus = false;
+        };
+
+        static void paintClosedState(juce::Graphics& g, const ClosedStateArgs& args);
     };
 }

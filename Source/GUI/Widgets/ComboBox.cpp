@@ -82,14 +82,16 @@ namespace TSS
 
         ComboBoxControlPainter::paintClosedState(
             g,
-            *this,
-            getLocalBounds().toFloat(),
-            style,
-            look_,
-            uiScale_,
-            getSelectedItemText(),
-            isEnabled(),
-            ComboBoxClosedControlHelper::shouldShowFocusRing(hasFocus_, isPopupOpen_));
+            {
+                .component = *this,
+                .bounds = getLocalBounds().toFloat(),
+                .style = style,
+                .look = look_,
+                .uiScale = uiScale_,
+                .text = getSelectedItemText(),
+                .enabled = isEnabled(),
+                .hasFocus = ComboBoxClosedControlHelper::shouldShowFocusRing(hasFocus_, isPopupOpen_),
+            });
     }
 
     juce::String ComboBox::getSelectedItemText() const
