@@ -44,7 +44,14 @@ PatchEditTopModulesPanel::PatchEditTopModulesPanel(const Config& config)
           .apvts = config.apvts,
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims}))
-    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(RampPortamentoPanel::Config{
+          .skin = config.skin,
+          .width = rowDims_.childModuleWidth,
+          .height = rowDims_.childModuleHeight,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims}))
 {
     setOpaque(false);
     addAndMakeVisible(*dco1Panel_);

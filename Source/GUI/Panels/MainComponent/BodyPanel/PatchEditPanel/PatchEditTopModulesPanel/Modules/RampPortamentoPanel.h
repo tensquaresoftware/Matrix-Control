@@ -18,8 +18,18 @@ class RampPortamentoPanel : public BaseModulePanel,
                             private juce::AudioProcessorValueTreeState::Listener
 {
 public:
-    RampPortamentoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit RampPortamentoPanel(const Config& config);
     ~RampPortamentoPanel() override;
 
     static ModulePanelLayout createLayout();
