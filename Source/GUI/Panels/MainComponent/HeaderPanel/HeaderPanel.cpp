@@ -101,35 +101,35 @@ void HeaderPanel::showLogoPopup()
     if (skin_ == nullptr)
         return;
 
-    TSS::HeaderLogoPopupMenu::show(
-        logo_,
-        *skin_,
-        uiScale_,
-        currentSkinItemId_,
-        currentUiScaleId_,
-        [this](int skinItemId)
-        {
-            currentSkinItemId_ = skinItemId;
-            if (onSkinSelected)
-                onSkinSelected(skinItemId);
-        },
-        [this](int scaleId)
-        {
-            currentUiScaleId_ = scaleId;
-            if (onUiScaleSelected)
-                onUiScaleSelected(scaleId);
-        },
-        isPluginMode_ ? nullptr : onAudioMidiSettingsRequested,
-        [this]
-        {
-            if (onSettingsRequested)
-                onSettingsRequested();
-        },
-        [this]
-        {
-            if (onAboutRequested)
-                onAboutRequested();
-        });
+    TSS::HeaderLogoPopupMenu::Config config;
+    config.uiScale = uiScale_;
+    config.currentSkinItemId = currentSkinItemId_;
+    config.currentUiScaleId = currentUiScaleId_;
+    config.onSkinSelected = [this](int skinItemId)
+    {
+        currentSkinItemId_ = skinItemId;
+        if (onSkinSelected)
+            onSkinSelected(skinItemId);
+    };
+    config.onUiScaleSelected = [this](int scaleId)
+    {
+        currentUiScaleId_ = scaleId;
+        if (onUiScaleSelected)
+            onUiScaleSelected(scaleId);
+    };
+    config.onAudioMidiSettingsRequested = isPluginMode_ ? nullptr : onAudioMidiSettingsRequested;
+    config.onSettingsRequested = [this]
+    {
+        if (onSettingsRequested)
+            onSettingsRequested();
+    };
+    config.onAboutRequested = [this]
+    {
+        if (onAboutRequested)
+            onAboutRequested();
+    };
+
+    TSS::HeaderLogoPopupMenu::show(logo_, *skin_, std::move(config));
 }
 
 void HeaderPanel::setUiScale(float uiScale)

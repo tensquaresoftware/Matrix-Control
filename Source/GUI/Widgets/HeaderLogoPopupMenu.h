@@ -18,15 +18,19 @@ namespace TSS
     class HeaderLogoPopupMenu : public juce::Component
     {
     public:
-        HeaderLogoPopupMenu(ISkin& skin,
-                            float uiScale,
-                            int currentSkinItemId,
-                            int currentUiScaleId,
-                            std::function<void(int skinItemId)> onSkinSelected,
-                            std::function<void(int scaleId)> onUiScaleSelected,
-                            std::function<void()> onAudioMidiSettingsRequested,
-                            std::function<void()> onSettingsRequested,
-                            std::function<void()> onAboutRequested);
+        struct Config
+        {
+            float uiScale = 1.0f;
+            int currentSkinItemId = 0;
+            int currentUiScaleId = 0;
+            std::function<void(int skinItemId)> onSkinSelected;
+            std::function<void(int scaleId)> onUiScaleSelected;
+            std::function<void()> onAudioMidiSettingsRequested;
+            std::function<void()> onSettingsRequested;
+            std::function<void()> onAboutRequested;
+        };
+
+        HeaderLogoPopupMenu(ISkin& skin, Config config);
         ~HeaderLogoPopupMenu() override;
 
         void paint(juce::Graphics& g) override;
@@ -36,16 +40,7 @@ namespace TSS
         bool keyPressed(const juce::KeyPress& key) override;
         void inputAttemptWhenModal() override;
 
-        static void show(Logo& logo,
-                         ISkin& skin,
-                         float uiScale,
-                         int currentSkinItemId,
-                         int currentUiScaleId,
-                         std::function<void(int skinItemId)> onSkinSelected,
-                         std::function<void(int scaleId)> onUiScaleSelected,
-                         std::function<void()> onAudioMidiSettingsRequested,
-                         std::function<void()> onSettingsRequested,
-                         std::function<void()> onAboutRequested);
+        static void show(Logo& logo, ISkin& skin, Config config);
 
     private:
         enum class ItemKind
@@ -96,6 +91,7 @@ namespace TSS
         float getSeparatorWidth() const;
         float getColumnWidth(int column) const;
         juce::Rectangle<float> getItemBounds(int flatIndex) const;
+        juce::Rectangle<int> preferredBoundsOver(Logo& logo) const;
         int getFlatIndexAt(int x, int y) const;
         bool isSelectableItem(int flatIndex) const;
         bool isCurrentSelection(int flatIndex) const;

@@ -14,23 +14,15 @@
 
 namespace TSS
 {
-    HeaderLogoPopupMenu::HeaderLogoPopupMenu(ISkin& skin,
-                                             float uiScale,
-                                             int currentSkinItemId,
-                                             int currentUiScaleId,
-                                             std::function<void(int skinItemId)> onSkinSelected,
-                                             std::function<void(int scaleId)> onUiScaleSelected,
-                                             std::function<void()> onAudioMidiSettingsRequested,
-                                             std::function<void()> onSettingsRequested,
-                                             std::function<void()> onAboutRequested)
-        : uiScale_(uiScale)
-        , currentSkinItemId_(currentSkinItemId)
-        , currentUiScaleId_(currentUiScaleId)
-        , onSkinSelected_(std::move(onSkinSelected))
-        , onUiScaleSelected_(std::move(onUiScaleSelected))
-        , onAudioMidiSettingsRequested_(std::move(onAudioMidiSettingsRequested))
-        , onSettingsRequested_(std::move(onSettingsRequested))
-        , onAboutRequested_(std::move(onAboutRequested))
+    HeaderLogoPopupMenu::HeaderLogoPopupMenu(ISkin& skin, Config config)
+        : uiScale_(config.uiScale)
+        , currentSkinItemId_(config.currentSkinItemId)
+        , currentUiScaleId_(config.currentUiScaleId)
+        , onSkinSelected_(std::move(config.onSkinSelected))
+        , onUiScaleSelected_(std::move(config.onUiScaleSelected))
+        , onAudioMidiSettingsRequested_(std::move(config.onAudioMidiSettingsRequested))
+        , onSettingsRequested_(std::move(config.onSettingsRequested))
+        , onAboutRequested_(std::move(config.onAboutRequested))
         , showAudioMidiDevices_(onAudioMidiSettingsRequested_ != nullptr)
         , look_(popupMenuLookFromSkin(skin))
         , renderer_(std::make_unique<PopupMenuRenderer>(true, uiScale_))
@@ -336,48 +328,22 @@ namespace TSS
         closePopup();
     }
 
-    void HeaderLogoPopupMenu::show(Logo& logo,
-                                  ISkin& skin,
-                                  float uiScale,
-                                  int currentSkinItemId,
-                                  int currentUiScaleId,
-                                  std::function<void(int skinItemId)> onSkinSelected,
-                                  std::function<void(int scaleId)> onUiScaleSelected,
-                                  std::function<void()> onAudioMidiSettingsRequested,
-                                  std::function<void()> onSettingsRequested,
-                                  std::function<void()> onAboutRequested)
+    juce::Rectangle<int> HeaderLogoPopupMenu::preferredBoundsOver(Logo& logo) const
     {
-        auto* topLevelComponent = logo.getTopLevelComponent();
-        if (topLevelComponent == nullptr)
-            return;
-
-        auto popupMenu = std::make_unique<HeaderLogoPopupMenu>(
-            skin,
-            uiScale,
-            currentSkinItemId,
-            currentUiScaleId,
-            std::move(onSkinSelected),
-            std::move(onUiScaleSelected),
-            std::move(onAudioMidiSettingsRequested),
-            std::move(onSettingsRequested),
-            std::move(onAboutRequested));
-        auto* rawPtr = popupMenu.get();
-
         const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(logo);
         const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
             kBorderThicknessDesign_,
-            uiScale,
+            uiScale_,
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const int insetPx = juce::roundToInt(borderThickness);
-        const int itemHeightPx = rawPtr->getItemHeightPx();
-        const int maxRows = onAudioMidiSettingsRequested != nullptr ? 9 : 8;
-        const int separatorPx = juce::roundToInt(rawPtr->getSeparatorWidth());
-        const int popupWidth = juce::roundToInt(rawPtr->getColumnWidth(0))
+        const int maxRows = showAudioMidiDevices_ ? 9 : 8;
+        const int separatorPx = juce::roundToInt(getSeparatorWidth());
+        const int popupWidth = juce::roundToInt(getColumnWidth(0))
             + separatorPx
-            + juce::roundToInt(rawPtr->getColumnWidth(1))
+            + juce::roundToInt(getColumnWidth(1))
             + 2 * insetPx;
-        const int popupHeight = maxRows * itemHeightPx + 2 * insetPx;
+        const int popupHeight = maxRows * getItemHeightPx() + 2 * insetPx;
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             logo,
@@ -385,8 +351,21 @@ namespace TSS
             popupHeight,
             ComboBox::getPopupLayoutDimensions().verticalMargin);
 
+        return { dimensions.x, dimensions.y, dimensions.width, dimensions.height };
+    }
+
+    void HeaderLogoPopupMenu::show(Logo& logo, ISkin& skin, Config config)
+    {
+        auto* topLevelComponent = logo.getTopLevelComponent();
+        if (topLevelComponent == nullptr)
+            return;
+
+        auto popupMenu = std::make_unique<HeaderLogoPopupMenu>(skin, std::move(config));
+        auto* rawPtr = popupMenu.get();
+        const auto bounds = rawPtr->preferredBoundsOver(logo);
+
         topLevelComponent->addAndMakeVisible(popupMenu.release());
-        rawPtr->setBounds(dimensions.x, dimensions.y, dimensions.width, dimensions.height);
+        rawPtr->setBounds(bounds);
         rawPtr->toFront(false);
         rawPtr->grabKeyboardFocus();
         rawPtr->enterModalState(false, nullptr, true);
