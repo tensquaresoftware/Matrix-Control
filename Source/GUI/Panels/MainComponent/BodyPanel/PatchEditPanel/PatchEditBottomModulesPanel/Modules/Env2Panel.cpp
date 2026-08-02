@@ -30,16 +30,15 @@ ModulePanelLayout Env2Panel::createLayout()
         });
 }
 
-Env2Panel::Env2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-                         const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
+Env2Panel::Env2Panel(const Config& config)
     : BaseModulePanel(BaseModulePanel::Config{
-          .skin = skin,
-          .widgetFactory = widgetFactory,
-          .apvts = apvts,
+          .skin = config.skin,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
           .layout = createLayout(),
-          .width = width,
-          .height = height,
-          .moduleHeaderDims = moduleHeaderDims,
-          .parameterCellDims = parameterCellDims})
+          .width = config.width,
+          .height = config.height,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims})
 {
 }
