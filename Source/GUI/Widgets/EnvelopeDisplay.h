@@ -83,6 +83,7 @@ namespace TSS
         void drawBorder(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         void drawTriangle(juce::Graphics& g, const juce::Rectangle<float>& bounds);
         
+        juce::Rectangle<float> getContentBounds() const;
         juce::Rectangle<float> getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const;
         void drawEnvelope(juce::Graphics& g, const juce::Rectangle<float>& innerBounds);
         
@@ -95,6 +96,10 @@ namespace TSS
         EnvelopePoints calculateEnvelopePoints(const juce::Rectangle<float>& centerBounds) const;
         int findPointAtPosition(const juce::Point<float>& position, const juce::Rectangle<float>& innerBounds) const;
         bool findSustainSegmentAtPosition(const juce::Point<float>& position, const juce::Rectangle<float>& innerBounds) const;
+
+        void applyParameterValue(int& storedValue, int paramIndex, int newValue);
+        void dragSustainSegment(const juce::Rectangle<float>& centerBounds, juce::Point<float> position);
+        void dragEditablePoint(const juce::Rectangle<float>& centerBounds, juce::Point<float> position);
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnvelopeDisplay)
     };

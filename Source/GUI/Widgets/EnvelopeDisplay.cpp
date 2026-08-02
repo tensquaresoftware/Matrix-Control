@@ -31,9 +31,7 @@ namespace TSS
 
     void EnvelopeDisplay::paint(juce::Graphics& g)
     {
-        const auto bounds = getLocalBounds().toFloat();
-        const auto contentBounds = bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
-            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
+        const auto contentBounds = getContentBounds();
 
         drawBackground(g, contentBounds);
         drawBorder(g, contentBounds);
@@ -188,6 +186,13 @@ namespace TSS
     }
     
     
+    juce::Rectangle<float> EnvelopeDisplay::getContentBounds() const
+    {
+        const auto bounds = getLocalBounds().toFloat();
+        return bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
+            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
+    }
+
     juce::Rectangle<float> EnvelopeDisplay::getCurveCenterBounds(const juce::Rectangle<float>& innerBounds) const
     {
         const float totalPadding = (static_cast<float>(dimensions_.curvePadding) + static_cast<float>(dimensions_.borderThickness)) * uiScale_;
@@ -323,12 +328,72 @@ namespace TSS
         return false;
     }
     
+    void EnvelopeDisplay::applyParameterValue(int& storedValue, int paramIndex, int newValue)
+    {
+        if (storedValue == newValue)
+            return;
+
+        storedValue = newValue;
+        repaint();
+
+        if (onValueChanged_)
+            onValueChanged_(paramIndex, newValue);
+    }
+
+    void EnvelopeDisplay::dragSustainSegment(const juce::Rectangle<float>& centerBounds, juce::Point<float> position)
+    {
+        const float relativeY = position.y - centerBounds.getY();
+        const float normalizedValue = 1.0f - (relativeY / centerBounds.getHeight());
+        const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
+                                         static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
+        applyParameterValue(sustain_, 3, newValue);
+    }
+
+    void EnvelopeDisplay::dragEditablePoint(const juce::Rectangle<float>& centerBounds, juce::Point<float> position)
+    {
+        const auto envelopePoints = calculateEnvelopePoints(centerBounds);
+
+        float originX = 0.0f;
+        int* storedValue = nullptr;
+        int paramIndex = -1;
+
+        switch (draggedPointIndex_)
+        {
+            case 1:
+                originX = centerBounds.getX();
+                storedValue = &delay_;
+                paramIndex = 0;
+                break;
+            case 2:
+                originX = envelopePoints.points[1].x;
+                storedValue = &attack_;
+                paramIndex = 1;
+                break;
+            case 3:
+                originX = envelopePoints.points[2].x;
+                storedValue = &decay_;
+                paramIndex = 2;
+                break;
+            case 5:
+                originX = envelopePoints.points[4].x;
+                storedValue = &release_;
+                paramIndex = 4;
+                break;
+            default:
+                return;
+        }
+
+        const float relativeX = position.x - originX;
+        const float normalizedValue = relativeX / envelopePoints.segmentMaxWidth;
+        const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
+                                         static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
+        applyParameterValue(*storedValue, paramIndex, newValue);
+    }
+
     void EnvelopeDisplay::mouseDown(const juce::MouseEvent& e)
     {
-        const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
-            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
-        
+        const auto innerBounds = getContentBounds();
+
         draggedPointIndex_ = findPointAtPosition(e.position, innerBounds);
         draggingSustainSegment_ = false;
 
@@ -357,103 +422,21 @@ namespace TSS
             editGestureActive_ = true;
         }
     }
-    
+
     void EnvelopeDisplay::mouseDrag(const juce::MouseEvent& e)
     {
-        const auto bounds = getLocalBounds().toFloat();
-        const auto innerBounds = bounds.withTrimmedTop(static_cast<float>(dimensions_.paddingTop) * uiScale_)
-            .withTrimmedBottom(static_cast<float>(dimensions_.paddingBottom) * uiScale_);
-        const auto centerBounds = getCurveCenterBounds(innerBounds);
-        
+        const auto centerBounds = getCurveCenterBounds(getContentBounds());
+
         if (draggingSustainSegment_)
         {
-            const float relativeY = e.position.y - centerBounds.getY();
-            const float normalizedValue = 1.0f - (relativeY / centerBounds.getHeight());
-            
-            const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
-                                             static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
-            
-            if (sustain_ != newValue)
-            {
-                sustain_ = newValue;
-                repaint();
-                
-                if (onValueChanged_)
-                    onValueChanged_(3, newValue);
-            }
+            dragSustainSegment(centerBounds, e.position);
             return;
         }
-        
+
         if (draggedPointIndex_ < 0)
             return;
-        
-        const auto envelopePoints = calculateEnvelopePoints(centerBounds);
-        const float segmentMaxWidth = envelopePoints.segmentMaxWidth;
-        
-        if (draggedPointIndex_ == 1)
-        {
-            const float relativeX = e.position.x - centerBounds.getX();
-            const float normalizedValue = relativeX / segmentMaxWidth;
-            const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
-                                             static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
-            
-            if (delay_ != newValue)
-            {
-                delay_ = newValue;
-                repaint();
-                
-                if (onValueChanged_)
-                    onValueChanged_(0, newValue);
-            }
-        }
-        else if (draggedPointIndex_ == 2)
-        {
-            const float relativeX = e.position.x - envelopePoints.points[1].x;
-            const float normalizedValue = relativeX / segmentMaxWidth;
-            const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
-                                             static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
-            
-            if (attack_ != newValue)
-            {
-                attack_ = newValue;
-                repaint();
-                
-                if (onValueChanged_)
-                    onValueChanged_(1, newValue);
-            }
-        }
-        else if (draggedPointIndex_ == 3)
-        {
-            const float relativeX = e.position.x - envelopePoints.points[2].x;
-            const float normalizedValue = relativeX / segmentMaxWidth;
-            const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
-                                             static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
-            
-            if (decay_ != newValue)
-            {
-                decay_ = newValue;
-                repaint();
-                
-                if (onValueChanged_)
-                    onValueChanged_(2, newValue);
-            }
-        }
-        else if (draggedPointIndex_ == 5)
-        {
-            const float relativeX = e.position.x - envelopePoints.points[4].x;
-            const float normalizedValue = relativeX / segmentMaxWidth;
-            const int newValue = juce::jlimit(kPointMinValue_, kPointMaxValue_,
-                                             static_cast<int>(normalizedValue * kPointMaxValue_ + 0.5f));
-            
-            if (release_ != newValue)
-            {
-                release_ = newValue;
-                repaint();
-                
-                if (onValueChanged_)
-                    onValueChanged_(4, newValue);
-            }
-        }
+
+        dragEditablePoint(centerBounds, e.position);
     }
     
     void EnvelopeDisplay::mouseUp(const juce::MouseEvent&)
