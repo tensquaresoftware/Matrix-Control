@@ -60,14 +60,14 @@ BaseModulePanel::BaseModulePanel(TSS::ISkin& skin,
             ? ParameterCell::ModuleType::PatchEdit
             : ParameterCell::ModuleType::MasterEdit;
 
-        parameterCells_.push_back(std::make_unique<ParameterCell>(
-            skin,
-            widgetFactory,
-            paramConfig.parameterId,
-            paramType,
-            modType,
-            apvts_,
-            parameterCellDims));
+        parameterCells_.push_back(std::make_unique<ParameterCell>(ParameterCell::Config{
+            .skin = skin,
+            .factory = widgetFactory,
+            .parameterId = paramConfig.parameterId,
+            .type = paramType,
+            .moduleType = modType,
+            .apvts = apvts_,
+            .dimensions = parameterCellDims}));
         addAndMakeVisible(*parameterCells_.back());
     }
 

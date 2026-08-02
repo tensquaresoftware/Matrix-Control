@@ -23,13 +23,18 @@ public:
     enum class ParameterType { Slider, ComboBox, None };
     enum class ModuleType { PatchEdit, MasterEdit };
 
-    ParameterCell(TSS::ISkin& skin,
-                  WidgetFactory& factory,
-                  const juce::String& parameterId,
-                  ParameterType type,
-                  ModuleType moduleType,
-                  juce::AudioProcessorValueTreeState& apvts,
-                  const ParameterCellDimensions& dimensions);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        WidgetFactory& factory;
+        juce::String parameterId;
+        ParameterType type = ParameterType::None;
+        ModuleType moduleType = ModuleType::PatchEdit;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ParameterCellDimensions& dimensions;
+    };
+
+    explicit ParameterCell(const Config& config);
     ~ParameterCell() override;
 
     void resized() override;

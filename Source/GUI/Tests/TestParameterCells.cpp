@@ -28,25 +28,25 @@ public:
             scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
-        sliderCell_ = std::make_unique<ParameterCell>(
-            skin,
-            widgetFactory,
-            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
-            ParameterCell::ParameterType::Slider,
-            ParameterCell::ModuleType::PatchEdit,
-            apvts,
-            dimensions_);
+        sliderCell_ = std::make_unique<ParameterCell>(ParameterCell::Config{
+            .skin = skin,
+            .factory = widgetFactory,
+            .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kFrequency,
+            .type = ParameterCell::ParameterType::Slider,
+            .moduleType = ParameterCell::ModuleType::PatchEdit,
+            .apvts = apvts,
+            .dimensions = dimensions_});
         sliderCell_->setUiScale(scale_);
         addAndMakeVisible(*sliderCell_);
 
-        comboCell_ = std::make_unique<ParameterCell>(
-            skin,
-            widgetFactory,
-            PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect,
-            ParameterCell::ParameterType::ComboBox,
-            ParameterCell::ModuleType::PatchEdit,
-            apvts,
-            dimensions_);
+        comboCell_ = std::make_unique<ParameterCell>(ParameterCell::Config{
+            .skin = skin,
+            .factory = widgetFactory,
+            .parameterId = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets::kWaveSelect,
+            .type = ParameterCell::ParameterType::ComboBox,
+            .moduleType = ParameterCell::ModuleType::PatchEdit,
+            .apvts = apvts,
+            .dimensions = dimensions_});
         comboCell_->setUiScale(scale_);
         addAndMakeVisible(*comboCell_);
     }

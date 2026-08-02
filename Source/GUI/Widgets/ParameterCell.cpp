@@ -13,28 +13,22 @@
 
 ParameterCell::~ParameterCell() = default;
 
-ParameterCell::ParameterCell(TSS::ISkin& skin,
-                             WidgetFactory& factory,
-                             const juce::String& parameterId,
-                             ParameterType type,
-                             ModuleType moduleType,
-                             juce::AudioProcessorValueTreeState& apvts,
-                             const ParameterCellDimensions& dimensions)
-    : skin_(&skin)
-    , parameterType_(type)
-    , moduleType_(moduleType)
-    , dimensions_(dimensions)
+ParameterCell::ParameterCell(const Config& config)
+    : skin_(&config.skin)
+    , parameterType_(config.type)
+    , moduleType_(config.moduleType)
+    , dimensions_(config.dimensions)
 {
     setOpaque(false);
-    if (type == ParameterType::None)
+    if (config.type == ParameterType::None)
     {
-        createSeparator(skin);
+        createSeparator(config.skin);
     }
     else
     {
-        createParameterLabel(skin, factory, parameterId);
-        createParameterWidget(skin, factory, parameterId, apvts);
-        createSeparator(skin);
+        createParameterLabel(config.skin, config.factory, config.parameterId);
+        createParameterWidget(config.skin, config.factory, config.parameterId, config.apvts);
+        createSeparator(config.skin);
     }
 }
 
