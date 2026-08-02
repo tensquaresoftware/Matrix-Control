@@ -32,17 +32,39 @@ def test_build_and_test_workflow_structure():
     jobs = workflow["jobs"]
     assert set(jobs) >= {
         "release-script-tests",
+        "quality-gate",
         "resolve-ci-tier",
         "build-and-test",
         "ci-success",
     }
 
-    assert jobs["resolve-ci-tier"]["needs"] == "release-script-tests"
+    assert jobs["resolve-ci-tier"]["needs"] == [
+        "release-script-tests",
+        "quality-gate",
+    ]
     assert "matrix" in jobs["resolve-ci-tier"]["outputs"]
     assert "tier" in jobs["resolve-ci-tier"]["outputs"]
 
+    assert (PROJECT_ROOT / "Scripts" / "quality" / "requirements.txt").is_file()
+    assert (PROJECT_ROOT / "Scripts" / "quality" / "lint_touched.py").is_file()
+
+    quality_gate = jobs["quality-gate"]
+    quality_runs = [
+        step.get("run", "")
+        for step in quality_gate["steps"]
+        if isinstance(step, dict) and "run" in step
+    ]
+    assert any(
+        "pip install -r Scripts/quality/requirements.txt" in run for run in quality_runs
+    )
+    assert any("Scripts/quality/lint_touched.py" in run for run in quality_runs)
+
     build_job = jobs["build-and-test"]
-    assert build_job["needs"] == ["release-script-tests", "resolve-ci-tier"]
+    assert build_job["needs"] == [
+        "release-script-tests",
+        "quality-gate",
+        "resolve-ci-tier",
+    ]
     assert "fromJSON(needs.resolve-ci-tier.outputs.matrix)" in str(
         build_job["strategy"]["matrix"]
     )
@@ -52,9 +74,11 @@ def test_build_and_test_workflow_structure():
     assert ci_success["name"] == "ci-success"
     assert ci_success["needs"] == [
         "release-script-tests",
+        "quality-gate",
         "resolve-ci-tier",
         "build-and-test",
     ]
+    assert "needs.quality-gate.result == 'success'" in ci_success["if"]
     assert "needs.build-and-test.result == 'success'" in ci_success["if"]
 
     assert "macos-debug-arm64" in workflow_text

@@ -79,9 +79,9 @@ _bmad-ui/.env.*.local
 /src/
 /docs/
 
-# Legacy folders — ignore if recreated
-Quality/
-Workbench/
+# Legacy folders at repo root — ignore if recreated (anchor so Scripts/quality/ stays tracked)
+/Quality/
+/Workbench/
 
 # Temporary files
 *.log

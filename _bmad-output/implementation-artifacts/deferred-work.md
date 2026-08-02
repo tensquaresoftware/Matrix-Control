@@ -1048,3 +1048,29 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-midi-synth-detection-retry.md`
   summary: Legacy blocking waitForSysExResponse paths are outside asyncSysExCaptureActive_ and could still race a presence tick.
   evidence: Edge Case Hunter; async Device Inquiry / patch paths are gated; remaining sync wait usage is pre-existing and rare on the message thread.
+
+## Deferred from: quick-dev spec-fix-github-actions-quality-gate (2026-08-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
+  summary: No regression test that Scripts/quality/ stays un-ignored (e.g. git check-ignore).
+  evidence: Blind Hunter; future unanchored Quality/ rule could silently re-break tracking on ignorecase=true.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
+  summary: requirements.txt uses a floating lizard pin (>=1.17.10,<2) that can drift CI metrics across minor releases.
+  evidence: Blind Hunter; pin policy is product/ops preference outside this green-CI fix.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
+  summary: Nesting scan strips only // comments, not block comments or brace literals — possible false positives.
+  evidence: Blind Hunter; pre-existing lint_touched.py behavior, not introduced by tracking/CI wiring.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
+  summary: Path gating uses startswith Source/Tests without normalizing backslashes for unusual Windows git output.
+  evidence: Blind Hunter; pre-existing; CI runners currently use forward-slash paths.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
+  summary: Exact needs list order equality is brittle to harmless YAML reorders; no assert quality-gate stays parallel to release-script-tests.
+  evidence: Blind Hunter; acceptable contract strictness for now.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-fix-github-actions-quality-gate.md`
+  summary: Tests do not lock fetch-depth:0 on quality-gate checkout; shallow history can still starve three-dot diffs.
+  evidence: Blind Hunter; workflow already sets fetch-depth:0; hardening the test lock is optional.
