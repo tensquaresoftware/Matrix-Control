@@ -39,6 +39,7 @@ namespace TSS
 
     ButtonLook buttonAlertLookFromSkin(const ISkin& skin)
     {
+        // Keep base border colours; only fill/text switch to alert.
         ButtonLook look = buttonLookFromSkin(skin);
         const auto red = juce::Colour(ColourChart::kRed);
         const auto black = juce::Colour(ColourChart::kBlack);
@@ -48,12 +49,11 @@ namespace TSS
         look.backgroundOn = red;
         look.backgroundHover = red;
         look.backgroundClicked = red;
-        look.borderOff = red;
-        look.borderOn = red;
         look.textOff = black;
         look.textOn = black;
         look.textHover = white;
         look.textClicked = white;
+        look.font = skin.getBaseFontBold().withHeight(look.font.getHeight());
         return look;
     }
 
