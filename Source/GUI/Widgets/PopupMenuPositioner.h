@@ -25,6 +25,14 @@ namespace TSS
     class PopupMenuPositioner
     {
     public:
+        struct DimensionsArgs
+        {
+            int popupWidth = 0;
+            int popupHeight = 0;
+            int verticalMargin = 0;
+            PopupVerticalPlacement placement = PopupVerticalPlacement::Auto;
+        };
+
         static PopupMenuDimensions calculateDimensions(
             const ComboBox& comboBox,
             int popupWidth,
@@ -33,12 +41,18 @@ namespace TSS
 
         static PopupMenuDimensions calculateDimensions(
             const juce::Component& anchor,
-            int popupWidth,
-            int popupHeight,
-            int verticalMargin,
-            PopupVerticalPlacement placement = PopupVerticalPlacement::Auto);
+            const DimensionsArgs& args);
 
     private:
+        struct ResolveYArgs
+        {
+            int desiredYBelow = 0;
+            int popupHeight = 0;
+            juce::Rectangle<int> screenBounds;
+            int verticalMargin = 0;
+            PopupVerticalPlacement placement = PopupVerticalPlacement::Auto;
+        };
+
         static juce::Point<int> positionBelow(
             const juce::Component& anchor,
             int verticalMargin);
@@ -56,11 +70,7 @@ namespace TSS
 
         static int resolveYPosition(
             const juce::Component& anchor,
-            int desiredYBelow,
-            int popupHeight,
-            const juce::Rectangle<int>& screenBounds,
-            int verticalMargin,
-            PopupVerticalPlacement placement,
+            const ResolveYArgs& args,
             bool& opensAbove);
     };
 }

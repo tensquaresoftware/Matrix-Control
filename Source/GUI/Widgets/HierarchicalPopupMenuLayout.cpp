@@ -396,10 +396,11 @@ namespace TSS
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             owner_,
-            juce::roundToInt(width),
-            juce::roundToInt(height),
-            getScaledVerticalMargin(),
-            owner_.getPopupVerticalPlacement());
+            PopupMenuPositioner::DimensionsArgs{
+                .popupWidth = juce::roundToInt(width),
+                .popupHeight = juce::roundToInt(height),
+                .verticalMargin = getScaledVerticalMargin(),
+                .placement = owner_.getPopupVerticalPlacement()});
 
         opensAbove_ = dimensions.opensAbove;
         getPreferredContentSize(width, height);

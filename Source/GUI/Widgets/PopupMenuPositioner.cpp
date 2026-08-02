@@ -10,41 +10,40 @@ namespace TSS
         int /* borderThickness */)
     {
         return calculateDimensions(static_cast<const juce::Component&>(comboBox),
-                                   popupWidth,
-                                   popupHeight,
-                                   comboBox.getScaledVerticalMargin(),
-                                   comboBox.getPopupVerticalPlacement());
+                                   DimensionsArgs{
+                                       .popupWidth = popupWidth,
+                                       .popupHeight = popupHeight,
+                                       .verticalMargin = comboBox.getScaledVerticalMargin(),
+                                       .placement = comboBox.getPopupVerticalPlacement()});
     }
 
     PopupMenuDimensions PopupMenuPositioner::calculateDimensions(
         const juce::Component& anchor,
-        int popupWidth,
-        int popupHeight,
-        int verticalMargin,
-        PopupVerticalPlacement placement)
+        const DimensionsArgs& args)
     {
         auto* topLevelComponent = anchor.getTopLevelComponent();
         if (topLevelComponent == nullptr)
-            return { popupWidth, popupHeight, 0, 0, false };
+            return { args.popupWidth, args.popupHeight, 0, 0, false };
 
         const auto topLevelScreenBounds = topLevelComponent->getScreenBounds();
-        const auto belowPosition = positionBelow(anchor, verticalMargin);
+        const auto belowPosition = positionBelow(anchor, args.verticalMargin);
         bool opensAbove = false;
         const int resolvedY = resolveYPosition(anchor,
-                                               belowPosition.getY(),
-                                               popupHeight,
-                                               topLevelScreenBounds,
-                                               verticalMargin,
-                                               placement,
+                                               ResolveYArgs{
+                                                   .desiredYBelow = belowPosition.getY(),
+                                                   .popupHeight = args.popupHeight,
+                                                   .screenBounds = topLevelScreenBounds,
+                                                   .verticalMargin = args.verticalMargin,
+                                                   .placement = args.placement},
                                                opensAbove);
         const int resolvedX = adjustXPosition(anchor,
                                               belowPosition.getX(),
-                                              popupWidth,
+                                              args.popupWidth,
                                               topLevelScreenBounds);
         const juce::Point<int> adjustedPosition { resolvedX, resolvedY };
         const auto relativePosition = adjustedPosition - topLevelScreenBounds.getPosition();
 
-        return { popupWidth, popupHeight, relativePosition.getX(), relativePosition.getY(), opensAbove };
+        return { args.popupWidth, args.popupHeight, relativePosition.getX(), relativePosition.getY(), opensAbove };
     }
 
     juce::Point<int> PopupMenuPositioner::positionBelow(
@@ -79,33 +78,29 @@ namespace TSS
 
     int PopupMenuPositioner::resolveYPosition(
         const juce::Component& anchor,
-        int desiredYBelow,
-        int popupHeight,
-        const juce::Rectangle<int>& screenBounds,
-        int verticalMargin,
-        PopupVerticalPlacement placement,
+        const ResolveYArgs& args,
         bool& opensAbove)
     {
-        switch (placement)
+        switch (args.placement)
         {
             case PopupVerticalPlacement::Above:
                 opensAbove = true;
-                return positionAbove(anchor, popupHeight, verticalMargin).getY();
+                return positionAbove(anchor, args.popupHeight, args.verticalMargin).getY();
 
             case PopupVerticalPlacement::Below:
                 opensAbove = false;
-                return desiredYBelow;
+                return args.desiredYBelow;
 
             case PopupVerticalPlacement::Auto:
             default:
-                if (desiredYBelow + popupHeight > screenBounds.getBottom())
+                if (args.desiredYBelow + args.popupHeight > args.screenBounds.getBottom())
                 {
                     opensAbove = true;
-                    return positionAbove(anchor, popupHeight, verticalMargin).getY();
+                    return positionAbove(anchor, args.popupHeight, args.verticalMargin).getY();
                 }
 
                 opensAbove = false;
-                return desiredYBelow;
+                return args.desiredYBelow;
         }
     }
 }

@@ -347,9 +347,10 @@ namespace TSS
 
         const auto dimensions = PopupMenuPositioner::calculateDimensions(
             logo,
-            popupWidth,
-            popupHeight,
-            ComboBox::getPopupLayoutDimensions().verticalMargin);
+            PopupMenuPositioner::DimensionsArgs{
+                .popupWidth = popupWidth,
+                .popupHeight = popupHeight,
+                .verticalMargin = ComboBox::getPopupLayoutDimensions().verticalMargin});
 
         return { dimensions.x, dimensions.y, dimensions.width, dimensions.height };
     }
