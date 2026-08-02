@@ -316,12 +316,14 @@ void ModulationBusCell::layoutWidgetRow()
     // Fixed scaled widths (no remainder absorption) so Init stays on design X 248 @ 100 %.
     const auto cols = TSS::computeModulationBusColumnStrip(
         sf,
-        dimensions_.busNumberLabelWidth,
-        dimensions_.sourceComboBoxWidth,
-        dimensions_.amountSliderWidth,
-        dimensions_.destinationComboBoxWidth,
-        dimensions_.initButtonWidth,
-        dimensions_.interControlGap);
+        {
+            dimensions_.busNumberLabelWidth,
+            dimensions_.sourceComboBoxWidth,
+            dimensions_.amountSliderWidth,
+            dimensions_.destinationComboBoxWidth,
+            dimensions_.initButtonWidth,
+            dimensions_.interControlGap,
+        });
 
     if (auto* label = busNumberLabel_.get())
         label->setBounds(cols.busNumberX, y, cols.busNumberW, labelH);

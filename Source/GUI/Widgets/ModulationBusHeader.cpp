@@ -54,12 +54,14 @@ namespace TSS
         // Destination label width stays 68 (not cell combo 104); X origins match cell columns.
         const auto cols = computeModulationBusColumnStrip(
             uiScale_,
-            dimensions_.busNumberTextWidth,
-            dimensions_.busSourceTextWidth,
-            dimensions_.busAmountTextWidth,
-            dimensions_.busDestinationTextWidth,
-            0,
-            dimensions_.interControlGap);
+            {
+                dimensions_.busNumberTextWidth,
+                dimensions_.busSourceTextWidth,
+                dimensions_.busAmountTextWidth,
+                dimensions_.busDestinationTextWidth,
+                0,
+                dimensions_.interControlGap,
+            });
 
         const float textAreaHeight = static_cast<float>(
             ScaledLayout::scaledInt(static_cast<float>(kTextAreaHeight), uiScale_));

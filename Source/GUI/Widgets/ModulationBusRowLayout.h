@@ -23,22 +23,28 @@ struct ModulationBusColumnStrip
     int initW = 0;
 };
 
-inline ModulationBusColumnStrip computeModulationBusColumnStrip(float uiScale,
-                                                                int designBusNumberW,
-                                                                int designSourceW,
-                                                                int designAmountW,
-                                                                int designDestinationW,
-                                                                int designInitW,
-                                                                int designGap)
+struct ModulationBusColumnDesignWidths
+{
+    int busNumberW = 0;
+    int sourceW = 0;
+    int amountW = 0;
+    int destinationW = 0;
+    int initW = 0;
+    int gap = 0;
+};
+
+inline ModulationBusColumnStrip computeModulationBusColumnStrip(
+    float uiScale,
+    const ModulationBusColumnDesignWidths& design)
 {
     ModulationBusColumnStrip strip;
-    const int gap = ScaledLayout::scaledInt(static_cast<float>(designGap), uiScale);
+    const int gap = ScaledLayout::scaledInt(static_cast<float>(design.gap), uiScale);
 
-    strip.busNumberW = ScaledLayout::scaledInt(static_cast<float>(designBusNumberW), uiScale);
-    strip.sourceW = ScaledLayout::scaledInt(static_cast<float>(designSourceW), uiScale);
-    strip.amountW = ScaledLayout::scaledInt(static_cast<float>(designAmountW), uiScale);
-    strip.destinationW = ScaledLayout::scaledInt(static_cast<float>(designDestinationW), uiScale);
-    strip.initW = ScaledLayout::scaledInt(static_cast<float>(designInitW), uiScale);
+    strip.busNumberW = ScaledLayout::scaledInt(static_cast<float>(design.busNumberW), uiScale);
+    strip.sourceW = ScaledLayout::scaledInt(static_cast<float>(design.sourceW), uiScale);
+    strip.amountW = ScaledLayout::scaledInt(static_cast<float>(design.amountW), uiScale);
+    strip.destinationW = ScaledLayout::scaledInt(static_cast<float>(design.destinationW), uiScale);
+    strip.initW = ScaledLayout::scaledInt(static_cast<float>(design.initW), uiScale);
 
     int x = 0;
     strip.busNumberX = x;
