@@ -9,6 +9,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
+#include <juce_events/juce_events.h>
 
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
@@ -121,6 +122,22 @@ private:
         int outboundIdleTimeoutMs = 0;
     };
 
+    struct DevicePresenceTimer final : juce::Timer
+    {
+        explicit DevicePresenceTimer(MidiManager& ownerIn) noexcept
+            : weakOwner(&ownerIn)
+        {
+        }
+
+        void timerCallback() override
+        {
+            if (auto* self = weakOwner.get())
+                self->onDevicePresenceTimer();
+        }
+
+        juce::WeakReference<MidiManager> weakOwner;
+    };
+
     juce::AudioProcessorValueTreeState& apvts;
 
     std::unique_ptr<MidiInputPort> inputMidiPort;
@@ -164,9 +181,11 @@ private:
     std::optional<Core::MidiOutboundQueue::Message> pendingSysEx_;
     std::atomic<bool> hasPendingSysEx_{ false };
     std::atomic<std::uint64_t> asyncRequestToken_{ 0 };
+    std::atomic<bool> asyncSysExCaptureActive_{ false };
     PackedPatchCallback pendingAsyncCallback_;
     juce::String lastInquiryInputId_;
     juce::String lastInquiryOutputId_;
+    std::unique_ptr<DevicePresenceTimer> devicePresenceTimer_;
 
     std::vector<juce::uint8> requestSysExData(juce::uint8 requestType,
                                               size_t expectedPackedSize,
@@ -190,6 +209,8 @@ private:
 
     void clearDeviceDetectionAfterPortLoss();
     void clearLastInquiryPortPair() noexcept;
+    void updateDevicePresenceMonitoring();
+    void onDevicePresenceTimer();
     bool armAsyncDeviceInquiryCapture(std::uint64_t token);
     void handleAsyncDeviceInquiryResponse(std::uint64_t token, const juce::MemoryBlock& response);
     void sendArmedDeviceInquiry(std::uint64_t token);

@@ -22,4 +22,13 @@ namespace Core
 
         return openInputId != lastInquiryInputId || openOutputId != lastInquiryOutputId;
     }
+
+    /** Presence retry / heartbeat: same open-port gate as sync inquiry, but ignores the
+        last-pair debounce so an already-inquired From/To pair can be re-checked. */
+    inline bool shouldForceDeviceInquiryForPresence(bool bothPortsAvailable,
+                                                    const juce::String& openInputId,
+                                                    const juce::String& openOutputId) noexcept
+    {
+        return bothPortsAvailable && openInputId.isNotEmpty() && openOutputId.isNotEmpty();
+    }
 }

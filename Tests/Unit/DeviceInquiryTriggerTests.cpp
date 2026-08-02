@@ -14,6 +14,8 @@ public:
         testStartsOnNewOpenPair();
         testDebouncesSameOpenPair();
         testRestartsWhenEitherPortChanges();
+        testForcePresenceRequiresOpenPorts();
+        testForcePresenceIgnoresLastPairDebounce();
     }
 
 private:
@@ -56,6 +58,25 @@ private:
         expect(Core::shouldStartDeviceInquiry(true, "in-b", "out-a", "in-a", "out-a"));
         expect(Core::shouldStartDeviceInquiry(true, "in-a", "out-b", "in-a", "out-a"));
         expect(Core::shouldStartDeviceInquiry(true, "in-b", "out-b", "in-a", "out-a"));
+    }
+
+    void testForcePresenceRequiresOpenPorts()
+    {
+        beginTest("shouldForceDeviceInquiryForPresence — false when ports incomplete");
+
+        expect(! Core::shouldForceDeviceInquiryForPresence(false, "in-a", "out-a"));
+        expect(! Core::shouldForceDeviceInquiryForPresence(true, {}, "out-a"));
+        expect(! Core::shouldForceDeviceInquiryForPresence(true, "in-a", {}));
+    }
+
+    void testForcePresenceIgnoresLastPairDebounce()
+    {
+        beginTest("shouldForceDeviceInquiryForPresence — true for same already-inquired pair");
+
+        expect(Core::shouldForceDeviceInquiryForPresence(true, "in-a", "out-a"));
+        // Debounce would reject this pair; force must still allow presence retry/heartbeat.
+        expect(! Core::shouldStartDeviceInquiry(true, "in-a", "out-a", "in-a", "out-a"));
+        expect(Core::shouldForceDeviceInquiryForPresence(true, "in-a", "out-a"));
     }
 };
 

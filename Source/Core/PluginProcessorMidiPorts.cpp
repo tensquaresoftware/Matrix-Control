@@ -6,6 +6,7 @@
 
 #include "Core/MIDI/KeyboardFromMidiInput.h"
 #include "Core/MIDI/MidiPortStateCoherence.h"
+#include "GUI/PluginEditor.h"
 #include "MIDI/MidiManager.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -274,6 +275,39 @@ void PluginProcessor::scheduleDeferredMidiPortSyncForPluginHost()
         if (deferredMidiPortSyncTimer_ != nullptr)
             deferredMidiPortSyncTimer_->startRetrySeries();
     });
+}
+
+void PluginProcessor::installMidiDeviceListConnection()
+{
+    juce::WeakReference<PluginProcessor> weakThis(this);
+    midiDeviceListConnection_ = juce::MidiDeviceListConnection::make(
+        [weakThis]
+        {
+            juce::MessageManager::callAsync(
+                [weakThis]
+                {
+                    if (auto* self = weakThis.get())
+                        self->handleMidiDeviceListChanged();
+                });
+        });
+}
+
+void PluginProcessor::handleMidiDeviceListChanged()
+{
+    // Soft open reporting: avoid permanently clearing persisted From/To on transient hot-plug
+    // open failures (same rationale as deferred host MIDI reopen retries).
+    syncMidiPortsFromState(false);
+
+    if (isStandaloneWrapper())
+    {
+        const auto keyboardFromId =
+            apvts.state.getProperty("keyboardFromPortId", juce::String()).toString();
+        if (keyboardFromId.isNotEmpty() && ! setKeyboardFromPort(keyboardFromId))
+            setKeyboardFromPort({});
+    }
+
+    if (auto* editor = dynamic_cast<PluginEditor*>(getActiveEditor()))
+        editor->refreshMidiPortListsFromOsChange();
 }
 
 void PluginProcessor::initializeMidiPortProperties()

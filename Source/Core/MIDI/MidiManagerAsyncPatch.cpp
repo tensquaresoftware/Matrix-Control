@@ -14,6 +14,7 @@ void MidiManager::cancelPendingSysExRequest() noexcept
         midiReceiver->cancelOneShotSysExCapture();
 
     pendingAsyncCallback_ = nullptr;
+    asyncSysExCaptureActive_.store(false, std::memory_order_release);
 }
 
 void MidiManager::finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::uint8> packed)
@@ -28,6 +29,7 @@ void MidiManager::finishAsyncPackedPatch(std::uint64_t token, std::vector<juce::
 
     auto callback = std::move(pendingAsyncCallback_);
     pendingAsyncCallback_ = nullptr;
+    asyncSysExCaptureActive_.store(false, std::memory_order_release);
 
     if (callback)
         callback(std::move(packed));
@@ -177,6 +179,7 @@ void MidiManager::requestSinglePatchAsync(juce::uint8 patchNumber,
 
     const auto token = asyncRequestToken_.load(std::memory_order_acquire);
     pendingAsyncCallback_ = std::move(callback);
+    asyncSysExCaptureActive_.store(true, std::memory_order_release);
 
     wakeConsumer();
     pollOutboundIdleThenRequest(patchNumber,

@@ -1030,3 +1030,21 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-header-port-names-uppercase.md`
   summary: Fixed-width header port comboboxes (and popups sized from that width) can clip long device/channel names harder once labels are uppercase.
   evidence: Blind Hunter; pre-existing 112px port combo + no ellipsis; uppercase may widen glyphs slightly — layout/tooltip work is out of scope for this display-only change.
+
+## Deferred from: quick-dev spec-midi-synth-detection-retry (2026-08-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-synth-detection-retry.md`
+  summary: Failed presence retries rewrite lastError / warning logs on every Device Inquiry timeout while the synth stays absent.
+  evidence: Blind Hunter; finishAsyncDeviceInquiryFailure path pre-existed; presence timer makes the write cadence more frequent.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-synth-detection-retry.md`
+  summary: USB/interface reappear under a new OS device identifier leaves persisted From/To ids stale until the user reselects ports.
+  evidence: Blind Hunter; port-id persistence mismatch is pre-existing host/driver behavior, not introduced by presence retry.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-synth-detection-retry.md`
+  summary: No automated coverage for presence timer interval switching, busy-skip, or OS list-change sync path.
+  evidence: Blind Hunter; only DeviceInquiryTrigger force-predicate unit tests were in scope.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-midi-synth-detection-retry.md`
+  summary: Legacy blocking waitForSysExResponse paths are outside asyncSysExCaptureActive_ and could still race a presence tick.
+  evidence: Edge Case Hunter; async Device Inquiry / patch paths are gated; remaining sync wait usage is pre-existing and rare on the message thread.

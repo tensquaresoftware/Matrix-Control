@@ -17,7 +17,10 @@ void MidiManager::clearDeviceDetectionAfterPortLoss()
     clearLastInquiryPortPair();
 
     if (! wasDetected && ! hadInquiryPair)
+    {
+        updateDevicePresenceMonitoring();
         return;
+    }
 
     sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
     updateDeviceStatus(false);
@@ -27,6 +30,51 @@ void MidiManager::clearLastInquiryPortPair() noexcept
 {
     lastInquiryInputId_.clear();
     lastInquiryOutputId_.clear();
+}
+
+void MidiManager::updateDevicePresenceMonitoring()
+{
+    if (devicePresenceTimer_ == nullptr)
+        return;
+
+    const auto inputId = inputMidiPort != nullptr ? inputMidiPort->getOpenDeviceId() : juce::String();
+    const auto outputId = outputMidiPort != nullptr ? outputMidiPort->getOpenDeviceId() : juce::String();
+
+    if (! Core::shouldForceDeviceInquiryForPresence(isDeviceDumpAvailable(), inputId, outputId))
+    {
+        devicePresenceTimer_->stopTimer();
+        return;
+    }
+
+    const bool detected = static_cast<bool>(apvts.state.getProperty("deviceDetected", false));
+    const int intervalMs = detected ? Core::MidiRequestTiming::kDevicePresenceHeartbeatDetectedMs
+                                    : Core::MidiRequestTiming::kDevicePresenceRetryUndetectedMs;
+
+    if (! devicePresenceTimer_->isTimerRunning()
+        || devicePresenceTimer_->getTimerInterval() != intervalMs)
+    {
+        devicePresenceTimer_->startTimer(intervalMs);
+    }
+}
+
+void MidiManager::onDevicePresenceTimer()
+{
+    const auto inputId = inputMidiPort != nullptr ? inputMidiPort->getOpenDeviceId() : juce::String();
+    const auto outputId = outputMidiPort != nullptr ? outputMidiPort->getOpenDeviceId() : juce::String();
+
+    if (! Core::shouldForceDeviceInquiryForPresence(isDeviceDumpAvailable(), inputId, outputId))
+    {
+        updateDevicePresenceMonitoring();
+        return;
+    }
+
+    // Skip while any shared async SysEx capture is active — performDeviceInquiry cancels it.
+    if (asyncSysExCaptureActive_.load(std::memory_order_acquire) || pendingAsyncCallback_ != nullptr)
+        return;
+
+    lastInquiryInputId_ = inputId;
+    lastInquiryOutputId_ = outputId;
+    performDeviceInquiry();
 }
 
 void MidiManager::refreshDeviceInquiryAfterPortSync()
@@ -46,16 +94,18 @@ void MidiManager::refreshDeviceInquiryAfterPortSync()
         return;
     }
 
-    if (! Core::shouldStartDeviceInquiry(true,
-                                         inputId,
-                                         outputId,
-                                         lastInquiryInputId_,
-                                         lastInquiryOutputId_))
-        return;
+    if (Core::shouldStartDeviceInquiry(true,
+                                       inputId,
+                                       outputId,
+                                       lastInquiryInputId_,
+                                       lastInquiryOutputId_))
+    {
+        lastInquiryInputId_ = inputId;
+        lastInquiryOutputId_ = outputId;
+        performDeviceInquiry();
+    }
 
-    lastInquiryInputId_ = inputId;
-    lastInquiryOutputId_ = outputId;
-    performDeviceInquiry();
+    updateDevicePresenceMonitoring();
 }
 
 void MidiManager::handleAsyncDeviceInquiryResponse(std::uint64_t token,
@@ -135,6 +185,7 @@ void MidiManager::finishAsyncDeviceInquirySuccess(std::uint64_t token,
     if (midiReceiver != nullptr)
         midiReceiver->cancelOneShotSysExCapture();
 
+    asyncSysExCaptureActive_.store(false, std::memory_order_release);
     sysExDelay_.setProfile(Core::SysExDelayProfile::fromDeviceInquiry(info));
     updateDeviceStatus(true, info.version, deviceType);
 }
@@ -150,6 +201,7 @@ void MidiManager::finishAsyncDeviceInquiryFailure(std::uint64_t token,
     if (midiReceiver != nullptr)
         midiReceiver->cancelOneShotSysExCapture();
 
+    asyncSysExCaptureActive_.store(false, std::memory_order_release);
     clearLastInquiryPortPair();
     sysExDelay_.setProfile(Core::SysExDelayProfile::stockDefault());
     updateDeviceStatus(false);
@@ -267,6 +319,8 @@ void MidiManager::performDeviceInquiry()
         updateErrorState("MIDI ports not available for Device Inquiry", "Connection");
         return;
     }
+
+    asyncSysExCaptureActive_.store(true, std::memory_order_release);
 
     const auto token = asyncRequestToken_.load(std::memory_order_acquire);
     const int profileDelayMs = sysExDelay_.getRequiredDelayMs();

@@ -13,6 +13,11 @@ namespace Core::MidiRequestTiming
     constexpr int kSettleProfileMultiplier = 5;
     constexpr int kIdleTimeoutProfileMultiplier = 50;
 
+    // Device presence monitoring on already-open MIDI From/To (UAT-tunable).
+    // Undetected: retry Device Inquiry; detected: heartbeat to notice drop without port retouch.
+    constexpr int kDevicePresenceRetryUndetectedMs = 1000;
+    constexpr int kDevicePresenceHeartbeatDetectedMs = 5000;
+
     inline int deviceSettleMs(int profileDelayMs) noexcept
     {
         return juce::jmax(kMinDeviceSettleMs, profileDelayMs * kSettleProfileMultiplier);

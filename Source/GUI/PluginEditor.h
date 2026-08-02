@@ -37,6 +37,9 @@ public:
     void mouseDown(const juce::MouseEvent& e) override;
     bool keyPressed(const juce::KeyPress& key) override;
 
+    /** Refresh header MIDI port combos after an OS MIDI device-list change. */
+    void refreshMidiPortListsFromOsChange();
+
 private:
     // Nested runtime timers; bodies live in PluginEditorTimers.cpp.
     class HeaderRefreshTimer : private juce::Timer

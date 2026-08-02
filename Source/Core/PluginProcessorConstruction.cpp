@@ -287,6 +287,7 @@ void PluginProcessor::finishConstructionSetup()
     initializeMutatorActionEnabledMirrorsForEmptyHistory();
     apvts.state.addListener(this);
     deferredMidiPortSyncTimer_ = std::make_unique<DeferredMidiPortSyncTimer>(*this);
+    installMidiDeviceListConnection();
     startMidiThread();
     refreshClipboardPasteEnabledProperties();
     refreshClipboardFeedbackProperties();

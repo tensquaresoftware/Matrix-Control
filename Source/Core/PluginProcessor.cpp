@@ -83,6 +83,7 @@ PluginProcessor::PluginProcessor()
 
 PluginProcessor::~PluginProcessor()
 {
+    midiDeviceListConnection_.reset();
     deferredMidiPortSyncTimer_.reset();
     apvts.state.removeListener(this);
 }

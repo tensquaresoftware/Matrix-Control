@@ -67,3 +67,22 @@ void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)
     headerPanel.setCurrentUiScaleId(pluginProcessor.getGuiScaleId());
     headerPanel.setCurrentSkinItemId(pluginProcessor.getSkinVariantId());
 }
+
+void PluginEditor::refreshMidiPortListsFromOsChange()
+{
+    if (mainComponent_ == nullptr)
+        return;
+
+    auto& headerPanel = mainComponent_->getHeaderPanel();
+    headerPanel.refreshPortLists();
+    headerPanel.selectMidiFromPort(
+        pluginProcessor.getApvts().state.getProperty("midiInputPortId", juce::String()).toString());
+    headerPanel.selectMidiToPort(
+        pluginProcessor.getApvts().state.getProperty("midiOutputPortId", juce::String()).toString());
+
+    if (pluginProcessor.isStandalone())
+    {
+        headerPanel.selectKeyboardFromPort(
+            pluginProcessor.getApvts().state.getProperty("keyboardFromPortId", juce::String()).toString());
+    }
+}

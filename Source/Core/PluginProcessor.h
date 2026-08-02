@@ -9,6 +9,7 @@
 #include <unordered_set>
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_audio_devices/juce_audio_devices.h>
 
 #include "Core/Actions/BankTransferProgressPresenter.h"
 #include "Core/Services/DeviceMemoryLimits.h"
@@ -317,6 +318,8 @@ private:
     void scheduleDeferredMidiPortSyncForPluginHost();
     void syncMidiPortsFromStateImpl(bool reportOpenFailures);
     void syncMidiInputPortFromState(bool reportOpenFailures);
+    void handleMidiDeviceListChanged();
+    void installMidiDeviceListConnection();
     void syncMidiOutputPortFromState(bool reportOpenFailures);
     bool arePersistedMidiPortsOpen() const;
     void initializePatchNameProperty();
@@ -448,8 +451,10 @@ private:
     bool suppressMutatorHistorySelectionDebounce_ { false };
     bool developmentLoggingStarted_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
+    juce::MidiDeviceListConnection midiDeviceListConnection_;
     
     static constexpr int kThreadStopTimeoutMs_ {5000};
 
+    JUCE_DECLARE_WEAK_REFERENCEABLE(PluginProcessor)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };
