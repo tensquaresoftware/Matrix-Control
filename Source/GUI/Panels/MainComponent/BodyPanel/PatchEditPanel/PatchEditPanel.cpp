@@ -32,7 +32,15 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::PatchEditSection::kGroupId)))
     , patchEditTopModulesPanel_(std::make_unique<PatchEditTopModulesPanel>(
-        skin, dims_.topModules, dims_.sectionHeaderWidth, dims_.topHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
+        PatchEditTopModulesPanel::Config{
+            .skin = skin,
+            .rowDims = dims_.topModules,
+            .width = dims_.sectionHeaderWidth,
+            .height = dims_.topHeight,
+            .parameterCellDims = parameterCellDims,
+            .moduleHeaderDims = moduleHeaderDims,
+            .widgetFactory = widgetFactory,
+            .apvts = apvts}))
     , patchEditDisplaysPanel_(std::make_unique<PatchEditDisplaysPanel>(skin, dims_.displays, apvts))
     , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(
         skin, dims_.bottomModules, dims_.sectionHeaderWidth, dims_.bottomHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))

@@ -14,23 +14,16 @@
 
 PatchEditTopModulesPanel::~PatchEditTopModulesPanel() = default;
 
-PatchEditTopModulesPanel::PatchEditTopModulesPanel(TSS::ISkin& skin,
-                                                   const PatchEditModulesRowDimensions& rowDims,
-                                                   int width,
-                                                   int height,
-                                                   const ParameterCellDimensions& parameterCellDims,
-                                                   const ModuleHeaderDimensions& moduleHeaderDims,
-                                                   WidgetFactory& widgetFactory,
-                                                   juce::AudioProcessorValueTreeState& apvts)
-    : rowDims_(rowDims)
-    , width_(width)
-    , height_(height)
-    , skin_(&skin)
-    , dco1Panel_(std::make_unique<Dco1Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , dco2Panel_(std::make_unique<Dco2Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , fmTrackPanel_(std::make_unique<FmTrackPanel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
+PatchEditTopModulesPanel::PatchEditTopModulesPanel(const Config& config)
+    : rowDims_(config.rowDims)
+    , width_(config.width)
+    , height_(config.height)
+    , skin_(&config.skin)
+    , dco1Panel_(std::make_unique<Dco1Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , dco2Panel_(std::make_unique<Dco2Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , fmTrackPanel_(std::make_unique<FmTrackPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
 {
     setOpaque(false);
     addAndMakeVisible(*dco1Panel_);

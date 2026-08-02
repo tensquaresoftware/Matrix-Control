@@ -23,14 +23,19 @@ class RampPortamentoPanel;
 class PatchEditTopModulesPanel : public juce::Component
 {
 public:
-    PatchEditTopModulesPanel(TSS::ISkin& skin,
-                             const PatchEditModulesRowDimensions& rowDims,
-                             int width,
-                             int height,
-                             const ParameterCellDimensions& parameterCellDims,
-                             const ModuleHeaderDimensions& moduleHeaderDims,
-                             WidgetFactory& widgetFactory,
-                             juce::AudioProcessorValueTreeState& apvts);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        const PatchEditModulesRowDimensions& rowDims;
+        int width = 0;
+        int height = 0;
+        const ParameterCellDimensions& parameterCellDims;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+    };
+
+    explicit PatchEditTopModulesPanel(const Config& config);
     ~PatchEditTopModulesPanel() override;
 
     void resized() override;
