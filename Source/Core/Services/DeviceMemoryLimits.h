@@ -32,13 +32,18 @@ namespace Core
         int wrapPatchWithinDevice(PatchCoordinates current, int direction) const noexcept;
 
     private:
-        DeviceMemoryLimits(bool hasBankConcept,
-                           int minBank,
-                           int maxBank,
-                           int minPatch,
-                           int maxPatch,
-                           bool hasRomBanks,
-                           int internalPatchSlotCount) noexcept;
+        struct InitArgs
+        {
+            bool hasBankConcept = true;
+            int minBankNumber = 0;
+            int maxBankNumber = 0;
+            int minPatchNumber = 0;
+            int maxPatchNumber = 0;
+            bool hasRomBanks = false;
+            int internalPatchSlotCount = 0;
+        };
+
+        explicit DeviceMemoryLimits(const InitArgs& args) noexcept;
 
         bool hasBankConcept_ = true;
         int minBankNumber_ = 0;

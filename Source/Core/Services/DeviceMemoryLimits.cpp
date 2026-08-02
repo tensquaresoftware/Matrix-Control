@@ -5,20 +5,14 @@
 
 namespace Core
 {
-    DeviceMemoryLimits::DeviceMemoryLimits(bool hasBankConcept,
-                                           int minBank,
-                                           int maxBank,
-                                           int minPatch,
-                                           int maxPatch,
-                                           bool hasRomBanks,
-                                           int internalPatchSlotCount) noexcept
-        : hasBankConcept_(hasBankConcept)
-        , minBankNumber_(minBank)
-        , maxBankNumber_(maxBank)
-        , minPatchNumber_(minPatch)
-        , maxPatchNumber_(maxPatch)
-        , hasRomBanks_(hasRomBanks)
-        , internalPatchSlotCount_(internalPatchSlotCount)
+    DeviceMemoryLimits::DeviceMemoryLimits(const InitArgs& args) noexcept
+        : hasBankConcept_(args.hasBankConcept)
+        , minBankNumber_(args.minBankNumber)
+        , maxBankNumber_(args.maxBankNumber)
+        , minPatchNumber_(args.minPatchNumber)
+        , maxPatchNumber_(args.maxPatchNumber)
+        , hasRomBanks_(args.hasRomBanks)
+        , internalPatchSlotCount_(args.internalPatchSlotCount)
     {
     }
 
@@ -28,25 +22,28 @@ namespace Core
         {
             case MatrixDeviceTypes::Type::kMatrix6:
             case MatrixDeviceTypes::Type::kMatrix6R:
-                return DeviceMemoryLimits(
-                    false,
-                    0,
-                    0,
-                    Matrix6Or6RLimits::kMinPatchNumber,
-                    Matrix6Or6RLimits::kMaxPatchNumber,
-                    false,
-                    Matrix6Or6RLimits::kInternalPatchSlotCount);
+                return DeviceMemoryLimits(InitArgs{
+                    .hasBankConcept = false,
+                    .minBankNumber = 0,
+                    .maxBankNumber = 0,
+                    .minPatchNumber = Matrix6Or6RLimits::kMinPatchNumber,
+                    .maxPatchNumber = Matrix6Or6RLimits::kMaxPatchNumber,
+                    .hasRomBanks = false,
+                    .internalPatchSlotCount = Matrix6Or6RLimits::kInternalPatchSlotCount,
+                });
 
             case MatrixDeviceTypes::Type::kMatrix1000:
-                return DeviceMemoryLimits(
-                    true,
-                    Matrix1000Limits::kMinBankNumber,
-                    Matrix1000Limits::kMaxBankNumber,
-                    Matrix1000Limits::kMinPatchNumber,
-                    Matrix1000Limits::kMaxPatchNumber,
-                    true,
-                    (Matrix1000Limits::kMaxBankNumber - Matrix1000Limits::kMinBankNumber + 1)
-                        * (Matrix1000Limits::kMaxPatchNumber - Matrix1000Limits::kMinPatchNumber + 1));
+                return DeviceMemoryLimits(InitArgs{
+                    .hasBankConcept = true,
+                    .minBankNumber = Matrix1000Limits::kMinBankNumber,
+                    .maxBankNumber = Matrix1000Limits::kMaxBankNumber,
+                    .minPatchNumber = Matrix1000Limits::kMinPatchNumber,
+                    .maxPatchNumber = Matrix1000Limits::kMaxPatchNumber,
+                    .hasRomBanks = true,
+                    .internalPatchSlotCount =
+                        (Matrix1000Limits::kMaxBankNumber - Matrix1000Limits::kMinBankNumber + 1)
+                        * (Matrix1000Limits::kMaxPatchNumber - Matrix1000Limits::kMinPatchNumber + 1),
+                });
 
             case MatrixDeviceTypes::Type::kUnknown:
             default:
