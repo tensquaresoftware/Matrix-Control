@@ -208,6 +208,23 @@ void MidiManager::finishAsyncDeviceInquiryFailure(std::uint64_t token,
     updateErrorState(errorMessage, errorType);
 }
 
+void MidiManager::softAbortDeviceInquiryOutboundBusy(std::uint64_t token)
+{
+    auto expected = token;
+    if (! asyncRequestToken_.compare_exchange_strong(expected, token + 1, std::memory_order_acq_rel))
+        return;
+
+    if (midiReceiver != nullptr)
+        midiReceiver->cancelOneShotSysExCapture();
+
+    asyncSysExCaptureActive_.store(false, std::memory_order_release);
+
+    // Keep deviceDetected / lastInquiry pair / delay profile — a busy wire is not a missing synth.
+    // Presence timer will retry on the next cadence tick.
+    MidiLogger::getInstance().logInfo(
+        "Device Inquiry deferred: outbound MIDI queue still busy (presence will retry)");
+}
+
 void MidiManager::scheduleDeviceInquiryTimeout(std::uint64_t token)
 {
     juce::WeakReference<MidiManager> weakThis(this);
@@ -290,10 +307,7 @@ void MidiManager::pollOutboundIdleThenDeviceInquiry(OutboundIdlePollArgs args)
 
     if (hasOutboundIdleTimedOut(args))
     {
-        MidiLogger::getInstance().logWarning("Timeout waiting for outbound MIDI queue to go idle");
-        finishAsyncDeviceInquiryFailure(args.token,
-                                        "Timeout waiting for outbound MIDI queue to go idle",
-                                        "Timeout");
+        softAbortDeviceInquiryOutboundBusy(args.token);
         return;
     }
 

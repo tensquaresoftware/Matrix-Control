@@ -83,6 +83,7 @@ context:
 
 ## Spec Change Log
 
+- 2026-08-02 (post-UAT harden): Outbound-idle timeout during Device Inquiry start soft-aborts without clearing detection (`softAbortDeviceInquiryOutboundBusy`). Avoids UI re-lock under dense realtime/SysEx traffic; KEEP presence timer + force inquiry + 1s/5s constants + OS list-change soft sync.
 ## Design Notes
 
 Port-sync debounce (`shouldStartDeviceInquiry`) must stay for repeated `syncMidiPortsFromState` without spam. Presence retry needs a separate force path so success does not permanently block re-inquiry on the same pair.
@@ -90,6 +91,8 @@ Port-sync debounce (`shouldStartDeviceInquiry`) must stay for repeated `syncMidi
 Prefer one `juce::Timer` on `MidiManager` (message thread) that picks the next interval from current `deviceDetected` after each completed inquiry attempt, rather than two overlapping timers.
 
 Heartbeat shares `asyncRequestToken_` with async dumps — skipping ticks while busy avoids cancelling bank/patch loads for presence checks.
+
+Outbound-idle timeout while starting Device Inquiry (queue never quiet enough under dense play/edit) uses `softAbortDeviceInquiryOutboundBusy`: release the capture token without clearing `deviceDetected` / footer lock. Real Device ID timeout or unsupported reply still clears detection as before.
 
 ## Verification
 
