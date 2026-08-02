@@ -1092,3 +1092,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-device-unresponsive-presence-sysex-brake.md`
   summary: Unsupported-but-detected + timeout prefers unresponsive overload footer over unsupported copy.
   evidence: Edge Case Hunter; rare Unknown Matrix-family path.
+
+## Deferred from: quick-dev spec-user-message-ascii-encoding (2026-08-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-user-message-ascii-encoding.md`
+  summary: Stale Compare footer wording with em dash remains in mutator export/compare implementation artifact.
+  evidence: Blind Hunter; documentation drift, not runtime; outside this bugfix code path.

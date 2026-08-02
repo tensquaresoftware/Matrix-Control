@@ -1118,7 +1118,7 @@ namespace PluginDisplayNames
             namespace Messages
             {
                 constexpr const char* kCompareLockedFooter =
-                    "Compare mode \xe2\x80\x94 editing and patch/bank changes are locked. "
+                    "Compare mode - editing and patch/bank changes are locked. "
                     "Click COMPARE again to exit.";
 
                 constexpr const char* kHistoryGateTitle = "Unsaved mutations";
