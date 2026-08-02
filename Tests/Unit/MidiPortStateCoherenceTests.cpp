@@ -13,6 +13,17 @@ public:
 
     void runTest() override
     {
+        testCoherentPortIdAfterOpenAttempt();
+        testIsMidiFromKeyboardFromConflict();
+        testFooterConstants();
+        testClearMidiFromKeyboardFromConflictFooterIfPresent();
+        testMaybeAlignApvtsPortIdAfterOpenAttempt();
+        testConflictRejectLeavesPeerRoleUnchanged();
+    }
+
+private:
+    void testCoherentPortIdAfterOpenAttempt()
+    {
         beginTest("coherentPortIdAfterOpenAttempt — success keeps requested id");
         expectEquals(Core::coherentPortIdAfterOpenAttempt(true, "port-a", "port-b"),
                      juce::String("port-a"));
@@ -22,39 +33,50 @@ public:
                      juce::String());
         expectEquals(Core::coherentPortIdAfterOpenAttempt(false, "port-a", "port-open"),
                      juce::String("port-open"));
+    }
 
+    void testIsMidiFromKeyboardFromConflict()
+    {
         beginTest("isMidiFromKeyboardFromConflict — same non-empty ids conflict");
         expect(Core::isMidiFromKeyboardFromConflict("dev-1", "dev-1"));
         expect(! Core::isMidiFromKeyboardFromConflict("dev-1", "dev-2"));
         expect(! Core::isMidiFromKeyboardFromConflict({}, "dev-1"));
         expect(! Core::isMidiFromKeyboardFromConflict("dev-1", {}));
         expect(! Core::isMidiFromKeyboardFromConflict({}, {}));
+    }
 
+    void testFooterConstants()
+    {
         beginTest("footer constants — Unknown and conflict copy are distinct");
         expect(juce::String(PluginDisplayNames::FooterPanel::kUnsupportedMatrixDeviceFooter)
                != juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));
         expect(PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter != nullptr);
+    }
 
+    void testClearMidiFromKeyboardFromConflictFooterIfPresent()
+    {
         beginTest("clearMidiFromKeyboardFromConflictFooterIfPresent — exact-string clear only");
-        {
-            juce::ValueTree state("P");
-            state.setProperty("uiMessageText",
-                              PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter,
-                              nullptr);
-            state.setProperty("uiMessageSeverity", "warning", nullptr);
-            Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
-            expect(state.getProperty("uiMessageText").toString().isEmpty());
-            expect(state.getProperty("uiMessageSeverity").toString().isEmpty());
 
-            state.setProperty("uiMessageText",
-                              PluginDisplayNames::FooterPanel::kDeviceLockGuidance,
-                              nullptr);
-            state.setProperty("uiMessageSeverity", "error", nullptr);
-            Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
-            expectEquals(state.getProperty("uiMessageText").toString(),
-                         juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));
-        }
+        juce::ValueTree state("P");
+        state.setProperty("uiMessageText",
+                          PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter,
+                          nullptr);
+        state.setProperty("uiMessageSeverity", "warning", nullptr);
+        Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
+        expect(state.getProperty("uiMessageText").toString().isEmpty());
+        expect(state.getProperty("uiMessageSeverity").toString().isEmpty());
 
+        state.setProperty("uiMessageText",
+                          PluginDisplayNames::FooterPanel::kDeviceLockGuidance,
+                          nullptr);
+        state.setProperty("uiMessageSeverity", "error", nullptr);
+        Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
+        expectEquals(state.getProperty("uiMessageText").toString(),
+                     juce::String(PluginDisplayNames::FooterPanel::kDeviceLockGuidance));
+    }
+
+    void testMaybeAlignApvtsPortIdAfterOpenAttempt()
+    {
         beginTest("maybeAlignApvtsPortIdAfterOpenAttempt — option 2 soft keeps desired id");
         {
             juce::ValueTree state("P");
@@ -72,33 +94,35 @@ public:
                 state, "midiInputPortId", true, false, "desired-dead", {});
             expect(state.getProperty("midiInputPortId").toString().isEmpty());
         }
+    }
 
+    void testConflictRejectLeavesPeerRoleUnchanged()
+    {
         beginTest("conflict reject leaves peer role unchanged — setter contract");
-        {
-            // Mirrors PluginProcessor::setMidiInputPort / setKeyboardFromPort: on conflict return
-            // false without writing the rejected role's port id.
-            juce::ValueTree state("P");
-            state.setProperty("midiInputPortId", "dev-a", nullptr);
-            state.setProperty("keyboardFromPortId", "dev-b", nullptr);
 
-            const juce::String attemptedKeyboard = "dev-a";
-            expect(Core::isMidiFromKeyboardFromConflict(
-                state.getProperty("midiInputPortId").toString(), attemptedKeyboard));
+        // Mirrors PluginProcessor::setMidiInputPort / setKeyboardFromPort: on conflict return
+        // false without writing the rejected role's port id.
+        juce::ValueTree state("P");
+        state.setProperty("midiInputPortId", "dev-a", nullptr);
+        state.setProperty("keyboardFromPortId", "dev-b", nullptr);
 
-            // Rejected role unchanged:
-            expectEquals(state.getProperty("keyboardFromPortId").toString(), juce::String("dev-b"));
-            expectEquals(state.getProperty("midiInputPortId").toString(), juce::String("dev-a"));
+        const juce::String attemptedKeyboard = "dev-a";
+        expect(Core::isMidiFromKeyboardFromConflict(
+            state.getProperty("midiInputPortId").toString(), attemptedKeyboard));
 
-            state.setProperty("uiMessageText",
-                              PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter,
-                              nullptr);
-            state.setProperty("uiMessageSeverity", "warning", nullptr);
+        // Rejected role unchanged:
+        expectEquals(state.getProperty("keyboardFromPortId").toString(), juce::String("dev-b"));
+        expectEquals(state.getProperty("midiInputPortId").toString(), juce::String("dev-a"));
 
-            // Successful later selection clears conflict footer:
-            state.setProperty("keyboardFromPortId", "dev-c", nullptr);
-            Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
-            expect(state.getProperty("uiMessageText").toString().isEmpty());
-        }
+        state.setProperty("uiMessageText",
+                          PluginDisplayNames::FooterPanel::kMidiFromKeyboardFromConflictFooter,
+                          nullptr);
+        state.setProperty("uiMessageSeverity", "warning", nullptr);
+
+        // Successful later selection clears conflict footer:
+        state.setProperty("keyboardFromPortId", "dev-c", nullptr);
+        Core::clearMidiFromKeyboardFromConflictFooterIfPresent(state);
+        expect(state.getProperty("uiMessageText").toString().isEmpty());
     }
 };
 
