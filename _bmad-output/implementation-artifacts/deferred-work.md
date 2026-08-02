@@ -1018,3 +1018,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-bug-midi-01-residual-panic-alert.md`
   summary: Outbound consumer can busy-spin while pending SysEx remains and more SysEx are queued (didWork true without sleeping the gate)
   evidence: Blind Hunter; pre-existing processOutboundQueue/run pattern, not introduced by residual drain patch
+
+## Deferred from: quick-dev spec-footer-synth-version-dot-format (2026-08-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-footer-synth-version-dot-format.md`
+  summary: No unit tests for footer device-version display formatting (1234→12.34, 116→1.16, dotted passthrough).
+  evidence: Blind Hunter; display formatter needs dedicated coverage so CI locks the Vxx.yy contract.

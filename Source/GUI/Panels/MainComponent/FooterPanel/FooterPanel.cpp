@@ -1,5 +1,6 @@
 #include "FooterPanel.h"
 
+#include "GUI/Helpers/DeviceVersionDisplayFormat.h"
 #include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ColourChart.h"
@@ -285,8 +286,9 @@ juce::String FooterPanel::buildDeviceDetailText() const
         return PluginDisplayNames::FooterPanel::kDeviceUnknownDetail;
 
     juce::String detail = MatrixDeviceTypes::toDisplayString(type).toUpperCase();
-    if (deviceVersion_.isNotEmpty())
-        detail += " (V" + deviceVersion_.toUpperCase() + ")";
+    const auto versionDisplay = TSS::formatDeviceVersionForDisplay(deviceVersion_);
+    if (versionDisplay.isNotEmpty())
+        detail += " (V" + versionDisplay + ")";
 
     return detail;
 }
