@@ -69,6 +69,15 @@ namespace Core
         bool apply(PatchModel& inOut, const MutationRecipe& recipe, IRandomSource& rng) const;
 
     private:
+        struct MutationPass
+        {
+            const MutationRecipe& recipe;
+            IRandomSource& rng;
+            double amount = 0.0;
+            double random = 0.0;
+            bool matrixModScopeActive = false;
+        };
+
         static int clampPercent(int value) noexcept;
         static int roundHalfUp(double value) noexcept;
         static int uniformRandomInt(IRandomSource& rng, int lo, int hi);
@@ -80,6 +89,9 @@ namespace Core
         static bool isChoiceDescriptorEligible(const PluginDescriptors::ChoiceParameterDescriptor& descriptor,
                                                const MutationRecipe& recipe,
                                                bool matrixModScopeActive);
+        static void mutateIntDescriptors(PatchModel& inOut, const MutationPass& pass);
+        static void mutateChoiceDescriptors(PatchModel& inOut, const MutationPass& pass);
+        static void restoreProtectedNameBytes(const PatchModel& before, PatchModel& inOut);
         static bool anyByteChangedInRange(const PatchModel& before,
                                           const PatchModel& after,
                                           size_t startIndex,
