@@ -46,7 +46,14 @@ MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensio
         TSS::sectionHeaderLookFromSkin(skin),
         PluginHelpers::getSectionDisplayName(PluginIDs::MasterEditSection::kGroupId),
         TSS::SectionHeader::ColourVariant::Orange))
-    , midiPanel_(std::make_unique<MidiPanel>(skin, dims_.childModuleWidth, dims_.midiPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
+    , midiPanel_(std::make_unique<MidiPanel>(MidiPanel::Config{
+          .skin = skin,
+          .width = dims_.childModuleWidth,
+          .height = dims_.midiPanelHeight,
+          .widgetFactory = widgetFactory,
+          .apvts = apvts,
+          .moduleHeaderDims = dims_.moduleHeader,
+          .parameterCellDims = dims_.parameterCell}))
     , vibratoPanel_(std::make_unique<VibratoPanel>(skin, dims_.childModuleWidth, dims_.vibratoPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
     , miscPanel_(std::make_unique<MiscPanel>(skin, dims_.childModuleWidth, dims_.miscPanelHeight, widgetFactory, apvts, dims_.moduleHeader, dims_.parameterCell))
 {

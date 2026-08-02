@@ -17,8 +17,18 @@ class WidgetFactory;
 class MidiPanel : public BaseModulePanel
 {
 public:
-    MidiPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit MidiPanel(const Config& config);
     ~MidiPanel() override = default;
 
     static ModulePanelLayout createLayout();

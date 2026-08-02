@@ -23,16 +23,15 @@ ModulePanelLayout MidiPanel::createLayout()
         });
 }
 
-MidiPanel::MidiPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-                         const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
+MidiPanel::MidiPanel(const Config& config)
     : BaseModulePanel(BaseModulePanel::Config{
-          .skin = skin,
-          .widgetFactory = widgetFactory,
-          .apvts = apvts,
+          .skin = config.skin,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
           .layout = createLayout(),
-          .width = width,
-          .height = height,
-          .moduleHeaderDims = moduleHeaderDims,
-          .parameterCellDims = parameterCellDims})
+          .width = config.width,
+          .height = config.height,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims})
 {
 }
