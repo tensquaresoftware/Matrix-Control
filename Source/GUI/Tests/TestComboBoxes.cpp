@@ -9,24 +9,29 @@
 class TestComboBoxes::ComboBoxScalePanel : public juce::Component
 {
 public:
-    ComboBoxScalePanel(float scale,
-                       const juce::String& scaleLabelText,
-                       const TSS::ComboBoxLook& comboLook,
-                       const TSS::PopupMenuLook& popupLook,
-                       const TSS::LabelLook& labelLook,
-                       int comboWidth,
-                       int comboHeight)
-        : scale_(scale)
-        , comboWidth_(comboWidth)
-        , comboHeight_(comboHeight)
-        , comboLook_(comboLook)
-        , popupLook_(popupLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::ComboBoxLook& comboLook;
+        const TSS::PopupMenuLook& popupLook;
+        const TSS::LabelLook& labelLook;
+        int comboWidth = 0;
+        int comboHeight = 0;
+    };
+
+    explicit ComboBoxScalePanel(const Config& config)
+        : scale_(config.scale)
+        , comboWidth_(config.comboWidth)
+        , comboHeight_(config.comboHeight)
+        , comboLook_(config.comboLook)
+        , popupLook_(config.popupLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            config.scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
         standardCombo_ = createComboBox(TSS::ComboBox::Style::Standard);
@@ -139,14 +144,14 @@ void TestComboBoxes::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ComboBoxScalePanel>(
-            spec.scale,
-            spec.label,
-            comboLook,
-            popupLook,
-            labelLook,
-            comboWidth,
-            comboHeight);
+        auto panel = std::make_unique<ComboBoxScalePanel>(ComboBoxScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .comboLook = comboLook,
+            .popupLook = popupLook,
+            .labelLook = labelLook,
+            .comboWidth = comboWidth,
+            .comboHeight = comboHeight});
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }
