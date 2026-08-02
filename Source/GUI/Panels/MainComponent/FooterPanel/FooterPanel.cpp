@@ -2,6 +2,7 @@
 
 #include "GUI/Helpers/TextFitHelpers.h"
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
@@ -85,7 +86,7 @@ void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintA
     g.setColour(args.badgeFill);
     g.fillRect(badgeBounds);
 
-    g.setColour(skin_->getColour(SkinColourId::kFooterPanelBackground));
+    g.setColour(args.badgeTextColour);
     g.drawText(args.badgeLabel, badgeBounds, juce::Justification::centred, false);
 
     bounds.removeFromLeft(badgeWidth + badgeGap);
@@ -111,6 +112,7 @@ void FooterPanel::paintStatusMessage(juce::Graphics& g,
         getSeverityPrefix(currentSeverity),
         currentMessage,
         getSeverityColour(currentSeverity),
+        skin_->getColour(SkinColourId::kFooterPanelBackground),
         detailColour,
         font
     });
@@ -133,6 +135,26 @@ void FooterPanel::paintDeviceStatus(juce::Graphics& g,
         PluginDisplayNames::FooterPanel::kDeviceLabel,
         buildDeviceDetailText(),
         badgeFill,
+        skin_->getColour(SkinColourId::kFooterPanelBackground),
+        detailColour,
+        font
+    });
+}
+
+void FooterPanel::paintMidiQueuePressureAlert(juce::Graphics& g,
+                                             juce::Rectangle<int> bounds,
+                                             const juce::Font& font,
+                                             juce::Colour detailColour) const
+{
+    if (! midiQueuePressureAlertActive_)
+        return;
+
+    paintBadgeAndDetail(g, {
+        bounds,
+        PluginDisplayNames::FooterPanel::kMidiQueuePressureBadge,
+        PluginDisplayNames::FooterPanel::kMidiQueuePressureMessage,
+        juce::Colour(ColourChart::kRed),
+        juce::Colour(ColourChart::kBlack),
         detailColour,
         font
     });
@@ -153,6 +175,7 @@ void FooterPanel::paint(juce::Graphics& g)
     const auto chromeGrey = skin_->getColour(SkinColourId::kFooterMessageInfo);
 
     paintStatusMessage(g, layout.leftBand.reduced(layout.padding, 0), font, chromeGrey);
+    paintMidiQueuePressureAlert(g, layout.centreBand.reduced(layout.padding, 0), font, chromeGrey);
     paintDeviceStatus(g, layout.rightBand.reduced(layout.padding, 0), font, chromeGrey);
 }
 
@@ -171,6 +194,15 @@ void FooterPanel::setUiScale(float uiScale)
         return;
 
     uiScale_ = uiScale;
+    repaint();
+}
+
+void FooterPanel::setMidiQueuePressureAlert(bool active)
+{
+    if (midiQueuePressureAlertActive_ == active)
+        return;
+
+    midiQueuePressureAlertActive_ = active;
     repaint();
 }
 

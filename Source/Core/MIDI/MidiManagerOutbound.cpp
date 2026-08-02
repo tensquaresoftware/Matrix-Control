@@ -55,8 +55,9 @@ void MidiManager::sendSysExWithDelay(const juce::MemoryBlock& sysExMessage, cons
 
 void MidiManager::sendQueuedSysEx(const juce::MemoryBlock& sysExMessage, const juce::String& description)
 {
+    // MidiSender::sendSysEx already logs once — do not double-log (and flush) on the consumer.
+    juce::ignoreUnused(description);
     midiSender->sendSysEx(sysExMessage);
-    MidiLogger::getInstance().logSysExSent(sysExMessage, description);
     sysExDelay_.recordSysExSent(static_cast<juce::int64>(juce::Time::getMillisecondCounterHiRes()));
 }
 
@@ -142,6 +143,14 @@ bool MidiManager::tryDispatchPendingSysEx()
     return false;
 }
 
+void MidiManager::drainQueuedRealtimeOnly()
+{
+    while (auto message = outboundQueue_.tryDequeueRealtime())
+        dispatchRealtimeMessage({ Core::MidiOutboundQueue::MessageCategory::kRealtime,
+                                  std::move(*message),
+                                  {} });
+}
+
 bool MidiManager::processOutboundQueue()
 {
     bool didWork = false;
@@ -157,7 +166,11 @@ bool MidiManager::processOutboundQueue()
         try
         {
             if (! handleOutboundMessage(*msg))
+            {
+                // Pending SysEx parked — flush any realtime already behind it before gate sleep.
+                drainQueuedRealtimeOnly();
                 break;
+            }
         }
         catch (const MidiConnectionException& e)
         {

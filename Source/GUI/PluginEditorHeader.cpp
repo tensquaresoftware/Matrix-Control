@@ -5,6 +5,7 @@
 #include "PluginEditorInternal.h"
 
 #include "Core/Audio/StandaloneAudioInputRouter.h"
+#include "Core/MIDI/MidiManager.h"
 #include "GUI/About/AboutWindow.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
@@ -46,6 +47,11 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
     headerPanel.onAudioMidiSettingsRequested = []
     {
         Core::StandaloneAudioInputRouter::showAudioMidiSettingsDialog();
+    };
+
+    headerPanel.onPanicRequested = [this]
+    {
+        pluginProcessor.getMidiManager().sendPanic();
     };
 
 #if JUCE_DEBUG

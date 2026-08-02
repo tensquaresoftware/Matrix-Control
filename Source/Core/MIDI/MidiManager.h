@@ -66,6 +66,12 @@ public:
                                  juce::uint8 amount,
                                  juce::uint8 destination);
 
+    // All Notes Off (CC 123) then Reset All Controllers (CC 121) on the active midiChannel,
+    // via the normal realtime outbound path (never bypasses the queue).
+    void sendPanic();
+
+    size_t getRealtimeOutboundDepth() const noexcept;
+
     std::vector<juce::uint8> requestCurrentPatch();
     // Request a single patch from the current bank by number (Request Data type=1).
     std::vector<juce::uint8> requestSinglePatch(juce::uint8 patchNumber);
@@ -143,6 +149,7 @@ private:
     bool openMidiOutputPort(const juce::String& deviceId, bool reportOpenFailure);
     void wakeConsumer() noexcept;
     bool processOutboundQueue();
+    void drainQueuedRealtimeOnly();
     bool handleOutboundMessage(Core::MidiOutboundQueue::Message& msg);
     bool tryDispatchPendingSysEx();
     bool isEditorSysExAllowed(const juce::MemoryBlock& sysEx) const;

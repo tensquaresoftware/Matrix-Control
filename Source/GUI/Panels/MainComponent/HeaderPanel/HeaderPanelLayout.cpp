@@ -179,4 +179,10 @@ void HeaderPanel::resized()
         placer.placePeak(peakIndicator_, metrics.peakIndicatorWidth);
         placer.endPacket();
     }
+
+    const int panicW = juce::roundToInt(static_cast<float>(dimensions_.panicButtonWidth) * uiScale_);
+    const int rightPad = juce::roundToInt(static_cast<float>(dimensions_.rightPadding) * uiScale_);
+    const int panicX = getLocalBounds().getRight() - rightPad - panicW;
+    panicButton_.setBounds(panicX, metrics.controlY, panicW, metrics.controlHeightPx);
+    panicButton_.setUiScale(uiScale_);
 }

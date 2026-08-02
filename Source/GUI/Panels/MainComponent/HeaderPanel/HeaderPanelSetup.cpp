@@ -64,6 +64,26 @@ void HeaderPanel::addChildControls(TSS::ISkin& skin)
     addAndMakeVisible(inputGainSlider_);
     peakIndicator_.setSkin(skin);
     addAndMakeVisible(peakIndicator_);
+    addAndMakeVisible(panicButton_);
+}
+
+void HeaderPanel::applyPanicButtonLook()
+{
+    if (skin_ == nullptr)
+        return;
+
+    panicButton_.setLook(panicAlertActive_
+                             ? TSS::buttonAlertLookFromSkin(*skin_)
+                             : TSS::buttonLookFromSkin(*skin_));
+}
+
+void HeaderPanel::setPanicQueuePressureAlert(bool active)
+{
+    if (panicAlertActive_ == active)
+        return;
+
+    panicAlertActive_ = active;
+    applyPanicButtonLook();
 }
 
 void HeaderPanel::setSkin(TSS::ISkin& skin)
@@ -88,4 +108,5 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
     peakIndicator_.setSkin(skin);
+    applyPanicButtonLook();
 }

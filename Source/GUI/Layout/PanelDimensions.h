@@ -34,6 +34,8 @@ struct HeaderPanelDimensions
     int portComboBoxWidth;
     int inputGainSliderWidth;
     int peakIndicatorWidth;
+    int rightPadding;
+    int panicButtonWidth;
 };
 
 struct FooterPanelDimensions

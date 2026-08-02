@@ -26,6 +26,7 @@ namespace PluginDisplayNames
         constexpr const char* kAboutButton         = "ABOUT...";
         constexpr const char* kLogoSkinSection     = "SKIN";
         constexpr const char* kLogoUiScaleSection  = "UI SCALE";
+        constexpr const char* kPanic               = "PANIC";
     }
 
     namespace FooterPanel
@@ -40,6 +41,10 @@ namespace PluginDisplayNames
         constexpr const char* kSeverityInfoPrefix = "INFO";
         constexpr const char* kSeverityWarningPrefix = "WARNING";
         constexpr const char* kSeverityErrorPrefix = "ERROR";
+
+        constexpr const char* kMidiQueuePressureBadge = "MIDI";
+        constexpr const char* kMidiQueuePressureMessage =
+            "Send queue backed up — click PANIC to clear stuck notes.";
 
         // Left-zone guidance while FR-2 device lock is active (D-038 — footer only, no modal).
         constexpr const char* kDeviceLockGuidance =

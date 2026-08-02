@@ -2,6 +2,7 @@
 
 #include "GUI/Layout/Design/DesignPanels.h"
 #include "GUI/Looks/TypographyStyles.h"
+#include "GUI/Skins/ColourChart.h"
 #include "GUI/Skins/ISkin.h"
 
 namespace TSS
@@ -33,6 +34,26 @@ namespace TSS
         look.borderDisabled = skin.getColour(SkinColourId::kButtonBorderDisabled);
         look.textDisabled = skin.getColour(SkinColourId::kButtonTextDisabled);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kDefault);
+        return look;
+    }
+
+    ButtonLook buttonAlertLookFromSkin(const ISkin& skin)
+    {
+        ButtonLook look = buttonLookFromSkin(skin);
+        const auto red = juce::Colour(ColourChart::kRed);
+        const auto black = juce::Colour(ColourChart::kBlack);
+        const auto white = juce::Colour(ColourChart::kWhite);
+
+        look.backgroundOff = red;
+        look.backgroundOn = red;
+        look.backgroundHover = red;
+        look.backgroundClicked = red;
+        look.borderOff = red;
+        look.borderOn = red;
+        look.textOff = black;
+        look.textOn = black;
+        look.textHover = white;
+        look.textClicked = white;
         return look;
     }
 

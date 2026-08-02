@@ -1008,3 +1008,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-settings-combobox-popup-display.md`
   summary: No automated assertion that Settings ComboBoxes receive a non-default PopupMenuLook after ctor/setSkin.
   evidence: Blind Hunter; verification remains build + manual UAT for this UI wiring fix.
+
+## Deferred from: quick-dev spec-bug-midi-01-residual-panic-alert (2026-08-02)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-bug-midi-01-residual-panic-alert.md`
+  summary: Header PANIC can overlap left-growing port/audio packets at high UI scale or narrow widths
+  evidence: Absolute far-right placement has no reserved layout budget against PacketPlacer; reviewers flagged collision / negative panicX without clamp
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-bug-midi-01-residual-panic-alert.md`
+  summary: Outbound consumer can busy-spin while pending SysEx remains and more SysEx are queued (didWork true without sleeping the gate)
+  evidence: Blind Hunter; pre-existing processOutboundQueue/run pattern, not introduced by residual drain patch

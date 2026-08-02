@@ -250,7 +250,8 @@ private:
 
     struct MatrixModSysExCoalesceTimer final : juce::Timer
     {
-        static constexpr int kCoalesceDelayMs = 10;
+        // Above stock Matrix-1000 SysEx gate (10 ms) so live edits do not saturate the wire.
+        static constexpr int kCoalesceDelayMs = 40;
 
         explicit MatrixModSysExCoalesceTimer(Core::MatrixModBusParameterSysExDispatcher& dispatcherIn) noexcept
             : dispatcher_(dispatcherIn)

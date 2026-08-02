@@ -439,6 +439,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MasterModelTests.cpp
         Tests/Unit/MidiActivityTrackerTests.cpp
         Tests/Unit/MidiManagerTests.cpp
+        Tests/Unit/MidiManagerRealtimeTests.cpp
         Tests/Unit/PatchModelTests.cpp
         Tests/Unit/SysExEncoderTests.cpp
         Tests/Unit/MasterParameterSysExDispatcherTests.cpp
@@ -476,6 +477,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MidiPortStateCoherenceTests.cpp
         Tests/Unit/MidiPortRoutingPropertyTests.cpp
         Tests/Unit/MidiOutboundQueueTests.cpp
+        Tests/Unit/RealtimeQueuePressureMonitorTests.cpp
         Tests/Unit/SysExDelayProfileTests.cpp
         Tests/Unit/SysExInterMessageDelayTests.cpp
         Tests/Unit/SysExParserTests.cpp

@@ -7,6 +7,9 @@
 
 #include "Core/Audio/AudioPassthroughProcessor.h"
 #include "Core/MIDI/MidiActivityTracker.h"
+#include "Core/MIDI/MidiManager.h"
+#include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
+#include "GUI/Panels/MainComponent/FooterPanel/FooterPanel.h"
 #include "GUI/Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -46,6 +49,16 @@ void PluginEditor::HeaderRefreshTimer::timerCallback()
         tracker.getActivityLevel(Core::MidiActivityTracker::Path::kMidiFromInbound));
     headerPanel_.getMidiToActivityLed().setLevel(
         tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound));
+
+    const auto realtimeDepth = processor_.getMidiManager().getRealtimeOutboundDepth();
+    if (queuePressureMonitor_.update(realtimeDepth, juce::Time::getMillisecondCounter()))
+    {
+        const bool alert = queuePressureMonitor_.isAlertActive();
+        headerPanel_.setPanicQueuePressureAlert(alert);
+
+        if (owner_.mainComponent_ != nullptr)
+            owner_.mainComponent_->getFooterPanel().setMidiQueuePressureAlert(alert);
+    }
 }
 
 PluginEditor::ClipboardFeedbackPhaseTimer::ClipboardFeedbackPhaseTimer(juce::AudioProcessorValueTreeState& apvts)

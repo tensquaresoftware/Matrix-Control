@@ -134,6 +134,7 @@ public:
         testRealtimePriorityOverSysEx();
         testInterleavedPriority();
         testEmptyQueue();
+        testRealtimeDepth();
         testDualProducerConsumerStress();
     }
 
@@ -153,6 +154,7 @@ private:
         expect(result->midiMessage.isNoteOn());
         expectEquals(result->midiMessage.getNoteNumber(), 60);
         expect(queue.isEmpty());
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 0);
     }
 
     void testRealtimePriorityOverSysEx()
@@ -217,7 +219,26 @@ private:
 
         Core::MidiOutboundQueue queue;
         expect(queue.isEmpty());
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 0);
+        expectEquals(static_cast<int>(queue.sysExDepth()), 0);
         expect(!queue.dequeue().has_value());
+    }
+
+    void testRealtimeDepth()
+    {
+        beginTest("realtimeDepth / sysExDepth track enqueue and dequeue");
+
+        Core::MidiOutboundQueue queue;
+        queue.enqueueRealtime(juce::MidiMessage::noteOn(1, 60, 0.5f));
+        queue.enqueueRealtime(juce::MidiMessage::noteOff(1, 60));
+        queue.enqueueSysEx(juce::MemoryBlock { "\xf0\x10\xf7", 3 });
+
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 2);
+        expectEquals(static_cast<int>(queue.sysExDepth()), 1);
+
+        (void) queue.dequeue();
+        expectEquals(static_cast<int>(queue.realtimeDepth()), 1);
+        expectEquals(static_cast<int>(queue.sysExDepth()), 1);
     }
 
     void testDualProducerConsumerStress()

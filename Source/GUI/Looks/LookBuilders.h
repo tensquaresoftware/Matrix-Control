@@ -7,6 +7,8 @@ namespace TSS
     class ISkin;
     
     ButtonLook buttonLookFromSkin(const ISkin& skin);
+    // Red fill / black text / white hover — queue-pressure PANIC alert look.
+    ButtonLook buttonAlertLookFromSkin(const ISkin& skin);
     SliderLook sliderLookFromSkin(const ISkin& skin);
     LabelLook labelLookFromSkin(const ISkin& skin);
     LabelLook darkPanelLabelLookFromSkin(const ISkin& skin);

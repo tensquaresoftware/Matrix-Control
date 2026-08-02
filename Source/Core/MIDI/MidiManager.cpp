@@ -190,6 +190,47 @@ void MidiManager::sendProgramChange(int programNumber, int channel)
     }
 }
 
+void MidiManager::sendPanic()
+{
+    const auto enqueuePanicPair = [this](int channel)
+    {
+        // Front-insert is LIFO per call — push Reset (121) first, then Notes Off (123),
+        // so dequeue order is 123 then 121. Thin priority: still via the consumer.
+        outboundQueue_.enqueueRealtimeFront(juce::MidiMessage::controllerEvent(channel, 121, 0));
+        outboundQueue_.enqueueRealtimeFront(juce::MidiMessage::controllerEvent(channel, 123, 0));
+    };
+    int channel = 1;
+    bool sendAllChannels = true;
+    if (auto* choice = dynamic_cast<juce::AudioParameterChoice*>(
+            apvts.getParameter(PluginIDs::MasterEditSection::MidiModule::ParameterWidgets::kChannel)))
+    {
+        const int index = choice->getIndex();
+        if (index >= 1 && index <= 16)
+        {
+            channel = index;
+            sendAllChannels = false;
+        }
+        // Omni (0) and Mono groups: clear every channel — synth may be sounding on any.
+    }
+
+    if (sendAllChannels)
+    {
+        for (int ch = 16; ch >= 1; --ch)
+            enqueuePanicPair(ch);
+    }
+    else
+    {
+        enqueuePanicPair(channel);
+    }
+
+    activityTracker_.notifyActivity(Core::MidiActivityTracker::Path::kInstrument);
+}
+
+size_t MidiManager::getRealtimeOutboundDepth() const noexcept
+{
+    return outboundQueue_.realtimeDepth();
+}
+
 void MidiManager::sendSetBank(int bank)
 {
     if (! isEditorOutboundAllowed())

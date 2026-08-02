@@ -11,6 +11,7 @@
 #include "GUI/Widgets/Logo.h"
 #include "GUI/Widgets/PeakIndicator.h"
 #include "GUI/Widgets/Slider.h"
+#include "GUI/Widgets/Button.h"
 
 #include "GUI/Layout/PanelDimensions.h"
 #include "GUI/Skins/Skin.h"
@@ -51,6 +52,7 @@ public:
     std::function<void()> onSettingsRequested;
     std::function<void()> onAudioMidiSettingsRequested;
     std::function<void()> onAboutRequested;
+    std::function<void()> onPanicRequested;
 #if JUCE_DEBUG
     std::function<void()> onUiTestsToggleRequested;
 #endif
@@ -68,6 +70,8 @@ public:
     juce::String getSelectedAudioFromSourceId() const;
     void selectAudioFromSourceId(const juce::String& sourceId);
 
+    void setPanicQueuePressureAlert(bool active);
+
     TSS::ComboBox& getMidiFromComboBox() { return midiFromComboBox_; }
     TSS::ComboBox& getMidiToComboBox() { return midiToComboBox_; }
     TSS::ComboBox& getKeyboardFromComboBox() { return keyboardFromComboBox_; }
@@ -77,11 +81,13 @@ public:
     TSS::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
     TSS::Slider& getInputGainSlider() { return inputGainSlider_; }
     TSS::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
+    TSS::Button& getPanicButton() { return panicButton_; }
 
 private:
     void showLogoPopup();
     void wireLogoCallbacks();
     void addChildControls(TSS::ISkin& skin);
+    void applyPanicButtonLook();
 
     void populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
     void populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce::String>& identifiers);
@@ -98,6 +104,7 @@ private:
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
+    bool panicAlertActive_ = false;
     int currentSkinItemId_ = static_cast<int>(TSS::Skin::SkinComboBoxItemId::kBlack);
     int currentUiScaleId_ = PluginIDs::Settings::ScaleLevels::kDefault;
 
@@ -116,6 +123,7 @@ private:
     TSS::Label inputGainLabel_;
     TSS::Slider inputGainSlider_;
     TSS::PeakIndicator peakIndicator_;
+    TSS::Button panicButton_;
 
     std::vector<juce::String> midiFromPortIdentifiers_;
     std::vector<juce::String> midiToPortIdentifiers_;

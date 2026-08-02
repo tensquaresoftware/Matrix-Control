@@ -84,9 +84,18 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
                            inputGainNormalizedFill,
                            inputGainFormatValue})
     , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
+    , panicButton_(dimensions.panicButtonWidth,
+                   dimensions.controlHeight,
+                   TSS::buttonLookFromSkin(skin),
+                   PluginDisplayNames::HeaderPanel::kPanic)
 {
     setOpaque(true);
     wireLogoCallbacks();
+    panicButton_.onClick = [this]
+    {
+        if (onPanicRequested)
+            onPanicRequested();
+    };
     addChildControls(skin);
     populateMidiPortLists();
 }

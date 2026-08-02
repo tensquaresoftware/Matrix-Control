@@ -30,6 +30,24 @@ namespace Core
         wakeConsumerIfNeeded();
     }
 
+    void MidiOutboundQueue::enqueueRealtimeFront(juce::MidiMessage message)
+    {
+        {
+            std::lock_guard<std::mutex> lock(queueMutex_);
+            // std::queue has no push_front — rebuild with new message first.
+            std::queue<juce::MidiMessage> rebuilt;
+            rebuilt.push(std::move(message));
+            while (! realtimeQueue_.empty())
+            {
+                rebuilt.push(std::move(realtimeQueue_.front()));
+                realtimeQueue_.pop();
+            }
+            realtimeQueue_ = std::move(rebuilt);
+        }
+
+        wakeConsumerIfNeeded();
+    }
+
     void MidiOutboundQueue::enqueueSysEx(juce::MemoryBlock sysEx)
     {
         {
@@ -38,6 +56,18 @@ namespace Core
         }
 
         wakeConsumerIfNeeded();
+    }
+
+    std::optional<juce::MidiMessage> MidiOutboundQueue::tryDequeueRealtime()
+    {
+        std::lock_guard<std::mutex> lock(queueMutex_);
+
+        if (realtimeQueue_.empty())
+            return std::nullopt;
+
+        auto message = realtimeQueue_.front();
+        realtimeQueue_.pop();
+        return message;
     }
 
     std::optional<MidiOutboundQueue::Message> MidiOutboundQueue::dequeue()
@@ -65,5 +95,17 @@ namespace Core
     {
         std::lock_guard<std::mutex> lock(queueMutex_);
         return realtimeQueue_.empty() && sysExQueue_.empty();
+    }
+
+    size_t MidiOutboundQueue::realtimeDepth() const noexcept
+    {
+        std::lock_guard<std::mutex> lock(queueMutex_);
+        return realtimeQueue_.size();
+    }
+
+    size_t MidiOutboundQueue::sysExDepth() const noexcept
+    {
+        std::lock_guard<std::mutex> lock(queueMutex_);
+        return sysExQueue_.size();
     }
 }

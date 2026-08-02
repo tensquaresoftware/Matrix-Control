@@ -10,6 +10,7 @@
 #include "MainComponent.h"
 #include "GUI/Layout/PanelDimensions.h"
 #include "Skins/Skin.h"
+#include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
 
 #if JUCE_DEBUG
 #include "Tests/TestComponent.h"
@@ -49,6 +50,7 @@ private:
         PluginProcessor& processor_;
         HeaderPanel& headerPanel_;
         PluginEditor& owner_;
+        Core::RealtimeQueuePressureMonitor queuePressureMonitor_;
         int audioFromRefreshAttempts_ = 0;
     };
 

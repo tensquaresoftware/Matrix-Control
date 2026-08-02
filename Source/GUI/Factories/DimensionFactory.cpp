@@ -193,6 +193,8 @@ namespace
             .portComboBoxWidth = Panels::Header::kPortComboBoxWidth,
             .inputGainSliderWidth = Panels::Header::kInputGainSliderWidth,
             .peakIndicatorWidth = Panels::Header::kPeakIndicatorWidth,
+            .rightPadding = Panels::Header::kRightPadding,
+            .panicButtonWidth = Panels::Header::kPanicButtonWidth,
         };
     }
 

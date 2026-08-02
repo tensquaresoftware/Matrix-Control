@@ -262,7 +262,7 @@ void MidiLogger::writeLog(const juce::String& formattedMessage)
     if (logToFile && fileStream && fileStream->is_open())
     {
         *fileStream << formattedMessage.toRawUTF8() << std::endl;
-        fileStream->flush();
+        // Avoid flush-per-message on the MIDI consumer hot path (stuck-note residual under Debug).
     }
 #endif
 }
@@ -278,7 +278,7 @@ void MidiLogger::writeLogRaw(const juce::String& message)
     if (logToFile && fileStream && fileStream->is_open())
     {
         *fileStream << message.toRawUTF8() << std::endl;
-        fileStream->flush();
+        // Avoid flush-per-message on the MIDI consumer hot path.
     }
 #endif
 }

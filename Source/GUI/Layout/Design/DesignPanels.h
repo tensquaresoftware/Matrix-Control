@@ -189,6 +189,7 @@ namespace TSS::Design
             inline constexpr int kLogoGapAfter = 32;
             inline constexpr int kLogoPopupColumnWidth = 80;
             inline constexpr int kLeftPadding = 12;
+            inline constexpr int kRightPadding = 12;
             inline constexpr int kControlHeight = 20;
             inline constexpr int kGap = 4;
             inline constexpr int kPacketExternalGap = kGap * 4;
@@ -200,6 +201,7 @@ namespace TSS::Design
             inline constexpr int kPortComboBoxWidth = 112;
             inline constexpr int kInputGainSliderWidth = 60;
             inline constexpr int kPeakIndicatorWidth = 12;
+            inline constexpr int kPanicButtonWidth = 56;
         }
 
         namespace Footer

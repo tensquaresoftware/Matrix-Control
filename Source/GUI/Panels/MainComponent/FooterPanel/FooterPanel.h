@@ -23,6 +23,7 @@ public:
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
+    void setMidiQueuePressureAlert(bool active);
 
     void valueTreePropertyChanged(juce::ValueTree& tree,
                                  const juce::Identifier& property) override;
@@ -50,6 +51,7 @@ private:
         juce::String badgeLabel;
         juce::String detailText;
         juce::Colour badgeFill;
+        juce::Colour badgeTextColour;
         juce::Colour detailColour;
         juce::Font font;
     };
@@ -86,7 +88,13 @@ private:
                            juce::Rectangle<int> bounds,
                            const juce::Font& font,
                            juce::Colour detailColour) const;
+    void paintMidiQueuePressureAlert(juce::Graphics& g,
+                                     juce::Rectangle<int> bounds,
+                                     const juce::Font& font,
+                                     juce::Colour detailColour) const;
     void syncFromApvtsState(juce::ValueTree& tree);
+
+    bool midiQueuePressureAlertActive_ = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)
 };

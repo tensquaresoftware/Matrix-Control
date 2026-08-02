@@ -53,8 +53,19 @@ namespace Core
         void enqueueRealtime(juce::MidiMessage message);
         void enqueueSysEx(juce::MemoryBlock sysEx);
 
+        // Pop one realtime message only (never touches sysExQueue_). Used to drain
+        // Note Off / CC while a SysEx is parked pending the inter-message gate.
+        std::optional<juce::MidiMessage> tryDequeueRealtime();
+
+        // Insert at the front of the realtime queue (Panic / urgent voice-clear).
+        void enqueueRealtimeFront(juce::MidiMessage message);
+
         std::optional<Message> dequeue();
         bool isEmpty() const noexcept;
+
+        // Mutex-safe depth probes for UI pressure / tests. Do not gate dequeue on these (TOCTOU).
+        size_t realtimeDepth() const noexcept;
+        size_t sysExDepth() const noexcept;
 
     private:
         void wakeConsumerIfNeeded();
