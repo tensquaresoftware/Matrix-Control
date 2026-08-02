@@ -17,8 +17,18 @@ class WidgetFactory;
 class Lfo2Panel : public BaseModulePanel
 {
 public:
-    Lfo2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit Lfo2Panel(const Config& config);
     ~Lfo2Panel() override = default;
 
     static ModulePanelLayout createLayout();
