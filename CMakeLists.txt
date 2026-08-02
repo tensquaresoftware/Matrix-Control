@@ -226,6 +226,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Dialogs/MasterInitConfirmDialog.cpp
     Source/GUI/Factories/WidgetFactory.cpp
     Source/GUI/Factories/DimensionFactory.cpp
+    Source/GUI/Factories/DimensionFactoryBuilders.cpp
     Source/GUI/Helpers/GrayedControlHelper.cpp
     Source/GUI/Helpers/CompareLockBinder.cpp
     Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
