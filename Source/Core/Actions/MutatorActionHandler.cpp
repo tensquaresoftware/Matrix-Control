@@ -6,22 +6,15 @@
 namespace Core
 {
 
-    MutatorActionHandler::MutatorActionHandler(juce::AudioProcessorValueTreeState& apvts,
-                                               PatchMutatorEnginePort* engine,
-                                               ExportFolderPicker pickExportFolder,
-                                               DefragLimitModalGate showDefragLimitModal,
-                                               ExportCollisionModalGate showExportCollisionModal,
-                                               FlushConfirmModalGate showFlushConfirmModal,
-                                               DeleteConfirmModalGate showDeleteConfirmModal,
-                                               int historySelectionDebounceMs)
-        : apvts_(apvts)
-        , engine_(engine)
-        , pickExportFolder_(std::move(pickExportFolder))
-        , showDefragLimitModal_(std::move(showDefragLimitModal))
-        , showExportCollisionModal_(std::move(showExportCollisionModal))
-        , showFlushConfirmModal_(std::move(showFlushConfirmModal))
-        , showDeleteConfirmModal_(std::move(showDeleteConfirmModal))
-        , historySelectionDebouncer_(historySelectionDebounceMs)
+    MutatorActionHandler::MutatorActionHandler(Dependencies dependencies)
+        : apvts_(dependencies.apvts)
+        , engine_(dependencies.engine)
+        , pickExportFolder_(std::move(dependencies.pickExportFolder))
+        , showDefragLimitModal_(std::move(dependencies.showDefragLimitModal))
+        , showExportCollisionModal_(std::move(dependencies.showExportCollisionModal))
+        , showFlushConfirmModal_(std::move(dependencies.showFlushConfirmModal))
+        , showDeleteConfirmModal_(std::move(dependencies.showDeleteConfirmModal))
+        , historySelectionDebouncer_(dependencies.historySelectionDebounceMs)
     {
     }
 

@@ -25,14 +25,19 @@ namespace Core
         // true = Delete; false = Cancel / abort.
         using DeleteConfirmModalGate = std::function<bool()>;
 
-        MutatorActionHandler(juce::AudioProcessorValueTreeState& apvts,
-                             PatchMutatorEnginePort* engine,
-                             ExportFolderPicker pickExportFolder = {},
-                             DefragLimitModalGate showDefragLimitModal = {},
-                             ExportCollisionModalGate showExportCollisionModal = {},
-                             FlushConfirmModalGate showFlushConfirmModal = {},
-                             DeleteConfirmModalGate showDeleteConfirmModal = {},
-                             int historySelectionDebounceMs = kComboboxPatchSendDebounceMs);
+        struct Dependencies
+        {
+            juce::AudioProcessorValueTreeState& apvts;
+            PatchMutatorEnginePort* engine = nullptr;
+            ExportFolderPicker pickExportFolder;
+            DefragLimitModalGate showDefragLimitModal;
+            ExportCollisionModalGate showExportCollisionModal;
+            FlushConfirmModalGate showFlushConfirmModal;
+            DeleteConfirmModalGate showDeleteConfirmModal;
+            int historySelectionDebounceMs = kComboboxPatchSendDebounceMs;
+        };
+
+        explicit MutatorActionHandler(Dependencies dependencies);
 
         void handleAction(const juce::String& propertyId, const juce::var& newValue) override;
 

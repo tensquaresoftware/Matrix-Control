@@ -226,7 +226,7 @@ void PluginProcessor::createPatchManagerActionHandler(const Core::ActionExecutio
 
 void PluginProcessor::createMutatorActionHandler()
 {
-    mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>(
+    Core::MutatorActionHandler::Dependencies dependencies {
         apvts,
         patchMutatorEngine_.get(),
         [this]() -> juce::File
@@ -256,7 +256,10 @@ void PluginProcessor::createMutatorActionHandler()
             if (! mutatorDeleteConfirmModalGate_)
                 return true;
             return mutatorDeleteConfirmModalGate_();
-        });
+        }
+    };
+
+    mutatorActionHandler_ = std::make_unique<Core::MutatorActionHandler>(std::move(dependencies));
 }
 
 void PluginProcessor::finishConstructionSetup()

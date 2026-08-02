@@ -176,55 +176,43 @@ private:
         juce::File exportPickerResult;
 
         explicit Harness(int debounceMs = Core::kComboboxPatchSendDebounceMs)
-            : handler(proc.apvts,
-                      &engine,
-                      [this]()
-                      {
-                          ++exportPickerCallCount;
-                          return exportPickerResult;
-                      },
-                      {},
-                      {},
-                      {},
-                      {},
-                      debounceMs)
+            : handler(buildDependencies({}, {}, debounceMs))
         {
         }
 
         Harness(Core::MutatorActionHandler::FlushConfirmModalGate flushGate,
                 int debounceMs = Core::kComboboxPatchSendDebounceMs)
-            : handler(proc.apvts,
-                      &engine,
-                      [this]()
-                      {
-                          ++exportPickerCallCount;
-                          return exportPickerResult;
-                      },
-                      {},
-                      {},
-                      std::move(flushGate),
-                      {},
-                      debounceMs)
+            : handler(buildDependencies(std::move(flushGate), {}, debounceMs))
         {
         }
 
         Harness(Core::MutatorActionHandler::DeleteConfirmModalGate deleteGate,
                 std::nullptr_t,
                 int debounceMs = Core::kComboboxPatchSendDebounceMs)
-            : handler(proc.apvts,
-                      &engine,
-                      [this]()
-                      {
-                          ++exportPickerCallCount;
-                          return exportPickerResult;
-                      },
-                      {},
-                      {},
-                      {},
-                      std::move(deleteGate),
-                      debounceMs)
+            : handler(buildDependencies({}, std::move(deleteGate), debounceMs))
         {
             juce::ignoreUnused(debounceMs);
+        }
+
+        Core::MutatorActionHandler::Dependencies buildDependencies(
+            Core::MutatorActionHandler::FlushConfirmModalGate flushGate,
+            Core::MutatorActionHandler::DeleteConfirmModalGate deleteGate,
+            int debounceMs)
+        {
+            return {
+                proc.apvts,
+                &engine,
+                [this]
+                {
+                    ++exportPickerCallCount;
+                    return exportPickerResult;
+                },
+                {},
+                {},
+                std::move(flushGate),
+                std::move(deleteGate),
+                debounceMs
+            };
         }
     };
 
