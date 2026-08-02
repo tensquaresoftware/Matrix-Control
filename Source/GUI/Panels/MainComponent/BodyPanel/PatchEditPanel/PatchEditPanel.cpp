@@ -43,7 +43,15 @@ PatchEditPanel::PatchEditPanel(TSS::ISkin& skin,
             .apvts = apvts}))
     , patchEditDisplaysPanel_(std::make_unique<PatchEditDisplaysPanel>(skin, dims_.displays, apvts))
     , patchEditBottomModulesPanel_(std::make_unique<PatchEditBottomModulesPanel>(
-        skin, dims_.bottomModules, dims_.sectionHeaderWidth, dims_.bottomHeight, parameterCellDims, moduleHeaderDims, widgetFactory, apvts))
+        PatchEditBottomModulesPanel::Config{
+            .skin = skin,
+            .rowDims = dims_.bottomModules,
+            .width = dims_.sectionHeaderWidth,
+            .height = dims_.bottomHeight,
+            .parameterCellDims = parameterCellDims,
+            .moduleHeaderDims = moduleHeaderDims,
+            .widgetFactory = widgetFactory,
+            .apvts = apvts}))
 {
     setOpaque(true);
     addAndMakeVisible(*sectionHeader_);

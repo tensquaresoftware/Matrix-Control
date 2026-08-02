@@ -14,23 +14,16 @@
 
 PatchEditBottomModulesPanel::~PatchEditBottomModulesPanel() = default;
 
-PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(TSS::ISkin& skin,
-                                                         const PatchEditModulesRowDimensions& rowDims,
-                                                         int width,
-                                                         int height,
-                                                         const ParameterCellDimensions& parameterCellDims,
-                                                         const ModuleHeaderDimensions& moduleHeaderDims,
-                                                         WidgetFactory& widgetFactory,
-                                                         juce::AudioProcessorValueTreeState& apvts)
-    : rowDims_(rowDims)
-    , width_(width)
-    , height_(height)
-    , skin_(&skin)
-    , env1Panel_(std::make_unique<Env1Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , env2Panel_(std::make_unique<Env2Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , env3Panel_(std::make_unique<Env3Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , lfo1Panel_(std::make_unique<Lfo1Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
-    , lfo2Panel_(std::make_unique<Lfo2Panel>(skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, widgetFactory, apvts, moduleHeaderDims, parameterCellDims))
+PatchEditBottomModulesPanel::PatchEditBottomModulesPanel(const Config& config)
+    : rowDims_(config.rowDims)
+    , width_(config.width)
+    , height_(config.height)
+    , skin_(&config.skin)
+    , env1Panel_(std::make_unique<Env1Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , env2Panel_(std::make_unique<Env2Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , env3Panel_(std::make_unique<Env3Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , lfo1Panel_(std::make_unique<Lfo1Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , lfo2Panel_(std::make_unique<Lfo2Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
 {
     setOpaque(false);
     addAndMakeVisible(*env1Panel_);

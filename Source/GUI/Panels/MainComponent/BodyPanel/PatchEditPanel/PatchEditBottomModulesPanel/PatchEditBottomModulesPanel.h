@@ -23,14 +23,19 @@ class Lfo2Panel;
 class PatchEditBottomModulesPanel : public juce::Component
 {
 public:
-    PatchEditBottomModulesPanel(TSS::ISkin& skin,
-                                const PatchEditModulesRowDimensions& rowDims,
-                                int width,
-                                int height,
-                                const ParameterCellDimensions& parameterCellDims,
-                                const ModuleHeaderDimensions& moduleHeaderDims,
-                                WidgetFactory& widgetFactory,
-                                juce::AudioProcessorValueTreeState& apvts);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        const PatchEditModulesRowDimensions& rowDims;
+        int width = 0;
+        int height = 0;
+        const ParameterCellDimensions& parameterCellDims;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+    };
+
+    explicit PatchEditBottomModulesPanel(const Config& config);
     ~PatchEditBottomModulesPanel() override;
 
     void resized() override;
