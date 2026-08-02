@@ -5,36 +5,30 @@
 namespace Core
 {
 
-    juce::String PatchNameResolver::resolve(const juce::String& deviceName,
-                                            int bank,
-                                            int patchNumber,
-                                            bool isRomBank,
-                                            const juce::String& factoryName,
-                                            const juce::String& overlayName,
-                                            Mode mode)
+    juce::String PatchNameResolver::resolve(const ResolveArgs& args)
     {
-        if (mode == Mode::kHardware)
+        if (args.mode == Mode::kHardware)
         {
-            if (! PatchFileNameSanitizer::isUsablePatchName(deviceName))
-                return PatchFileNameSanitizer::formatBankPatchLabel(bank, patchNumber);
+            if (! PatchFileNameSanitizer::isUsablePatchName(args.deviceName))
+                return PatchFileNameSanitizer::formatBankPatchLabel(args.bank, args.patchNumber);
 
-            return deviceName;
+            return args.deviceName;
         }
 
-        if (isRomBank && factoryName.isNotEmpty())
-            return factoryName;
+        if (args.isRomBank && args.factoryName.isNotEmpty())
+            return args.factoryName;
 
-        if (PatchFileNameSanitizer::isOberheimBankPlaceholderName(deviceName)
-            || ! PatchFileNameSanitizer::isUsablePatchName(deviceName))
+        if (PatchFileNameSanitizer::isOberheimBankPlaceholderName(args.deviceName)
+            || ! PatchFileNameSanitizer::isUsablePatchName(args.deviceName))
         {
-            if (overlayName.isNotEmpty())
-                return overlayName;
+            if (args.overlayName.isNotEmpty())
+                return args.overlayName;
         }
 
-        if (! PatchFileNameSanitizer::isUsablePatchName(deviceName))
-            return PatchFileNameSanitizer::formatBankPatchLabel(bank, patchNumber);
+        if (! PatchFileNameSanitizer::isUsablePatchName(args.deviceName))
+            return PatchFileNameSanitizer::formatBankPatchLabel(args.bank, args.patchNumber);
 
-        return deviceName;
+        return args.deviceName;
     }
 
 } // namespace Core

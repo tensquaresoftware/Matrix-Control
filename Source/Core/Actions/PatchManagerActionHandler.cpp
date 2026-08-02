@@ -128,13 +128,15 @@ namespace Core
                                                              : PatchNameResolver::Mode::kMusical;
         }();
 
-        model.setName(PatchNameResolver::resolve(model.getName(),
-                                                 bank,
-                                                 patch,
-                                                 isRom,
-                                                 factoryName,
-                                                 overlayName,
-                                                 mode));
+        model.setName(PatchNameResolver::resolve({
+            .deviceName = model.getName(),
+            .bank = bank,
+            .patchNumber = patch,
+            .isRomBank = isRom,
+            .factoryName = factoryName,
+            .overlayName = overlayName,
+            .mode = mode,
+        }));
     }
 
     void PatchManagerActionHandler::reapplyDisplayedPatchName()

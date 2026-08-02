@@ -15,13 +15,18 @@ namespace Core
             kHardware
         };
 
-        static juce::String resolve(const juce::String& deviceName,
-                                    int bank,
-                                    int patchNumber,
-                                    bool isRomBank,
-                                    const juce::String& factoryName,
-                                    const juce::String& overlayName,
-                                    Mode mode);
+        struct ResolveArgs
+        {
+            juce::String deviceName;
+            int bank = 0;
+            int patchNumber = 0;
+            bool isRomBank = false;
+            juce::String factoryName;
+            juce::String overlayName;
+            Mode mode = Mode::kMusical;
+        };
+
+        static juce::String resolve(const ResolveArgs& args);
     };
 
 } // namespace Core

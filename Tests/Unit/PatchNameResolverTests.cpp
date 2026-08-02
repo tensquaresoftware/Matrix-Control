@@ -23,9 +23,15 @@ private:
     {
         beginTest("musical_romFactoryWinsOverBnk");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "BNK2: 05", 2, 5, true, "VOICES 1", "OVERLAY",
-            Core::PatchNameResolver::Mode::kMusical);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "BNK2: 05",
+            .bank = 2,
+            .patchNumber = 5,
+            .isRomBank = true,
+            .factoryName = "VOICES 1",
+            .overlayName = "OVERLAY",
+            .mode = Core::PatchNameResolver::Mode::kMusical,
+        });
         expectEquals(result, juce::String("VOICES 1"));
     }
 
@@ -33,9 +39,15 @@ private:
     {
         beginTest("musical_overlayWinsOnBnkWhenNoFactory");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "BNK0: 12", 0, 12, false, {}, "PAPANO 4",
-            Core::PatchNameResolver::Mode::kMusical);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "BNK0: 12",
+            .bank = 0,
+            .patchNumber = 12,
+            .isRomBank = false,
+            .factoryName = {},
+            .overlayName = "PAPANO 4",
+            .mode = Core::PatchNameResolver::Mode::kMusical,
+        });
         expectEquals(result, juce::String("PAPANO 4"));
     }
 
@@ -43,9 +55,15 @@ private:
     {
         beginTest("musical_keepsUsableNonBnkDump");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "BRASS 1", 0, 3, false, {}, "OVERLAY",
-            Core::PatchNameResolver::Mode::kMusical);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "BRASS 1",
+            .bank = 0,
+            .patchNumber = 3,
+            .isRomBank = false,
+            .factoryName = {},
+            .overlayName = "OVERLAY",
+            .mode = Core::PatchNameResolver::Mode::kMusical,
+        });
         expectEquals(result, juce::String("BRASS 1"));
     }
 
@@ -53,9 +71,15 @@ private:
     {
         beginTest("musical_fallsBackToBxPyyWhenEmpty");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "   ", 1, 7, false, {}, {},
-            Core::PatchNameResolver::Mode::kMusical);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "   ",
+            .bank = 1,
+            .patchNumber = 7,
+            .isRomBank = false,
+            .factoryName = {},
+            .overlayName = {},
+            .mode = Core::PatchNameResolver::Mode::kMusical,
+        });
         expectEquals(result, juce::String("B1-P07"));
     }
 
@@ -63,9 +87,15 @@ private:
     {
         beginTest("hardware_keepsBnkWithoutOverlayOrFactory");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "BNK0: 12", 0, 12, true, "VOICES 1", "PAPANO 4",
-            Core::PatchNameResolver::Mode::kHardware);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "BNK0: 12",
+            .bank = 0,
+            .patchNumber = 12,
+            .isRomBank = true,
+            .factoryName = "VOICES 1",
+            .overlayName = "PAPANO 4",
+            .mode = Core::PatchNameResolver::Mode::kHardware,
+        });
         expectEquals(result, juce::String("BNK0: 12"));
     }
 
@@ -73,9 +103,15 @@ private:
     {
         beginTest("hardware_fallsBackToBxPyyWhenEmpty");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "", 0, 4, false, {}, "PAPANO 4",
-            Core::PatchNameResolver::Mode::kHardware);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "",
+            .bank = 0,
+            .patchNumber = 4,
+            .isRomBank = false,
+            .factoryName = {},
+            .overlayName = "PAPANO 4",
+            .mode = Core::PatchNameResolver::Mode::kHardware,
+        });
         expectEquals(result, juce::String("B0-P04"));
     }
 
@@ -83,9 +119,15 @@ private:
     {
         beginTest("hardware_keepsUsableMusicalDump");
 
-        const auto result = Core::PatchNameResolver::resolve(
-            "BRASS 1", 0, 3, false, {}, {},
-            Core::PatchNameResolver::Mode::kHardware);
+        const auto result = Core::PatchNameResolver::resolve({
+            .deviceName = "BRASS 1",
+            .bank = 0,
+            .patchNumber = 3,
+            .isRomBank = false,
+            .factoryName = {},
+            .overlayName = {},
+            .mode = Core::PatchNameResolver::Mode::kHardware,
+        });
         expectEquals(result, juce::String("BRASS 1"));
     }
 };
