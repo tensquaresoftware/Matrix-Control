@@ -27,7 +27,14 @@ PatchEditTopModulesPanel::PatchEditTopModulesPanel(const Config& config)
           .apvts = config.apvts,
           .moduleHeaderDims = config.moduleHeaderDims,
           .parameterCellDims = config.parameterCellDims}))
-    , dco2Panel_(std::make_unique<Dco2Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , dco2Panel_(std::make_unique<Dco2Panel>(Dco2Panel::Config{
+          .skin = config.skin,
+          .width = rowDims_.childModuleWidth,
+          .height = rowDims_.childModuleHeight,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims}))
     , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
     , fmTrackPanel_(std::make_unique<FmTrackPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
     , rampPortamentoPanel_(std::make_unique<RampPortamentoPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))

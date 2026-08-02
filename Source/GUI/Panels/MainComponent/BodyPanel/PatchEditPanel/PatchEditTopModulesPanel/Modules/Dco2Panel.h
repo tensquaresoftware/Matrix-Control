@@ -17,8 +17,18 @@ class WidgetFactory;
 class Dco2Panel : public BaseModulePanel
 {
 public:
-    Dco2Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit Dco2Panel(const Config& config);
     ~Dco2Panel() override = default;
 
     static ModulePanelLayout createLayout();
