@@ -71,6 +71,8 @@ public:
     void selectAudioFromSourceId(const juce::String& sourceId);
 
     void setPanicQueuePressureAlert(bool active);
+    void setPanicMidiOutputAvailable(bool available);
+    void syncPanicEnabledFromMidiToSelection();
 
     TSS::ComboBox& getMidiFromComboBox() { return midiFromComboBox_; }
     TSS::ComboBox& getMidiToComboBox() { return midiToComboBox_; }

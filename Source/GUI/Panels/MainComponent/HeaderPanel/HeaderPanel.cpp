@@ -98,6 +98,7 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
     };
     addChildControls(skin);
     populateMidiPortLists();
+    syncPanicEnabledFromMidiToSelection();
 }
 
 void HeaderPanel::paint(juce::Graphics& g)
@@ -281,6 +282,7 @@ void HeaderPanel::selectMidiToPort(const juce::String& deviceId)
 {
     midiToComboBox_.setSelectedId(findItemIdForIdentifier(midiToPortIdentifiers_, deviceId),
                                   juce::dontSendNotification);
+    syncPanicEnabledFromMidiToSelection();
 }
 
 void HeaderPanel::selectKeyboardFromPort(const juce::String& deviceId)

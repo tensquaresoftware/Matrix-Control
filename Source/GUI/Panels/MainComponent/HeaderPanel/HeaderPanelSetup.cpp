@@ -86,6 +86,18 @@ void HeaderPanel::setPanicQueuePressureAlert(bool active)
     applyPanicButtonLook();
 }
 
+void HeaderPanel::setPanicMidiOutputAvailable(bool available)
+{
+    // Grayed + non-clickable when MIDI To is unset — Panic has nowhere to send.
+    panicButton_.setInactiveAppearance(! available);
+    panicButton_.setEnabled(available);
+}
+
+void HeaderPanel::syncPanicEnabledFromMidiToSelection()
+{
+    setPanicMidiOutputAvailable(getSelectedMidiToPortIdentifier().isNotEmpty());
+}
+
 void HeaderPanel::setSkin(TSS::ISkin& skin)
 {
     skin_ = &skin;
