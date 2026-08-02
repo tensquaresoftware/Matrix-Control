@@ -30,28 +30,23 @@ BankTransferProgressDialog::BankTransferProgressDialog(TSS::ISkin& skin)
 
 BankTransferProgressDialog::~BankTransferProgressDialog() = default;
 
-void BankTransferProgressDialog::prepareForShow(const juce::String& title,
-                                                const juce::String& message,
-                                                const juce::String& detail,
-                                                int totalSteps,
-                                                std::function<void()> onCancelRequested,
-                                                ContentLayout layout)
+void BankTransferProgressDialog::prepareForShow(PrepareForShowArgs args)
 {
     using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
     using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-    title_ = title;
-    detail_ = detail;
-    primaryMessage_ = message;
-    primaryTotalSteps_ = juce::jmax(1, totalSteps);
+    title_ = std::move(args.title);
+    detail_ = std::move(args.detail);
+    primaryMessage_ = std::move(args.message);
+    primaryTotalSteps_ = juce::jmax(1, args.totalSteps);
     primaryCompletedSteps_ = 0;
     secondaryLaneActive_ = false;
     secondaryCompletedSteps_ = 0;
 
     // Prefer explicit layout; fall back to title so existing call sites keep working.
-    contentLayout_ = layout;
-    if (layout == ContentLayout::Import
-        && title == juce::String(kExportTitle))
+    contentLayout_ = args.layout;
+    if (args.layout == ContentLayout::Import
+        && title_ == juce::String(kExportTitle))
         contentLayout_ = ContentLayout::Export;
 
     if (contentLayout_ == ContentLayout::Import)
@@ -66,7 +61,7 @@ void BankTransferProgressDialog::prepareForShow(const juce::String& title,
         secondaryTotalSteps_ = 1;
     }
 
-    onCancelRequested_ = std::move(onCancelRequested);
+    onCancelRequested_ = std::move(args.onCancelRequested);
     setCancelEnabled(static_cast<bool>(onCancelRequested_));
     resized();
     repaint();
@@ -206,36 +201,31 @@ juce::Rectangle<int> BankTransferProgressDialog::paintFolderHeader(juce::Graphic
     return body;
 }
 
-void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g,
-                                                  juce::Rectangle<int>& body,
-                                                  const juce::Font& bodyFont,
-                                                  const juce::String& message,
-                                                  int completedSteps,
-                                                  int totalSteps,
-                                                  bool enabled) const
+void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g, const PhaseLanePaintArgs& args) const
 {
-    const float em = bodyFont.getHeight();
+    const float em = args.bodyFont.getHeight();
     const int gapHalfEm = juce::roundToInt(em * 0.5f);
     const int lineHeight = juce::jmax(1, juce::roundToInt(em));
     const int barHeight = juce::roundToInt(16.0f * uiScale_);
 
-    g.setFont(bodyFont);
-    g.setColour(enabled ? skin_->getColour(SkinColourId::kDarkPanelText)
-                        : skin_->getColour(SkinColourId::kSliderTextDisabled));
+    g.setFont(args.bodyFont);
+    g.setColour(args.enabled ? skin_->getColour(SkinColourId::kDarkPanelText)
+                             : skin_->getColour(SkinColourId::kSliderTextDisabled));
 
     {
-        auto progressLabel = body.removeFromTop(lineHeight);
-        g.drawText(message, progressLabel, juce::Justification::centredLeft, false);
+        auto progressLabel = args.body.removeFromTop(lineHeight);
+        g.drawText(args.message, progressLabel, juce::Justification::centredLeft, false);
     }
 
-    body.removeFromTop(gapHalfEm);
+    args.body.removeFromTop(gapHalfEm);
 
-    auto progressBar = body.removeFromTop(barHeight);
+    auto progressBar = args.body.removeFromTop(barHeight);
     const float fraction = juce::jlimit(
         0.0f,
         1.0f,
-        static_cast<float>(completedSteps) / static_cast<float>(juce::jmax(1, totalSteps)));
-    paintProgressBar(g, progressBar, fraction, enabled);
+        static_cast<float>(args.completedSteps)
+            / static_cast<float>(juce::jmax(1, args.totalSteps)));
+    paintProgressBar(g, progressBar, fraction, args.enabled);
 }
 
 void BankTransferProgressDialog::paintExportBody(juce::Graphics& g,
@@ -246,12 +236,13 @@ void BankTransferProgressDialog::paintExportBody(juce::Graphics& g,
 
     body = paintFolderHeader(g, body, bodyFont, juce::String(kDestinationFolderLabel));
     paintPhaseLane(g,
-                   body,
-                   bodyFont,
-                   primaryMessage_,
-                   primaryCompletedSteps_,
-                   primaryTotalSteps_,
-                   true);
+                   PhaseLanePaintArgs {
+                       body,
+                       bodyFont,
+                       primaryMessage_,
+                       primaryCompletedSteps_,
+                       primaryTotalSteps_,
+                       true });
 }
 
 void BankTransferProgressDialog::paintImportBody(juce::Graphics& g,
@@ -262,21 +253,23 @@ void BankTransferProgressDialog::paintImportBody(juce::Graphics& g,
 
     body = paintFolderHeader(g, body, bodyFont, juce::String(kSourceFolderLabel));
     paintPhaseLane(g,
-                   body,
-                   bodyFont,
-                   primaryMessage_,
-                   primaryCompletedSteps_,
-                   primaryTotalSteps_,
-                   true);
+                   PhaseLanePaintArgs {
+                       body,
+                       bodyFont,
+                       primaryMessage_,
+                       primaryCompletedSteps_,
+                       primaryTotalSteps_,
+                       true });
 
     body.removeFromTop(juce::roundToInt(bodyFont.getHeight()));
     paintPhaseLane(g,
-                   body,
-                   bodyFont,
-                   secondaryMessage_,
-                   secondaryCompletedSteps_,
-                   secondaryTotalSteps_,
-                   secondaryLaneActive_);
+                   PhaseLanePaintArgs {
+                       body,
+                       bodyFont,
+                       secondaryMessage_,
+                       secondaryCompletedSteps_,
+                       secondaryTotalSteps_,
+                       secondaryLaneActive_ });
 }
 
 void BankTransferProgressDialog::paint(juce::Graphics& g)

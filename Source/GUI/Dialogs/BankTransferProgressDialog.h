@@ -32,12 +32,17 @@ public:
     ~BankTransferProgressDialog() override;
 
     // detail is typically an absolute folder path (may be empty).
-    void prepareForShow(const juce::String& title,
-                        const juce::String& message,
-                        const juce::String& detail,
-                        int totalSteps,
-                        std::function<void()> onCancelRequested,
-                        ContentLayout layout = ContentLayout::Import);
+    struct PrepareForShowArgs
+    {
+        juce::String title;
+        juce::String message;
+        juce::String detail;
+        int totalSteps = 1;
+        std::function<void()> onCancelRequested;
+        ContentLayout layout = ContentLayout::Import;
+    };
+
+    void prepareForShow(PrepareForShowArgs args);
 
     // Activates the secondary lane (import write / restore) and starts its progress at 0.
     void beginSecondaryPhase(const juce::String& message, int totalSteps);
@@ -69,13 +74,17 @@ private:
                                            juce::Rectangle<int> body,
                                            const juce::Font& bodyFont,
                                            const juce::String& folderLabel) const;
-    void paintPhaseLane(juce::Graphics& g,
-                        juce::Rectangle<int>& body,
-                        const juce::Font& bodyFont,
-                        const juce::String& message,
-                        int completedSteps,
-                        int totalSteps,
-                        bool enabled) const;
+    struct PhaseLanePaintArgs
+    {
+        juce::Rectangle<int>& body;
+        const juce::Font& bodyFont;
+        const juce::String& message;
+        int completedSteps = 0;
+        int totalSteps = 1;
+        bool enabled = true;
+    };
+
+    void paintPhaseLane(juce::Graphics& g, const PhaseLanePaintArgs& args) const;
     void paintExportBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
     void paintImportBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
 

@@ -194,8 +194,13 @@ void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShow
         bankTransferProgressDialog_->setSkin(*skin_);
     }
 
-    bankTransferProgressDialog_->prepareForShow(
-        request.title, request.message, request.detail, request.totalSteps, request.onCancelRequested);
+    bankTransferProgressDialog_->prepareForShow({
+        .title = request.title,
+        .message = request.message,
+        .detail = request.detail,
+        .totalSteps = request.totalSteps,
+        .onCancelRequested = request.onCancelRequested,
+    });
 
     const int baseWidth = layoutDimensions_.editor.width;
     const float uiScale = (baseWidth > 0)
