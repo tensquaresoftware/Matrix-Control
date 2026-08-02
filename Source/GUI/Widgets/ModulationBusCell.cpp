@@ -17,106 +17,106 @@
 
 ModulationBusCell::~ModulationBusCell() = default;
 
-ModulationBusCell::ModulationBusCell(TSS::ISkin& skin,
-                                      int width,
-                                      int height,
-                                      const ModulationBusCellDimensions& dimensions,
-                                      int busNumber,
-                                      WidgetFactory& factory,
-                                      juce::AudioProcessorValueTreeState& apvts,
-                                      const juce::String& sourceParamId,
-                                      const juce::String& amountParamId,
-                                      const juce::String& destinationParamId,
-                                      const juce::String& busId)
-    : busNumber_(busNumber)
-    , dimensions_(dimensions)
-    , skin_(&skin)
-    , apvts_(apvts)
-    , busId_(busId)
+ModulationBusCell::ModulationBusCell(const Config& config)
+    : busNumber_(config.busNumber)
+    , dimensions_(config.dimensions)
+    , skin_(&config.skin)
+    , apvts_(config.apvts)
+    , busId_(config.busId)
 {
     setOpaque(false);
-    setSize(width, height);
-    createBusNumberLabel(busNumber, skin);
-    createSourceComboBox(factory, skin, sourceParamId, apvts);
-    createAmountSlider(factory, skin, amountParamId, apvts);
-    createDestinationComboBox(busNumber, skin, destinationParamId, apvts);
-    createInitButton(skin, busNumber);
-    createSeparator(skin);
+    setSize(config.width, config.height);
+    createBusNumberLabel();
+    createSourceComboBox(config.factory, config.sourceParamId);
+    createAmountSlider(config.factory, config.amountParamId);
+    createDestinationComboBox(config.destinationParamId);
+    createInitButton();
+    createSeparator();
 
     resized();
 }
 
-void ModulationBusCell::createBusNumberLabel(int busNumber, TSS::ISkin& skin)
+void ModulationBusCell::createBusNumberLabel()
 {
+    jassert(skin_ != nullptr);
+
     busNumberLabel_ = std::make_unique<TSS::Label>(
         dimensions_.busNumberLabelWidth,
         dimensions_.busNumberLabelHeight,
-        TSS::labelLookFromSkin(skin),
-        juce::String(busNumber));
+        TSS::labelLookFromSkin(*skin_),
+        juce::String(busNumber_));
     busNumberLabel_->setInterceptsMouseClicks(false, false);
     addAndMakeVisible(*busNumberLabel_);
 }
 
-void ModulationBusCell::createSourceComboBox(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusCell::createSourceComboBox(WidgetFactory& factory, const juce::String& sourceParamId)
 {
+    jassert(skin_ != nullptr);
+
     sourceComboBox_ = factory.createChoiceParameterComboBox(
         sourceParamId,
-        skin,
+        *skin_,
         dimensions_.sourceComboBoxWidth,
         dimensions_.sourceComboBoxHeight);
     sourceAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
+        apvts_,
         sourceParamId,
         *sourceComboBox_);
     addAndMakeVisible(*sourceComboBox_);
 }
 
-void ModulationBusCell::createAmountSlider(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusCell::createAmountSlider(WidgetFactory& factory, const juce::String& amountParamId)
 {
+    jassert(skin_ != nullptr);
+
     amountSlider_ = factory.createIntParameterSlider(
         amountParamId,
-        skin,
+        *skin_,
         dimensions_.amountSliderWidth,
         dimensions_.amountSliderHeight);
     amountAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-        apvts,
+        apvts_,
         amountParamId,
         *amountSlider_);
     addAndMakeVisible(*amountSlider_);
 }
 
-void ModulationBusCell::createDestinationComboBox(int busNumber, TSS::ISkin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts)
+void ModulationBusCell::createDestinationComboBox(const juce::String& destinationParamId)
 {
-    const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
+    jassert(skin_ != nullptr);
+
+    const auto busNumberAsSizeT = static_cast<size_t>(busNumber_);
     const auto& destinationDesc = PluginDescriptors::MatrixModulationSection::kModulationBusChoiceParameters[busNumberAsSizeT][1];
 
     destinationComboBox_ = std::make_unique<TSS::ComboBox>(
         dimensions_.destinationComboBoxWidth,
         dimensions_.destinationComboBoxHeight,
-        TSS::comboBoxLookFromSkin(skin));
-    destinationComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        TSS::comboBoxLookFromSkin(*skin_));
+    destinationComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(*skin_));
     for (const auto& choice : destinationDesc.choices)
     {
         destinationComboBox_->addItem(choice, destinationComboBox_->getNumItems() + 1);
     }
     destinationComboBox_->setSelectedItemIndex(destinationDesc.defaultIndex);
     destinationAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        apvts,
+        apvts_,
         destinationParamId,
         *destinationComboBox_);
     addAndMakeVisible(*destinationComboBox_);
 }
 
-void ModulationBusCell::createInitButton(TSS::ISkin& skin, int busNumber)
+void ModulationBusCell::createInitButton()
 {
+    jassert(skin_ != nullptr);
+
     initButton_ = std::make_unique<TSS::Button>(
         dimensions_.initButtonWidth,
         dimensions_.initButtonHeight,
-        TSS::buttonLookFromSkin(skin),
+        TSS::buttonLookFromSkin(*skin_),
         PluginDisplayNames::ShortLabels::kInit);
-    
+
     juce::String initBusId;
-    switch (busNumber)
+    switch (busNumber_)
     {
         case 0: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus0Init; break;
         case 1: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus1Init; break;
@@ -130,7 +130,7 @@ void ModulationBusCell::createInitButton(TSS::ISkin& skin, int busNumber)
         case 9: initBusId = PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus9Init; break;
         default: return;
     }
-    
+
     initButton_->onClick = [this, initBusId]
     {
         apvts_.state.setProperty(initBusId, juce::Time::getCurrentTime().toMilliseconds(), nullptr);
@@ -138,12 +138,14 @@ void ModulationBusCell::createInitButton(TSS::ISkin& skin, int busNumber)
     addAndMakeVisible(*initButton_);
 }
 
-void ModulationBusCell::createSeparator(TSS::ISkin& skin)
+void ModulationBusCell::createSeparator()
 {
+    jassert(skin_ != nullptr);
+
     separator_ = std::make_unique<TSS::HorizontalSeparator>(
         dimensions_.separatorWidth,
         dimensions_.separatorHeight,
-        TSS::horizontalSeparatorLookFromSkin(skin));
+        TSS::horizontalSeparatorLookFromSkin(*skin_));
     addAndMakeVisible(*separator_);
 }
 
@@ -367,7 +369,7 @@ void ModulationBusCell::setUiScale(float uiScale)
 {
     if (juce::approximatelyEqual(uiScale_, uiScale))
         return;
-    
+
     uiScale_ = uiScale;
     resized();
     repaint();

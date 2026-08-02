@@ -32,18 +32,19 @@ public:
             scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
-        busCell_ = std::make_unique<ModulationBusCell>(
-            skin,
-            panelWidth_,
-            panelHeight_,
-            dimensions_,
-            0,
-            widgetFactory,
-            apvts,
-            PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Source,
-            PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Amount,
-            PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Destination,
-            PluginIDs::MatrixModulationSection::ModulationBus::kBus0);
+        busCell_ = std::make_unique<ModulationBusCell>(ModulationBusCell::Config{
+            .skin = skin,
+            .width = panelWidth_,
+            .height = panelHeight_,
+            .dimensions = dimensions_,
+            .busNumber = 0,
+            .factory = widgetFactory,
+            .apvts = apvts,
+            .sourceParamId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Source,
+            .amountParamId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Amount,
+            .destinationParamId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Destination,
+            .busId = PluginIDs::MatrixModulationSection::ModulationBus::kBus0,
+        });
         busCell_->setUiScale(scale_);
         addAndMakeVisible(*busCell_);
     }

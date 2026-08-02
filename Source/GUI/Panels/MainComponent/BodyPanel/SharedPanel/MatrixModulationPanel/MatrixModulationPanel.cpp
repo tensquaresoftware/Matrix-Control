@@ -118,18 +118,19 @@ MatrixModulationPanel::MatrixModulationPanel(TSS::ISkin& skin, const MatrixModul
     for (int busNumber = 0; busNumber < Matrix1000Limits::kModulationBusCount; ++busNumber)
     {
         const auto busNumberAsSizeT = static_cast<size_t>(busNumber);
-        auto bus = std::make_unique<ModulationBusCell>(
-            skin,
-            dims_.width,
-            dims_.modulationBusRowHeight,
-            dims_.busCell,
-            busNumber,
-            widgetFactory,
-            apvts_,
-            parameterArrays.sourceParameterIds[busNumberAsSizeT],
-            parameterArrays.amountParameterIds[busNumberAsSizeT],
-            parameterArrays.destinationParameterIds[busNumberAsSizeT],
-            parameterArrays.busIds[busNumberAsSizeT]);
+        auto bus = std::make_unique<ModulationBusCell>(ModulationBusCell::Config{
+            .skin = skin,
+            .width = dims_.width,
+            .height = dims_.modulationBusRowHeight,
+            .dimensions = dims_.busCell,
+            .busNumber = busNumber,
+            .factory = widgetFactory,
+            .apvts = apvts_,
+            .sourceParamId = parameterArrays.sourceParameterIds[busNumberAsSizeT],
+            .amountParamId = parameterArrays.amountParameterIds[busNumberAsSizeT],
+            .destinationParamId = parameterArrays.destinationParameterIds[busNumberAsSizeT],
+            .busId = parameterArrays.busIds[busNumberAsSizeT],
+        });
         addAndMakeVisible(*bus);
         bus->setReorderDragCallbacks(
             [this](int sourceBus) { beginBusReorderDrag(sourceBus); },

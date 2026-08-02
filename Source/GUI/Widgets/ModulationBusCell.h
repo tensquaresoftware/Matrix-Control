@@ -23,17 +23,22 @@ class WidgetFactory;
 class ModulationBusCell : public juce::Component
 {
 public:
-    ModulationBusCell(TSS::ISkin& skin,
-                      int width,
-                      int height,
-                      const ModulationBusCellDimensions& dimensions,
-                      int busNumber,
-                      WidgetFactory& factory,
-                      juce::AudioProcessorValueTreeState& apvts,
-                      const juce::String& sourceParamId,
-                      const juce::String& amountParamId,
-                      const juce::String& destinationParamId,
-                      const juce::String& busId);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        const ModulationBusCellDimensions& dimensions;
+        int busNumber = 0;
+        WidgetFactory& factory;
+        juce::AudioProcessorValueTreeState& apvts;
+        juce::String sourceParamId;
+        juce::String amountParamId;
+        juce::String destinationParamId;
+        juce::String busId;
+    };
+
+    explicit ModulationBusCell(const Config& config);
     ~ModulationBusCell() override;
 
     void paint(juce::Graphics& g) override;
@@ -73,12 +78,12 @@ private:
     ReorderDragEndFn onReorderDragEnd_;
 
     ModulationBusCellDimensions dimensions_;
-    void createBusNumberLabel(int busNumber, TSS::ISkin& skin);
-    void createSourceComboBox(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& sourceParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createAmountSlider(WidgetFactory& factory, TSS::ISkin& skin, const juce::String& amountParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createDestinationComboBox(int busNumber, TSS::ISkin& skin, const juce::String& destinationParamId, juce::AudioProcessorValueTreeState& apvts);
-    void createInitButton(TSS::ISkin& skin, int busNumber);
-    void createSeparator(TSS::ISkin& skin);
+    void createBusNumberLabel();
+    void createSourceComboBox(WidgetFactory& factory, const juce::String& sourceParamId);
+    void createAmountSlider(WidgetFactory& factory, const juce::String& amountParamId);
+    void createDestinationComboBox(const juce::String& destinationParamId);
+    void createInitButton();
+    void createSeparator();
 
     void layoutWidgetRow();
     void layoutSeparator(int yTop, int separatorHeight);
