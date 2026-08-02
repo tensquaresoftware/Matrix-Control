@@ -31,7 +31,15 @@ ModulePanelLayout RampPortamentoPanel::createLayout()
 
 RampPortamentoPanel::RampPortamentoPanel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
                          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
-    : BaseModulePanel(skin, widgetFactory, apvts, createLayout(), width, height, moduleHeaderDims, parameterCellDims)
+    : BaseModulePanel(BaseModulePanel::Config{
+          .skin = skin,
+          .widgetFactory = widgetFactory,
+          .apvts = apvts,
+          .layout = createLayout(),
+          .width = width,
+          .height = height,
+          .moduleHeaderDims = moduleHeaderDims,
+          .parameterCellDims = parameterCellDims})
 {
     apvts.addParameterListener(
         PluginIDs::PatchEditSection::RampPortamentoModule::ParameterWidgets::kPortamentoKeyboardMode,

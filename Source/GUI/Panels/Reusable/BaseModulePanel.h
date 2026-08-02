@@ -26,20 +26,25 @@ namespace TSS
 class BaseModulePanel : public juce::Component
 {
 public:
-    BaseModulePanel(TSS::ISkin& skin,
-                    WidgetFactory& widgetFactory,
-                    juce::AudioProcessorValueTreeState& apvts,
-                    const ModulePanelLayout& layout,
-                    int width,
-                    int height,
-                    const ModuleHeaderDimensions& moduleHeaderDims,
-                    const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        ModulePanelLayout layout;
+        int width = 0;
+        int height = 0;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit BaseModulePanel(const Config& config);
     ~BaseModulePanel() override;
 
     void resized() override;
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
-    
+
     void setInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
     ParameterCell* getParameterCellAt(size_t index);
@@ -55,6 +60,10 @@ protected:
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
     std::vector<std::unique_ptr<ParameterCell>> parameterCells_;
+
+private:
+    void createHeader(const Config& panelConfig, const ModulePanelConfig& moduleConfig);
+    void createParameterCells(const Config& panelConfig, const ModulePanelConfig& moduleConfig);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseModulePanel)
 };
