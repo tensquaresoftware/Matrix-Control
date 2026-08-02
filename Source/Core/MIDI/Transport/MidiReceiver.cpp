@@ -4,6 +4,24 @@
 
 #include "Core/Loggers/MidiLogger.h"
 
+namespace
+{
+juce::String midiMessageTypeLabel(const juce::MidiMessage& message)
+{
+    if (message.isNoteOn())
+        return "NoteOn";
+    if (message.isNoteOff())
+        return "NoteOff";
+    if (message.isController())
+        return "CC";
+    if (message.isPitchWheel())
+        return "PitchWheel";
+    if (message.isAftertouch())
+        return "Aftertouch";
+    return "Unknown";
+}
+} // namespace
+
 MidiReceiver::MidiReceiver()
     : midiInput(nullptr)
     , isDestroying(false)
@@ -26,9 +44,7 @@ MidiReceiver::~MidiReceiver()
 
     // Stop MIDI input to prevent new callbacks
     if (midiInput != nullptr)
-    {
         midiInput->stop();
-    }
 
     reset();
 }
@@ -55,58 +71,56 @@ void MidiReceiver::handleIncomingMidiMessage(juce::MidiInput* source,
 {
     juce::ignoreUnused(source);
 
-    // Safety check: ensure we're not being destroyed and still valid
     if (isDestroying.load() || midiInput == nullptr)
-    {
         return;
-    }
 
     if (activityTracker_ != nullptr)
         activityTracker_->notifyActivity(Core::MidiActivityTracker::Path::kMidiFromInbound);
 
-    // Log all incoming MIDI messages for debugging
-    MidiLogger::getInstance().logInfo("MIDI message received: " + 
-                                       juce::String(message.getRawDataSize()) + " bytes");
+    MidiLogger::getInstance().logInfo("MIDI message received: "
+                                      + juce::String(message.getRawDataSize())
+                                      + " bytes");
 
     if (message.isSysEx())
+        handleIncomingSysEx(message);
+    else
+        logIncomingNonSysExMessage(message);
+}
+
+void MidiReceiver::handleIncomingSysEx(const juce::MidiMessage& message)
+{
+    // JUCE's getSysExData() excludes F0/F7. Our parser/decoder require the full envelope
+    // (same format as on-disk .syx and outbound encode). Use getRawData() which keeps both.
+    const juce::uint8* rawData = message.getRawData();
+    const int rawSize = message.getRawDataSize();
+
+    MidiLogger::getInstance().logInfo("SysEx message detected: "
+                                      + juce::String(rawSize) + " bytes");
+
+    if (rawSize <= 0 || rawData == nullptr)
     {
-        // JUCE's getSysExData() excludes F0/F7. Our parser/decoder require the full envelope
-        // (same format as on-disk .syx and outbound encode). Use getRawData() which keeps both.
-        const juce::uint8* rawData = message.getRawData();
-        const int rawSize = message.getRawDataSize();
-
-        MidiLogger::getInstance().logInfo("SysEx message detected: " +
-                                          juce::String(rawSize) + " bytes");
-
-        if (rawSize > 0 && rawData != nullptr)
-        {
-            juce::MemoryBlock completeSysEx(rawData, static_cast<size_t>(rawSize));
-            MidiLogger::getInstance().logSysExReceived(completeSysEx);
-            processCompleteSysEx(completeSysEx);
-        }
-        else
-        {
-            MidiLogger::getInstance().logWarning("SysEx message has null data or zero size");
-        }
+        MidiLogger::getInstance().logWarning("SysEx message has null data or zero size");
+        return;
     }
-    else if (message.isProgramChange())
+
+    juce::MemoryBlock completeSysEx(rawData, static_cast<size_t>(rawSize));
+    MidiLogger::getInstance().logSysExReceived(completeSysEx);
+    processCompleteSysEx(completeSysEx);
+}
+
+void MidiReceiver::logIncomingNonSysExMessage(const juce::MidiMessage& message)
+{
+    if (message.isProgramChange())
     {
         MidiLogger::getInstance().logProgramChange(
             static_cast<juce::uint8>(message.getProgramChangeNumber()), "RECEIVED");
+        return;
     }
-    else
-    {
-        // Log other MIDI message types for debugging
-        juce::String msgType = "Unknown";
-        if (message.isNoteOn()) msgType = "NoteOn";
-        else if (message.isNoteOff()) msgType = "NoteOff";
-        else if (message.isController()) msgType = "CC";
-        else if (message.isPitchWheel()) msgType = "PitchWheel";
-        else if (message.isAftertouch()) msgType = "Aftertouch";
-        
-        MidiLogger::getInstance().logInfo("MIDI message type: " + msgType + 
-                                          ", channel: " + juce::String(message.getChannel()));
-    }
+
+    MidiLogger::getInstance().logInfo("MIDI message type: "
+                                      + midiMessageTypeLabel(message)
+                                      + ", channel: "
+                                      + juce::String(message.getChannel()));
 }
 
 juce::MemoryBlock MidiReceiver::waitForSysExResponse(int timeoutMs)

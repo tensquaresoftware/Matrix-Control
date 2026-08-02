@@ -54,6 +54,8 @@ private:
     std::mutex oneShotMutex_;
 
     void processCompleteSysEx(const juce::MemoryBlock& completeSysEx);
+    void handleIncomingSysEx(const juce::MidiMessage& message);
+    void logIncomingNonSysExMessage(const juce::MidiMessage& message);
     bool checkIfResponseReceived();
     juce::MemoryBlock getReceivedSysEx();
     bool hasTimeoutElapsed(const std::chrono::steady_clock::time_point& startTime, int timeoutMs) const;
