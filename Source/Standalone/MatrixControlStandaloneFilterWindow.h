@@ -17,27 +17,6 @@ public:
         hideJuceOptionsButton();
     }
 
-    MatrixControlStandaloneFilterWindow (const juce::String& title,
-                                         juce::Colour backgroundColour,
-                                         juce::PropertySet* settingsToUse,
-                                         bool takeOwnershipOfSettings,
-                                         const juce::String& preferredDefaultDeviceName = {},
-                                         const juce::AudioDeviceManager::AudioDeviceSetup* preferredSetupOptions = nullptr,
-                                         const juce::Array<juce::StandalonePluginHolder::PluginInOuts>& constrainToConfiguration = {},
-                                         bool autoOpenMidiDevices = false)
-        : juce::StandaloneFilterWindow (title,
-                                        backgroundColour,
-                                        settingsToUse,
-                                        takeOwnershipOfSettings,
-                                        preferredDefaultDeviceName,
-                                        preferredSetupOptions,
-                                        constrainToConfiguration,
-                                        autoOpenMidiDevices)
-    {
-        enableNativeTitleBar();
-        hideJuceOptionsButton();
-    }
-
     void fitWindowToContent()
     {
         if (auto* processor = getAudioProcessor())
