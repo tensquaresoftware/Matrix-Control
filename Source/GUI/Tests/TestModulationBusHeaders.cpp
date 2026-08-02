@@ -9,24 +9,29 @@
 class TestModulationBusHeaders::ModulationBusHeaderScalePanel : public juce::Component
 {
 public:
-    ModulationBusHeaderScalePanel(float scale,
-                                  const juce::String& scaleLabelText,
-                                  const TSS::ModulationBusHeaderLook& headerLook,
-                                  const TSS::LabelLook& labelLook,
-                                  int headerWidth,
-                                  int headerHeight,
-                                  const ModulationBusHeaderDimensions& dimensions)
-        : scale_(scale)
-        , headerWidth_(headerWidth)
-        , headerHeight_(headerHeight)
-        , dimensions_(dimensions)
-        , headerLook_(headerLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::ModulationBusHeaderLook& headerLook;
+        const TSS::LabelLook& labelLook;
+        int headerWidth = 0;
+        int headerHeight = 0;
+        const ModulationBusHeaderDimensions& dimensions;
+    };
+
+    explicit ModulationBusHeaderScalePanel(const Config& config)
+        : scale_(config.scale)
+        , headerWidth_(config.headerWidth)
+        , headerHeight_(config.headerHeight)
+        , dimensions_(config.dimensions)
+        , headerLook_(config.headerLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             headerWidth_,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            config.scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
         blueHeader_ = createHeader(TSS::ModulationBusHeader::ColourVariant::Blue);
@@ -141,14 +146,15 @@ void TestModulationBusHeaders::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ModulationBusHeaderScalePanel>(
-            spec.scale,
-            spec.label,
-            headerLook,
-            labelLook,
-            headerWidth_,
-            headerHeight_,
-            dimensions_);
+        auto panel = std::make_unique<ModulationBusHeaderScalePanel>(ModulationBusHeaderScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .headerLook = headerLook,
+            .labelLook = labelLook,
+            .headerWidth = headerWidth_,
+            .headerHeight = headerHeight_,
+            .dimensions = dimensions_,
+        });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }
