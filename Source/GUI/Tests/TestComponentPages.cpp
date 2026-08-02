@@ -200,13 +200,14 @@ void TestComponent::createCellAndMenuTestPages(juce::AudioProcessorValueTreeStat
         layoutDimensions_.patchEditParameterCell);
     testContentHost_->addAndMakeVisible(*testParameterCells_);
 
-    testModulationBusCells_ = std::make_unique<TestModulationBusCells>(
-        *skin_,
-        *widgetFactory_,
-        apvts,
-        matrixMod.busCell,
-        matrixMod.width,
-        matrixMod.modulationBusRowHeight);
+    testModulationBusCells_ = std::make_unique<TestModulationBusCells>(TestModulationBusCells::Config{
+        .skin = *skin_,
+        .widgetFactory = *widgetFactory_,
+        .apvts = apvts,
+        .dimensions = matrixMod.busCell,
+        .panelWidth = matrixMod.width,
+        .panelHeight = matrixMod.modulationBusRowHeight,
+    });
     testContentHost_->addAndMakeVisible(*testModulationBusCells_);
 
     testModulationBusHeaders_ = std::make_unique<TestModulationBusHeaders>(

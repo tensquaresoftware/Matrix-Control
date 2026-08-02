@@ -11,35 +11,40 @@
 class TestModulationBusCells::ModulationBusCellScalePanel : public juce::Component
 {
 public:
-    ModulationBusCellScalePanel(float scale,
-                                const juce::String& scaleLabelText,
-                                TSS::ISkin& skin,
-                                WidgetFactory& widgetFactory,
-                                juce::AudioProcessorValueTreeState& apvts,
-                                const ModulationBusCellDimensions& dimensions,
-                                int panelWidth,
-                                int panelHeight,
-                                const TSS::LabelLook& labelLook)
-        : scale_(scale)
-        , dimensions_(dimensions)
-        , panelWidth_(panelWidth)
-        , panelHeight_(panelHeight)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        TSS::ISkin& skin;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModulationBusCellDimensions& dimensions;
+        int panelWidth = 0;
+        int panelHeight = 0;
+        const TSS::LabelLook& labelLook;
+    };
+
+    explicit ModulationBusCellScalePanel(const Config& config)
+        : scale_(config.scale)
+        , dimensions_(config.dimensions)
+        , panelWidth_(config.panelWidth)
+        , panelHeight_(config.panelHeight)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             panelWidth_,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            config.scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
         busCell_ = std::make_unique<ModulationBusCell>(ModulationBusCell::Config{
-            .skin = skin,
+            .skin = config.skin,
             .width = panelWidth_,
             .height = panelHeight_,
             .dimensions = dimensions_,
             .busNumber = 0,
-            .factory = widgetFactory,
-            .apvts = apvts,
+            .factory = config.widgetFactory,
+            .apvts = config.apvts,
             .sourceParamId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Source,
             .amountParamId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Amount,
             .destinationParamId = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets::kBus0Destination,
@@ -87,19 +92,14 @@ private:
     std::unique_ptr<ModulationBusCell> busCell_;
 };
 
-TestModulationBusCells::TestModulationBusCells(TSS::ISkin& skin,
-                                               WidgetFactory& widgetFactory,
-                                               juce::AudioProcessorValueTreeState& apvts,
-                                               const ModulationBusCellDimensions& dimensions,
-                                               int panelWidth,
-                                               int panelHeight)
-    : dimensions_(dimensions)
-    , panelWidth_(panelWidth)
-    , panelHeight_(panelHeight)
+TestModulationBusCells::TestModulationBusCells(const Config& config)
+    : dimensions_(config.dimensions)
+    , panelWidth_(config.panelWidth)
+    , panelHeight_(config.panelHeight)
 {
-    widgetFactory_ = &widgetFactory;
-    apvts_ = &apvts;
-    setSkin(skin);
+    widgetFactory_ = &config.widgetFactory;
+    apvts_ = &config.apvts;
+    setSkin(config.skin);
 }
 
 TestModulationBusCells::~TestModulationBusCells() = default;
@@ -144,16 +144,17 @@ void TestModulationBusCells::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<ModulationBusCellScalePanel>(
-            spec.scale,
-            spec.label,
-            *skin_,
-            *widgetFactory_,
-            *apvts_,
-            dimensions_,
-            panelWidth_,
-            panelHeight_,
-            labelLook);
+        auto panel = std::make_unique<ModulationBusCellScalePanel>(ModulationBusCellScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .skin = *skin_,
+            .widgetFactory = *widgetFactory_,
+            .apvts = *apvts_,
+            .dimensions = dimensions_,
+            .panelWidth = panelWidth_,
+            .panelHeight = panelHeight_,
+            .labelLook = labelLook,
+        });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

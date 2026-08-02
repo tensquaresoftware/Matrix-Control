@@ -18,12 +18,17 @@ class WidgetFactory;
 class TestModulationBusCells : public juce::Component
 {
 public:
-    TestModulationBusCells(TSS::ISkin& skin,
-                           WidgetFactory& widgetFactory,
-                           juce::AudioProcessorValueTreeState& apvts,
-                           const ModulationBusCellDimensions& dimensions,
-                           int panelWidth,
-                           int panelHeight);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModulationBusCellDimensions& dimensions;
+        int panelWidth = 0;
+        int panelHeight = 0;
+    };
+
+    explicit TestModulationBusCells(const Config& config);
     ~TestModulationBusCells() override;
 
     void setSkin(TSS::ISkin& skin);
