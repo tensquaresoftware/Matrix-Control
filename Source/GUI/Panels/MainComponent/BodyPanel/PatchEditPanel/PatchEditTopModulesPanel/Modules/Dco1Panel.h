@@ -17,8 +17,18 @@ class WidgetFactory;
 class Dco1Panel : public BaseModulePanel
 {
 public:
-    Dco1Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-          const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims);
+    struct Config
+    {
+        TSS::ISkin& skin;
+        int width = 0;
+        int height = 0;
+        WidgetFactory& widgetFactory;
+        juce::AudioProcessorValueTreeState& apvts;
+        const ModuleHeaderDimensions& moduleHeaderDims;
+        const ParameterCellDimensions& parameterCellDims;
+    };
+
+    explicit Dco1Panel(const Config& config);
     ~Dco1Panel() override = default;
 
     static ModulePanelLayout createLayout();
@@ -27,4 +37,3 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Dco1Panel)
 };
-

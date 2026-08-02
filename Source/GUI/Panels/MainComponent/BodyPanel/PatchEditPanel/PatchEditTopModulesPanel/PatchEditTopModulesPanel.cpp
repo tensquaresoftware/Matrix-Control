@@ -19,7 +19,14 @@ PatchEditTopModulesPanel::PatchEditTopModulesPanel(const Config& config)
     , width_(config.width)
     , height_(config.height)
     , skin_(&config.skin)
-    , dco1Panel_(std::make_unique<Dco1Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
+    , dco1Panel_(std::make_unique<Dco1Panel>(Dco1Panel::Config{
+          .skin = config.skin,
+          .width = rowDims_.childModuleWidth,
+          .height = rowDims_.childModuleHeight,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims}))
     , dco2Panel_(std::make_unique<Dco2Panel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
     , vcfVcaPanel_(std::make_unique<VcfVcaPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))
     , fmTrackPanel_(std::make_unique<FmTrackPanel>(config.skin, rowDims_.childModuleWidth, rowDims_.childModuleHeight, config.widgetFactory, config.apvts, config.moduleHeaderDims, config.parameterCellDims))

@@ -30,16 +30,15 @@ ModulePanelLayout Dco1Panel::createLayout()
         });
 }
 
-Dco1Panel::Dco1Panel(TSS::ISkin& skin, int width, int height, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts,
-                         const ModuleHeaderDimensions& moduleHeaderDims, const ParameterCellDimensions& parameterCellDims)
+Dco1Panel::Dco1Panel(const Config& config)
     : BaseModulePanel(BaseModulePanel::Config{
-          .skin = skin,
-          .widgetFactory = widgetFactory,
-          .apvts = apvts,
+          .skin = config.skin,
+          .widgetFactory = config.widgetFactory,
+          .apvts = config.apvts,
           .layout = createLayout(),
-          .width = width,
-          .height = height,
-          .moduleHeaderDims = moduleHeaderDims,
-          .parameterCellDims = parameterCellDims})
+          .width = config.width,
+          .height = config.height,
+          .moduleHeaderDims = config.moduleHeaderDims,
+          .parameterCellDims = config.parameterCellDims})
 {
 }
