@@ -9,35 +9,34 @@ namespace
 {
     namespace PatchEdit = PluginIDs::PatchEditSection;
 
+    struct WidgetIdKindEntry
+    {
+        const char* widgetId;
+        PatchModuleKind kind;
+    };
+
+    constexpr WidgetIdKindEntry kCopyOrPasteWidgetIds[] = {
+        { PatchEdit::Dco1Module::StandaloneWidgets::kCopy, PatchModuleKind::Dco1 },
+        { PatchEdit::Dco1Module::StandaloneWidgets::kPaste, PatchModuleKind::Dco1 },
+        { PatchEdit::Dco2Module::StandaloneWidgets::kCopy, PatchModuleKind::Dco2 },
+        { PatchEdit::Dco2Module::StandaloneWidgets::kPaste, PatchModuleKind::Dco2 },
+        { PatchEdit::Envelope1Module::StandaloneWidgets::kCopy, PatchModuleKind::Env1 },
+        { PatchEdit::Envelope1Module::StandaloneWidgets::kPaste, PatchModuleKind::Env1 },
+        { PatchEdit::Envelope2Module::StandaloneWidgets::kCopy, PatchModuleKind::Env2 },
+        { PatchEdit::Envelope2Module::StandaloneWidgets::kPaste, PatchModuleKind::Env2 },
+        { PatchEdit::Envelope3Module::StandaloneWidgets::kCopy, PatchModuleKind::Env3 },
+        { PatchEdit::Envelope3Module::StandaloneWidgets::kPaste, PatchModuleKind::Env3 },
+        { PatchEdit::Lfo1Module::StandaloneWidgets::kCopy, PatchModuleKind::Lfo1 },
+        { PatchEdit::Lfo1Module::StandaloneWidgets::kPaste, PatchModuleKind::Lfo1 },
+        { PatchEdit::Lfo2Module::StandaloneWidgets::kCopy, PatchModuleKind::Lfo2 },
+        { PatchEdit::Lfo2Module::StandaloneWidgets::kPaste, PatchModuleKind::Lfo2 },
+    };
+
     std::optional<PatchModuleKind> kindFromCopyOrPasteId(const juce::String& widgetId)
     {
-        if (widgetId == PatchEdit::Dco1Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Dco1Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Dco1;
-
-        if (widgetId == PatchEdit::Dco2Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Dco2Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Dco2;
-
-        if (widgetId == PatchEdit::Envelope1Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Envelope1Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Env1;
-
-        if (widgetId == PatchEdit::Envelope2Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Envelope2Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Env2;
-
-        if (widgetId == PatchEdit::Envelope3Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Envelope3Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Env3;
-
-        if (widgetId == PatchEdit::Lfo1Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Lfo1Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Lfo1;
-
-        if (widgetId == PatchEdit::Lfo2Module::StandaloneWidgets::kCopy
-            || widgetId == PatchEdit::Lfo2Module::StandaloneWidgets::kPaste)
-            return PatchModuleKind::Lfo2;
+        for (const auto& entry : kCopyOrPasteWidgetIds)
+            if (widgetId == entry.widgetId)
+                return entry.kind;
 
         return std::nullopt;
     }
