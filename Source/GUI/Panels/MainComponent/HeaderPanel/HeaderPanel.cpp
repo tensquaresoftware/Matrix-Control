@@ -209,7 +209,7 @@ void HeaderPanel::populateInputPortCombo(TSS::ComboBox& combo, std::vector<juce:
     {
         const auto& device = devices.getReference(i);
         const int itemId = i + kFirstDeviceItemId;
-        combo.addItem(device.name, itemId);
+        combo.addItem(device.name.toUpperCase(), itemId);
         identifiers.push_back(device.identifier);
     }
 
@@ -231,7 +231,7 @@ void HeaderPanel::populateOutputPortCombo(TSS::ComboBox& combo, std::vector<juce
     {
         const auto& device = devices.getReference(i);
         const int itemId = i + kFirstDeviceItemId;
-        combo.addItem(device.name, itemId);
+        combo.addItem(device.name.toUpperCase(), itemId);
         identifiers.push_back(device.identifier);
     }
 
@@ -321,7 +321,7 @@ void HeaderPanel::populateAudioFromCombo(const juce::StringArray& channelNames,
     for (int i = 0; i < count; ++i)
     {
         const int itemId = i + kFirstDeviceItemId;
-        audioFromComboBox_.addItem(channelNames[i], itemId);
+        audioFromComboBox_.addItem(channelNames[i].toUpperCase(), itemId);
         audioFromSourceIdentifiers_.push_back(channelIds[i]);
     }
 
