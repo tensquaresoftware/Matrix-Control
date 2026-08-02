@@ -178,6 +178,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/DeviceMemoryLimits.cpp
     Source/Core/Services/DeviceTypeRegistry.cpp
     Source/Core/Services/PatchFileService.cpp
+    Source/Core/Services/PatchFileServiceMutatorExport.cpp
     Source/Core/Services/PatchFileNameSanitizer.cpp
     Source/Core/Services/PatchNameOverlayStore.cpp
     Source/Core/Services/PatchNameResolver.cpp
@@ -518,6 +519,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/DeviceMemoryLimits.cpp
         Source/Core/Services/DeviceTypeRegistry.cpp
         Source/Core/Services/PatchFileService.cpp
+        Source/Core/Services/PatchFileServiceMutatorExport.cpp
         Source/Core/Services/PatchFileNameSanitizer.cpp
         Source/Core/Services/PatchNameOverlayStore.cpp
         Source/Core/Services/PatchNameResolver.cpp

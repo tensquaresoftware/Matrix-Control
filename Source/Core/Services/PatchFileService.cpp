@@ -2,10 +2,6 @@
 
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
-#include "Core/Models/PatchModel.h"
-#include "Core/Services/PatchFileNameSanitizer.h"
-#include "Core/Services/PatchMutator/MutationHistoryStore.h"
-#include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace Core
@@ -46,303 +42,79 @@ namespace Core
         lastScan_ = {};
     }
 
+    juce::File PatchFileService::withSyxExtension(const juce::File& file)
+    {
+        return file.hasFileExtension(kSyxExtension)
+            ? file
+            : file.withFileExtension(kSyxExtension);
+    }
+
+    PatchFileSaveResult PatchFileService::makeSaveFailure(const char* message)
+    {
+        PatchFileSaveResult result;
+        result.errorMessage = message;
+        return result;
+    }
+
+    bool PatchFileService::validateTempSyxContents(const juce::File& tempFile) const
+    {
+        juce::MemoryBlock readBack;
+        return tempFile.loadFileAsData(readBack) && decoder_.validatePatchSysExMessage(readBack);
+    }
+
+    bool PatchFileService::replaceFileWithTemp(const juce::File& target, juce::File& tempFile)
+    {
+        if (target.existsAsFile() && ! target.deleteFile())
+            return false;
+
+        return tempFile.moveFileTo(target);
+    }
+
+    PatchFileSaveResult PatchFileService::finalizeTempSyxWrite(const juce::File& target,
+                                                               juce::File tempFile)
+    {
+        if (! validateTempSyxContents(tempFile))
+        {
+            tempFile.deleteFile();
+            return makeSaveFailure("Validation failed");
+        }
+
+        if (! replaceFileWithTemp(target, tempFile))
+        {
+            tempFile.deleteFile();
+            return makeSaveFailure("Write failed");
+        }
+
+        PatchFileSaveResult result;
+        result.success = true;
+        return result;
+    }
+
     PatchFileSaveResult PatchFileService::savePatchSysExFile(const juce::File& targetFile,
                                                              const juce::uint8* packedData,
                                                              SysExEncoder& encoder,
                                                              int patchNumber)
     {
-        PatchFileSaveResult result;
-
         if (packedData == nullptr)
-        {
-            result.errorMessage = "Invalid patch data";
-            return result;
-        }
+            return makeSaveFailure("Invalid patch data");
 
-        const auto target = targetFile.hasFileExtension(kSyxExtension)
-            ? targetFile
-            : targetFile.withFileExtension(kSyxExtension);
-
+        const auto target = withSyxExtension(targetFile);
         const auto parent = target.getParentDirectory();
         if (! parent.isDirectory() || ! parent.hasWriteAccess())
-        {
-            result.errorMessage = "Folder not writable";
-            return result;
-        }
+            return makeSaveFailure("Folder not writable");
 
         const auto encoded = encoder.encodePatchSysEx(static_cast<juce::uint8>(patchNumber), packedData);
         if (encoded.getSize() == 0)
-        {
-            result.errorMessage = "Encode failed";
-            return result;
-        }
+            return makeSaveFailure("Encode failed");
 
         const auto tempFile = parent.getNonexistentChildFile(
             target.getFileNameWithoutExtension() + "_write",
             ".tmp");
 
         if (! tempFile.replaceWithData(encoded.getData(), encoded.getSize()))
-        {
-            result.errorMessage = "Write failed";
-            return result;
-        }
+            return makeSaveFailure("Write failed");
 
-        juce::MemoryBlock readBack;
-        if (! tempFile.loadFileAsData(readBack) || ! decoder_.validatePatchSysExMessage(readBack))
-        {
-            tempFile.deleteFile();
-            result.errorMessage = "Validation failed";
-            return result;
-        }
-
-        if (target.existsAsFile() && ! target.deleteFile())
-        {
-            tempFile.deleteFile();
-            result.errorMessage = "Write failed";
-            return result;
-        }
-
-        if (! tempFile.moveFileTo(target))
-        {
-            tempFile.deleteFile();
-            result.errorMessage = "Write failed";
-            return result;
-        }
-
-        result.success = true;
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::validateMutatorExport(const juce::File& folder,
-                                                                    const MutationHistoryStore& store)
-    {
-        PatchFileExportResult result;
-
-        if (store.isEmpty())
-        {
-            result.errorMessage = "History empty";
-            return result;
-        }
-
-        if (! folder.isDirectory() || ! folder.hasWriteAccess())
-            result.errorMessage = "Folder not writable";
-        else
-            result.success = true;
-
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::writeInitialSnapshot(const juce::File& folder,
-                                                                 const MutationHistoryStore& store,
-                                                                 SysExEncoder& encoder,
-                                                                 const juce::String& userPatchName)
-    {
-        const auto initialFile = folder.getChildFile("Initial.syx");
-        return writeExportPatchFile(initialFile, store.getInitialSnapshot().data(), encoder, userPatchName);
-    }
-
-    PatchFileExportResult PatchFileService::writeExportPatchFile(const juce::File& file,
-                                                                 const juce::uint8* packedData,
-                                                                 SysExEncoder& encoder,
-                                                                 const juce::String& userPatchName)
-    {
-        PatchModel stamped;
-        stamped.loadFrom(packedData);
-
-        // Keep the buffer's existing name when the live user name is blank — never wipe
-        // bytes 0–7 to spaces just because the stamp argument was empty.
-        if (userPatchName.trim().isNotEmpty())
-            stamped.setName(userPatchName);
-
-        PatchFileExportResult result;
-        const auto save = savePatchSysExFile(file, stamped.data(), encoder);
-
-        if (! save.success)
-        {
-            result.errorMessage = save.errorMessage;
-            return result;
-        }
-
-        result.success = true;
-        result.filesWritten = 1;
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::writeRootEntry(const juce::File& rootDir,
-                                                           int rootIndex,
-                                                           const MutationHistoryStore& store,
-                                                           SysExEncoder& encoder,
-                                                           const juce::String& userPatchName)
-    {
-        PatchFileExportResult result;
-        result.success = true;
-
-        if (const auto rootEntry = store.getEntry(rootIndex, MutationHistoryStore::kRootOnly))
-        {
-            const auto rootLabel = MutationNaming::formatRootLabel(rootIndex);
-            const auto rootFile = rootDir.getChildFile(
-                PatchFileNameSanitizer::ensureSyxExtension(rootLabel));
-            return writeExportPatchFile(rootFile, rootEntry->result.data(), encoder, userPatchName);
-        }
-
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::writeRetryEntries(const juce::File& rootDir,
-                                                              int rootIndex,
-                                                              const MutationHistoryStore& store,
-                                                              SysExEncoder& encoder,
-                                                              const juce::String& userPatchName)
-    {
-        PatchFileExportResult result;
-        result.success = true;
-
-        for (const auto retryIndex : store.getSortedRetryIndices(rootIndex))
-        {
-            if (const auto retryEntry = store.getEntry(rootIndex, retryIndex))
-            {
-                const auto stem = MutationNaming::formatExportStem(rootIndex, retryIndex);
-                const auto retryFile = rootDir.getChildFile(
-                    PatchFileNameSanitizer::ensureSyxExtension(stem));
-                const auto write = writeExportPatchFile(retryFile, retryEntry->result.data(), encoder, userPatchName);
-
-                if (! write.success)
-                    return write;
-
-                result.filesWritten += write.filesWritten;
-            }
-        }
-
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::writeRootFolder(const juce::File& folder,
-                                                            int rootIndex,
-                                                            const MutationHistoryStore& store,
-                                                            SysExEncoder& encoder,
-                                                            const juce::String& userPatchName)
-    {
-        PatchFileExportResult result;
-        const auto rootDir = folder.getChildFile(MutationNaming::formatRootLabel(rootIndex));
-
-        if (! rootDir.createDirectory())
-        {
-            result.errorMessage = "Folder not writable";
-            return result;
-        }
-
-        const auto rootWrite = writeRootEntry(rootDir, rootIndex, store, encoder, userPatchName);
-        if (! rootWrite.success)
-            return rootWrite;
-
-        result.filesWritten += rootWrite.filesWritten;
-
-        const auto retryWrite = writeRetryEntries(rootDir, rootIndex, store, encoder, userPatchName);
-        if (! retryWrite.success)
-            return retryWrite;
-
-        result.filesWritten += retryWrite.filesWritten;
-        result.success = true;
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::writeAllRootFolders(const juce::File& folder,
-                                                                const MutationHistoryStore& store,
-                                                                SysExEncoder& encoder,
-                                                                const juce::String& userPatchName)
-    {
-        PatchFileExportResult result;
-
-        for (const auto rootIndex : store.getSortedRootIndices())
-        {
-            const auto rootWrite = writeRootFolder(folder, rootIndex, store, encoder, userPatchName);
-
-            if (! rootWrite.success)
-                return rootWrite;
-
-            result.filesWritten += rootWrite.filesWritten;
-        }
-
-        result.success = true;
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::writeHistoryLayout(const juce::File& folder,
-                                                               const MutationHistoryStore& store,
-                                                               SysExEncoder& encoder,
-                                                               const juce::String& userPatchName)
-    {
-        PatchFileExportResult result;
-
-        if (store.hasInitialSnapshot())
-        {
-            const auto initialWrite = writeInitialSnapshot(folder, store, encoder, userPatchName);
-            if (! initialWrite.success)
-                return initialWrite;
-
-            result.filesWritten += initialWrite.filesWritten;
-        }
-
-        const auto rootsWrite = writeAllRootFolders(folder, store, encoder, userPatchName);
-        if (! rootsWrite.success)
-            return rootsWrite;
-
-        result.filesWritten += rootsWrite.filesWritten;
-        result.success = true;
-        return result;
-    }
-
-    PatchFileExportResult PatchFileService::exportMutatorHistory(const juce::File& folder,
-                                                                 const MutationHistoryStore& store,
-                                                                 SysExEncoder& encoder,
-                                                                 const juce::String& userPatchName)
-    {
-        const auto validation = validateMutatorExport(folder, store);
-        if (! validation.success)
-            return validation;
-
-        return writeHistoryLayout(folder, store, encoder, userPatchName);
-    }
-
-    juce::File PatchFileService::resolveKeepSessionFolder(const juce::File& parentFolder,
-                                                          const juce::String& basename)
-    {
-        constexpr int kMaxKeepSuffix = 999;
-        juce::File candidate = parentFolder.getChildFile(basename);
-
-        for (int suffix = 2; candidate.exists() && suffix <= kMaxKeepSuffix; ++suffix)
-            candidate = parentFolder.getChildFile(basename + "-" + juce::String(suffix));
-
-        return candidate;
-    }
-
-    PatchFileExportResult PatchFileService::exportMutatorHistorySession(const juce::File& sessionFolder,
-                                                                        const MutationHistoryStore& store,
-                                                                        SysExEncoder& encoder,
-                                                                        bool clearExisting,
-                                                                        const juce::String& userPatchName)
-    {
-        PatchFileExportResult result;
-
-        if (store.isEmpty())
-        {
-            result.errorMessage = "History empty";
-            return result;
-        }
-
-        if (clearExisting && sessionFolder.exists() && ! sessionFolder.deleteRecursively())
-        {
-            result.errorMessage = "Folder not writable";
-            return result;
-        }
-
-        if (! sessionFolder.createDirectory())
-        {
-            result.errorMessage = "Folder not writable";
-            return result;
-        }
-
-        return writeHistoryLayout(sessionFolder, store, encoder, userPatchName);
+        return finalizeTempSyxWrite(target, tempFile);
     }
 
     PatchFileLoadResult PatchFileService::loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut)
@@ -431,13 +203,13 @@ namespace Core
     {
         const auto syxFiles = findSyxFiles(folder);
         juce::StringArray validNames;
-        int validCount = 0;
-        int invalidCount = 0;
+        FolderScanCounts counts;
+        counts.syxFileCount = syxFiles.size();
 
-        collectSyxScanResults(syxFiles, validNames, validCount, invalidCount);
+        collectSyxScanResults(syxFiles, validNames, counts.validCount, counts.invalidCount);
         validNames.sort(false);
 
-        return makeScanResult(folder, std::move(validNames), validCount, invalidCount, syxFiles.size());
+        return makeScanResult(folder, std::move(validNames), counts);
     }
 
     bool PatchFileService::validateFileContents(const juce::File& file) const
@@ -467,22 +239,20 @@ namespace Core
 
     PatchFolderScanResult PatchFileService::makeScanResult(const juce::File& folder,
                                                            juce::StringArray validNames,
-                                                           int validCount,
-                                                           int invalidCount,
-                                                           int syxFileCount) const
+                                                           const FolderScanCounts& counts) const
     {
         PatchFolderScanResult result;
         result.folder = folder;
         result.folderUsable = true;
-        result.validCount = validCount;
-        result.invalidCount = invalidCount;
+        result.validCount = counts.validCount;
+        result.invalidCount = counts.invalidCount;
         result.sortedValidFileNames = std::move(validNames);
         result.footerSeverity = "info";
 
-        if (syxFileCount == 0)
+        if (counts.syxFileCount == 0)
             result.footerMessage = FooterMessages::kEmptyFolder;
         else
-            result.footerMessage = FooterMessages::formatScanSummary(validCount, invalidCount);
+            result.footerMessage = FooterMessages::formatScanSummary(counts.validCount, counts.invalidCount);
 
         return result;
     }

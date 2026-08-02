@@ -71,8 +71,14 @@ MutatorActionResult PatchMutatorEngine::exportHistoryResolved(const juce::File& 
 
 MutatorActionResult PatchMutatorEngine::runSessionExport(const juce::File& sessionFolder, bool clearExisting)
 {
-    return makeExportHistoryResult(patchFileService_->exportMutatorHistorySession(
-        sessionFolder, historyStore_, *sysExEncoder_, clearExisting, patchModel_->getName()));
+    const Core::MutatorHistorySessionExportArgs args {
+        sessionFolder,
+        historyStore_,
+        *sysExEncoder_,
+        clearExisting,
+        patchModel_->getName()
+    };
+    return makeExportHistoryResult(patchFileService_->exportMutatorHistorySession(args));
 }
 
 MutatorActionResult PatchMutatorEngine::defragHistory()

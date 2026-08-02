@@ -533,7 +533,8 @@ private:
                                 makeParentBuffer(402)));
 
         const auto sessionFolder = tempDir.getChildFile("OB-VOX @ B8-P25");
-        const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, false, "OB-VOX");
+        const Core::MutatorHistorySessionExportArgs args { sessionFolder, store, encoder_, false, "OB-VOX" };
+        const auto result = service_.exportMutatorHistorySession(args);
 
         expect(result.success);
         expect(sessionFolder.getChildFile("Initial.syx").existsAsFile());
@@ -577,7 +578,8 @@ private:
         expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 410),
                                 makeParentBuffer(410)));
 
-        const auto result = service_.exportMutatorHistorySession(sessionFolder, store, encoder_, true, "WARMPAD");
+        const Core::MutatorHistorySessionExportArgs args { sessionFolder, store, encoder_, true, "WARMPAD" };
+        const auto result = service_.exportMutatorHistorySession(args);
 
         expect(result.success);
         expect(! stale.existsAsFile());
