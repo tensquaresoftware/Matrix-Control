@@ -76,35 +76,19 @@ namespace TSS
             systemDisplayScale,
             ScaledDrawing::StrokeSnapPolicy::kRound);
         const float textSpacing = static_cast<float>(kTextSpacing_) * uiScale_;
+        const float lineY = centreY - lineThickness * 0.5f;
 
         g.setColour(look_.line);
 
-        drawLeftLine(g, area, centreX, halfTextWidth, centreY, lineThickness, textSpacing);
-        drawRightLine(g, area, centreX, halfTextWidth, centreY, lineThickness, textSpacing);
-    }
+        const float leftEndX = centreX - halfTextWidth - textSpacing;
+        const float leftWidth = leftEndX - area.getX();
+        if (leftWidth > 0.0f)
+            g.fillRect(juce::Rectangle<float>(area.getX(), lineY, leftWidth, lineThickness));
 
-    void GroupLabel::drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY, float lineThickness, float textSpacing)
-    {
-        const auto lineEndX = centreX - halfTextWidth - textSpacing;
-        const auto lineWidth = lineEndX - area.getX();
-
-        if (lineWidth > 0.0f)
-        {
-            const float lineY = centreY - lineThickness * 0.5f;
-            g.fillRect(juce::Rectangle<float>(area.getX(), lineY, lineWidth, lineThickness));
-        }
-    }
-
-    void GroupLabel::drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY, float lineThickness, float textSpacing)
-    {
-        const float lineStartX = centreX + halfTextWidth + textSpacing;
-        const float lineWidth = area.getRight() - lineStartX;
-
-        if (lineWidth > 0.0f)
-        {
-            const float lineY = centreY - lineThickness * 0.5f;
-            g.fillRect(juce::Rectangle<float>(lineStartX, lineY, lineWidth, lineThickness));
-        }
+        const float rightStartX = centreX + halfTextWidth + textSpacing;
+        const float rightWidth = area.getRight() - rightStartX;
+        if (rightWidth > 0.0f)
+            g.fillRect(juce::Rectangle<float>(rightStartX, lineY, rightWidth, lineThickness));
     }
 
     void GroupLabel::calculateTextWidth()

@@ -39,8 +39,6 @@ namespace TSS
 
         void drawText(juce::Graphics& g, const juce::Rectangle<float>& area);
         void drawLines(juce::Graphics& g, const juce::Rectangle<float>& area, float textWidth);
-        void drawLeftLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY, float lineThickness, float textSpacing);
-        void drawRightLine(juce::Graphics& g, const juce::Rectangle<float>& area, float centreX, float halfTextWidth, float centreY, float lineThickness, float textSpacing);
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GroupLabel)
     };
