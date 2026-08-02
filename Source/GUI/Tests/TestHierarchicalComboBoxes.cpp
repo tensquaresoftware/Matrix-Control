@@ -10,24 +10,29 @@
 class TestHierarchicalComboBoxes::HierarchicalComboBoxScalePanel : public juce::Component
 {
 public:
-    HierarchicalComboBoxScalePanel(float scale,
-                                   const juce::String& scaleLabelText,
-                                   const TSS::ComboBoxLook& comboLook,
-                                   const TSS::PopupMenuLook& popupLook,
-                                   const TSS::LabelLook& labelLook,
-                                   int comboWidth,
-                                   int comboHeight)
-        : scale_(scale)
-        , comboWidth_(comboWidth)
-        , comboHeight_(comboHeight)
-        , comboLook_(comboLook)
-        , popupLook_(popupLook)
+    struct Config
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        const TSS::ComboBoxLook& comboLook;
+        const TSS::PopupMenuLook& popupLook;
+        const TSS::LabelLook& labelLook;
+        int comboWidth = 0;
+        int comboHeight = 0;
+    };
+
+    explicit HierarchicalComboBoxScalePanel(const Config& config)
+        : scale_(config.scale)
+        , comboWidth_(config.comboWidth)
+        , comboHeight_(config.comboHeight)
+        , comboLook_(config.comboLook)
+        , popupLook_(config.popupLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            config.labelLook,
+            config.scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
         historyCombo_ = std::make_unique<TSS::HierarchicalComboBox>(comboWidth_, comboHeight_, comboLook_);
@@ -160,14 +165,14 @@ void TestHierarchicalComboBoxes::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<HierarchicalComboBoxScalePanel>(
-            spec.scale,
-            spec.label,
-            comboLook,
-            popupLook,
-            labelLook,
-            comboWidth_,
-            comboHeight_);
+        auto panel = std::make_unique<HierarchicalComboBoxScalePanel>(HierarchicalComboBoxScalePanel::Config{
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .comboLook = comboLook,
+            .popupLook = popupLook,
+            .labelLook = labelLook,
+            .comboWidth = comboWidth_,
+            .comboHeight = comboHeight_});
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }
