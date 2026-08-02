@@ -5,82 +5,106 @@
 
 namespace
 {
-    using namespace TSS::Design;
+    namespace BW = TSS::Design::Atoms::Widths::Button;
+    using namespace PluginIDs;
 
-    bool endsWith(const juce::String& s, const char* suffix)
+    struct ExactButtonWidthEntry
     {
-        return s.endsWith(suffix);
+        const char* widgetId;
+        int width;
+    };
+
+    constexpr ExactButtonWidthEntry kExactStandaloneButtonWidths[] = {
+        { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
+          BW::kPatchManagerUnlockBank },
+        { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank,
+          BW::kPatchManagerImportBank },
+        { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank,
+          BW::kPatchManagerExportBank },
+
+        { PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,
+          BW::kInternalPatchesInit },
+        { PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch,
+          BW::kInternalPatchesCopy },
+        { PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch,
+          BW::kInternalPatchesPaste },
+        { PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch,
+          BW::kInternalPatchesStore },
+
+        { PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder,
+          BW::kComputerPatchesLoad },
+        { PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs,
+          BW::kComputerPatchesSaveAs },
+        { PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile,
+          BW::kComputerPatchesSave },
+
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate,
+          BW::kPatchMutatorMutate },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry,
+          BW::kPatchMutatorRetry },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare,
+          BW::kPatchMutatorCompare },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete,
+          BW::kPatchMutatorDelete },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear,
+          BW::kPatchMutatorClear },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport,
+          BW::kPatchMutatorExport },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious,
+          BW::kPatchMutatorHistoryNav },
+        { PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext,
+          BW::kPatchMutatorHistoryNav },
+    };
+
+    std::optional<int> findExactStandaloneButtonWidth(const juce::String& widgetId)
+    {
+        for (const auto& entry : kExactStandaloneButtonWidths)
+        {
+            if (widgetId == entry.widgetId)
+                return entry.width;
+        }
+
+        return std::nullopt;
+    }
+
+    std::optional<int> resolvePrefixStandaloneButtonWidth(const juce::String& widgetId)
+    {
+        if (widgetId.startsWith("bankUtilitySelectBank"))
+            return BW::kPatchManagerBankSelect;
+
+        if (widgetId.startsWith("patchMutatorEnable"))
+            return BW::kInit;
+
+        return std::nullopt;
+    }
+
+    std::optional<int> resolveSuffixStandaloneButtonWidth(const juce::String& widgetId)
+    {
+        if (widgetId.endsWith("LoadPrevious") || widgetId.endsWith("LoadNext"))
+            return BW::kInit;
+
+        if (widgetId.endsWith("Init"))
+            return BW::kInit;
+
+        if (widgetId.endsWith("Copy"))
+            return BW::kCopy;
+
+        if (widgetId.endsWith("Paste"))
+            return BW::kPaste;
+
+        return std::nullopt;
     }
 }
 
 std::optional<int> WidgetDimensionRegistry::resolveStandaloneButtonWidth(const juce::String& widgetId)
 {
-    using namespace PluginIDs;
-    namespace BW = TSS::Design::Atoms::Widths::Button;
+    if (const auto exact = findExactStandaloneButtonWidth(widgetId))
+        return exact;
 
-    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank)
-        return BW::kPatchManagerUnlockBank;
+    if (const auto prefix = resolvePrefixStandaloneButtonWidth(widgetId))
+        return prefix;
 
-    if (widgetId.startsWith("bankUtilitySelectBank"))
-        return BW::kPatchManagerBankSelect;
-
-    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank)
-        return BW::kPatchManagerImportBank;
-    if (widgetId == PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank)
-        return BW::kPatchManagerExportBank;
-
-    if (widgetId == PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch)
-        return BW::kInternalPatchesInit;
-    if (widgetId == PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch)
-        return BW::kInternalPatchesCopy;
-    if (widgetId == PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch)
-        return BW::kInternalPatchesPaste;
-    if (widgetId == PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch)
-        return BW::kInternalPatchesStore;
-
-    if (widgetId == PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder)
-        return BW::kComputerPatchesLoad;
-    if (widgetId == PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs)
-        return BW::kComputerPatchesSaveAs;
-    if (widgetId == PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile)
-        return BW::kComputerPatchesSave;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate)
-        return BW::kPatchMutatorMutate;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kRetry)
-        return BW::kPatchMutatorRetry;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kCompare)
-        return BW::kPatchMutatorCompare;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kDelete)
-        return BW::kPatchMutatorDelete;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kClear)
-        return BW::kPatchMutatorClear;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kExport)
-        return BW::kPatchMutatorExport;
-
-    if (widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryPrevious
-        || widgetId == PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryNext)
-        return BW::kPatchMutatorHistoryNav;
-
-    if (widgetId.startsWith("patchMutatorEnable"))
-        return BW::kInit;
-
-    if (endsWith(widgetId, "LoadPrevious") || endsWith(widgetId, "LoadNext"))
-        return BW::kInit;
-
-    if (endsWith(widgetId, "Init"))
-        return BW::kInit;
-    if (endsWith(widgetId, "Copy"))
-        return BW::kCopy;
-    if (endsWith(widgetId, "Paste"))
-        return BW::kPaste;
-
-    return std::nullopt;
+    return resolveSuffixStandaloneButtonWidth(widgetId);
 }
 
 bool WidgetDimensionRegistry::isStandaloneButtonWidthResolvable(const juce::String& widgetId)
