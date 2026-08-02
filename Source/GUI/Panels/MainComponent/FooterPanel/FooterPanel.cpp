@@ -32,54 +32,8 @@ FooterPanel::~FooterPanel()
     apvts.state.removeListener(this);
 }
 
-void FooterPanel::paintBadgeAndDetail(juce::Graphics& g,
-                                      juce::Rectangle<int> bounds,
-                                      const juce::String& badgeLabel,
-                                      const juce::String& detailText,
-                                      juce::Colour badgeFill,
-                                      juce::Colour detailColour,
-                                      const juce::Font& font) const
+FooterPanel::FooterBandLayout FooterPanel::computeBandLayout() const
 {
-    const int badgeHeight = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeHeight), uiScale_);
-    const int badgePad = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeHorizontalPadding), uiScale_);
-    const int badgeGap = TSS::ScaledLayout::scaledInt(
-        static_cast<float>(dimensions_.severityBadgeToMessageGap), uiScale_);
-    const auto badgeFont = skin_->getBaseFontBold().withHeight(font.getHeight());
-
-    g.setFont(badgeFont);
-
-    const int labelWidth = juce::roundToInt(juce::GlyphArrangement::getStringWidth(badgeFont, badgeLabel));
-    const int badgeWidth = juce::jmin(bounds.getWidth(), labelWidth + 2 * badgePad);
-    const int badgeY = bounds.getCentreY() - badgeHeight / 2;
-    const juce::Rectangle<int> badgeBounds {
-        bounds.getX(),
-        badgeY,
-        badgeWidth,
-        badgeHeight
-    };
-
-    g.setColour(badgeFill);
-    g.fillRect(badgeBounds);
-
-    g.setColour(skin_->getColour(SkinColourId::kFooterPanelBackground));
-    g.drawText(badgeLabel, badgeBounds, juce::Justification::centred, false);
-
-    bounds.removeFromLeft(badgeWidth + badgeGap);
-    g.setFont(font);
-    g.setColour(detailColour);
-
-    // Prefer start of the message; truncate with ASCII "..." only (no U+2026 mojibake).
-    const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
-        detailText, font, static_cast<float>(bounds.getWidth()), false);
-    g.drawText(fittedDetail, bounds, juce::Justification::centredLeft, false);
-}
-
-void FooterPanel::paint(juce::Graphics& g)
-{
-    g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
-
     const int padding = juce::jmax(1, juce::roundToInt(static_cast<float>(dimensions_.padding) * uiScale_));
     const int bandHeight = TSS::ScaledLayout::scaledInt(
         static_cast<float>(dimensions_.bandHeight), uiScale_);
@@ -97,45 +51,109 @@ void FooterPanel::paint(juce::Graphics& g)
     const auto area = getLocalBounds();
     const int bandY = area.getY() + bandVerticalInset;
 
-    const juce::Rectangle<int> leftBand { area.getX(), bandY, patchEditW, bandHeight };
-    const juce::Rectangle<int> centreBand { leftBand.getRight() + gap, bandY, sharedW, bandHeight };
-    const juce::Rectangle<int> rightBand { centreBand.getRight() + gap, bandY, masterEditW, bandHeight };
+    FooterBandLayout layout;
+    layout.padding = padding;
+    layout.leftBand = { area.getX(), bandY, patchEditW, bandHeight };
+    layout.centreBand = { layout.leftBand.getRight() + gap, bandY, sharedW, bandHeight };
+    layout.rightBand = { layout.centreBand.getRight() + gap, bandY, masterEditW, bandHeight };
+    return layout;
+}
+
+void FooterPanel::paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintArgs& args) const
+{
+    auto bounds = args.bounds;
+    const int badgeHeight = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.severityBadgeHeight), uiScale_);
+    const int badgePad = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.severityBadgeHorizontalPadding), uiScale_);
+    const int badgeGap = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dimensions_.severityBadgeToMessageGap), uiScale_);
+    const auto badgeFont = skin_->getBaseFontBold().withHeight(args.font.getHeight());
+
+    g.setFont(badgeFont);
+
+    const int labelWidth = juce::roundToInt(juce::GlyphArrangement::getStringWidth(badgeFont, args.badgeLabel));
+    const int badgeWidth = juce::jmin(bounds.getWidth(), labelWidth + 2 * badgePad);
+    const int badgeY = bounds.getCentreY() - badgeHeight / 2;
+    const juce::Rectangle<int> badgeBounds {
+        bounds.getX(),
+        badgeY,
+        badgeWidth,
+        badgeHeight
+    };
+
+    g.setColour(args.badgeFill);
+    g.fillRect(badgeBounds);
+
+    g.setColour(skin_->getColour(SkinColourId::kFooterPanelBackground));
+    g.drawText(args.badgeLabel, badgeBounds, juce::Justification::centred, false);
+
+    bounds.removeFromLeft(badgeWidth + badgeGap);
+    g.setFont(args.font);
+    g.setColour(args.detailColour);
+
+    // Prefer start of the message; truncate with ASCII "..." only (no U+2026 mojibake).
+    const auto fittedDetail = TSS::TextFitHelpers::fitWithAsciiEllipsis(
+        args.detailText, args.font, static_cast<float>(bounds.getWidth()), false);
+    g.drawText(fittedDetail, bounds, juce::Justification::centredLeft, false);
+}
+
+void FooterPanel::paintStatusMessage(juce::Graphics& g,
+                                     juce::Rectangle<int> bounds,
+                                     const juce::Font& font,
+                                     juce::Colour detailColour) const
+{
+    if (currentMessage.isEmpty() || currentSeverity == MessageSeverity::None)
+        return;
+
+    paintBadgeAndDetail(g, {
+        bounds,
+        getSeverityPrefix(currentSeverity),
+        currentMessage,
+        getSeverityColour(currentSeverity),
+        detailColour,
+        font
+    });
+}
+
+void FooterPanel::paintDeviceStatus(juce::Graphics& g,
+                                    juce::Rectangle<int> bounds,
+                                    const juce::Font& font,
+                                    juce::Colour detailColour) const
+{
+    const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
+    const bool deviceOk = deviceDetected_
+        && MatrixDeviceTypes::isSupportedMatrixDevice(type);
+    const auto badgeFill = deviceOk
+        ? skin_->getColour(SkinColourId::kFooterMessageInfo)
+        : skin_->getColour(SkinColourId::kFooterMessageError).withAlpha(0.8f);
+
+    paintBadgeAndDetail(g, {
+        bounds,
+        PluginDisplayNames::FooterPanel::kDeviceLabel,
+        buildDeviceDetailText(),
+        badgeFill,
+        detailColour,
+        font
+    });
+}
+
+void FooterPanel::paint(juce::Graphics& g)
+{
+    g.fillAll(skin_->getColour(SkinColourId::kFooterPanelBackground));
+
+    const auto layout = computeBandLayout();
 
     g.setColour(skin_->getColour(SkinColourId::kBodyPanelBackground).withAlpha(0.0f));
-    g.fillRect(leftBand);
-    g.fillRect(centreBand);
-    g.fillRect(rightBand);
+    g.fillRect(layout.leftBand);
+    g.fillRect(layout.centreBand);
+    g.fillRect(layout.rightBand);
 
     const auto font = skin_->getBaseFont().withHeight(skin_->getBaseFont().getHeight() * uiScale_);
     const auto chromeGrey = skin_->getColour(SkinColourId::kFooterMessageInfo);
 
-    if (! currentMessage.isEmpty() && currentSeverity != MessageSeverity::None)
-    {
-        paintBadgeAndDetail(g,
-                            leftBand.reduced(padding, 0),
-                            getSeverityPrefix(currentSeverity),
-                            currentMessage,
-                            getSeverityColour(currentSeverity),
-                            chromeGrey,
-                            font);
-    }
-
-    {
-        const auto type = MatrixDeviceTypes::fromApvtsString(deviceType_);
-        const bool deviceOk = deviceDetected_
-            && MatrixDeviceTypes::isSupportedMatrixDevice(type);
-        const auto badgeFill = deviceOk
-            ? skin_->getColour(SkinColourId::kFooterMessageInfo)
-            : skin_->getColour(SkinColourId::kFooterMessageError).withAlpha(0.8f);
-
-        paintBadgeAndDetail(g,
-                            rightBand.reduced(padding, 0),
-                            PluginDisplayNames::FooterPanel::kDeviceLabel,
-                            buildDeviceDetailText(),
-                            badgeFill,
-                            chromeGrey,
-                            font);
-    }
+    paintStatusMessage(g, layout.leftBand.reduced(layout.padding, 0), font, chromeGrey);
+    paintDeviceStatus(g, layout.rightBand.reduced(layout.padding, 0), font, chromeGrey);
 }
 
 void FooterPanel::resized()

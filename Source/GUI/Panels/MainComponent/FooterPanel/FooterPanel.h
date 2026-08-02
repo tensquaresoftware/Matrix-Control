@@ -36,6 +36,24 @@ private:
         Error
     };
 
+    struct FooterBandLayout
+    {
+        juce::Rectangle<int> leftBand;
+        juce::Rectangle<int> centreBand;
+        juce::Rectangle<int> rightBand;
+        int padding = 0;
+    };
+
+    struct BadgeDetailPaintArgs
+    {
+        juce::Rectangle<int> bounds;
+        juce::String badgeLabel;
+        juce::String detailText;
+        juce::Colour badgeFill;
+        juce::Colour detailColour;
+        juce::Font font;
+    };
+
     FooterPanelDimensions dimensions_;
 
     TSS::ISkin* skin_;
@@ -58,13 +76,16 @@ private:
     juce::Colour getSeverityColour(MessageSeverity severity) const;
     juce::String getSeverityPrefix(MessageSeverity severity) const;
     juce::String buildDeviceDetailText() const;
-    void paintBadgeAndDetail(juce::Graphics& g,
-                             juce::Rectangle<int> bounds,
-                             const juce::String& badgeLabel,
-                             const juce::String& detailText,
-                             juce::Colour badgeFill,
-                             juce::Colour detailColour,
-                             const juce::Font& font) const;
+    FooterBandLayout computeBandLayout() const;
+    void paintBadgeAndDetail(juce::Graphics& g, const BadgeDetailPaintArgs& args) const;
+    void paintStatusMessage(juce::Graphics& g,
+                            juce::Rectangle<int> bounds,
+                            const juce::Font& font,
+                            juce::Colour detailColour) const;
+    void paintDeviceStatus(juce::Graphics& g,
+                           juce::Rectangle<int> bounds,
+                           const juce::Font& font,
+                           juce::Colour detailColour) const;
     void syncFromApvtsState(juce::ValueTree& tree);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FooterPanel)
