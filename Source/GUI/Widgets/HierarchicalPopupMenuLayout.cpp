@@ -102,7 +102,7 @@ namespace TSS
         for (int i = 0; i < owner_.getPrimaryItemCount(); ++i)
         {
             const auto& primary = owner_.getPrimaryItem(i);
-            if (primary.isSentinel)
+            if (! primary.isSelectable())
                 continue;
 
             float width = measureLabel(primary.label) + sidePadding;
@@ -117,15 +117,6 @@ namespace TSS
 
         primaryColumnWidth_ = maxPrimary;
         secondaryColumnWidth_ = maxSecondary;
-    }
-
-    bool HierarchicalPopupMenu::isSeparatorRow(int primaryIndex) const
-    {
-        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, primaryIndex);
-        if (storageIndex < 0)
-            return false;
-
-        return owner_.getPrimaryItem(storageIndex).isSeparator;
     }
 
     bool HierarchicalPopupMenu::hasSecondaryColumn() const

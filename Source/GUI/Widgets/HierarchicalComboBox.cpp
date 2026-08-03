@@ -63,12 +63,7 @@ namespace TSS
 
     void HierarchicalComboBox::addPrimaryItem(int id, const juce::String& label, bool isSentinel)
     {
-        primaryItems_.push_back({ id, label, isSentinel, false, {} });
-    }
-
-    void HierarchicalComboBox::addSeparatorItem(int id)
-    {
-        primaryItems_.push_back({ id, {}, false, true, {} });
+        primaryItems_.push_back({ id, label, isSentinel, {} });
     }
 
     void HierarchicalComboBox::addChildItem(int primaryId, int id, const juce::String& label)

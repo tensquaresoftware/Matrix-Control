@@ -29,9 +29,6 @@ namespace TSS
         void drawSubMenuChevron(juce::Graphics& g,
                                 const juce::Rectangle<float>& itemBounds,
                                 const juce::Font& font) const;
-        // Horizontal rule centred in a full item row (non-selectable group divider).
-        void drawHorizontalSeparatorItem(juce::Graphics& g,
-                                         const juce::Rectangle<float>& itemBounds) const;
         void drawVerticalSeparators(juce::Graphics& g, const juce::Rectangle<float>& contentBounds,
                                    int columnCount, float actualColumnWidth, float separatorWidth) const;
 

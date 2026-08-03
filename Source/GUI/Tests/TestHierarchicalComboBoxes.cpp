@@ -85,9 +85,8 @@ private:
     {
         combo.clear();
 
-        // Session origin row + divider, as Patch Mutator HISTORY builds them.
+        // Session origin row, as Patch Mutator HISTORY builds it.
         combo.addPrimaryItem(-1, PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kCompareSecondaryLabel);
-        combo.addSeparatorItem(-2);
 
         // M00: retries → chevron + N2 with Mxx / Mxx-Ryy (AC #4)
         combo.addPrimaryItem(1, "M00");

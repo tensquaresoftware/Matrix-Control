@@ -12,7 +12,7 @@ namespace TSS
         int count = 0;
         for (int i = 0; i < owner.getPrimaryItemCount(); ++i)
         {
-            if (! owner.getPrimaryItem(i).isSentinel)
+            if (owner.getPrimaryItem(i).isSelectable())
                 ++count;
         }
         return count;
@@ -24,7 +24,7 @@ namespace TSS
         for (int i = 0; i < owner.getPrimaryItemCount(); ++i)
         {
             const auto& primary = owner.getPrimaryItem(i);
-            if (primary.isSentinel)
+            if (! primary.isSelectable())
                 continue;
 
             if (primary.id == primaryId)
@@ -41,7 +41,7 @@ namespace TSS
         int current = 0;
         for (int i = 0; i < owner.getPrimaryItemCount(); ++i)
         {
-            if (owner.getPrimaryItem(i).isSentinel)
+            if (! owner.getPrimaryItem(i).isSelectable())
                 continue;
 
             if (current == openableIndex)
@@ -88,10 +88,6 @@ namespace TSS
         int rowIndex = openableIndexForPrimaryId(owner_, owner_.getSelectedPrimaryId());
         if (rowIndex < 0)
             rowIndex = 0;
-
-        // Never open with a separator row highlighted.
-        while (rowIndex < rowCount && isSeparatorRow(rowIndex))
-            ++rowIndex;
 
         return rowIndex < rowCount ? rowIndex : -1;
     }
@@ -172,7 +168,7 @@ namespace TSS
         }
 
         const auto primaryIndex = getPrimaryIndexAt(x, y);
-        if (primaryIndex < 0 || isSeparatorRow(primaryIndex))
+        if (primaryIndex < 0)
             return;
 
         if (primaryIndex != highlightedPrimaryIndex_)
@@ -200,7 +196,7 @@ namespace TSS
             return;
 
         const auto& primary = owner_.getPrimaryItem(storageIndex);
-        if (primary.isSeparator || ! primary.children.empty())
+        if (! primary.children.empty())
             return;
 
         // Commit after teardown so onChange rebuild/clear cannot run under a live popup.

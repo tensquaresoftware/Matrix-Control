@@ -27,9 +27,8 @@ namespace PatchMutatorPanelInternal
         TSS::Button* button = nullptr;
     };
 
-    // Reserved HISTORY level-1 ids — negative so they never collide with the 1..N mutation ids.
+    // Reserved HISTORY level-1 id — negative so it never collides with the 1..N mutation ids.
     constexpr int kHistoryInitialPrimaryId = -1;
-    constexpr int kHistoryInitialSeparatorPrimaryId = -2;
 
     // Same word as the Patch Name secondary line while the origin snapshot is auditioned.
     constexpr const char* kHistoryInitialLabel =

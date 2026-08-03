@@ -224,10 +224,7 @@ void PatchMutatorPanel::refreshHistoryComboBox()
 
     historyInitialRowPresent_ = isHistoryInitialRowAvailable(apvts_.state);
     if (historyInitialRowPresent_)
-    {
         historyComboBox_->addPrimaryItem(kHistoryInitialPrimaryId, kHistoryInitialLabel);
-        historyComboBox_->addSeparatorItem(kHistoryInitialSeparatorPrimaryId);
-    }
 
     for (int i = 0; i < mutateLabelList.size(); ++i)
     {
