@@ -67,26 +67,8 @@ namespace TSS
 
         measureColumnWidths();
 
-        highlightedPrimaryIndex_ = openableIndexForPrimaryId(owner_, owner_.getSelectedPrimaryId());
-        if (highlightedPrimaryIndex_ < 0 && countOpenablePrimaries(owner_) > 0)
-            highlightedPrimaryIndex_ = 0;
-
-        if (highlightedPrimaryIndex_ >= 0)
-        {
-            const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
-            if (storageIndex >= 0)
-            {
-                const auto& primary = owner_.getPrimaryItem(storageIndex);
-                for (size_t i = 0; i < primary.children.size(); ++i)
-                {
-                    if (primary.children[i].id == owner_.getSelectedChildId())
-                    {
-                        highlightedChildIndex_ = static_cast<int>(i);
-                        break;
-                    }
-                }
-            }
-        }
+        highlightedPrimaryIndex_ = resolveInitialHighlightedPrimaryIndex();
+        highlightedChildIndex_ = resolveInitialHighlightedChildIndex();
 
         ensureHighlightedPrimaryVisible();
         ensureHighlightedChildVisible();
@@ -99,6 +81,39 @@ namespace TSS
     }
 
     HierarchicalPopupMenu::~HierarchicalPopupMenu() = default;
+
+    int HierarchicalPopupMenu::resolveInitialHighlightedPrimaryIndex() const
+    {
+        const int rowCount = countOpenablePrimaries(owner_);
+        int rowIndex = openableIndexForPrimaryId(owner_, owner_.getSelectedPrimaryId());
+        if (rowIndex < 0)
+            rowIndex = 0;
+
+        // Never open with a separator row highlighted.
+        while (rowIndex < rowCount && isSeparatorRow(rowIndex))
+            ++rowIndex;
+
+        return rowIndex < rowCount ? rowIndex : -1;
+    }
+
+    int HierarchicalPopupMenu::resolveInitialHighlightedChildIndex() const
+    {
+        if (highlightedPrimaryIndex_ < 0)
+            return -1;
+
+        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, highlightedPrimaryIndex_);
+        if (storageIndex < 0)
+            return -1;
+
+        const auto& primary = owner_.getPrimaryItem(storageIndex);
+        for (size_t i = 0; i < primary.children.size(); ++i)
+        {
+            if (primary.children[i].id == owner_.getSelectedChildId())
+                return static_cast<int>(i);
+        }
+
+        return -1;
+    }
 
     int HierarchicalPopupMenu::getPrimaryIndexAt(int x, int y) const
     {
@@ -157,7 +172,7 @@ namespace TSS
         }
 
         const auto primaryIndex = getPrimaryIndexAt(x, y);
-        if (primaryIndex < 0)
+        if (primaryIndex < 0 || isSeparatorRow(primaryIndex))
             return;
 
         if (primaryIndex != highlightedPrimaryIndex_)
@@ -185,7 +200,7 @@ namespace TSS
             return;
 
         const auto& primary = owner_.getPrimaryItem(storageIndex);
-        if (! primary.children.empty())
+        if (primary.isSeparator || ! primary.children.empty())
             return;
 
         // Commit after teardown so onChange rebuild/clear cannot run under a live popup.

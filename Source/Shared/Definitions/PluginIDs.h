@@ -631,7 +631,12 @@ namespace PluginIDs
                 constexpr const char* kSelectedMutateRootIndex = "patchMutatorSelectedM";
                 constexpr const char* kSelectedRetryIndex    = "patchMutatorSelectedR";
                 constexpr const char* kCompareActive = "patchMutatorCompareActive";
+                // HISTORY INITIAL row: origin snapshot selected without the full Compare lock.
+                constexpr const char* kInitialSelected = "patchMutatorInitialSelected";
                 constexpr int kSelectedRetryRootOnly = -1; // matches Core::MutationHistoryStore::kRootOnly
+
+                // uiMirror — session origin snapshot exists, so HISTORY can offer the INITIAL row
+                constexpr const char* kInitialSnapshotAvailable = "patchMutatorInitialAvailable";
 
                 // uiMirror — action button enabled flags (Core → GUI; not persisted in session XML)
                 constexpr const char* kMutateEnabled = "patchMutatorMutateEnabled";

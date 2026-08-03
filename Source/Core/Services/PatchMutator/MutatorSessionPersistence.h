@@ -91,6 +91,8 @@ namespace Core::MutatorSessionPersistence
         state.removeProperty(S::kSelectedMutateRootIndex, nullptr);
         state.removeProperty(S::kSelectedRetryIndex, nullptr);
         state.removeProperty(S::kCompareActive, nullptr);
+        state.removeProperty(S::kInitialSelected, nullptr);
+        state.removeProperty(S::kInitialSnapshotAvailable, nullptr);
         state.removeProperty(S::kMutateEnabled, nullptr);
         state.removeProperty(S::kRetryEnabled, nullptr);
         state.removeProperty(S::kExportEnabled, nullptr);
@@ -111,6 +113,8 @@ namespace Core::MutatorSessionPersistence
         state.setProperty(S::kSelectedMutateRootIndex, -1, nullptr);
         state.setProperty(S::kSelectedRetryIndex, S::kSelectedRetryRootOnly, nullptr);
         state.setProperty(S::kCompareActive, false, nullptr);
+        state.setProperty(S::kInitialSelected, false, nullptr);
+        state.setProperty(S::kInitialSnapshotAvailable, false, nullptr);
         // Force idle name even if stale XML still embeds a previous session name (crash / legacy).
         state.setProperty(PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
                           juce::String(kDefaultPatchName),

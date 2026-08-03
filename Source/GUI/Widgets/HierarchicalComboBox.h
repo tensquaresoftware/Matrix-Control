@@ -29,6 +29,9 @@ namespace TSS
 
         void clear();
         void addPrimaryItem(int id, const juce::String& label, bool isSentinel = false);
+        // Non-selectable horizontal rule between level-1 groups. Unlike the empty-combo
+        // sentinel it still occupies a popup row.
+        void addSeparatorItem(int id);
         void addChildItem(int primaryId, int id, const juce::String& label);
 
         void setSelectedPrimaryId(int primaryId, juce::NotificationType notification = juce::sendNotification);
@@ -74,7 +77,10 @@ namespace TSS
             int id = 0;
             juce::String label;
             bool isSentinel = false;
+            bool isSeparator = false;
             std::vector<ChildItem> children;
+
+            bool isSelectable() const { return ! isSentinel && ! isSeparator; }
         };
 
         friend class HierarchicalPopupMenu;

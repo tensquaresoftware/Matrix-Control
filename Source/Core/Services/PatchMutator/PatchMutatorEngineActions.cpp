@@ -53,6 +53,7 @@ MutatorActionResult PatchMutatorEngine::mutate()
 
     selectedRootIndex_ = rootIndex;
     selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    initialSelected_ = false;
     syncHistoryUiProperties(apvts_);
 
     return makeSuccessResult();
@@ -95,6 +96,7 @@ MutatorActionResult PatchMutatorEngine::retry()
     pushResultToEditorAndSynth(working);
 
     selectedRetryIndex_ = retryIndex;
+    initialSelected_ = false;
     syncHistoryUiProperties(apvts_);
 
     return makeSuccessResult();
@@ -106,6 +108,7 @@ MutatorActionResult PatchMutatorEngine::exitCompareMode()
     state.setProperty(MutatorState::kCompareActive, false, nullptr);
     {
         SuppressMutatorHistorySelectionDebounceGuard suppressGuard(hooks_);
+        state.setProperty(MutatorState::kInitialSelected, false, nullptr);
         state.setProperty(MutatorState::kSelectedMutateRootIndex, compareSavedMutateRootIndex_, nullptr);
         state.setProperty(MutatorState::kSelectedRetryIndex, compareSavedRetryIndex_, nullptr);
     }
@@ -127,10 +130,20 @@ MutatorActionResult PatchMutatorEngine::enterCompareMode()
     if (! historyStore_.hasInitialSnapshot())
         return makeWarningResult(kNoInitialSnapshotFooterMessage);
 
+    // Manual INITIAL already auditions the origin — Compare would be a no-op lock.
+    if (initialSelected_)
+        return makeWarningResult(kNoSelectionFooterMessage);
+
     compareSavedMutateRootIndex_ = selectedRootIndex_;
     compareSavedRetryIndex_ = selectedRetryIndex_;
 
     apvts_.state.setProperty(MutatorState::kCompareActive, true, nullptr);
+    {
+        // Compare shows the origin, so HISTORY must display INITIAL too. Guarded: the
+        // Compare lock already drives the panel refresh — no extra audition dispatch.
+        SuppressMutatorHistorySelectionDebounceGuard suppressGuard(hooks_);
+        apvts_.state.setProperty(MutatorState::kInitialSelected, true, nullptr);
+    }
 
     const PatchModel initialSnapshot = historyStore_.getInitialSnapshot();
     if (candidateDiffersFromLive(initialSnapshot))
@@ -158,6 +171,10 @@ MutatorActionResult PatchMutatorEngine::deleteSelected()
 
     if (historyStore_.isEmpty())
         return makeWarningResult(kEmptyHistoryFooterMessage);
+
+    // The origin snapshot is not a history entry — DELETE never applies to it.
+    if (initialSelected_)
+        return makeWarningResult(kNoSelectionFooterMessage);
 
     const int mutateRootIndex = selectedRootIndex_;
     if (mutateRootIndex < 0 || ! historyStore_.hasRoot(mutateRootIndex))

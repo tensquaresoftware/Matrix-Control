@@ -103,6 +103,23 @@ namespace TSS
         g.fillPath(chevron);
     }
 
+    void PopupMenuRenderer::drawHorizontalSeparatorItem(juce::Graphics& g,
+                                                        const juce::Rectangle<float>& itemBounds) const
+    {
+        const auto separatorColour = isButtonLike_
+            ? look_.separatorButtonLike
+            : look_.separator;
+        const float thickness = juce::jmax(1.0f, uiScale_);
+        const float horizontalPadding =
+            static_cast<float>(ComboBox::getPopupLayoutDimensions().textLeftPadding) * uiScale_;
+
+        g.setColour(separatorColour);
+        g.fillRect(itemBounds.getX() + horizontalPadding,
+                   itemBounds.getCentreY() - thickness * 0.5f,
+                   juce::jmax(0.0f, itemBounds.getWidth() - 2.0f * horizontalPadding),
+                   thickness);
+    }
+
     void PopupMenuRenderer::drawItem(juce::Graphics& g, const ComboBox& comboBox, int itemIndex,
                                     const juce::Rectangle<float>& itemBounds, int highlightedItemIndex,
                                     const juce::Font& font) const

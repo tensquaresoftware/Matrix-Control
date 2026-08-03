@@ -17,6 +17,12 @@ public:
         compare_exit_restoresSelection();
         compare_exit_auditionsRestoredEntry();
         compare_auditionBlockedWhileActive();
+        compare_enter_selectsInitialInHistory();
+        compare_exit_clearsInitialSelection();
+        initialSelected_auditionsOriginSnapshot();
+        initialSelected_blocksRetryAndDelete();
+        mutate_fromInitial_keepsSnapshotAndSelectsNewEntry();
+        clear_hidesInitialSelection();
     }
 
 private:
@@ -192,6 +198,140 @@ private:
 
         harness.engine.auditionSelectedHistoryEntry();
         expectEquals(countPatchSysExMessages(harness.queue), 0);
+    }
+
+    void compare_enter_selectsInitialInHistory()
+    {
+        beginTest("compare_enter_selectsInitialInHistory");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+
+        expect(harness.engine.toggleCompare().success);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+        expect(static_cast<bool>(
+            harness.proc.apvts.state.getProperty(MutatorState::kInitialSnapshotAvailable, false)));
+    }
+
+    void compare_exit_clearsInitialSelection()
+    {
+        beginTest("compare_exit_clearsInitialSelection");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+        expect(harness.engine.retry().success);
+
+        const int rootBeforeCompare = static_cast<int>(
+            harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex));
+        const int retryBeforeCompare = static_cast<int>(
+            harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex));
+
+        expect(harness.engine.toggleCompare().success);
+        expect(harness.engine.toggleCompare().success);
+
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)),
+                     rootBeforeCompare);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedRetryIndex)),
+                     retryBeforeCompare);
+    }
+
+    void initialSelected_auditionsOriginSnapshot()
+    {
+        beginTest("initialSelected_auditionsOriginSnapshot");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        const auto origin = makeDistinctBuffer(861);
+        std::memcpy(harness.model.data(), origin.data(), Core::PatchModel::kBufferSize);
+        expect(harness.engine.mutate().success);
+        (void) countPatchSysExMessages(harness.queue);
+
+        harness.proc.apvts.state.setProperty(MutatorState::kInitialSelected, true, nullptr);
+        harness.engine.auditionSelectedHistoryEntry();
+
+        expectEquals(countPatchSysExMessages(harness.queue), 1);
+        Core::PatchModel expectedLive;
+        expectedLive.loadFrom(origin.data());
+        expectedLive.setName(harness.model.getName());
+        expect(std::memcmp(harness.model.data(), expectedLive.data(), Core::PatchModel::kBufferSize) == 0);
+
+        // Manual INITIAL is not the Compare lock.
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+    }
+
+    void initialSelected_blocksRetryAndDelete()
+    {
+        beginTest("initialSelected_blocksRetryAndDelete");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+
+        harness.proc.apvts.state.setProperty(MutatorState::kInitialSelected, true, nullptr);
+        harness.engine.refreshActionEnabledMirrors(harness.proc.apvts);
+
+        expectActionEnabledMirrors(*this, harness, ActionEnabledExpectations {
+            .mutate = true,
+            .retry = false,
+            .exportEnabled = true,
+            .deleteEnabled = false,
+            .clear = true });
+
+        expect(! harness.engine.retry().success);
+        expect(! harness.engine.deleteSelected().success);
+        expect(! harness.engine.toggleCompare().success);
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kCompareActive, false)));
+        expectEquals(harness.engine.rootCount(), 1);
+    }
+
+    void mutate_fromInitial_keepsSnapshotAndSelectsNewEntry()
+    {
+        beginTest("mutate_fromInitial_keepsSnapshotAndSelectsNewEntry");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        const auto origin = makeDistinctBuffer(871);
+        std::memcpy(harness.model.data(), origin.data(), Core::PatchModel::kBufferSize);
+        expect(harness.engine.mutate().success);
+        const auto snapshotBefore = harness.store().getInitialSnapshot();
+
+        harness.proc.apvts.state.setProperty(MutatorState::kInitialSelected, true, nullptr);
+
+        expect(harness.engine.mutate().success);
+        const auto snapshotAfter = harness.store().getInitialSnapshot();
+        expect(std::memcmp(snapshotBefore.data(), snapshotAfter.data(), Core::PatchModel::kBufferSize) == 0);
+
+        expectEquals(harness.engine.rootCount(), 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 1);
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+
+        // The new mutation branched from the origin, not from M00.
+        const auto entry = harness.engine.getEntry(1);
+        expect(entry.has_value());
+        expect(std::memcmp(entry->parentSnapshot.data(), snapshotBefore.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    void clear_hidesInitialSelection()
+    {
+        beginTest("clear_hidesInitialSelection");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+        expect(harness.engine.mutate().success);
+
+        harness.proc.apvts.state.setProperty(MutatorState::kInitialSelected, true, nullptr);
+
+        expect(harness.engine.clearHistory().success);
+        expect(harness.proc.apvts.state.getProperty(MutatorState::kHistoryMutateList).toString().isEmpty());
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+        // CLEAR keeps the RAM snapshot; only the empty history hides the row.
+        expect(harness.store().hasInitialSnapshot());
     }
 
 };

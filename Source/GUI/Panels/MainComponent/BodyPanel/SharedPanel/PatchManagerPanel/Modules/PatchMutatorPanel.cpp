@@ -119,19 +119,11 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
     if (isRecipeProperty(name))
         refreshRecipeFromApvts();
 
-    if (name == MutatorState::kHistoryMutateList || name == MutatorState::kHistoryRetryList
-        || name == MutatorState::kHistoryRetryListsByRoot
-        || name == MutatorState::kSelectedMutateRootIndex || name == MutatorState::kSelectedRetryIndex)
-    {
+    if (isHistoryComboRefreshProperty(name))
         scheduleHistoryComboBoxRefresh();
-    }
 
-    if (name == MutatorState::kCompareActive || name == MutatorState::kHistoryMutateList
-        || name == MutatorState::kHistoryRetryListsByRoot
-        || name == MutatorState::kSelectedMutateRootIndex)
-    {
+    if (isCompareUiRefreshProperty(name))
         refreshCompareUiState();
-    }
 }
 
 void PatchMutatorPanel::valueTreeRedirected(juce::ValueTree&)

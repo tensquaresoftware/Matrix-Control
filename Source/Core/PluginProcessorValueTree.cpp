@@ -175,13 +175,17 @@ void PluginProcessor::dispatchMutatorHistorySelectionChange(const juce::String& 
     if (suppressMutatorHistorySelectionDebounce_)
         return;
 
-    const bool isMutateRootSelection = parameterId == MutatorState::kSelectedMutateRootIndex;
+    // INITIAL toggles the audition target without changing M/R, so it also rebuilds the
+    // mirrors (RETRY / DELETE enablement).
+    const bool isInitialSelection = parameterId == MutatorState::kInitialSelected;
+    const bool rebuildsMirrors = isInitialSelection
+                                 || parameterId == MutatorState::kSelectedMutateRootIndex;
 
-    if (! isMutateRootSelection && parameterId != MutatorState::kSelectedRetryIndex)
+    if (! rebuildsMirrors && parameterId != MutatorState::kSelectedRetryIndex)
         return;
 
     if (mutatorActionHandler_ != nullptr)
-        mutatorActionHandler_->onHistorySelectionChanged(isMutateRootSelection);
+        mutatorActionHandler_->onHistorySelectionChanged(rebuildsMirrors);
 }
 
 void PluginProcessor::handleDeviceTypePropertyChange(const juce::String& propertyName)

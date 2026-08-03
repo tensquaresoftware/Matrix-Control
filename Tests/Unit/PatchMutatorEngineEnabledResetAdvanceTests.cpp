@@ -30,6 +30,8 @@ public:
         advance_previous_wrapsFromFirstToLast();
         advance_compareActive_noOp();
         advance_unknownSelection_noOp();
+        advance_withInitialSnapshot_walksInitialFirst();
+        advance_singleMutationWithInitial_togglesInitial();
     }
 
 private:
@@ -419,6 +421,66 @@ private:
 
         harness.engine.advanceHistorySelection(false);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 5);
+    }
+
+    void advance_withInitialSnapshot_walksInitialFirst()
+    {
+        beginTest("advance_withInitialSnapshot_walksInitialFirst");
+
+        EngineHarness harness;
+        const auto parent = makeDistinctBuffer(1);
+        expect(harness.store().insertRoot(0, makeDistinctBuffer(100), parent));
+        expect(harness.store().insertRoot(1, makeDistinctBuffer(200), parent));
+        harness.store().setInitialSnapshot(parent);
+
+        harness.engine.setAuditionSelection(0, Core::MutationHistoryStore::kRootOnly);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+
+        const auto expectInitialSelected = [this, &harness](bool selected)
+        {
+            expect(static_cast<bool>(
+                       harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false))
+                   == selected);
+        };
+
+        // INITIAL leads the flat walk: M00 -> M01 -> INITIAL -> M00.
+        harness.engine.advanceHistorySelection(true);
+        expectInitialSelected(false);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 1);
+
+        harness.engine.advanceHistorySelection(true);
+        expectInitialSelected(true);
+        // M / R stay put so leaving INITIAL lands back on a real entry.
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 1);
+
+        harness.engine.advanceHistorySelection(true);
+        expectInitialSelected(false);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
+
+        // Backwards from the first mutation lands on INITIAL.
+        harness.engine.advanceHistorySelection(false);
+        expectInitialSelected(true);
+    }
+
+    void advance_singleMutationWithInitial_togglesInitial()
+    {
+        beginTest("advance_singleMutationWithInitial_togglesInitial");
+
+        EngineHarness harness;
+        const auto parent = makeDistinctBuffer(1);
+        expect(harness.store().insertRoot(0, makeDistinctBuffer(100), parent));
+        harness.store().setInitialSnapshot(parent);
+
+        harness.engine.setAuditionSelection(0, Core::MutationHistoryStore::kRootOnly);
+        harness.engine.syncHistoryUiProperties(harness.proc.apvts);
+
+        // Two flat slots now (INITIAL + M00) — nav is no longer a no-op.
+        harness.engine.advanceHistorySelection(true);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+
+        harness.engine.advanceHistorySelection(true);
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(MutatorState::kInitialSelected, false)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(MutatorState::kSelectedMutateRootIndex)), 0);
     }
 
 };

@@ -94,6 +94,12 @@ namespace TSS
             if (! itemBounds.intersects(primaryContent))
                 continue;
 
+            if (primary.isSeparator)
+            {
+                renderer_.drawHorizontalSeparatorItem(g, itemBounds);
+                continue;
+            }
+
             const bool isHighlighted = primaryIndex == highlightedPrimaryIndex_;
             renderer_.drawLabelItem(g, primary.label, itemBounds, isHighlighted, true, cachedFont_);
 

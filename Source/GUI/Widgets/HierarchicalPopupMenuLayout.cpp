@@ -119,6 +119,15 @@ namespace TSS
         secondaryColumnWidth_ = maxSecondary;
     }
 
+    bool HierarchicalPopupMenu::isSeparatorRow(int primaryIndex) const
+    {
+        const auto storageIndex = primaryStorageIndexForOpenableIndex(owner_, primaryIndex);
+        if (storageIndex < 0)
+            return false;
+
+        return owner_.getPrimaryItem(storageIndex).isSeparator;
+    }
+
     bool HierarchicalPopupMenu::hasSecondaryColumn() const
     {
         if (highlightedPrimaryIndex_ < 0)

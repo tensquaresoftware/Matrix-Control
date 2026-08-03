@@ -114,6 +114,11 @@ void PatchMutatorEngine::rebuildHistoryListMirrors()
 juce::Array<PatchMutatorEngine::FlatHistoryEntry> PatchMutatorEngine::buildFlatHistoryEntries() const
 {
     juce::Array<FlatHistoryEntry> flat;
+
+    // INITIAL leads the walk whenever HISTORY offers it (same gate as the combo row).
+    if (canOfferInitialSelection())
+        flat.add({ kInitialFlatRootIndex, MutationHistoryStore::kRootOnly });
+
     for (const int rootIndex : historyStore_.getSortedRootIndices())
     {
         flat.add({ rootIndex, MutationHistoryStore::kRootOnly });
@@ -141,8 +146,11 @@ int PatchMutatorEngine::indexOfFlatHistoryEntry(const juce::Array<FlatHistoryEnt
 
 void PatchMutatorEngine::commitHistorySelectionToApvts()
 {
-    // Match panel write order so existing selection listeners rebuild + audition.
+    // INITIAL first: when it changes without touching M/R it is the only notification the
+    // panel and the audition dispatch get.
     auto& state = apvts_.state;
+    state.setProperty(MutatorState::kInitialSelected, initialSelected_, nullptr);
+    // Match panel write order so existing selection listeners rebuild + audition.
     state.setProperty(MutatorState::kSelectedRetryIndex, selectedRetryIndex_, nullptr);
     state.setProperty(MutatorState::kSelectedMutateRootIndex, selectedRootIndex_, nullptr);
 }
@@ -158,7 +166,11 @@ void PatchMutatorEngine::advanceHistorySelection(bool isNext)
     if (flat.size() < 2)
         return;
 
-    const int currentIndex = indexOfFlatHistoryEntry(flat, selectedRootIndex_, selectedRetryIndex_);
+    const int currentIndex = initialSelected_
+                                 ? indexOfFlatHistoryEntry(flat,
+                                                           kInitialFlatRootIndex,
+                                                           MutationHistoryStore::kRootOnly)
+                                 : indexOfFlatHistoryEntry(flat, selectedRootIndex_, selectedRetryIndex_);
     // Stale / unknown selection — do not pretend we are at flat[0] and jump.
     if (currentIndex < 0)
         return;
@@ -169,9 +181,18 @@ void PatchMutatorEngine::advanceHistorySelection(bool isNext)
                               : (currentIndex - 1 + count) % count;
     const auto& next = flat.getReference(nextIndex);
 
-    if (next.rootIndex == selectedRootIndex_ && next.retryIndex == selectedRetryIndex_)
+    if (next.isInitial())
+    {
+        // Keep the mutation selection so leaving INITIAL lands back on a real entry.
+        initialSelected_ = true;
+        commitHistorySelectionToApvts();
+        return;
+    }
+
+    if (! initialSelected_ && next.rootIndex == selectedRootIndex_ && next.retryIndex == selectedRetryIndex_)
         return;
 
+    initialSelected_ = false;
     selectedRootIndex_ = next.rootIndex;
     selectedRetryIndex_ = next.retryIndex;
     commitHistorySelectionToApvts();
@@ -184,7 +205,7 @@ void PatchMutatorEngine::auditionSelectedHistoryEntry()
 
     applySelectionFromApvts();
 
-    if (historyStore_.isEmpty() || selectedRootIndex_ < 0)
+    if (historyStore_.isEmpty() || (selectedRootIndex_ < 0 && ! initialSelected_))
         return;
 
     const PatchModel auditionModel = resolveAuditionBuffer();
@@ -203,8 +224,11 @@ void PatchMutatorEngine::clearEmptyHistoryUi(juce::AudioProcessorValueTreeState&
     state.setProperty(MutatorState::kHistoryRetryListsByRoot, juce::String(), nullptr);
     state.setProperty(MutatorState::kSelectedMutateRootIndex, -1, nullptr);
     state.setProperty(MutatorState::kSelectedRetryIndex, MutationHistoryStore::kRootOnly, nullptr);
+    // No mutations left — HISTORY hides INITIAL even when the snapshot survives (CLEAR).
+    state.setProperty(MutatorState::kInitialSelected, false, nullptr);
     selectedRootIndex_ = -1;
     selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+    initialSelected_ = false;
     refreshActionEnabledMirrors(apvts);
 }
 
@@ -262,6 +286,10 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
     if (! state.hasProperty(MutatorState::kCompareActive))
         state.setProperty(MutatorState::kCompareActive, false, nullptr);
 
+    state.setProperty(MutatorState::kInitialSnapshotAvailable,
+                      historyStore_.hasInitialSnapshot(),
+                      nullptr);
+
     // Selection → list rebuild goes through rebuildHistoryListMirrors() which calls
     // applySelectionFromApvts() first. Do not self-heal here: mutate/retry/delete set
     // engine members then sync while APVTS may still hold the previous selection.
@@ -273,6 +301,11 @@ void PatchMutatorEngine::syncHistoryUiProperties(juce::AudioProcessorValueTreeSt
         return;
     }
 
+    // Engine members are the truth here — publish INITIAL before the enabled mirrors read
+    // the selection back from APVTS. Compare shows the origin too, so it keeps the row.
+    state.setProperty(MutatorState::kInitialSelected,
+                      initialSelected_ || readBoolProperty(state, MutatorState::kCompareActive, false),
+                      nullptr);
     writeHistoryListMirrors(state);
     writeSelectedHistoryUi(state, roots);
     refreshActionEnabledMirrors(apvts);
@@ -287,12 +320,14 @@ void PatchMutatorEngine::refreshActionEnabledMirrors(juce::AudioProcessorValueTr
     state.setProperty(MutatorState::kMutateEnabled,
                       computeMutateEnabled(historyStore_, recipe),
                       nullptr);
+    // INITIAL is the origin, not a history entry: RETRY / DELETE have nothing to act on.
+    const int selectedEntryRootIndex = initialSelected_ ? -1 : selectedRootIndex_;
     state.setProperty(MutatorState::kRetryEnabled,
-                      computeRetryEnabled(historyStore_, selectedRootIndex_),
+                      computeRetryEnabled(historyStore_, selectedEntryRootIndex),
                       nullptr);
     state.setProperty(MutatorState::kExportEnabled, computeExportEnabled(historyStore_), nullptr);
     state.setProperty(MutatorState::kDeleteEnabled,
-                      computeDeleteEnabled(historyStore_, selectedRootIndex_),
+                      computeDeleteEnabled(historyStore_, selectedEntryRootIndex),
                       nullptr);
     state.setProperty(MutatorState::kClearEnabled, computeExportEnabled(historyStore_), nullptr);
 }

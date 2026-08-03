@@ -63,14 +63,19 @@ namespace TSS
 
     void HierarchicalComboBox::addPrimaryItem(int id, const juce::String& label, bool isSentinel)
     {
-        primaryItems_.push_back({ id, label, isSentinel, {} });
+        primaryItems_.push_back({ id, label, isSentinel, false, {} });
+    }
+
+    void HierarchicalComboBox::addSeparatorItem(int id)
+    {
+        primaryItems_.push_back({ id, {}, false, true, {} });
     }
 
     void HierarchicalComboBox::addChildItem(int primaryId, int id, const juce::String& label)
     {
         for (auto& primary : primaryItems_)
         {
-            if (primary.id != primaryId || primary.isSentinel)
+            if (primary.id != primaryId || ! primary.isSelectable())
                 continue;
 
             primary.children.push_back({ id, label });
@@ -139,7 +144,7 @@ namespace TSS
 
         for (const auto& primary : primaryItems_)
         {
-            if (! primary.isSentinel)
+            if (primary.isSelectable())
                 return true;
         }
 
@@ -175,7 +180,7 @@ namespace TSS
     void HierarchicalComboBox::commitSelection(int primaryId, int childId, juce::NotificationType notification)
     {
         const auto* primary = findPrimaryItem(primaryId);
-        if (primary == nullptr || primary->isSentinel)
+        if (primary == nullptr || ! primary->isSelectable())
             return;
 
         // Fall back to primary-only when the requested child is missing (e.g. after a rebuild

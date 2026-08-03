@@ -101,6 +101,7 @@ private:
     bool historySelectionHydrating_ = false;
     bool deferHistoryComboRefresh_ = false;
     bool historyComboRefreshScheduled_ = false;
+    bool historyInitialRowPresent_ = false;
     bool compareBlinkVisible_ = true;
 
     // History / recipe / compare (PatchMutatorPanelHistory.cpp).
@@ -114,7 +115,9 @@ private:
     void applyCompareControlLock(bool compareActive);
     void applyCompareBlinkState(bool compareActive);
     void handleHistoryComboSelectionChange();
+    void applyHistoryRootSelectionChange(int newRootIndex, int childId);
     void syncHistorySelectionFromApvts();
+    int resolveHistoryChildIdForRetry(int selectedRetryIndex) const;
     void addRetryChildrenForPrimary(int primaryId, const juce::StringArray& retryLabelList);
     static juce::StringArray parsePipeSeparatedList(const juce::String& encodedList);
 

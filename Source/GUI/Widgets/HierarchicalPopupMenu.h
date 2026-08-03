@@ -57,7 +57,11 @@ namespace TSS
         std::unique_ptr<PopupMenuCustomScrollBar> primaryScrollBar_;
         std::unique_ptr<PopupMenuCustomScrollBar> secondaryScrollBar_;
 
+        int resolveInitialHighlightedPrimaryIndex() const;
+        int resolveInitialHighlightedChildIndex() const;
         bool hasSecondaryColumn() const;
+        // Separator rows are painted and take a row slot, but never highlight or commit.
+        bool isSeparatorRow(int primaryIndex) const;
         int getOpenablePrimaryCount() const;
         int getSecondaryItemCount() const;
         float getItemHeight() const;

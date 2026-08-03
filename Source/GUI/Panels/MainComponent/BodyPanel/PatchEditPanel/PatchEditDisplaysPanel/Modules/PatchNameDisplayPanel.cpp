@@ -144,6 +144,7 @@ bool PatchNameDisplayPanel::isTrackedProperty(const juce::String& propertyName)
 {
     return propertyName == kPatchName
         || propertyName == MutatorState::kCompareActive
+        || propertyName == MutatorState::kInitialSelected
         || propertyName == MutatorState::kHistoryMutateList
         || propertyName == MutatorState::kSelectedMutateRootIndex
         || propertyName == MutatorState::kSelectedRetryIndex
@@ -189,6 +190,10 @@ juce::String PatchNameDisplayPanel::computeSecondaryLabel() const
 
     if (historyListEmpty || selectedRootIndex < 0)
         return {};
+
+    // HISTORY INITIAL auditions the same origin snapshot as Compare, without the lock.
+    if (static_cast<bool>(apvts_.state.getProperty(MutatorState::kInitialSelected, false)))
+        return kCompareSecondaryLabel;
 
     const int selectedRetryIndex = static_cast<int>(apvts_.state.getProperty(
         MutatorState::kSelectedRetryIndex, MutatorState::kSelectedRetryRootOnly));

@@ -57,16 +57,20 @@ std::map<int, juce::StringArray> PatchMutatorPanel::parseRetryListsByRoot(const 
 
 int PatchMutatorPanel::countFlatHistoryEntries(const juce::ValueTree& state)
 {
+    // INITIAL is a navigable slot too (engine flat list leads with it).
+    const int initialSlotCount = isHistoryInitialRowAvailable(state) ? 1 : 0;
+
     const auto byRoot = parseRetryListsByRoot(state.getProperty(MutatorState::kHistoryRetryListsByRoot).toString());
     if (! byRoot.empty())
     {
-        int count = 0;
+        int count = initialSlotCount;
         for (const auto& entry : byRoot)
             count += entry.second.size();
         return count;
     }
 
-    return parsePipeSeparatedList(state.getProperty(MutatorState::kHistoryMutateList).toString()).size();
+    return initialSlotCount
+           + parsePipeSeparatedList(state.getProperty(MutatorState::kHistoryMutateList).toString()).size();
 }
 
 void PatchMutatorPanel::rebuildRetryLabelsCacheFromApvts()
@@ -125,14 +129,46 @@ void PatchMutatorPanel::addRetryChildrenForPrimary(int primaryId, const juce::St
     }
 }
 
+void PatchMutatorPanel::applyHistoryRootSelectionChange(int newRootIndex, int childId)
+{
+    // Hierarchical UX: honour the submenu child clicked while changing M;
+    // fall back to root-only when no child is selected.
+    int newRetryIndex = MutatorState::kSelectedRetryRootOnly;
+    const auto cacheIt = retryLabelsByRootIndex_.find(newRootIndex);
+    if (childId > 0 && cacheIt != retryLabelsByRootIndex_.end())
+    {
+        const auto display = Core::MutationNaming::buildHistorySubmenuDisplay(
+            newRootIndex, cacheIt->second);
+        if (childId <= display.retryIndices.size())
+            newRetryIndex = display.retryIndices[childId - 1];
+    }
+
+    deferHistoryComboRefresh_ = true;
+    apvts_.state.setProperty(MutatorState::kSelectedRetryIndex, newRetryIndex, nullptr);
+    apvts_.state.setProperty(MutatorState::kSelectedMutateRootIndex, newRootIndex, nullptr);
+    deferHistoryComboRefresh_ = false;
+    refreshHistoryComboBox();
+}
+
 void PatchMutatorPanel::handleHistoryComboSelectionChange()
 {
     if (historySelectionHydrating_ || historyComboBox_ == nullptr)
         return;
 
     const int primaryId = historyComboBox_->getSelectedPrimaryId();
+
+    if (primaryId == kHistoryInitialPrimaryId)
+    {
+        // Keep M / R untouched: they are where leaving INITIAL comes back to.
+        apvts_.state.setProperty(MutatorState::kInitialSelected, true, nullptr);
+        return;
+    }
+
     if (primaryId <= 0 || primaryId > mutateRootIndices_.size())
         return;
+
+    if (isHistoryInitialSelected(apvts_.state))
+        apvts_.state.setProperty(MutatorState::kInitialSelected, false, nullptr);
 
     const int newRootIndex = mutateRootIndices_[primaryId - 1];
     const int currentRootIndex = static_cast<int>(
@@ -141,23 +177,7 @@ void PatchMutatorPanel::handleHistoryComboSelectionChange()
 
     if (newRootIndex != currentRootIndex)
     {
-        // Hierarchical UX: honour the submenu child clicked while changing M;
-        // fall back to root-only when no child is selected.
-        int newRetryIndex = MutatorState::kSelectedRetryRootOnly;
-        const auto cacheIt = retryLabelsByRootIndex_.find(newRootIndex);
-        if (childId > 0 && cacheIt != retryLabelsByRootIndex_.end())
-        {
-            const auto display = Core::MutationNaming::buildHistorySubmenuDisplay(
-                newRootIndex, cacheIt->second);
-            if (childId <= display.retryIndices.size())
-                newRetryIndex = display.retryIndices[childId - 1];
-        }
-
-        deferHistoryComboRefresh_ = true;
-        apvts_.state.setProperty(MutatorState::kSelectedRetryIndex, newRetryIndex, nullptr);
-        apvts_.state.setProperty(MutatorState::kSelectedMutateRootIndex, newRootIndex, nullptr);
-        deferHistoryComboRefresh_ = false;
-        refreshHistoryComboBox();
+        applyHistoryRootSelectionChange(newRootIndex, childId);
         return;
     }
 
@@ -192,6 +212,7 @@ void PatchMutatorPanel::refreshHistoryComboBox()
     if (mutateLabelList.isEmpty())
     {
         retryLabelsByRootIndex_.clear();
+        historyInitialRowPresent_ = false;
         historyComboBox_->setTextWhenNothingSelected(MutatorDisplayNames::kEmptyHistorySentinel);
         historyComboBox_->setSelectedIds(0, 0, juce::dontSendNotification);
         historySelectionHydrating_ = false;
@@ -200,6 +221,13 @@ void PatchMutatorPanel::refreshHistoryComboBox()
     }
 
     rebuildRetryLabelsCacheFromApvts();
+
+    historyInitialRowPresent_ = isHistoryInitialRowAvailable(apvts_.state);
+    if (historyInitialRowPresent_)
+    {
+        historyComboBox_->addPrimaryItem(kHistoryInitialPrimaryId, kHistoryInitialLabel);
+        historyComboBox_->addSeparatorItem(kHistoryInitialSeparatorPrimaryId);
+    }
 
     for (int i = 0; i < mutateLabelList.size(); ++i)
     {
@@ -233,6 +261,15 @@ void PatchMutatorPanel::syncHistorySelectionFromApvts()
     if (historyComboBox_ == nullptr)
         return;
 
+    // Compare auditions the origin, so it shows the same row as a manual INITIAL pick.
+    const bool compareActive = static_cast<bool>(
+        apvts_.state.getProperty(MutatorState::kCompareActive, false));
+    if (historyInitialRowPresent_ && (compareActive || isHistoryInitialSelected(apvts_.state)))
+    {
+        historyComboBox_->setSelectedIds(kHistoryInitialPrimaryId, 0, juce::dontSendNotification);
+        return;
+    }
+
     const int selectedMutateRootIndex = static_cast<int>(
         apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
     if (selectedMutateRootIndex < 0)
@@ -241,16 +278,7 @@ void PatchMutatorPanel::syncHistorySelectionFromApvts()
         return;
     }
 
-    int primaryId = 0;
-    for (int i = 0; i < mutateRootIndices_.size(); ++i)
-    {
-        if (mutateRootIndices_[i] == selectedMutateRootIndex)
-        {
-            primaryId = i + 1;
-            break;
-        }
-    }
-
+    const int primaryId = mutateRootIndices_.indexOf(selectedMutateRootIndex) + 1;
     if (primaryId <= 0)
     {
         historyComboBox_->setSelectedIds(0, 0, juce::dontSendNotification);
@@ -259,24 +287,20 @@ void PatchMutatorPanel::syncHistorySelectionFromApvts()
 
     const int selectedRetryIndex = static_cast<int>(apvts_.state.getProperty(
         MutatorState::kSelectedRetryIndex, MutatorState::kSelectedRetryRootOnly));
-    int childId = 0;
 
-    for (int i = 0; i < retryIndices_.size(); ++i)
-    {
-        if (retryIndices_[i] == selectedRetryIndex)
-        {
-            childId = i + 1;
-            break;
-        }
-    }
+    historyComboBox_->setSelectedIds(primaryId,
+                                     resolveHistoryChildIdForRetry(selectedRetryIndex),
+                                     juce::dontSendNotification);
+}
 
-    if (childId == 0 && ! retryIndices_.isEmpty())
-    {
-        // Root-only, or orphan retry not present in this root's list — select N2 root recall.
-        childId = 1;
-    }
+int PatchMutatorPanel::resolveHistoryChildIdForRetry(int selectedRetryIndex) const
+{
+    const int childId = retryIndices_.indexOf(selectedRetryIndex) + 1;
+    if (childId > 0)
+        return childId;
 
-    historyComboBox_->setSelectedIds(primaryId, childId, juce::dontSendNotification);
+    // Root-only, or orphan retry not present in this root's list — select N2 root recall.
+    return retryIndices_.isEmpty() ? 0 : 1;
 }
 
 void PatchMutatorPanel::applyCompareBlinkState(bool compareActive)
@@ -308,12 +332,14 @@ void PatchMutatorPanel::refreshCompareUiState()
         apvts_.state.getProperty(MutatorState::kSelectedMutateRootIndex, -1));
     const bool historyEmpty = mutateLabelList.isEmpty() || selectedMutateRootIndex < 0;
     const int flatHistoryEntryCount = countFlatHistoryEntries(apvts_.state);
+    // Manual INITIAL already shows the origin — COMPARE has nothing to swap in.
+    const bool initialSelectedWithoutCompare = ! compareActive && isHistoryInitialSelected(apvts_.state);
 
     applyCompareControlLock(compareActive);
 
     if (compareButton_ != nullptr)
     {
-        compareButton_->setEnabled(compareActive || ! historyEmpty);
+        compareButton_->setEnabled(compareActive || (! historyEmpty && ! initialSelectedWithoutCompare));
         compareButton_->setAlpha(1.0f);
         if (! compareActive)
             compareButton_->setToggleState(false, juce::dontSendNotification);

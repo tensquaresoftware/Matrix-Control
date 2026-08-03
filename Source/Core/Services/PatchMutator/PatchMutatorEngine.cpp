@@ -88,6 +88,9 @@ void PatchMutatorEngine::forceExitCompare()
         return;
 
     state.setProperty(MutatorState::kCompareActive, false, nullptr);
+    // Compare owned the INITIAL row while it was active — drop it with the lock.
+    state.setProperty(MutatorState::kInitialSelected, false, nullptr);
+    initialSelected_ = false;
     compareSavedMutateRootIndex_ = -1;
     compareSavedRetryIndex_ = MutationHistoryStore::kRootOnly;
     clearCompareLockedFooterIfPresent(apvts_);
@@ -108,9 +111,21 @@ void PatchMutatorEngine::auditionAfterHistoryMutation()
         pushResultToEditorAndSynth(buffer);
 }
 
+bool PatchMutatorEngine::canOfferInitialSelection() const
+{
+    return ! historyStore_.isEmpty() && historyStore_.hasInitialSnapshot();
+}
+
 void PatchMutatorEngine::applySelectionFromApvts()
 {
     const auto& state = apvts_.state;
+
+    // Compare keeps its own lock semantics: while it is active the origin is on screen but
+    // the selection still belongs to the mutation Compare will restore.
+    initialSelected_ = canOfferInitialSelection()
+                       && readBoolProperty(state, MutatorState::kInitialSelected, false)
+                       && ! readBoolProperty(state, MutatorState::kCompareActive, false);
+
     if (! state.hasProperty(MutatorState::kSelectedMutateRootIndex))
         return;
 
@@ -169,6 +184,10 @@ std::optional<MutatorActionResult> PatchMutatorEngine::validateRetryPrecondition
     if (historyStore_.isEmpty())
         return makeWarningResult(kEmptyHistoryFooterMessage);
 
+    // RETRY needs a mutation to branch from — the origin snapshot has no parent entry.
+    if (initialSelected_)
+        return makeWarningResult(kNoSelectionFooterMessage);
+
     const auto rootIndexOpt = resolveSelectedRootIndex();
     if (! rootIndexOpt.has_value() || ! historyStore_.hasRoot(*rootIndexOpt))
         return makeWarningResult(kNoSelectionFooterMessage);
@@ -215,6 +234,11 @@ PatchModel PatchMutatorEngine::resolveAuditionBuffer()
 
     if (historyStore_.isEmpty())
         return *patchModel_;
+
+    // HISTORY INITIAL: the origin snapshot is what the user hears, so it is also what
+    // MUTATE branches from.
+    if (initialSelected_)
+        return historyStore_.getInitialSnapshot();
 
     int rootIndex = selectedRootIndex_;
     int retryIndex = selectedRetryIndex_;

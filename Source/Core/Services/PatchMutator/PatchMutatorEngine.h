@@ -121,10 +121,16 @@ namespace Core
     private:
         friend class ::PatchMutatorEngineTestAccess;
 
+        // Reserved flat-navigation slot for the session origin snapshot (HISTORY INITIAL row).
+        // Never a store index — MutationHistoryStore roots start at 0.
+        static constexpr int kInitialFlatRootIndex = -2;
+
         struct FlatHistoryEntry
         {
             int rootIndex = -1;
             int retryIndex = MutationHistoryStore::kRootOnly;
+
+            bool isInitial() const noexcept { return rootIndex == kInitialFlatRootIndex; }
         };
 
         static MutatorActionResult makeWarningResult(const char* message);
@@ -164,6 +170,9 @@ namespace Core
                                            int rootIndex,
                                            int retryIndex);
         void commitHistorySelectionToApvts();
+        // HISTORY INITIAL row is offered only while the origin snapshot can be auditioned
+        // alongside at least one mutation.
+        bool canOfferInitialSelection() const;
         void clearEmptyHistoryUi(juce::AudioProcessorValueTreeState& apvts);
         void writeHistoryListMirrors(juce::ValueTree& state);
         void writeSelectedHistoryUi(juce::ValueTree& state, const juce::Array<int>& roots);
@@ -188,6 +197,9 @@ namespace Core
         juce::Random rng_;
         int selectedRootIndex_ = -1;
         int selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
+        // HISTORY INITIAL selected: origin snapshot auditioned while selectedRootIndex_ /
+        // selectedRetryIndex_ keep the mutation to come back to. Independent of kCompareActive.
+        bool initialSelected_ = false;
         int compareSavedMutateRootIndex_ = -1;
         int compareSavedRetryIndex_ = MutationHistoryStore::kRootOnly;
 
