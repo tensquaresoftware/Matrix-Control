@@ -874,6 +874,9 @@ namespace PluginDisplayNames
             {
                 // Patch names are 8 characters long in the Oberheim Matrix-1000 :
                 constexpr const char* kDefaultPatchName = "--------";
+                // Assigned after full-patch INIT when the template name is blank — distinct from
+                // session-idle kDefaultPatchName and from Mutator Compare secondary "INITIAL".
+                constexpr const char* kInitPatchName = "INIT";
                 // Secondary line literal while Compare is active — distinct from the Mxx / Mxx-Ryy
                 // Mutator history labels used the rest of the time.
                 constexpr const char* kCompareSecondaryLabel = "INITIAL";

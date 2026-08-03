@@ -169,7 +169,7 @@ namespace PatchManagerActionHandlerTestSupport
         , mapper(proc.apvts, model)
         , decoder(parser)
         , initLoader(decoder)
-        , patchInitService(model, initLoader, []() { return juce::File(); })
+        , patchInitService(model, initLoader, [this]() { return initTemplatesFolder; })
         , midiManager(proc.apvts, queue, tracker)
         , patchSelectionMidiSync(&midiManager)
         , limits(std::move(limitsIn))

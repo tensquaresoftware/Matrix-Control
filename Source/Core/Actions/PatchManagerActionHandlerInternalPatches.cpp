@@ -18,6 +18,18 @@
 namespace Core
 {
 
+    namespace
+    {
+        void assignInitPatchNameIfBlank(PatchModel* patchModel)
+        {
+            if (patchModel == nullptr || ! patchModel->getName().isEmpty())
+                return;
+
+            using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
+            patchModel->setName(kInitPatchName);
+        }
+    }
+
     bool PatchManagerActionHandler::tryHandleInitPasteStoreActions(const juce::String& propertyId,
                                                                    const DeviceMemoryLimits& limits)
     {
@@ -259,6 +271,7 @@ namespace Core
         clearLastDeviceDumpRawName();
 
         const auto result = patchInitService_->initFullPatch();
+        assignInitPatchNameIfBlank(patchModel_);
 
         if (hooks_.setPatchLoadContext)
             hooks_.setPatchLoadContext(

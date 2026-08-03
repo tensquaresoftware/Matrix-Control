@@ -15,6 +15,10 @@ public:
         testStoreRomBankBlocked();
         testStoreRamBankSuccess();
         testInitLoadsTemplateAndBufferToApvts();
+        testInitBlankTemplate_assignsInitPatchName();
+        testInitBlankCustomTemplate_assignsInitPatchName();
+        testInitNamedTemplate_preservesTemplateName();
+        testInitDefaultDashNameTemplate_preserved();
         testInitMatrix1000_sendsEditBuffer();
         testInitMatrix6_sendsPatchToCurrentSlot();
         testInitRomBankBlocked();
@@ -33,6 +37,27 @@ public:
     }
 
 private:
+    static juce::File createTempInitTemplatesDir()
+    {
+        return juce::File::getSpecialLocation(juce::File::tempDirectory)
+            .getNonexistentChildFile("MatrixControlInitPatchName", "", false);
+    }
+
+    bool writeNamedPatchInitSyx(const juce::File& templatesDir, const juce::String& patchName)
+    {
+        if (! templatesDir.createDirectory())
+            return false;
+
+        Core::PatchModel named;
+        named.loadFrom(Core::InitDefaults::patchData());
+        named.setName(patchName);
+
+        SysExEncoder encoder;
+        const auto syx = encoder.encodePatchSysEx(0, named.data());
+        const auto file = templatesDir.getChildFile(Core::InitTemplateLoader::kPatchInitFileName);
+        return file.replaceWithData(syx.getData(), syx.getSize());
+    }
+
     void testPasteRomBankBlocked()
     {
         beginTest("paste_romBank_blocked");
@@ -127,6 +152,88 @@ private:
         expect(!queued.patchData);
         expect(queued.editBufferPatch);
         expectEquals(queued.patchSysExCount, 1);
+    }
+
+    void testInitBlankTemplate_assignsInitPatchName()
+    {
+        beginTest("init_blankTemplate_assignsInitPatchName");
+
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
+        using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expectEquals(harness.model.getName(), juce::String(kInitPatchName));
+        expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(),
+                     juce::String(kInitPatchName));
+    }
+
+    void testInitBlankCustomTemplate_assignsInitPatchName()
+    {
+        beginTest("init_blankCustomTemplate_assignsInitPatchName");
+
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kInitPatchName;
+        using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
+
+        const auto tempDir = createTempInitTemplatesDir();
+        const bool wrote = writeNamedPatchInitSyx(tempDir, {});
+        expect(wrote, "Blank-name PatchInit.syx should write");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.initTemplatesFolder = tempDir;
+        if (wrote)
+            harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expectEquals(harness.model.getName(), juce::String(kInitPatchName));
+        expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(),
+                     juce::String(kInitPatchName));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testInitNamedTemplate_preservesTemplateName()
+    {
+        beginTest("init_namedTemplate_preservesTemplateName");
+
+        using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
+
+        const auto tempDir = createTempInitTemplatesDir();
+        const bool wrote = writeNamedPatchInitSyx(tempDir, "MYINIT");
+        expect(wrote, "Named PatchInit.syx should write");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.initTemplatesFolder = tempDir;
+        if (wrote)
+            harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expectEquals(harness.model.getName(), juce::String("MYINIT"));
+        expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(), juce::String("MYINIT"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testInitDefaultDashNameTemplate_preserved()
+    {
+        beginTest("init_defaultDashNameTemplate_preserved");
+
+        using PluginDisplayNames::PatchEditSection::PatchNameModule::StandaloneWidgets::kDefaultPatchName;
+        using PluginIDs::PatchEditSection::PatchNameModule::kPatchName;
+
+        const auto tempDir = createTempInitTemplatesDir();
+        const bool wrote = writeNamedPatchInitSyx(tempDir, kDefaultPatchName);
+        expect(wrote, "Dash-name PatchInit.syx should write");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        harness.initTemplatesFolder = tempDir;
+        if (wrote)
+            harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expectEquals(harness.model.getName(), juce::String(kDefaultPatchName));
+        expectEquals(harness.proc.apvts.state.getProperty(kPatchName).toString(),
+                     juce::String(kDefaultPatchName));
+
+        tempDir.deleteRecursively();
     }
 
     void testInitMatrix1000_sendsEditBuffer()

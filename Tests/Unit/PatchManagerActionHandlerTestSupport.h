@@ -129,6 +129,7 @@ namespace PatchManagerActionHandlerTestSupport
         SysExDecoder decoder;
         Core::InitTemplateLoader initLoader;
         Core::PatchInitService patchInitService;
+        juce::File initTemplatesFolder;
         Core::MidiOutboundQueue queue;
         Core::MidiActivityTracker tracker;
         MidiManager midiManager;

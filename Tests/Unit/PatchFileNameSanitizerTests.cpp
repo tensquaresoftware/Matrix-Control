@@ -101,6 +101,10 @@ private:
                      juce::String("P03 - WARM PAD"));
         expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(99, "lead"),
                      juce::String("P99 - LEAD"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(0, "INIT"),
+                     juce::String("P00 - INIT"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(1, "INIT"),
+                     juce::String("P01 - INIT"));
     }
 
     void bankExportFileStem_omitsNameWhenSanitizedEmpty()
