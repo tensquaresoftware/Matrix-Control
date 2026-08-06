@@ -1,4 +1,4 @@
-# Prompt Quick Dev — Dirty / unsaved patch UX — chantier 2
+# Prompt Quick Dev — Dirty / non sauvé — chantier 2
 
 Copier-coller le bloc ci-dessous dans une **conversation Cursor fraîche**, puis lancer `/bmad-quick-dev` (ou coller avec le skill attaché).
 
@@ -7,60 +7,60 @@ Copier-coller le bloc ci-dessous dans une **conversation Cursor fraîche**, puis
 ```
 /bmad-quick-dev
 
-## Intent
+## Intention
 
-Implement **chantier 2** of the Dirty vs unsaved patch UX for Matrix-Control.
+Implémenter le **chantier 2** de l’UX « Dirty vs non sauvé » pour Matrix-Control.
 
-Product SSOT (frozen decisions):
+Référence produit (décisions figées) :
 `Documentation/Development/Plans/2026/08/2026-08-03-Dirty-Vs-Unsaved-Patch-UX.md`
-— especially §0 decisions 5–6, §4.5, §5.2–5.3, §6 (Computer Patches load), §8 items 6–7.
+— surtout §0 décisions 5–6, §4.5, §5.2–5.3, §6 (chargement Computer Patches), §8 points 6–7.
 
-Baseline already on `main` (chantier 1 shipped):
+Base déjà sur `main` (chantier 1 livré) :
 `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md`
-Commit: `75f397d` — leave-context modal is Cancel / Discard / Store (RAM) or Save As (ROM); risk = dirty ∨ not-STORED-in-RAM; INIT marks not-STORED; PASTE stays silent on entry.
+Commit : `75f397d` — en quittant un patch : Cancel / Discard / Store (RAM) ou Save As (ROM) ; risque = dirty **ou** non encore STORED en RAM ; un INIT marque non-STORED ; PASTE reste silencieux à l’entrée.
 
-## Problem
+## Problème
 
-Two gaps remain after chantier 1:
+Deux manques restent après le chantier 1 :
 
-1. **SAVE AS from a device-origin patch** still refreshes the clean snapshot and typically clears the “not STORED in RAM” signal, so leaving the slot after Save As can stay silent even though the RAM slot was never STOREd. Product decision: keep the same at-risk rule as post-INIT (lecture B) until STORE.
+1. **SAVE AS depuis un patch d’origine device** rafraîchit encore la photo « clean » et efface en pratique le signal « pas encore STORED en RAM ». On peut donc quitter le slot après un Save As **sans** alerte, alors que le slot RAM n’a jamais reçu de STORE. Décision produit : garder la **même** règle à risque que après un INIT (lecture B) jusqu’au STORE.
 
-2. **Dirty patch that originated from a `.syx` file** should offer Cancel / Discard / **Save** (overwrite the known file) or **Save As** when there is no clear target — not only Store / Save As as for device/ROM. File intent takes priority for chantier 2; do not add a fourth “also Store RAM” button in the same modal unless the plan explicitly requires it later.
+2. **Patch dirty venu d’un fichier `.syx`** : en partant, proposer Cancel / Discard / **Save** (écraser le fichier connu) ou **Save As** s’il n’y a pas de cible claire — pas seulement Store / Save As comme pour device / ROM. Pour le chantier 2, l’intention **fichier** prime ; ne pas ajouter un quatrième bouton « Store RAM en plus » dans la même modale (sauf décision produit ultérieure).
 
-## In scope
+## Dans le périmètre
 
-- After successful SAVE / SAVE AS from a **device-origin** (or INIT / not-yet-RAM-persisted) context: keep `patchNotStoredInRam_` (or equivalent) set so subsequent leave still prompts with the chantier 1 at-risk family (RAM: Cancel / Discard / Store).
-- Track **computer-file origin** (known `.syx` path vs none) so leave-context Persist for file-origin dirty can run Save vs Save As appropriately.
-- Wire modal button sets / copy for file-origin dirty: Cancel / Discard / Save (or Save As).
-- Preserve Settings “never warn” suppression for the whole risk family.
-- Keep Mutator history modal **after** the risk modal; do not merge with name-recon / IMPORT / Defrag / Master INIT dialogs.
-- Unit tests for: Save As from device keeps not-STORED; file-origin dirty Persist Save path; never-warn still skips; Cancel abort unchanged.
-- English-only UI strings. Core must not include AlertWindow / dialog types.
-- Follow CONVENTIONS.md / project-context; run lint_touched on touched C++ and related unit tests.
+- Après un SAVE / SAVE AS réussi depuis un contexte **origine device** (ou INIT / pas encore figé en RAM) : garder `patchNotStoredInRam_` (ou équivalent) à vrai, pour qu’un départ suivant déclenche encore la famille de modale du chantier 1 (RAM : Cancel / Discard / Store).
+- Suivre l’**origine fichier** (chemin `.syx` connu vs aucun) pour que le Persist d’un dirty d’origine fichier lance Save ou Save As selon le cas.
+- Brancher libellés / boutons de modale pour dirty d’origine fichier : Cancel / Discard / Save (ou Save As).
+- Respecter Settings « ne jamais prévenir » (coupe toute la famille).
+- Garder la modale historique Mutator **après** la modale risque ; ne pas fusionner avec reconcil. de nom / IMPORT / Defrag / Master INIT.
+- Tests unitaires : Save As depuis device conserve non-STORED ; Persist Save pour origine fichier ; never-warn reste silencieux ; Cancel abort inchangé.
+- Chaînes UI en anglais uniquement. Core ne doit pas inclure AlertWindow / types de dialogue.
+- Suivre CONVENTIONS.md / project-context ; lancer lint_touched sur le C++ touché et les tests liés.
 
-## Out of scope
+## Hors périmètre
 
-- Chantier 3 (plugin / DAW / session close warning).
-- Changing PASTE entry silence or INIT not-STORED behaviour from chantier 1 (reuse; do not regress).
-- Merging unrelated modals; French UI strings; inventing a 4-button Store+Save modal.
-- Broad refactors unrelated to origin tracking / Persist paths.
+- Chantier 3 (alerte à la fermeture plugin / DAW / session).
+- Modifier le silence PASTE à l’entrée ou le comportement INIT non-STORED du chantier 1 (réutiliser ; ne pas régresser).
+- Fusionner des modales sans rapport ; textes UI en français ; inventer une modale à 4 boutons Store+Save.
+- Gros refactors hors suivi d’origine / chemins Persist.
 
-## Suggested approach
+## Approche suggérée
 
-1. Read the plan §0 / §4.5 / §5.2 / §8 and the chantier 1 spec + Code Map.
-2. Trace current SAVE / SAVE AS / `captureCleanSnapshot` / `patchNotStoredInRam_` clear sites.
-3. Spec then implement: origin + Persist button semantics; keep risk after device-origin Save As; file-origin Save/Save As.
-4. Extend gate / policy / handler tests; verify build + targeted tests.
-5. Quick-dev review; append only true deferrals to `deferred-work.md`.
+1. Lire le plan §0 / §4.5 / §5.2 / §8 et la spec + Code Map du chantier 1.
+2. Tracer les sites actuels SAVE / SAVE AS / `captureCleanSnapshot` / clear de `patchNotStoredInRam_`.
+3. Spec puis implémentation : origine + sémantique des boutons Persist ; conserver le risque après Save As device ; Save / Save As pour origine fichier.
+4. Étendre les tests gate / policy / handler ; vérifier build + tests ciblés.
+5. Revue quick-dev ; n’ajouter à `deferred-work.md` que les vrais reports.
 
-## Done when
+## Terminé quand
 
-- Device-origin Save As then leave without STORE → at-risk modal (Store when RAM allowed).
-- Dirty `.syx`-origin leave → Cancel / Discard / Save (known path) or Save As (no clear path).
-- Never-warn still silent; Mutator order unchanged; chantier 1 INIT/PASTE behaviour preserved.
-- Spec artifact under `_bmad-output/implementation-artifacts/` with status ready for review; tests green.
+- Save As depuis device, puis départ sans STORE → modale à risque (Store si RAM autorisée).
+- Départ d’un dirty d’origine `.syx` → Cancel / Discard / Save (chemin connu) ou Save As (pas de cible claire).
+- Never-warn toujours silencieux ; ordre Mutator inchangé ; comportements INIT / PASTE du chantier 1 préservés.
+- Artefact de spec sous `_bmad-output/implementation-artifacts/` prêt pour revue ; tests verts.
 ```
 
 ---
 
-*Fichier d’aide — coller le bloc fenced ci-dessus, pas tout le fichier.*
+*Fichier d’aide — coller le bloc entre triples backticks, pas tout le fichier.*
