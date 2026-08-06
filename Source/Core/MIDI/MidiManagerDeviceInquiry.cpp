@@ -4,6 +4,7 @@
 #include "MidiManager.h"
 
 #include "Core/Loggers/MidiLogger.h"
+#include "Core/MIDI/DeviceInquiryCaptureFilter.h"
 #include "Core/MIDI/DeviceInquiryTrigger.h"
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/Queue/SysExDelayProfile.h"
@@ -172,6 +173,10 @@ bool MidiManager::armAsyncDeviceInquiryCapture(std::uint64_t token)
                     if (auto* self = weakThis.get())
                         self->handleAsyncDeviceInquiryResponse(token, response);
                 });
+        },
+        [](const juce::MemoryBlock& sysex)
+        {
+            return Core::isDeviceInquiryIdentityReply(sysex);
         });
 
     return true;

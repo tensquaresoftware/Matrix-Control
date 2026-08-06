@@ -162,16 +162,23 @@ bool MidiReceiver::isInputAvailable() const noexcept
     return midiInput != nullptr;
 }
 
-void MidiReceiver::armOneShotSysExCapture(SysExCaptureCallback callback)
+void MidiReceiver::armOneShotSysExCapture(SysExCaptureCallback callback, SysExCaptureFilter filter)
 {
     std::lock_guard<std::mutex> lock(oneShotMutex_);
     oneShotCapture_ = std::move(callback);
+    oneShotFilter_ = std::move(filter);
 }
 
 void MidiReceiver::cancelOneShotSysExCapture() noexcept
 {
     std::lock_guard<std::mutex> lock(oneShotMutex_);
     oneShotCapture_ = nullptr;
+    oneShotFilter_ = nullptr;
+}
+
+void MidiReceiver::feedCompleteSysEx(const juce::MemoryBlock& completeSysEx)
+{
+    processCompleteSysEx(completeSysEx);
 }
 
 void MidiReceiver::processCompleteSysEx(const juce::MemoryBlock& completeSysEx)
@@ -186,10 +193,43 @@ void MidiReceiver::processCompleteSysEx(const juce::MemoryBlock& completeSysEx)
 void MidiReceiver::deliverOneShotCapture(const juce::MemoryBlock& completeSysEx)
 {
     SysExCaptureCallback callback;
+    SysExCaptureFilter filter;
     {
         std::lock_guard<std::mutex> lock(oneShotMutex_);
+        if (! oneShotCapture_)
+            return;
+
+        filter = oneShotFilter_;
+        if (! filter)
+        {
+            callback = std::move(oneShotCapture_);
+            oneShotCapture_ = nullptr;
+            oneShotFilter_ = nullptr;
+        }
+    }
+
+    if (filter)
+    {
+        bool accepted = false;
+        try
+        {
+            accepted = filter(completeSysEx);
+        }
+        catch (...)
+        {
+            return; // keep armed
+        }
+
+        if (! accepted)
+            return;
+
+        std::lock_guard<std::mutex> lock(oneShotMutex_);
+        if (! oneShotCapture_)
+            return; // cancelled while filtering
+
         callback = std::move(oneShotCapture_);
         oneShotCapture_ = nullptr;
+        oneShotFilter_ = nullptr;
     }
 
     if (callback)

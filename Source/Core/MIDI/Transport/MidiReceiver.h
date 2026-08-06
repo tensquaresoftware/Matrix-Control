@@ -17,6 +17,8 @@ class MidiReceiver : public juce::MidiInputCallback
 {
 public:
     using SysExCaptureCallback = std::function<void(const juce::MemoryBlock&)>;
+    // Return true to deliver and clear the one-shot; false to keep listening (MIDI input thread).
+    using SysExCaptureFilter = std::function<bool(const juce::MemoryBlock&)>;
 
     MidiReceiver();
     ~MidiReceiver() override;
@@ -29,10 +31,14 @@ public:
     // Legacy blocking wait — prefer armOneShotSysExCapture (does not block the message thread).
     juce::MemoryBlock waitForSysExResponse(int timeoutMs = SysExConstants::kDefaultTimeoutMs);
 
-    // Arm a one-shot capture: the next complete SysEx invokes callback on the MIDI input thread.
-    // Caller should marshal to the message thread if needed.
-    void armOneShotSysExCapture(SysExCaptureCallback callback);
+    // Arm a one-shot capture. Without a filter, the next complete SysEx invokes callback on the
+    // MIDI input thread. With a filter, non-matching SysEx leave the capture armed until a match,
+    // cancel, or a new arm. Caller should marshal to the message thread if needed.
+    void armOneShotSysExCapture(SysExCaptureCallback callback, SysExCaptureFilter filter = {});
     void cancelOneShotSysExCapture() noexcept;
+
+    // Feed a completed SysEx into store + one-shot delivery (unit tests / simulators).
+    void feedCompleteSysEx(const juce::MemoryBlock& completeSysEx);
 
     void reset();
     bool isInputAvailable() const noexcept;
@@ -51,6 +57,7 @@ private:
     std::mutex responseMutex;
 
     SysExCaptureCallback oneShotCapture_;
+    SysExCaptureFilter oneShotFilter_;
     std::mutex oneShotMutex_;
 
     void processCompleteSysEx(const juce::MemoryBlock& completeSysEx);

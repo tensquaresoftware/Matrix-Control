@@ -1116,3 +1116,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md`
   summary: If Persist succeeds then Mutator history Cancel aborts navigation, the patch may already be STORED/saved while the user remains on the slot.
   evidence: Edge Case Hunter; acceptable (work is safe); deferring Persist until both gates would change gate ordering semantics.
+
+## Deferred from: quick-dev spec-mt4-bridge-presence-device-inquiry (2026-08-06)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mt4-bridge-presence-device-inquiry.md`
+  summary: Bridge teVirtualMIDI merged bidirectional `MT4 Port N` should move to real separate Input/Output virtual endpoints (`MT4 Input N` / `MT4 Output N`) — not rename-only — to match Scarlett-style non-echo wiring for the Emagic community.
+  evidence: Lab presence flap with MIDI-OX still seeing identity replies; merged create was chosen to dodge identical IN/OUT name collisions; Matrix-Control capture filter is the first fix; Bridge port-model rework is sequenced next in unitor-win64-driver.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-mt4-bridge-presence-device-inquiry.md`
+  summary: Async patch one-shot still re-arms via callAsync after non-patch SysEx (same steal race pattern as Device Inquiry had).
+  evidence: MidiManagerAsyncPatch.cpp armAsyncSinglePatchCapture; out of presence-flap scope; same optional filter pattern could apply later.
