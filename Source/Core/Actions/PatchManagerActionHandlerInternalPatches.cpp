@@ -264,7 +264,7 @@ namespace Core
                 false)))
             return;
 
-        if (! confirmPatchContextChange(false))
+        if (! confirmPatchContextChange(true))
             return;
 
         abandonPendingDeviceLoad();
@@ -280,6 +280,7 @@ namespace Core
         using namespace PatchManagerActionHandlerInternal;
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
         captureCleanSnapshot();
+        markPatchNotStoredInRam();
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();
@@ -314,9 +315,7 @@ namespace Core
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
 
-        if (! confirmPatchContextChange(false))
-            return;
-
+        // PASTE entry: silent like module C/P — no risk modal and no Mutator history gate.
         abandonPendingDeviceLoad();
         clearLastDeviceDumpRawName();
 

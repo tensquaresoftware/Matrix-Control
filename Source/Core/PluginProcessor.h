@@ -16,6 +16,7 @@
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
+#include "Core/Services/UnsavedEditWarningPolicy.h"
 
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -181,8 +182,8 @@ public:
 
     void setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate gate);
 
-    // FR-51 unsaved-edit modal: returns true for Continue, false for Cancel.
-    using UnsavedEditConfirmModalGate = std::function<bool()>;
+    // FR-51 unsaved/at-risk modal: Cancel / Discard / Persist (Store or Save As).
+    using UnsavedEditConfirmModalGate = std::function<Core::UnsavedEditConfirmChoice(bool storeAllowed)>;
 
     void setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate);
 
@@ -357,6 +358,7 @@ private:
     void updateDevicePatchLoadContext();
     bool confirmPatchContextChangeGate(bool includeUnsavedEditWarning = true);
     bool confirmUnsavedEditGateIfNeeded();
+    bool applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoice choice, bool storeAllowed);
     bool requireMessageThreadForModalGate() const;
     bool runMutatorHistoryGateChoice();
     bool runMutatorExportForGate();

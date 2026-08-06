@@ -237,6 +237,39 @@ namespace Core
 
         patchModel_->normalizeNameEncoding();
         dirtyPatchTracker_->captureSnapshot(*patchModel_);
+        patchNotStoredInRam_ = false;
+    }
+
+    bool PatchManagerActionHandler::isCurrentBankStoreAllowed() const
+    {
+        if (! deviceMemoryLimits_)
+            return false;
+
+        const auto limits = deviceMemoryLimits_();
+        return limits.isPasteStoreAllowed(getCurrentBank(limits));
+    }
+
+    bool PatchManagerActionHandler::tryPersistCurrentPatchFromUnsavedGate(bool storeAllowed)
+    {
+        if (storeAllowed)
+        {
+            if (! isCurrentBankStoreAllowed())
+                return false;
+
+            handleInternalPatchStore(deviceMemoryLimits_());
+        }
+        else
+        {
+            handleSavePatchAs();
+        }
+
+        if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr
+            || patchNameSyncer_ == nullptr)
+            return ! patchNotStoredInRam_;
+
+        return ! patchNotStoredInRam_
+            && ! dirtyPatchTracker_->syncApvtsAndIsDirty(
+                   *apvtsPatchMapper_, *patchNameSyncer_, *patchModel_);
     }
 
     int PatchManagerActionHandler::getCurrentBank(const DeviceMemoryLimits& limits) const

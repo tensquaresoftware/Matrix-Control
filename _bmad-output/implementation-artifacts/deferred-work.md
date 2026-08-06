@@ -1098,3 +1098,21 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-user-message-ascii-encoding.md`
   summary: Stale Compare footer wording with em dash remains in mutator export/compare implementation artifact.
   evidence: Blind Hunter; documentation drift, not runtime; outside this bugfix code path.
+
+## Deferred from: quick-dev spec-dirty-unsaved-patch-ux-chantier-1 (2026-08-03)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md`
+  summary: `patchNotStoredInRam_` is not persisted across plugin/session reload after INIT without STORE.
+  evidence: Edge Case Hunter; chantier 3 / session close is out of scope; in-memory flag is enough for live leave prompts.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md`
+  summary: No PluginProcessor-level test that leave-after-INIT (clean + notStored) blocks via real policy+modal choice enum.
+  evidence: Blind Hunter; handler harness still mocks bool `confirmPatchContextChange`; policy unit-tested separately.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md`
+  summary: Persist Store while MIDI outbound blocked aborts leave with no dedicated footer beyond existing STORE silence.
+  evidence: Blind/Edge Hunter; tryPersist returns false and stays; footer polish can wait unless real-world confusion appears.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-1.md`
+  summary: If Persist succeeds then Mutator history Cancel aborts navigation, the patch may already be STORED/saved while the user remains on the slot.
+  evidence: Edge Case Hunter; acceptable (work is safe); deferring Persist until both gates would change gate ordering semantics.

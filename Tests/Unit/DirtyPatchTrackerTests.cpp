@@ -74,6 +74,8 @@ public:
         testUnsavedWarningPolicy_neverWarnSkipsPrompt();
         testUnsavedWarningPolicy_warnAlwaysWhenDirty();
         testUnsavedWarningPolicy_cleanNeverPrompts();
+        testUnsavedWarningPolicy_notStoredPromptsWhenClean();
+        testUnsavedWarningPolicy_neverWarnSkipsNotStored();
     }
 
 private:
@@ -312,6 +314,25 @@ private:
         using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
         expect(! Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false));
         expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, false));
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false, false));
+    }
+
+    void testUnsavedWarningPolicy_notStoredPromptsWhenClean()
+    {
+        beginTest("Unsaved warning policy — not stored prompts when clean");
+
+        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        expect(Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false, true));
+        expect(Core::UnsavedEditWarning::shouldPrompt(kDefault, false, true));
+    }
+
+    void testUnsavedWarningPolicy_neverWarnSkipsNotStored()
+    {
+        beginTest("Unsaved warning policy — never warn skips not stored");
+
+        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, false, true));
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, true, true));
     }
 };
 

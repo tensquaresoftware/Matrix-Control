@@ -22,7 +22,7 @@ namespace Core
         std::function<void(const PatchLoadContext&)> setPatchLoadContext;
         // Patch-context gate: consulted before navigation, load, INIT, or PASTE.
         // `includeUnsavedEditWarning` is true for navigation / file load / NumberBox;
-        // false for in-place INIT/PASTE (Mutator history only — no FR-51 modal).
+        // true = risk modal + Mutator history; false = history-only. PASTE skips this hook.
         // Returns true to proceed, false to abort. May be empty (proceed).
         std::function<bool(bool includeUnsavedEditWarning)> confirmPatchContextChange;
         // Optional test seams for device dump (empty = MidiManager).

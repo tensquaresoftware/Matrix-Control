@@ -118,12 +118,20 @@ namespace PluginDisplayNames
     {
         namespace UnsavedEditConfirm
         {
-            constexpr const char* kTitle = "Unsaved edits";
-            constexpr const char* kBody =
-                "This patch has edits that were not stored to the synth and not saved as a .syx file.\n\n"
-                "Continue and discard these edits, or Cancel to keep editing.";
-            constexpr const char* kCancel   = "Cancel";
-            constexpr const char* kContinue = "Continue";
+            constexpr const char* kTitle = "Unsaved patch";
+            constexpr const char* kBodyStore =
+                "This patch is not stored in the synth's current RAM slot yet "
+                "(edits and/or an INIT that was never stored).\n\n"
+                "Store writes it to the current RAM location. Discard abandons it and continues. "
+                "Cancel keeps editing.";
+            constexpr const char* kBodySaveAs =
+                "This patch has changes that were not saved as a .syx file.\n\n"
+                "Save As writes a new file. Discard abandons the changes and continues. "
+                "Cancel keeps editing.";
+            constexpr const char* kCancel  = "Cancel";
+            constexpr const char* kDiscard = "Discard";
+            constexpr const char* kStore   = "Store";
+            constexpr const char* kSaveAs  = "Save As";
         }
 
         namespace PatchNameReconciliation

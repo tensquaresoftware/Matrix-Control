@@ -111,6 +111,25 @@ bool PluginProcessor::requireMessageThreadForModalGate() const
     return true;
 }
 
+bool PluginProcessor::applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoice choice,
+                                                    bool storeAllowed)
+{
+    switch (choice)
+    {
+        case Core::UnsavedEditConfirmChoice::kCancel:
+            return false;
+
+        case Core::UnsavedEditConfirmChoice::kDiscard:
+            return true;
+
+        case Core::UnsavedEditConfirmChoice::kPersist:
+            return patchManagerActionHandler_ != nullptr
+                && patchManagerActionHandler_->tryPersistCurrentPatchFromUnsavedGate(storeAllowed);
+    }
+
+    return false;
+}
+
 bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
 {
     using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
@@ -125,8 +144,10 @@ bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
 
     const bool isDirty = dirtyPatchTracker_->syncApvtsAndIsDirty(
         *apvtsPatchMapper_, *patchNameSyncer_, *patchModel_);
+    const bool notStoredInRam = patchManagerActionHandler_ != nullptr
+        && patchManagerActionHandler_->isPatchNotStoredInRam();
 
-    if (! Core::UnsavedEditWarning::shouldPrompt(policy, isDirty))
+    if (! Core::UnsavedEditWarning::shouldPrompt(policy, isDirty, notStoredInRam))
         return true;
 
     // No UI gate wired (headless / tests) -> proceed without blocking.
@@ -136,7 +157,10 @@ bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
     if (! requireMessageThreadForModalGate())
         return false;
 
-    return unsavedEditConfirmModalGate_();
+    const bool storeAllowed = patchManagerActionHandler_ != nullptr
+        && patchManagerActionHandler_->isCurrentBankStoreAllowed();
+
+    return applyUnsavedEditConfirmChoice(unsavedEditConfirmModalGate_(storeAllowed), storeAllowed);
 }
 
 bool PluginProcessor::confirmPatchContextChangeGate(bool includeUnsavedEditWarning)

@@ -105,6 +105,12 @@ namespace Core
         void loadCurrentPatchFromDevice(const DeviceMemoryLimits& limits,
                                         const InternalCoordinatesSnapshot& priorCoordinates);
 
+        // Chantier 1: INIT (and similar) can be clean vs snapshot yet not STORED in RAM.
+        bool isPatchNotStoredInRam() const noexcept { return patchNotStoredInRam_; }
+        bool isCurrentBankStoreAllowed() const;
+        // Runs STORE (RAM) or Save As (ROM) for the unsaved-edit Persist choice. False = stay.
+        bool tryPersistCurrentPatchFromUnsavedGate(bool storeAllowed);
+
     private:
         enum class PatchNameResolvePurpose
         {
@@ -120,9 +126,10 @@ namespace Core
         };
 
         // Returns true when the pending patch-context change may proceed.
-        // `includeUnsavedEditWarning` selects FR-51 + history (navigation) vs history-only (INIT/PASTE).
+        // `includeUnsavedEditWarning` selects FR-51 risk + history vs history-only.
         bool confirmPatchContextChange(bool includeUnsavedEditWarning = true);
         void captureCleanSnapshot();
+        void markPatchNotStoredInRam() noexcept { patchNotStoredInRam_ = true; }
         void revertComputerPatchesSelectionIfNeeded(int previousSelectedId);
         void rememberComputerPatchesSelection(int selectedId);
         void seedCommittedComputerPatchesSelectionIfNeeded();
@@ -390,6 +397,7 @@ namespace Core
         bool suppressComputerPatchesSelectLoad_ = false;
         std::uint64_t deviceLoadGeneration_ = 0;
         std::optional<PendingDeviceLoad> pendingDeviceLoad_;
+        bool patchNotStoredInRam_ = false;
 
         // When OPEN replaces the browser then Cancel/fails the auto-load, restore this snapshot.
         struct ComputerPatchesBrowserSnapshot

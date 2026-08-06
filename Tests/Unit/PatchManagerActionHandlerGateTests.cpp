@@ -12,7 +12,13 @@ public:
         testHistoryGate_cancelAbortsNavigation();
         testHistoryGate_proceedAllowsNavigation();
         testHistoryGate_cancelAbortsInit();
-        testUnsavedGate_initSkipsUnsavedWarningFlag();
+        testUnsavedGate_initIncludesUnsavedWarningFlag();
+        testUnsavedGate_initMarksNotStoredInRam();
+        testUnsavedGate_storeClearsNotStoredInRam();
+        testUnsavedGate_pasteSkipsContextGate();
+        testUnsavedGate_secondInitWhileNotStoredStillGates();
+        testUnsavedGate_tryPersistStoreClearsNotStored();
+        testUnsavedGate_tryPersistStoreBlockedKeepsNotStored();
         testUnsavedGate_loadCancelRevertsSelection();
         testUnsavedGate_prevNextCancelDoesNotDoubleLoad();
         testUnsavedGate_openCancelRestoresPriorBrowser();
@@ -70,13 +76,13 @@ private:
 
         // On Cancel the patch load hook (history reset) must not fire.
         expectEquals(harness.gateState->calls, 1);
-        expect(! harness.gateState->lastIncludeUnsavedEditWarning);
+        expect(harness.gateState->lastIncludeUnsavedEditWarning);
         expect(!harness.patchLoadHookState->invoked);
     }
 
-    void testUnsavedGate_initSkipsUnsavedWarningFlag()
+    void testUnsavedGate_initIncludesUnsavedWarningFlag()
     {
-        beginTest("unsavedGate_initSkipsUnsavedWarningFlag");
+        beginTest("unsavedGate_initIncludesUnsavedWarningFlag");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
@@ -84,7 +90,105 @@ private:
         harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
 
         expectEquals(harness.gateState->calls, 1);
-        expect(! harness.gateState->lastIncludeUnsavedEditWarning);
+        expect(harness.gateState->lastIncludeUnsavedEditWarning);
+    }
+
+    void testUnsavedGate_initMarksNotStoredInRam()
+    {
+        beginTest("unsavedGate_initMarksNotStoredInRam");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expect(harness.dirtyPatchTracker.hasSnapshot());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+        expect(harness.handler.isPatchNotStoredInRam());
+    }
+
+    void testUnsavedGate_storeClearsNotStoredInRam()
+    {
+        beginTest("unsavedGate_storeClearsNotStoredInRam");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+        expect(harness.handler.isPatchNotStoredInRam());
+
+        harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
+
+        expect(! harness.handler.isPatchNotStoredInRam());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+    }
+
+    void testUnsavedGate_pasteSkipsContextGate()
+    {
+        beginTest("unsavedGate_pasteSkipsContextGate");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 7, false);
+        harness.mapper.apvtsToBuffer();
+        harness.clipboard.copyFullPatch(harness.model, "BANK 0 / PATCH 0");
+        harness.gateState->allow = false;
+        harness.gateState->calls = 0;
+
+        harness.handler.handleAction(InternalPatches::kPastePatch, juce::var());
+
+        expectEquals(harness.gateState->calls, 0);
+        expect(harness.patchLoadHookState->invoked);
+    }
+
+    void testUnsavedGate_secondInitWhileNotStoredStillGates()
+    {
+        beginTest("unsavedGate_secondInitWhileNotStoredStillGates");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+        expect(harness.handler.isPatchNotStoredInRam());
+        expectEquals(harness.gateState->calls, 1);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+
+        expectEquals(harness.gateState->calls, 2);
+        expect(harness.gateState->lastIncludeUnsavedEditWarning);
+        expect(harness.handler.isPatchNotStoredInRam());
+    }
+
+    void testUnsavedGate_tryPersistStoreClearsNotStored()
+    {
+        beginTest("unsavedGate_tryPersistStoreClearsNotStored");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+        expect(harness.handler.isPatchNotStoredInRam());
+
+        expect(harness.handler.tryPersistCurrentPatchFromUnsavedGate(true));
+        expect(! harness.handler.isPatchNotStoredInRam());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+    }
+
+    void testUnsavedGate_tryPersistStoreBlockedKeepsNotStored()
+    {
+        beginTest("unsavedGate_tryPersistStoreBlockedKeepsNotStored");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
+
+        harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
+        expect(harness.handler.isPatchNotStoredInRam());
+
+        harness.proc.apvts.state.setProperty("deviceDetected", false, nullptr);
+        expect(! harness.handler.tryPersistCurrentPatchFromUnsavedGate(true));
+        expect(harness.handler.isPatchNotStoredInRam());
     }
 
     void testUnsavedGate_loadCancelRevertsSelection()
