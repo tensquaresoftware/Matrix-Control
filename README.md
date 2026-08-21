@@ -70,7 +70,7 @@ The project is actively under development. As of early 2026:
 
 ## Supporting the project
 
-Matrix-Control is developed in my free time, alongside a day job as an instructional designer for an [Ableton-certified training center](https://fastlane.fr) in Montpellier, France. The main tool powering my development workflow is [Claude Code](https://claude.com/claude-code), which has been instrumental in accelerating progress on this project — especially during the large-scale refactoring phases.
+Matrix-Control is developed in my free time, alongside a day job as an instructional designer for an [Ableton-certified training center](https://fastlane.fr) in Montpellier, France. The main tool powering my development workflow is [Cursor](https://cursor.com), which has been instrumental in accelerating progress on this project — especially during the large-scale refactoring phases.
 
 If you enjoy the Matrix-1000 Editor or are looking forward to Matrix-Control, sponsoring the project on [GitHub Sponsors](https://github.com/sponsors/tensquaresoftware) is the most direct way to help keep the development going. Every contribution, no matter the size, is genuinely appreciated.
 
@@ -85,7 +85,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 #### macOS
 
 - macOS Tahoe or later
-- VS Code (with the CMake Tools and C/C++ extensions)
+- **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+
 - Ninja build system
 - JUCE 8 installed (set `JUCE_DIR` environment variable to your JUCE installation path, e.g., `/Applications/JUCE`)
@@ -93,7 +93,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 #### Windows
 
 - Windows 11 or later
-- VS Code (with the CMake Tools and C/C++ extensions)
+- **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+ (add to system PATH during installation)
 - Visual Studio 2022 with "Desktop development with C++" workload
 - JUCE 8 installed (set `JUCE_DIR` environment variable to your JUCE installation path, e.g., `C:\JUCE`)
@@ -160,9 +160,9 @@ cmake --build Builds/Linux --config Debug
 
 > **Note:** Audio Unit (AU) format is only available on macOS. On Windows, only VST3 and Standalone formats are built.
 
-### Using VS Code
+### Using Cursor or VS Code
 
-1. Open the project folder in VS Code
+1. Open the project folder in **Cursor** or **VS Code**
 2. CMake Tools extension will automatically detect the project
 3. Select your build kit (CMake Tools will prompt you)
 4. Use the build tasks:
@@ -189,7 +189,7 @@ Debug configurations are available in `.vscode/launch.json`:
 - **macOS**: Standalone, AU in Logic Pro, VST3 in Reaper, AU in Ableton Live
 - **Windows**: Standalone, VST3 in Reaper
 
-Press `F5` in VS Code to start debugging.
+Press `F5` in **Cursor** or **VS Code** to start debugging.
 
 ---
 
