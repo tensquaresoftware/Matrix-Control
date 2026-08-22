@@ -66,8 +66,7 @@ namespace Core
         abandonPendingDeviceLoad();
         clearLastDeviceDumpRawName();
 
-        if (hooks_.setPatchLoadContext)
-            hooks_.setPatchLoadContext(PatchLoadContext::computerFile(file.getFileNameWithoutExtension()));
+        noteComputerPatchOrigin(file);
 
         applyLoadedPatchToApvtsAndSynth(limits);
         rememberComputerPatchesSelection(requestedId);
@@ -258,8 +257,9 @@ namespace Core
         if (patchNameSyncer_ != nullptr)
             patchNameSyncer_->apvtsToBuffer();
 
+        const auto target = targetFile.withFileExtension(PatchFileService::kSyxExtension);
         const auto result = patchFileService_->savePatchSysExFile(
-            targetFile.withFileExtension(PatchFileService::kSyxExtension),
+            target,
             patchModel_->data(),
             *sysExEncoder_);
 
@@ -269,13 +269,32 @@ namespace Core
             return;
         }
 
-        completeSuccessfulSave(PatchManagerActionHandlerInternal::savedSyxFileName(targetFile));
+        completeSuccessfulSave(target);
     }
 
-    void PatchManagerActionHandler::completeSuccessfulSave(const juce::String& savedFileName)
+    void PatchManagerActionHandler::completeSuccessfulSave(const juce::File& savedFile)
     {
+        const auto savedFileName = PatchManagerActionHandlerInternal::savedSyxFileName(savedFile);
+        // Device / INIT context: refresh clean snapshot but keep RAM risk until STORE (§0.5 / §4.5).
+        const bool retainRamRisk = ! editorPatchFromComputerFile_;
+
         patchNameSyncer_->bufferToApvts();
         captureCleanSnapshot();
+
+        if (retainRamRisk)
+            markPatchNotStoredInRam();
+
+        if (editorPatchFromComputerFile_)
+        {
+            knownSyxFullPath_ = savedFile.getFullPathName();
+
+            if (hooks_.setPatchLoadContext)
+            {
+                hooks_.setPatchLoadContext(PatchLoadContext::computerFile(
+                    savedFile.getFileNameWithoutExtension(), knownSyxFullPath_));
+            }
+        }
+
         publishSaveSuccessFooter(savedFileName);
         rescanAndSelectSavedFile(savedFileName);
     }

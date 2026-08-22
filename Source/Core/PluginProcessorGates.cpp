@@ -112,7 +112,7 @@ bool PluginProcessor::requireMessageThreadForModalGate() const
 }
 
 bool PluginProcessor::applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoice choice,
-                                                    bool storeAllowed)
+                                                    Core::UnsavedEditPersistKind persistKind)
 {
     switch (choice)
     {
@@ -124,7 +124,7 @@ bool PluginProcessor::applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoi
 
         case Core::UnsavedEditConfirmChoice::kPersist:
             return patchManagerActionHandler_ != nullptr
-                && patchManagerActionHandler_->tryPersistCurrentPatchFromUnsavedGate(storeAllowed);
+                && patchManagerActionHandler_->tryPersistCurrentPatchFromUnsavedGate(persistKind);
     }
 
     return false;
@@ -157,10 +157,11 @@ bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
     if (! requireMessageThreadForModalGate())
         return false;
 
-    const bool storeAllowed = patchManagerActionHandler_ != nullptr
-        && patchManagerActionHandler_->isCurrentBankStoreAllowed();
+    const auto persistKind = patchManagerActionHandler_ != nullptr
+        ? patchManagerActionHandler_->resolveUnsavedEditPersistKind(isDirty)
+        : Core::UnsavedEditPersistKind::kSaveAs;
 
-    return applyUnsavedEditConfirmChoice(unsavedEditConfirmModalGate_(storeAllowed), storeAllowed);
+    return applyUnsavedEditConfirmChoice(unsavedEditConfirmModalGate_(persistKind), persistKind);
 }
 
 bool PluginProcessor::confirmPatchContextChangeGate(bool includeUnsavedEditWarning)

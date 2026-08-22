@@ -170,7 +170,8 @@ private:
         harness.handler.handleAction(InternalPatches::kInitPatch, juce::var());
         expect(harness.handler.isPatchNotStoredInRam());
 
-        expect(harness.handler.tryPersistCurrentPatchFromUnsavedGate(true));
+        expect(harness.handler.tryPersistCurrentPatchFromUnsavedGate(
+            Core::UnsavedEditPersistKind::kStore));
         expect(! harness.handler.isPatchNotStoredInRam());
         expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));
@@ -187,9 +188,13 @@ private:
         expect(harness.handler.isPatchNotStoredInRam());
 
         harness.proc.apvts.state.setProperty("deviceDetected", false, nullptr);
-        expect(! harness.handler.tryPersistCurrentPatchFromUnsavedGate(true));
+        expect(! harness.handler.tryPersistCurrentPatchFromUnsavedGate(
+            Core::UnsavedEditPersistKind::kStore));
         expect(harness.handler.isPatchNotStoredInRam());
     }
+
+
+
 
     void testUnsavedGate_loadCancelRevertsSelection()
     {
@@ -312,25 +317,28 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         const auto tempDir = createTempScanDir();
         expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 71.syx");
+        setupComputerPatchesScan(harness, tempDir);
 
         harness.proc.apvts.state.setProperty(
-            ComputerPatches::StateProperties::kFolderPath,
-            tempDir.getFullPathName(),
-            nullptr);
-        harness.handler.rescanPersistedComputerPatchesFolder();
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
 
-        harness.pickSaveFileCallback = [&tempDir](juce::File, juce::String stem) {
-            return tempDir.getChildFile(stem + ".syx");
-        };
+        harness.model.setName("EDITED!!");
+        harness.patchNameSyncer.bufferToApvts();
+        expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchFile, juce::var());
 
         expect(harness.dirtyPatchTracker.hasSnapshot());
         expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));
+        expect(! harness.handler.isPatchNotStoredInRam());
 
         tempDir.deleteRecursively();
     }
+
 
     void testUnsavedGate_captureAfterStoreLeavesClean()
     {

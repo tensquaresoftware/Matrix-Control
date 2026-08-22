@@ -183,7 +183,8 @@ public:
     void setMutatorHistoryGateModalGate(MutatorHistoryGateModalGate gate);
 
     // FR-51 unsaved/at-risk modal: Cancel / Discard / Persist (Store or Save As).
-    using UnsavedEditConfirmModalGate = std::function<Core::UnsavedEditConfirmChoice(bool storeAllowed)>;
+    using UnsavedEditConfirmModalGate =
+        std::function<Core::UnsavedEditConfirmChoice(Core::UnsavedEditPersistKind persistKind)>;
 
     void setUnsavedEditConfirmModalGate(UnsavedEditConfirmModalGate gate);
 
@@ -358,7 +359,8 @@ private:
     void updateDevicePatchLoadContext();
     bool confirmPatchContextChangeGate(bool includeUnsavedEditWarning = true);
     bool confirmUnsavedEditGateIfNeeded();
-    bool applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoice choice, bool storeAllowed);
+    bool applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoice choice,
+                                       Core::UnsavedEditPersistKind persistKind);
     bool requireMessageThreadForModalGate() const;
     bool runMutatorHistoryGateChoice();
     bool runMutatorExportForGate();

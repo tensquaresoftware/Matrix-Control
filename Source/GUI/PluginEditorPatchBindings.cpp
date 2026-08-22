@@ -170,19 +170,36 @@ void PluginEditor::setUnsavedEditConfirmGateBinding()
 {
     pluginProcessor.setUnsavedEditConfirmModalGate(
         [safeThis = juce::Component::SafePointer<PluginEditor>(this)](
-            bool storeAllowed) -> Core::UnsavedEditConfirmChoice
+            Core::UnsavedEditPersistKind persistKind) -> Core::UnsavedEditConfirmChoice
         {
             if (! isMessageThread() || safeThis == nullptr)
                 return Core::UnsavedEditConfirmChoice::kCancel;
 
             namespace Dialog = PluginDisplayNames::Dialogs::UnsavedEditConfirm;
 
+            const char* body = Dialog::kBodySaveAs;
+            const char* persistLabel = Dialog::kSaveAs;
+
+            switch (persistKind)
+            {
+                case Core::UnsavedEditPersistKind::kStore:
+                    body = Dialog::kBodyStore;
+                    persistLabel = Dialog::kStore;
+                    break;
+                case Core::UnsavedEditPersistKind::kSave:
+                    body = Dialog::kBodySave;
+                    persistLabel = Dialog::kSave;
+                    break;
+                case Core::UnsavedEditPersistKind::kSaveAs:
+                    break;
+            }
+
             const int code = showOrderedConfirmAlert({
                 juce::MessageBoxIconType::WarningIcon,
                 Dialog::kTitle,
-                storeAllowed ? Dialog::kBodyStore : Dialog::kBodySaveAs,
+                body,
                 Dialog::kCancel,
-                storeAllowed ? Dialog::kStore : Dialog::kSaveAs,
+                persistLabel,
                 safeThis.getComponent(),
                 Dialog::kDiscard
             });

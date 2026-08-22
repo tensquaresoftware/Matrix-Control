@@ -155,8 +155,7 @@ namespace Core
         captureCleanSnapshot();
         clearPendingDeviceLoad();
 
-        if (hooks_.setPatchLoadContext)
-            hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(bank, patch));
+        noteDevicePatchOrigin(bank, patch);
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();

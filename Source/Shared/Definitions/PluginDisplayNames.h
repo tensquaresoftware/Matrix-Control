@@ -124,6 +124,10 @@ namespace PluginDisplayNames
                 "(edits and/or an INIT that was never stored).\n\n"
                 "Store writes it to the current RAM location. Discard abandons it and continues. "
                 "Cancel keeps editing.";
+            constexpr const char* kBodySave =
+                "This patch has changes that were not saved to its .syx file.\n\n"
+                "Save overwrites that file. Discard abandons the changes and continues. "
+                "Cancel keeps editing.";
             constexpr const char* kBodySaveAs =
                 "This patch has changes that were not saved as a .syx file.\n\n"
                 "Save As writes a new file. Discard abandons the changes and continues. "
@@ -131,6 +135,7 @@ namespace PluginDisplayNames
             constexpr const char* kCancel  = "Cancel";
             constexpr const char* kDiscard = "Discard";
             constexpr const char* kStore   = "Store";
+            constexpr const char* kSave    = "Save";
             constexpr const char* kSaveAs  = "Save As";
         }
 

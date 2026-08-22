@@ -230,9 +230,7 @@ namespace Core
     void PatchManagerActionHandler::applyPastedPatchToEditorAndSynth(const DeviceMemoryLimits& limits,
                                                                      int currentBank)
     {
-        if (hooks_.setPatchLoadContext)
-            hooks_.setPatchLoadContext(
-                PatchLoadContext::deviceMemory(currentBank, getCurrentPatch(limits)));
+        noteDevicePatchOrigin(currentBank, getCurrentPatch(limits));
 
         using namespace PatchManagerActionHandlerInternal;
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
@@ -273,9 +271,7 @@ namespace Core
         const auto result = patchInitService_->initFullPatch();
         assignInitPatchNameIfBlank(patchModel_);
 
-        if (hooks_.setPatchLoadContext)
-            hooks_.setPatchLoadContext(
-                PatchLoadContext::deviceMemory(getCurrentBank(limits), getCurrentPatch(limits)));
+        noteDevicePatchOrigin(getCurrentBank(limits), getCurrentPatch(limits));
 
         using namespace PatchManagerActionHandlerInternal;
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);

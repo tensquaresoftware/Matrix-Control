@@ -224,8 +224,7 @@ namespace Core
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
         captureCleanSnapshot();
 
-        if (hooks_.setPatchLoadContext)
-            hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(importedBank, currentPatch));
+        noteDevicePatchOrigin(importedBank, currentPatch);
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();

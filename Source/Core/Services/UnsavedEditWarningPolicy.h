@@ -4,12 +4,20 @@
 
 namespace Core
 {
-    // FR-51 leave-context modal choice (Store vs Save As is chosen by the GUI from RAM/ROM).
+    // FR-51 leave-context modal choice (Persist action is chosen separately).
     enum class UnsavedEditConfirmChoice
     {
         kCancel,
         kDiscard,
         kPersist
+    };
+
+    // Leave-modal Persist action: Store (RAM), Save (known .syx), or Save As (picker).
+    enum class UnsavedEditPersistKind
+    {
+        kStore,
+        kSave,
+        kSaveAs
     };
 
     namespace UnsavedEditWarning

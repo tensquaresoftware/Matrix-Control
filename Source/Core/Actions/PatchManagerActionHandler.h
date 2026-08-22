@@ -16,6 +16,7 @@
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchNameOverlayStore.h"
+#include "Core/Services/UnsavedEditWarningPolicy.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
 class MidiManager;
@@ -108,8 +109,11 @@ namespace Core
         // Chantier 1: INIT (and similar) can be clean vs snapshot yet not STORED in RAM.
         bool isPatchNotStoredInRam() const noexcept { return patchNotStoredInRam_; }
         bool isCurrentBankStoreAllowed() const;
-        // Runs STORE (RAM) or Save As (ROM) for the unsaved-edit Persist choice. False = stay.
-        bool tryPersistCurrentPatchFromUnsavedGate(bool storeAllowed);
+        bool hasUsableKnownSyxPath() const;
+        // File-origin dirty → Save / Save As; otherwise Store (RAM) or Save As (ROM).
+        UnsavedEditPersistKind resolveUnsavedEditPersistKind(bool isDirty) const;
+        // Runs Store / Save / Save As for the unsaved-edit Persist choice. False = stay.
+        bool tryPersistCurrentPatchFromUnsavedGate(UnsavedEditPersistKind persistKind);
 
     private:
         enum class PatchNameResolvePurpose
@@ -284,8 +288,12 @@ namespace Core
         void publishLoadFooters(const juce::String& fileName,
                                   const PatchNameReconciliationResult& reconciliation);
         void publishLoadFailureFooter(const juce::String& message);
+        void noteDevicePatchOrigin(int bank, int patch);
+        void noteComputerPatchOrigin(const juce::File& file);
+        bool performUnsavedGatePersistAction(UnsavedEditPersistKind persistKind);
+        bool didUnsavedGatePersistSucceed(UnsavedEditPersistKind persistKind) const;
         void saveCurrentPatchToFile(const juce::File& targetFile);
-        void completeSuccessfulSave(const juce::String& savedFileName);
+        void completeSuccessfulSave(const juce::File& savedFile);
         void rescanAndSelectSavedFile(const juce::String& savedFileName);
         juce::File resolveRescanFolder() const;
         juce::File resolveDefaultSaveFolder() const;
@@ -398,6 +406,9 @@ namespace Core
         std::uint64_t deviceLoadGeneration_ = 0;
         std::optional<PendingDeviceLoad> pendingDeviceLoad_;
         bool patchNotStoredInRam_ = false;
+        // Mirrored from PatchLoadContext for leave Persist (file Save vs Store) without a get hook.
+        bool editorPatchFromComputerFile_ = false;
+        juce::String knownSyxFullPath_;
 
         // When OPEN replaces the browser then Cancel/fails the auto-load, restore this snapshot.
         struct ComputerPatchesBrowserSnapshot

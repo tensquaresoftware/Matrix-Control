@@ -18,11 +18,13 @@ namespace Core
         return context;
     }
 
-    PatchLoadContext PatchLoadContext::computerFile(const juce::String& fileStem)
+    PatchLoadContext PatchLoadContext::computerFile(const juce::String& fileStem,
+                                                    const juce::String& knownSyxFullPath)
     {
         PatchLoadContext context;
         context.origin = Origin::kComputerFile;
         context.fileStem = fileStem;
+        context.knownSyxFullPath = knownSyxFullPath;
         return context;
     }
 

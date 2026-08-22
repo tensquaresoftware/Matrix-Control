@@ -22,9 +22,12 @@ namespace Core
         int bank { 0 };
         int patch { 0 };
         juce::String fileStem; // Computer origin only — raw stem, sanitized on demand.
+        // Computer origin only — absolute .syx path for leave-modal Save overwrite (chantier 2).
+        juce::String knownSyxFullPath;
 
         static PatchLoadContext deviceMemory(int bank, int patch);
-        static PatchLoadContext computerFile(const juce::String& fileStem);
+        static PatchLoadContext computerFile(const juce::String& fileStem,
+                                             const juce::String& knownSyxFullPath = {});
 
         // Export session folder basename:
         //   Device / INIT / PASTE : `{Name} @ B{b}-P{pp:02d}` or `B{b}-P{pp:02d}` when name empty

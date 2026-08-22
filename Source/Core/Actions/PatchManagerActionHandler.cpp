@@ -9,6 +9,7 @@
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/Matrix1000FactoryPatchNames.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
+#include "Core/Services/PatchMutator/PatchLoadContext.h"
 #include "Core/Services/PatchNameDisplayMode.h"
 #include "Core/Services/PatchNameOverlayStore.h"
 #include "Core/Services/PatchNameResolver.h"
@@ -249,27 +250,99 @@ namespace Core
         return limits.isPasteStoreAllowed(getCurrentBank(limits));
     }
 
-    bool PatchManagerActionHandler::tryPersistCurrentPatchFromUnsavedGate(bool storeAllowed)
+    bool PatchManagerActionHandler::hasUsableKnownSyxPath() const
     {
-        if (storeAllowed)
-        {
-            if (! isCurrentBankStoreAllowed())
-                return false;
+        if (knownSyxFullPath_.isEmpty())
+            return false;
 
-            handleInternalPatchStore(deviceMemoryLimits_());
-        }
-        else
+        const juce::File file(knownSyxFullPath_);
+        return file.getParentDirectory().isDirectory();
+    }
+
+    UnsavedEditPersistKind PatchManagerActionHandler::resolveUnsavedEditPersistKind(bool isDirty) const
+    {
+        if (editorPatchFromComputerFile_ && isDirty)
         {
-            handleSavePatchAs();
+            return hasUsableKnownSyxPath() ? UnsavedEditPersistKind::kSave
+                                           : UnsavedEditPersistKind::kSaveAs;
         }
 
+        return isCurrentBankStoreAllowed() ? UnsavedEditPersistKind::kStore
+                                           : UnsavedEditPersistKind::kSaveAs;
+    }
+
+    void PatchManagerActionHandler::noteDevicePatchOrigin(int bank, int patch)
+    {
+        editorPatchFromComputerFile_ = false;
+        knownSyxFullPath_.clear();
+
+        if (hooks_.setPatchLoadContext)
+            hooks_.setPatchLoadContext(PatchLoadContext::deviceMemory(bank, patch));
+    }
+
+    void PatchManagerActionHandler::noteComputerPatchOrigin(const juce::File& file)
+    {
+        editorPatchFromComputerFile_ = true;
+        knownSyxFullPath_ = file.getFullPathName();
+
+        if (hooks_.setPatchLoadContext)
+        {
+            hooks_.setPatchLoadContext(PatchLoadContext::computerFile(
+                file.getFileNameWithoutExtension(), knownSyxFullPath_));
+        }
+    }
+
+    bool PatchManagerActionHandler::performUnsavedGatePersistAction(UnsavedEditPersistKind persistKind)
+    {
+        switch (persistKind)
+        {
+            case UnsavedEditPersistKind::kStore:
+                if (! isCurrentBankStoreAllowed())
+                    return false;
+
+                handleInternalPatchStore(deviceMemoryLimits_());
+                return true;
+
+            case UnsavedEditPersistKind::kSave:
+                if (! hasUsableKnownSyxPath())
+                    return false;
+
+                saveCurrentPatchToFile(juce::File(knownSyxFullPath_));
+                return true;
+
+            case UnsavedEditPersistKind::kSaveAs:
+                handleSavePatchAs();
+                return true;
+        }
+
+        return false;
+    }
+
+    bool PatchManagerActionHandler::didUnsavedGatePersistSucceed(UnsavedEditPersistKind persistKind) const
+    {
         if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr
             || patchNameSyncer_ == nullptr)
-            return ! patchNotStoredInRam_;
+        {
+            return false;
+        }
 
-        return ! patchNotStoredInRam_
-            && ! dirtyPatchTracker_->syncApvtsAndIsDirty(
-                   *apvtsPatchMapper_, *patchNameSyncer_, *patchModel_);
+        const bool stillDirty = dirtyPatchTracker_->syncApvtsAndIsDirty(
+            *apvtsPatchMapper_, *patchNameSyncer_, *patchModel_);
+
+        if (persistKind == UnsavedEditPersistKind::kStore)
+            return ! patchNotStoredInRam_ && ! stillDirty;
+
+        // Save / Save As: dirty must clear. Device-origin Save As may intentionally keep not-STORED.
+        return ! stillDirty;
+    }
+
+    bool PatchManagerActionHandler::tryPersistCurrentPatchFromUnsavedGate(
+        UnsavedEditPersistKind persistKind)
+    {
+        if (! performUnsavedGatePersistAction(persistKind))
+            return false;
+
+        return didUnsavedGatePersistSucceed(persistKind);
     }
 
     int PatchManagerActionHandler::getCurrentBank(const DeviceMemoryLimits& limits) const
