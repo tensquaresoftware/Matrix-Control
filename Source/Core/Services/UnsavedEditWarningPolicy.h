@@ -22,6 +22,11 @@ namespace Core
 
     namespace UnsavedEditWarning
     {
+        inline bool isAtRisk(bool isDirty, bool notStoredInRam) noexcept
+        {
+            return isDirty || notStoredInRam;
+        }
+
         // Settings policy: warn when dirty and/or not yet STORED in RAM, unless never-warn.
         inline bool shouldPrompt(int policyId, bool isDirty, bool notStoredInRam = false) noexcept
         {
@@ -30,7 +35,7 @@ namespace Core
             if (policyId == kNeverWarn)
                 return false;
 
-            return isDirty || notStoredInRam;
+            return isAtRisk(isDirty, notStoredInRam);
         }
     }
 } // namespace Core

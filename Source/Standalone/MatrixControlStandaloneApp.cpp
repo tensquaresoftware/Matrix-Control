@@ -4,6 +4,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "Core/PluginProcessor.h"
 #include "Standalone/MatrixControlStandaloneFilterWindow.h"
 
 namespace
@@ -96,8 +97,25 @@ public:
         appProperties.saveIfNeeded();
     }
 
+    PluginProcessor* getActivePluginProcessor() const
+    {
+        if (mainWindow != nullptr)
+            return dynamic_cast<PluginProcessor*>(mainWindow->getAudioProcessor());
+
+        if (pluginHolder != nullptr)
+            return dynamic_cast<PluginProcessor*>(pluginHolder->processor.get());
+
+        return nullptr;
+    }
+
     void systemRequestedQuit() override
     {
+        if (auto* processor = getActivePluginProcessor())
+        {
+            if (! processor->confirmSessionCloseGateIfNeeded())
+                return;
+        }
+
         if (pluginHolder != nullptr)
             pluginHolder->savePluginState();
 

@@ -130,6 +130,25 @@ bool PluginProcessor::applyUnsavedEditConfirmChoice(Core::UnsavedEditConfirmChoi
     return false;
 }
 
+bool PluginProcessor::isCurrentPatchAtRisk()
+{
+    if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr
+        || patchNameSyncer_ == nullptr)
+        return false;
+
+    const bool isDirty = dirtyPatchTracker_->syncApvtsAndIsDirty(
+        *apvtsPatchMapper_, *patchNameSyncer_, *patchModel_);
+    const bool notStoredInRam = patchManagerActionHandler_ != nullptr
+        && patchManagerActionHandler_->isPatchNotStoredInRam();
+
+    return Core::UnsavedEditWarning::isAtRisk(isDirty, notStoredInRam);
+}
+
+bool PluginProcessor::confirmSessionCloseGateIfNeeded()
+{
+    return confirmUnsavedEditGateIfNeeded();
+}
+
 bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
 {
     using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;

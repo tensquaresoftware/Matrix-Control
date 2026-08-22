@@ -1126,3 +1126,18 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-mt4-bridge-presence-device-inquiry.md`
   summary: Async patch one-shot still re-arms via callAsync after non-patch SysEx (same steal race pattern as Device Inquiry had).
   evidence: MidiManagerAsyncPatch.cpp armAsyncSinglePatchCapture; out of presence-flap scope; same optional filter pattern could apply later.
+
+## Deferred from: quick-dev spec-dirty-unsaved-patch-ux-chantier-3 (2026-08-22)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-3.md`
+  summary: Plugin editor close in a DAW host has no reliable JUCE pre-destroy hook; at-risk close warning is not shown when the host tears down the editor without going through Standalone quit/close paths.
+  evidence: PluginEditor destructor clears modal gates before teardown; AudioProcessorEditor has no portable closeButtonPressed equivalent in plugin mode.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-3.md`
+  summary: DAW project quit, plugin unload, and `getStateInformation` cannot show a blocking FR-51-family modal (no message-thread UI during processor teardown).
+  evidence: JUCE host lifecycle; `releaseResources` / destructor paths are unsuitable for AlertWindow; best-effort coverage is Standalone-only.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-dirty-unsaved-patch-ux-chantier-3.md`
+  summary: `patchNotStoredInRam_` is still not persisted in session state — reloading a DAW project after INIT-without-STORE will not re-prompt until the user edits or INIT again.
+  evidence: Chantier-1 deferred-work retained; chantier 3 uses live in-memory risk only at close hooks.
+

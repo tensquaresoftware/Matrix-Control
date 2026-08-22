@@ -40,6 +40,13 @@ public:
             fitWindowToContent();
     }
 
+    void closeButtonPressed() override
+    {
+        // Route through the app quit path so risk gating and modal-cancel retry stay unified.
+        if (auto* app = juce::JUCEApplicationBase::getInstance())
+            app->systemRequestedQuit();
+    }
+
 private:
     void hideJuceOptionsButton()
     {

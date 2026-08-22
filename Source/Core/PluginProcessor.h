@@ -161,6 +161,10 @@ public:
 
     bool isStandalone() const;
 
+    // Chantier 3 — session / close warning (reuses FR-51 gate; no Mutator history).
+    bool isCurrentPatchAtRisk();
+    bool confirmSessionCloseGateIfNeeded();
+
     using PatchFolderPicker = std::function<juce::File()>;
 
     void setPatchFolderPicker(PatchFolderPicker picker);

@@ -406,6 +406,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ClipboardServiceTests.cpp
         Tests/Unit/ClipboardFeedbackResolverTests.cpp
         Tests/Unit/DirtyPatchTrackerTests.cpp
+        Tests/Unit/PluginProcessorCloseGateTests.cpp
         Tests/Unit/MutationHistoryStoreTests.cpp
         Tests/Unit/MutationNamingTests.cpp
         Tests/Unit/HistoryDefragServiceTests.cpp
