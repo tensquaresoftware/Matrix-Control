@@ -27,7 +27,7 @@ Source complète : `CONVENTIONS.md` §1.
 
 ## Clarté BMad (questions / décisions / explications)
 
-Pendant les commandes BMad story (`create-story`, `dev-story`, `quick-dev`, `code-review`), appliquer aussi `.cursor/rules/bmad-clarity-bar.mdc` et `_bmad/custom/clarity-bar-fr.md`.
+Pendant les commandes BMad story (`create-story`, `dev-story`, `build` / ancien `quick-dev`, `code-review`), appliquer aussi `.cursor/rules/bmad-clarity-bar.mdc` et `_bmad/custom/clarity-bar-fr.md`.
 
 Guillaume ne doit **pas** avoir à demander une reformulation pour comprendre une explication, une question ou une décision. Si la phrase-test « Reformule en langage naturel, sans jargon excessif » ferait réécrire le texte → le réécrire **avant** l’envoi.
 

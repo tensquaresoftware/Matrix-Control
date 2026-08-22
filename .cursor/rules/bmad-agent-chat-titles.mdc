@@ -5,7 +5,7 @@ alwaysApply: true
 
 # BMad — titres des conversations Agents
 
-When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-quick-dev`, `/bmad-correct-course`, etc.), consider renaming the current chat — **only under the gate below**.
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-build`, `/bmad-correct-course`, etc.), consider renaming the current chat — **only under the gate below**.
 
 Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API persists the title** — direct database edits to the sidebar cache are overwritten when the conversation is opened (Cursor reloads the title from the conversation checkpoint).
 
@@ -27,7 +27,7 @@ All of the following must be true:
 2. The **current** sidebar title does **not** already look like a BMad title — i.e. it does **not** start with `BMad —` (em dash) or `BMad -` (hyphen fallback).
 3. You have **not** already called `rename_chat` earlier in this conversation.
 
-Typical auto-generated titles that still need a rename: `Story creation process`, `Code review discussion`, `bmad dev story 4-4`, `Quick dev request`, etc.
+Typical auto-generated titles that still need a rename: `Story creation process`, `Code review discussion`, `bmad dev story 4-4`, `Build request`, `Quick dev request`, etc.
 
 ### When NOT to rename (forbidden)
 
@@ -47,7 +47,7 @@ When renaming is allowed, do it as the **first tool call**, before other work.
 
 ## After rename — story-command amorce
 
-For `bmad-create-story`, `bmad-dev-story`, `bmad-quick-dev`, and `bmad-code-review`, follow `.cursor/rules/bmad-story-context-amorce.mdc` for the first user-facing content (`Contexte de la Story`).
+For `bmad-create-story`, `bmad-dev-story`, `bmad-build` (and deprecated alias `bmad-quick-dev`), and `bmad-code-review`, follow `.cursor/rules/bmad-story-context-amorce.mdc` for the first user-facing content (`Contexte de la Story`).
 
 ---
 
@@ -64,21 +64,21 @@ These commands keep a compact ID-only title when a story ID is present:
 | `bmad-create-story` | `BMad — Create Story {Story ID}` |
 | `bmad-dev-story` | `BMad — Dev Story {Story ID}` |
 | `bmad-code-review` | `BMad — Code Review {Story ID}` |
-| `bmad-quick-dev` | `BMad — Quick Dev {Story ID}` |
+| `bmad-build` (alias `bmad-quick-dev`) | `BMad — Build {Story ID}` |
 
-Omit `{Story ID}` only when none can be inferred. For `bmad-quick-dev` without a story ID, fall through to format B.
+Omit `{Story ID}` only when none can be inferred. For `bmad-build` / `bmad-quick-dev` without a story ID, fall through to format B.
 
 Examples:
 
 - `/bmad-create-story 4-5` → `BMad — Create Story 4-5`
 - `/bmad-dev-story 4-4` → `BMad — Dev Story 4-4`
 - `/bmad-code-review 4-4` → `BMad — Code Review 4-4`
-- `/bmad-quick-dev 8-4` → `BMad — Quick Dev 8-4`
-- `/bmad-quick-dev` + story `8-4` in the message → `BMad — Quick Dev 8-4`
+- `/bmad-build 8-4` → `BMad — Build 8-4`
+- `/bmad-build` + story `8-4` in the message → `BMad — Build 8-4`
 
 ### B — All other BMad commands (label + short topic)
 
-Also used for `bmad-quick-dev` **only when no story ID** can be inferred.
+Also used for `bmad-build` **only when no story ID** can be inferred.
 
 Format: `BMad — {Workflow Label} : {Topic}`
 
@@ -89,7 +89,7 @@ Format: `BMad — {Workflow Label} : {Topic}`
 
 Examples:
 
-- `/bmad-quick-dev` + disabled controls look (no story ID) → `BMad — Quick Dev : Look contrôles inactifs`
+- `/bmad-build` + disabled controls look (no story ID) → `BMad — Build : Look contrôles inactifs`
 - `/bmad-correct-course` + bank unlock simplify → `BMad — Correct Course : Unlock banque`
 - `/bmad-sprint-status` → `BMad — Sprint Status` (no topic needed)
 
@@ -105,7 +105,9 @@ Examples:
 | `bmad-correct-course` | Correct Course |
 | `bmad-sprint-planning` | Sprint Planning |
 | `bmad-sprint-status` | Sprint Status |
-| `bmad-quick-dev` | Quick Dev |
+| `bmad-build` | Build |
+| `bmad-quick-dev` | Build |
+| `bmad-build-auto` | Build Auto |
 | `bmad-check-implementation-readiness` | Implementation Readiness |
 | `bmad-create-architecture` | Create Architecture |
 | `bmad-create-epics-and-stories` | Create Epics |
@@ -115,12 +117,15 @@ Examples:
 | `bmad-help` | Help |
 | `bmad-checkpoint-preview` | Checkpoint |
 | `bmad-investigate` | Investigate |
+| `bmad-review` | Review |
 | `bmad-review-adversarial-general` | Adversarial Review |
 | `bmad-review-edge-case-hunter` | Edge Case Review |
 | `bmad-party-mode` | Party Mode |
 | `bmad-brainstorming` | Brainstorming |
 | `bmad-ux` | UX |
+| `bmad-deep-recon` | Deep Recon |
 | `bmad-technical-research` | Technical Research |
+| `bmad-project-context` | Project Context |
 | `bmad-generate-project-context` | Project Context |
 | `bmad-document-project` | Document Project |
 | Other `bmad-*` skill | Title-case the skill slug after `bmad-`, words separated by spaces |
@@ -132,7 +137,7 @@ Examples:
 Infer the topic from the user intent / first message (and attached story or spec name when present).
 
 1. **Language split (mandatory):**
-   - **English stays only** for the fixed prefix: `BMad` + workflow label (`Quick Dev`, `Correct Course`, …).
+   - **English stays only** for the fixed prefix: `BMad` + workflow label (`Build`, `Correct Course`, …).
    - **French for the topic** after the colon — never English Title Case for the subject.
 2. **Length:** 2–5 content words. Prefer concrete nouns already in the request.
 3. **Casing:** sentence-style French (not English Title Case for the whole topic). Keep established product / UI terms **untranslated** when they are real product names (`Track Generator`, `Look`, `Patch Mutator`, `MIDI`, IDs) mixed into an otherwise French phrase — never force-translate them (bad: « générateur de piste »).
@@ -148,7 +153,7 @@ Parse from the user message (slash command or attached skill context):
 
 - Epic-story: `4-5`, `7-3b`, `2-9b`, `8-4`
 - Utility stories: `U-0`, `U-11`
-- Accept `/bmad-create-story 4-5`, `/bmad-quick-dev 8-4`, `/bmad-create story 4-5`, or `story 4-5` / `US 8-4` in plain text
+- Accept `/bmad-create-story 4-5`, `/bmad-build 8-4`, `/bmad-create story 4-5`, or `story 4-5` / `US 8-4` in plain text
 
 ---
 
@@ -157,9 +162,9 @@ Parse from the user message (slash command or attached skill context):
 When several conversations would share the **same base title** (formats A or B), disambiguate with a numeric suffix:
 
 ```
-BMad — Quick Dev 8-4 (1)
-BMad — Quick Dev 8-4 (2)
-BMad — Quick Dev 8-4 (3)
+BMad — Build 8-4 (1)
+BMad — Build 8-4 (2)
+BMad — Build 8-4 (3)
 ```
 
 ### Algorithm (before calling `rename_chat`)
@@ -213,8 +218,8 @@ Only run this when the rename-once gate allows a rename.
 | Wrong | Right |
 |---|---|
 | `BMad — Sprint Status (2026-06-19)` | `BMad — Sprint Status` |
-| `BMad — Quick Dev : 8-4` | `BMad — Quick Dev 8-4` |
+| `BMad — Build : 8-4` | `BMad — Build 8-4` |
 | Renaming again on turn 2 because the topic “improved” | Keep the existing `BMad — …` title |
-| `BMad — Quick Dev : Disabled Controls Look` | `BMad — Quick Dev : Look contrôles inactifs` (no story ID) |
+| `BMad — Build : Disabled Controls Look` | `BMad — Build : Look contrôles inactifs` (no story ID) |
 | `BMad — Correct Course : Réduction de la latence audio` | `BMad — Correct Course : Latence audio` |
-| Two chats both named `BMad — Quick Dev 8-4` | Second becomes `BMad — Quick Dev 8-4 (1)` |
+| Two chats both named `BMad — Build 8-4` | Second becomes `BMad — Build 8-4 (1)` |

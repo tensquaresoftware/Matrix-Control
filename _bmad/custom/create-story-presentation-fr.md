@@ -29,4 +29,4 @@ Ce document s’applique à **toute** sortie utilisateur de `bmad-create-story` 
 
 ## Fin de workflow
 
-Résumer en français clair : story créée, chemin du fichier, statut « prêt à développer », et proposer la suite (souvent Quick Dev ou Dev Story) **avec recommandation**.
+Résumer en français clair : story créée, chemin du fichier, statut « prêt à développer », et proposer la suite (souvent Build ou Dev Story) **avec recommandation**.

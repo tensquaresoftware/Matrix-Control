@@ -1,6 +1,6 @@
-# Quick Dev — contrat de présentation (Matrix-Control)
+# Build — contrat de présentation (Matrix-Control)
 
-Ce document s’applique à **toute** sortie utilisateur de `bmad-quick-dev` (clarification, plan, implémentation, **revue interne**, présentation finale).
+Ce document s’applique à **toute** sortie utilisateur de `bmad-build` (et de l’alias déprécié `bmad-quick-dev`) : clarification, plan, implémentation, **revue interne**, présentation finale.
 Il prime sur le style télégraphique des étapes internes et des sous-agents.
 
 **Barème partagé (obligatoire) :** charger et appliquer `clarity-bar-fr.md` en premier. Rien ici n’assouplit ce barème.
@@ -55,7 +55,7 @@ Il prime sur le style télégraphique des étapes internes et des sous-agents.
 
 ### Revue interne (phase critique — même exigence que code-review)
 
-La revue intégrée à Quick Dev **n’a pas le droit** d’être plus dense que `bmad-code-review`.
+La revue intégrée à Build **n’a pas le droit** d’être plus dense que `bmad-code-review`.
 
 1. **En bref** — enjeu principal en langage de produit.
 2. **Verdict** — comptes : décisions à prendre / corrections à appliquer / à reporter.

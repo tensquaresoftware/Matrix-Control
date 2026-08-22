@@ -1,5 +1,5 @@
 ---
-description: Mandatory Contexte de la Story opening for create/dev/quick-dev/code-review BMad commands
+description: Mandatory Contexte de la Story opening for create/dev/build/code-review BMad commands
 alwaysApply: true
 ---
 
@@ -11,7 +11,7 @@ Applies on **first activation** of any of these skills / slash commands:
 
 - `bmad-create-story`
 - `bmad-dev-story`
-- `bmad-quick-dev`
+- `bmad-build` (and deprecated alias `bmad-quick-dev`)
 - `bmad-code-review`
 
 Does **not** apply to other BMad commands (`sprint-status`, `help`, `correct-course`, etc.).
@@ -35,7 +35,7 @@ Rules for the sentence:
    Ex. say **Track Generator**, not « générateur de piste » ; **Patch Mutator**, not « mutateur de patch ».  
    Labels follow the product UI / `PluginDisplayNames.h`.
 5. **Forbidden in this blurb:** file paths, AC IDs, class names, long bullet lists, implementation plans, English sentence dumps that are not product labels.
-6. If no story ID yet (freeform quick-dev), still use the same heading and summarize the requested change in one sentence.
+6. If no story ID yet (freeform build), still use the same heading and summarize the requested change in one sentence.
 7. For `bmad-create-story`, summarize the story **about to be written** (intent from epic / sprint / user ask).
 
 Then continue the normal workflow.

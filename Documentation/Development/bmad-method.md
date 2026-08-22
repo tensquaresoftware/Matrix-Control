@@ -8,7 +8,7 @@ version: "1.3"
 sources:
   - https://github.com/bmad-code-org/bmad-method
 created: 2026-06-17
-updated: 2026-06-23
+updated: 2026-08-22
 ---
 
 # BMad Method — Development Cycle Quick Reference
@@ -19,7 +19,9 @@ Reference guide for [the **BMad** method](https://github.com/bmad-code-org/bmad-
 
 Recommended setup: chat in your preferred language with the AI assistant; deliverables in `_bmad-output/` in English.
 
-**Command syntax**: `/bmad-help`, `/bmad-dev-story`, etc. Natural-language requests work too when they clearly match a skill.
+**Command syntax**: `/bmad-help`, `/bmad-build`, `/bmad-code-review`, etc. Natural-language requests work too when they clearly match a skill.
+
+**Matrix-Control install:** BMad **6.11.0** (`_bmad/_config/manifest.yaml`).
 
 ---
 
@@ -77,14 +79,17 @@ When unsure: invoke **`/bmad-help`** — analyses project state and recommends t
 
 ### Phase 4 — Implementation
 
+**Official chain (BMad 6.11+):** `/bmad-sprint-planning` → `/bmad-build` → `/bmad-code-review`.
+
 | Command | Code | Role |
 |---------|------|------|
-| `/bmad-sprint-planning` | SP† | Build or refresh `sprint-status.yaml`. |
-| `/bmad-sprint-status` | SS | Sprint summary and routing to the next workflow. |
-| `/bmad-create-story` | CS | Draft the next (or a targeted) story with full dev context. |
-| `/bmad-create-story validate` | VS | Validate story completeness and ACs before dev. |
-| `/bmad-dev-story` | DS | Implement the story, run tests, update the story file. |
+| `/bmad-sprint-planning` | SP† | Build or refresh `sprint-status.yaml` (includes readiness gate). |
+| `/bmad-sprint-status` | SS | Deprecated shim → status view of `/bmad-sprint-planning`. |
+| `/bmad-build` | BD | Official implementation path: clarify → plan → code → review. |
 | `/bmad-code-review` | CR | Adversarial code review (Blind Hunter, Edge Case Hunter, Acceptance Auditor). |
+| `/bmad-create-story` | CS | Deprecated shim — draft story with full dev context (still works until v7). |
+| `/bmad-create-story validate` | VS | Deprecated shim — validate story completeness and ACs. |
+| `/bmad-dev-story` | DS | Deprecated shim — implement the story, run tests, update the story file. |
 | `/bmad-checkpoint-preview` | CK | Guided human review of a commit, branch, or PR. |
 | `/bmad-qa-generate-e2e-tests` | QA | Generate automated API/E2E tests *(not a substitute for CR or UAT)*. |
 | `/bmad-retrospective` | ER | End-of-epic retrospective and lessons learned. |
@@ -96,11 +101,13 @@ When unsure: invoke **`/bmad-help`** — analyses project state and recommends t
 | Command | Code | Role |
 |---------|------|------|
 | `/bmad-help` | BH | Orientation: where you are and what to run next. |
-| `/bmad-quick-dev` | QQ | Intent → plan → code → review outside a full story. |
+| `/bmad-build` | BD | Intent → plan → code → review (official Phase 4 implementation path; replaces Quick Dev). |
+| `/bmad-quick-dev` | — | Deprecated alias → `/bmad-build` (shim until v7). |
 | `/bmad-correct-course` | CC | Major scope or direction change; sprint change proposal. |
 | `/bmad-investigate` | IN | Structured forensic investigation of a bug or incident. |
-| `/bmad-generate-project-context` | GPC | Generate `project-context.md` from the codebase (brownfield). |
-| `/bmad-document-project` | DP | Document an existing project for agent context. |
+| `/bmad-project-context` | PC | Verified project context block in `AGENTS.md` (replaces generate/document-project pair). |
+| `/bmad-generate-project-context` | — | Deprecated alias → `/bmad-project-context`. |
+| `/bmad-document-project` | — | Deprecated alias → `/bmad-project-context`. |
 | `/bmad-party-mode` | PM | Multi-agent roundtable on a cross-cutting topic. |
 
 ### Anytime — documents & quality
@@ -213,7 +220,7 @@ This layout is enforced by a **team workflow override** (BMad 6.9+):
 | `_bmad/custom/bmad-sprint-planning.toml` | Injects layout rules into `/bmad-sprint-planning` via `persistent_facts`. |
 | `_bmad/custom/sprint-status-layout.md` | Full spec and example referenced by the override. |
 
-`/bmad-sprint-planning` is the only workflow that regenerates the whole file; other skills (`create-story`, `dev-story`, `quick-dev`, `code-review`) patch statuses and must preserve comments and structure. To customise further: `/bmad-customize` or edit the files above.
+`/bmad-sprint-planning` is the only workflow that regenerates the whole file; other skills (`create-story`, `dev-story`, `build`, `code-review`) patch statuses and must preserve comments and structure. To customise further: `/bmad-customize` or edit the files above.
 
 ---
 
@@ -222,13 +229,13 @@ This layout is enforced by a **team workflow override** (BMad 6.9+):
 | Situation | Code | Command |
 |-----------|------|---------|
 | CR feedback | DS | `/bmad-dev-story` until clean |
-| Small same-scope tweak | DS or QQ | `/bmad-dev-story` or `/bmad-quick-dev` |
+| Small same-scope tweak | DS or BD | `/bmad-dev-story` or `/bmad-build` |
 | New cross-cutting scope | CC | `/bmad-correct-course` then update PRD / architecture / stories |
 | Bug / incident | IN → DS | `/bmad-investigate` then `/bmad-dev-story` or a new story |
 | Multiple viewpoints | PM | `/bmad-party-mode` |
-| Urgent fix outside sprint | QQ | `/bmad-quick-dev` |
+| Urgent fix outside sprint | BD | `/bmad-build` |
 
-**Rule:** same story, same intent → DS (or QQ if tiny). New intent or architectural impact → CC first. Do not let code and `_bmad-output/` diverge.
+**Rule:** same story, same intent → DS (or BD if tiny). New intent or architectural impact → CC first. Do not let code and `_bmad-output/` diverge.
 
 ---
 

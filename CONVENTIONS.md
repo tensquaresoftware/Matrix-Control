@@ -85,23 +85,23 @@ Use the MCP tool `rename_chat` (`cursor-app-control`). Cursor rule: `.cursor/rul
 | `/bmad-create-story 4-5` | `BMad — Create Story 4-5` |
 | `/bmad-dev-story 4-5` | `BMad — Dev Story 4-5` |
 | `/bmad-code-review 4-5` | `BMad — Code Review 4-5` |
-| `/bmad-quick-dev 8-4` | `BMad — Quick Dev 8-4` |
+| `/bmad-build 8-4` | `BMad — Build 8-4` |
 
-**Format B — all other BMad commands** (also `bmad-quick-dev` when **no** story ID): `BMad — {Workflow Label} : {Topic}`
+**Format B — all other BMad commands** (also `bmad-build` when **no** story ID): `BMad — {Workflow Label} : {Topic}`
 
-- Workflow labels stay in English (`Quick Dev`, `Correct Course`, …).
+- Workflow labels stay in English (`Build`, `Correct Course`, …).
 - Topic after the colon is **French** (short, 2–5 words, no filler) — not English Title Case. Product/UI terms may stay as-is inside the French phrase (`Look`, `Patch Mutator`, `MIDI`).
 - Omit the colon and topic when none is useful (e.g. `/bmad-help` → `BMad — Help`).
 
 | Command (examples) | Sidebar title |
 |---|---|
-| `/bmad-quick-dev` (disabled controls look, no story) | `BMad — Quick Dev : Look contrôles inactifs` |
+| `/bmad-build` (disabled controls look, no story) | `BMad — Build : Look contrôles inactifs` |
 | `/bmad-correct-course` (bank unlock) | `BMad — Correct Course : Unlock banque` |
 | `/bmad-sprint-status` | `BMad — Sprint Status` |
 
 **Duplicates:** if the base title is already used, append ` (n)` with the next free positive integer (`(1)`, `(2)`, …). See the Cursor rule for the read-only DB check before `rename_chat`.
 
-**Amorce (create / dev / quick-dev / code-review):** first user-facing content must be `## Contexte de la Story` + one plain-French sentence — SSOT `.cursor/rules/bmad-story-context-amorce.mdc`. Do not repeat on later turns.
+**Amorce (create / dev / build / code-review):** first user-facing content must be `## Contexte de la Story` + one plain-French sentence — SSOT `.cursor/rules/bmad-story-context-amorce.mdc`. Do not repeat on later turns.
 
 Story IDs include epic-story numbers (`4-5`, `7-3b`) and utility stories (`U-0`, `U-11`).
 
