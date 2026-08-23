@@ -52,13 +52,15 @@ void ApvtsPatchMapper::pushModuleToApvts(const juce::String& moduleGroupId)
     for (const auto& d : intDescriptors_)
     {
         if (d.parentGroupId == moduleGroupId)
-            pushIntToApvts(d);
+            apvts_.getParameterAsValue(d.parameterId)
+                .setValue(static_cast<float>(model_.getValue(d)));
     }
 
     for (const auto& d : choiceDescriptors_)
     {
         if (d.parentGroupId == moduleGroupId)
-            pushChoiceToApvts(d);
+            apvts_.getParameterAsValue(d.parameterId)
+                .setValue(static_cast<float>(model_.getChoiceIndex(d)));
     }
 }
 
@@ -78,14 +80,16 @@ void ApvtsPatchMapper::syncChoiceToBuffer(const PluginDescriptors::ChoiceParamet
 
 void ApvtsPatchMapper::pushIntToApvts(const PluginDescriptors::IntParameterDescriptor& d)
 {
-    apvts_.getParameterAsValue(d.parameterId)
-        .setValue(static_cast<float>(model_.getValue(d)));
+    auto* param = apvts_.getParameter(d.parameterId);
+    if (param != nullptr)
+        param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(model_.getValue(d))));
 }
 
 void ApvtsPatchMapper::pushChoiceToApvts(const PluginDescriptors::ChoiceParameterDescriptor& d)
 {
-    apvts_.getParameterAsValue(d.parameterId)
-        .setValue(static_cast<float>(model_.getChoiceIndex(d)));
+    auto* param = apvts_.getParameter(d.parameterId);
+    if (param != nullptr)
+        param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(model_.getChoiceIndex(d))));
 }
 
 std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsPatchMapper::buildIntDescriptors()

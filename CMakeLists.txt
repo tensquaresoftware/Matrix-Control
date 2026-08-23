@@ -471,6 +471,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
         Tests/Unit/UndoManagerApvtsSpikeTests.cpp
+        Tests/Unit/UndoManagerModuleBulkTestSupport.cpp
         Tests/Unit/UndoManagerModuleBulkTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp

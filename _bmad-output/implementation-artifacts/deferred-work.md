@@ -1,5 +1,12 @@
 # Deferred Work
 
+## Deferred from: code review of spec-12-2-bulk-editorial-transactions-for-init-and-paste-module (2026-08-24)
+
+- PluginProcessorConstruction `beginEditorialTransaction` hook wiring has no dedicated test; `UndoManagerModuleBulkTests` harness duplicates the lambda.
+- Init redo not covered in bulk undo tests (paste redo is covered).
+- Temp init fixture directories created in bulk tests are not deleted after runs.
+- Duplicate `valueTreePropertyChanged` logic between `PasteUndoHarness` and `InitUndoHarness`.
+
 ## Deferred from: quick-dev spec-clipboard-compatible-blink-feedback (2026-07-25)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-clipboard-compatible-blink-feedback.md`

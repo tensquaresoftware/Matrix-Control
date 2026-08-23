@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-08-24'
 status: 'done'
 baseline_commit: '278681ef3219aa91afe9f88b9539b094b4ca5131'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - _bmad-output/specs/spec-undo-redo-patch-editing/SPEC.md
   - _bmad-output/specs/spec-undo-redo-patch-editing/undo-policy.md
@@ -60,7 +60,7 @@ context:
 - `Source/Core/Actions/ModuleActionHandler.cpp:352-396` — `pastePatchModule`: call hook after successful `clipboardService_->pasteModule`, before `pushModuleToApvtsAndSysEx`.
 - `Source/Core/Actions/ModuleActionHandler.cpp:309-321` — `pushModuleToApvtsAndSysEx`: read-only; already wraps `pushModuleToApvts` with `suppressPatchSysEx`.
 - `Source/Core/Init/PatchModuleInitService.cpp:26-38` — read-only; init flow: model copy → `pushModuleToApvts` → `dispatchModule`; transaction must start in handler before this runs.
-- `Source/Core/Models/ApvtsPatchMapper.cpp:50-63` — `pushModuleToApvts` iterates module descriptors; each `setValueNotifyingHost` records undo when manager wired.
+- `Source/Core/Models/ApvtsPatchMapper.cpp:50-63` — `pushModuleToApvts` iterates module descriptors; each `getParameterAsValue().setValue` records undo when manager wired; `pushIntToApvts` / `pushChoiceToApvts` keep `setValueNotifyingHost` for non-module bulk paths.
 - `Source/Core/PluginProcessorValueTree.cpp:150-154` — suppress skips per-param SysEx during bulk forward write; undo path uses normal dispatch when suppress off.
 - `Source/Core/PluginProcessor.h:96-97,402` — `getUndoManager()` / `undoManager_` (story 12-1).
 - `Tests/Unit/ModuleActionHandlerTests.cpp:64-116` — `HandlerHarness` uses `nullptr` UndoManager today; extend or mirror with `&undoManager` for paste proof.
@@ -89,13 +89,14 @@ context:
 ## Spec Change Log
 
 - Review loop 1 (patch): `ApvtsPatchMapper::pushIntToApvts` / `pushChoiceToApvts` switched from `setValueNotifyingHost` to `getParameterAsValue().setValue` so bulk Init/Paste writes record undo when wrapped by `beginNewTransaction`. KEEP: handler-level `beginEditorialTransaction` hook and suppress boundaries unchanged.
+- Review loop 2 (patch): Scoped undo-recording writes to `pushModuleToApvts` only; restored `setValueNotifyingHost` in `pushIntToApvts` / `pushChoiceToApvts` so patch load and Matrix Mod paths do not flood the undo stack before story 12-5.
 ## Design Notes
 
 `PatchModuleInitService::initModule` performs model copy and APVTS push in one call. The editorial transaction boundary belongs in `handlePatchModuleInit` immediately before that call so all `pushModuleToApvts` writes inside the service share one undo step without restructuring the service.
 
 Paste already separates model write (`clipboardService_->pasteModule`) from APVTS push (`pushModuleToApvtsAndSysEx`). Start the transaction after successful paste, before APVTS push — only APVTS editorial state is undoable per SPEC.
 
-Bulk APVTS push must use `getParameterAsValue().setValue` (not `setValueNotifyingHost`) so changes enter the UndoManager while `beginNewTransaction` is active.
+Bulk APVTS push for Init/Paste must use `getParameterAsValue().setValue` inside `pushModuleToApvts` (not `setValueNotifyingHost`) so changes enter the UndoManager while `beginNewTransaction` is active. Other `pushIntToApvts` / `pushChoiceToApvts` callers keep `setValueNotifyingHost`.
 
 Test harness pattern: copy `ModuleActionHandlerTests::HandlerHarness` but construct `apvts(*this, &undoManager, …)` and assert module param count > 1 for a meaningful bulk proof (e.g. Envelope module paste layout already in tests).
 
@@ -136,3 +137,16 @@ Test harness pattern: copy `ModuleActionHandlerTests::HandlerHarness` but constr
 
 - Bulk paste/init/redo undo proofs in unit harness.
   [`UndoManagerModuleBulkTests.cpp:302`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp#L302)
+
+### Review Findings
+
+- [x] [Review][Patch] Scope undo-recording APVTS push to module bulk path only — `pushIntToApvts` / `pushChoiceToApvts` now use `getParameterAsValue().setValue`, so `bufferToApvts()` and `pushBusToApvts()` also record undo on patch load and Matrix Mod writes; stack clear is story 12-5. [`ApvtsPatchMapper.cpp:79`](../../Source/Core/Models/ApvtsPatchMapper.cpp#L79)
+- [x] [Review][Patch] Assert SysEx dispatch after `undo()` in bulk tests — forward paste/init assert `patchDispatchCount > 0` but post-undo SysEx is never checked (CAP-5 / AC4). [`UndoManagerModuleBulkTests.cpp:382`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp#L382)
+- [x] [Review][Patch] Assert exactly one undo transaction on successful paste and init — AC1/AC2 require `getUndoDescriptions().size() == 1`; success tests only check `canUndo()`. [`UndoManagerModuleBulkTests.cpp:328`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp#L328)
+- [x] [Review][Patch] Add incompatible-clipboard blocked-paste test — I/O matrix covers empty or incompatible clipboard; only empty case is tested. [`UndoManagerModuleBulkTests.cpp:336`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp#L336)
+- [x] [Review][Patch] Footer non-editorial AC uses `getNumActions()` — test asserts `canUndo` and `getUndoDescriptions().size()` but not `getNumActions()` per AC5. [`UndoManagerModuleBulkTests.cpp:480`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp#L480)
+- [x] [Review][Patch] Sync spec metadata and Code Map with implementation — frontmatter `status: done` vs sprint `review`; Code Map still references `setValueNotifyingHost` for bulk push. [`spec-12-2-bulk-editorial-transactions-for-init-and-paste-module.md`](spec-12-2-bulk-editorial-transactions-for-init-and-paste-module.md)
+- [x] [Review][Defer] PluginProcessorConstruction hook wiring has no dedicated test — harness duplicates `beginNewTransaction` lambda; brace-order regression risk only. [`PluginProcessorConstruction.cpp:127`](../../Source/Core/PluginProcessorConstruction.cpp#L127) — deferred, harness mirrors production
+- [x] [Review][Defer] Init redo not covered — paste redo is tested; init redo symmetric gap only. [`UndoManagerModuleBulkTests.cpp`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp) — deferred, low risk
+- [x] [Review][Defer] Temp init fixture dirs lack teardown — `createTempTemplatesDir` leaves folders under system temp. [`UndoManagerModuleBulkTests.cpp:269`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp#L269) — deferred, test hygiene
+- [x] [Review][Defer] Duplicate harness listeners in bulk tests — `PasteUndoHarness` and `InitUndoHarness` share identical `valueTreePropertyChanged`. [`UndoManagerModuleBulkTests.cpp`](../../Tests/Unit/UndoManagerModuleBulkTests.cpp) — deferred, refactor optional
