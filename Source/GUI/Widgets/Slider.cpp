@@ -196,6 +196,7 @@ namespace TSS
         grabKeyboardFocus();
         dragStartValue_ = getValue();
         dragStartPosition_ = e.getPosition();
+        dragNotification_ = std::make_unique<juce::Slider::ScopedDragNotification>(*this);
     }
 
     void Slider::mouseDrag(const juce::MouseEvent& e)
@@ -215,6 +216,7 @@ namespace TSS
 
     void Slider::mouseUp(const juce::MouseEvent&)
     {
+        dragNotification_.reset();
     }
 
     void Slider::mouseDoubleClick(const juce::MouseEvent&)

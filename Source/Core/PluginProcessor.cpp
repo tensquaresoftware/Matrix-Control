@@ -60,7 +60,7 @@ PluginProcessor::PluginProcessor()
           makeBusesProperties()
 #endif
       )
-    , apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
+    , apvts(*this, &undoManager_, "PARAMETERS", createParameterLayout())
     , midiActivityTracker_{ std::make_unique<Core::MidiActivityTracker>() }
     , outboundQueue_{ std::make_unique<Core::MidiOutboundQueue>() }
     , instrumentForwarder_{ std::make_unique<Core::InstrumentMidiForwarder>() }

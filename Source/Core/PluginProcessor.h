@@ -93,6 +93,9 @@ public:
     juce::AudioProcessorValueTreeState& getApvts() noexcept { return apvts; }
     const juce::AudioProcessorValueTreeState& getApvts() const noexcept { return apvts; }
 
+    juce::UndoManager& getUndoManager() noexcept { return undoManager_; }
+    const juce::UndoManager& getUndoManager() const noexcept { return undoManager_; }
+
     void startMidiThread();
     void stopMidiThread();
 
@@ -396,6 +399,7 @@ private:
     void buildMasterParameterIdSet();
     void buildMatrixModParameterIdSet();
 
+    juce::UndoManager undoManager_;
     juce::AudioProcessorValueTreeState apvts;
     std::unique_ptr<Core::MidiActivityTracker> midiActivityTracker_;
     std::unique_ptr<Core::MidiOutboundQueue> outboundQueue_;

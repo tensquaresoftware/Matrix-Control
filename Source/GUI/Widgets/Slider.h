@@ -65,6 +65,7 @@ namespace TSS
         std::function<float(double)> normalizedFill_;
         std::function<juce::String(double)> formatValue_;
         bool hasFocus_ = false;
+        std::unique_ptr<juce::Slider::ScopedDragNotification> dragNotification_;
 
         void drawTrack(juce::Graphics& g, const juce::Rectangle<int>& bounds, bool enabled);
         void drawValueBar(juce::Graphics& g, const juce::Rectangle<float>& bounds, bool enabled);

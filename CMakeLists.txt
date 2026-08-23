@@ -470,6 +470,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutatorActionHandlerTests.cpp
         Tests/Unit/ModuleActionHandlerTests.cpp
         Tests/Unit/MatrixModInitServiceTests.cpp
+        Tests/Unit/UndoManagerApvtsSpikeTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
