@@ -14,7 +14,7 @@ namespace TSS
 
 /**
  * Binds one TrackGeneratorDisplay to five APVTS int parameters (Point 1…5).
- * Writes via setValueNotifyingHost; refreshes the display from parameter listeners.
+ * Writes via getParameterAsValue().setValue during display drags; refreshes the display from parameter listeners.
  * Does not touch sliders or FmTrackPanel.
  */
 class TrackGeneratorDisplayApvtsBinding : private juce::AudioProcessorValueTreeState::Listener

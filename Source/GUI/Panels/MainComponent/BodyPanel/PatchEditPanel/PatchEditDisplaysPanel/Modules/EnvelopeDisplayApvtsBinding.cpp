@@ -84,28 +84,27 @@ int EnvelopeDisplayApvtsBinding::readIntParameter(const juce::String& parameterI
 
 void EnvelopeDisplayApvtsBinding::writeIntParameter(const juce::String& parameterId, int value)
 {
-    auto* param = apvts_.getParameter(parameterId);
-    if (param == nullptr)
+    if (apvts_.getParameter(parameterId) == nullptr)
         return;
 
     const int clampedValue = juce::jlimit(0, kIntParameterMax, value);
-
-    if (auto* rangedParam = dynamic_cast<juce::RangedAudioParameter*>(param))
-        param->setValueNotifyingHost(rangedParam->convertTo0to1(static_cast<float>(clampedValue)));
-    else
-        param->setValueNotifyingHost(static_cast<float>(clampedValue) / static_cast<float>(kIntParameterMax));
+    apvts_.getParameterAsValue(parameterId).setValue(static_cast<float>(clampedValue));
 }
 
 void EnvelopeDisplayApvtsBinding::beginParameterGesture(const juce::String& parameterId)
 {
     endParameterGesture();
 
-    if (auto* param = apvts_.getParameter(parameterId))
-    {
-        param->beginChangeGesture();
-        activeGestureParameter_ = param;
-        activeGestureGate_->store(param);
-    }
+    auto* param = apvts_.getParameter(parameterId);
+    if (param == nullptr)
+        return;
+
+    if (auto* undoManager = apvts_.getUndoManager())
+        undoManager->beginNewTransaction("Envelope edit");
+
+    param->beginChangeGesture();
+    activeGestureParameter_ = param;
+    activeGestureGate_->store(param);
 }
 
 void EnvelopeDisplayApvtsBinding::endParameterGesture()

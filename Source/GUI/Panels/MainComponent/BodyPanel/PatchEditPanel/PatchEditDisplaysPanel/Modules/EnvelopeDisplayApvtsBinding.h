@@ -14,7 +14,7 @@ namespace TSS
 
 /**
  * Binds one EnvelopeDisplay to five APVTS int parameters (Delay…Release).
- * Writes via setValueNotifyingHost; refreshes the display from parameter listeners.
+ * Writes via getParameterAsValue().setValue during display drags; refreshes the display from parameter listeners.
  * Does not touch sliders or Env panels.
  */
 class EnvelopeDisplayApvtsBinding : private juce::AudioProcessorValueTreeState::Listener

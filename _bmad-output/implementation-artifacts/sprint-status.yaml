@@ -224,7 +224,7 @@ development_status:
   epic-12: in-progress
   12-1-spike-undomanager-on-apvts-with-one-slider-and-midi-proof: done
   12-2-bulk-editorial-transactions-for-init-and-paste-module: done
-  12-3-interactive-display-gesture-transactions: backlog
+  12-3-interactive-display-gesture-transactions: review
   12-4-matrix-mod-reorder-undo-and-keyboard-shortcuts: backlog
   12-5-mutator-load-policy-dirty-tracker-and-core-tests: backlog
   epic-12-retrospective: optional
