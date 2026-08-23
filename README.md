@@ -4,7 +4,7 @@
 
 [![Status: Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-FFA500?style=for-the-badge)](https://github.com/tensquaresoftware/matrix-control)
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://github.com/tensquaresoftware/matrix-control)
-[![Framework: JUCE 8](https://img.shields.io/badge/Framework-JUCE%208-5765A4?style=for-the-badge)](https://juce.com)
+[![Framework: JUCE 9](https://img.shields.io/badge/Framework-JUCE%209-5765A4?style=for-the-badge)](https://juce.com)
 [![Formats: AU / VST3 / Standalone](https://img.shields.io/badge/Formats-AU%20%7C%20VST3%20%7C%20Standalone-2E86AB?style=for-the-badge)](https://github.com/tensquaresoftware/matrix-control)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/Sponsor-Ten%20Square%20Software-ff69b4?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/tensquaresoftware)
@@ -88,7 +88,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 - **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+
 - Ninja build system
-- JUCE 8 installed (set `JUCE_DIR` environment variable to your JUCE installation path, e.g., `/Applications/JUCE`)
+- JUCE 9.0.1 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `/Volumes/Guillaume/Dev/SDKs/JUCE-9`)
 
 #### Windows
 
@@ -96,7 +96,7 @@ Also see **[Luthier](https://github.com/tensquaresoftware/luthier)** — a Proju
 - **Cursor** or **VS Code** (with the CMake Tools and C/C++ extensions)
 - CMake 3.22+ (add to system PATH during installation)
 - Visual Studio 2022 with "Desktop development with C++" workload
-- JUCE 8 installed (set `JUCE_DIR` environment variable to your JUCE installation path, e.g., `C:\JUCE`)
+- JUCE 9.0.1 installed (set `JUCE_DIR` to your JUCE checkout, e.g. `C:\Users\Guillaume\Dev\SDKs\JUCE-9`)
 
 ### Environment Setup
 
@@ -105,7 +105,7 @@ Set the `JUCE_DIR` environment variable to point to your JUCE installation:
 **macOS:**
 
 ```bash
-export JUCE_DIR=/Applications/JUCE
+export JUCE_DIR=/Volumes/Guillaume/Dev/SDKs/JUCE-9
 ```
 
 **Windows:**
@@ -114,7 +114,7 @@ export JUCE_DIR=/Applications/JUCE
 # System environment variable (recommended)
 # Set via: System Properties → Environment Variables → System variables
 # Name: JUCE_DIR
-# Value: C:\JUCE
+# Value: C:\Users\Guillaume\Dev\SDKs\JUCE-9
 ```
 
 ### Build

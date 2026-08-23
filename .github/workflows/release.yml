@@ -26,7 +26,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  JUCE_VERSION: "8.0.12"
+  JUCE_VERSION: "9.0.1"
 
 jobs:
   validate-tag:
@@ -137,6 +137,7 @@ jobs:
             libxrender-dev \
             libglu1-mesa-dev \
             mesa-common-dev \
+            libegl-dev \
             libglib2.0-dev
 
       - name: Configure CMake (Release)

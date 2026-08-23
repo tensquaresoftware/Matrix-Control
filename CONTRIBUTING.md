@@ -72,7 +72,7 @@ Please make sure you are comfortable with the project's build setup before contr
 Familiarity with the following is recommended:
 
 - **C++17**
-- **JUCE 8** framework (particularly `AudioProcessor`, `AudioProcessorValueTreeState`, MIDI I/O)
+- **JUCE 9** framework (particularly `AudioProcessor`, `AudioProcessorValueTreeState`, MIDI I/O)
 - **CMake** as a build system
 - Basic knowledge of **MIDI SysEx** and the Matrix-1000 parameter model is a plus
 
@@ -153,7 +153,7 @@ EOF
 
 Each leg:
 
-1. Checks out JUCE **8.0.12** (cached between runs)
+1. Checks out JUCE **9.0.1** (cached between runs)
 2. Configures with `MATRIX_BUILD_TESTS=ON` and plugin copy disabled (`USER_COPY_TO_*=OFF`)
 3. Builds the `Matrix-Control` plugin target and `Matrix-Control_Tests`
 4. Runs the `Matrix-Control_Tests` console binary (headless Core unit tests — no MIDI hardware)
@@ -162,12 +162,12 @@ The matrix uses `fail-fast: false` so all three OS results appear in one run.
 
 ### Reproduce CI locally
 
-Set `JUCE_DIR` to your JUCE 8.0.12 install, then configure with the preset for your platform and the same CI flags:
+Set `JUCE_DIR` to your JUCE 9.0.1 install, then configure with the preset for your platform and the same CI flags:
 
 **macOS (Apple Silicon):**
 
 ```bash
-export JUCE_DIR=/Applications/JUCE
+export JUCE_DIR=/Volumes/Guillaume/Dev/SDKs/JUCE-9
 cmake --preset macos-debug-arm64 \
   -DMATRIX_BUILD_TESTS=ON \
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \
@@ -179,7 +179,7 @@ cmake --build --preset macos-debug-arm64 --target Matrix-Control Matrix-Control_
 **Windows (PowerShell):**
 
 ```powershell
-$env:JUCE_DIR = "C:\JUCE"
+$env:JUCE_DIR = "C:\Users\Guillaume\Dev\SDKs\JUCE-9"
 cmake --preset windows-debug `
   -DMATRIX_BUILD_TESTS=ON `
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF `
@@ -193,7 +193,7 @@ cmake --build --preset windows-debug --target Matrix-Control Matrix-Control_Test
 Install the same packages as the workflow (`build-essential`, `ninja-build`, ALSA/JACK, FreeType, X11/Mesa dev libs — see `.github/workflows/build-and-test.yml`), then:
 
 ```bash
-export JUCE_DIR=/path/to/JUCE
+export JUCE_DIR=/path/to/JUCE-9
 cmake --preset linux-debug \
   -DMATRIX_BUILD_TESTS=ON \
   -DUSER_COPY_TO_SYSTEM_FOLDERS=OFF \

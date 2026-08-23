@@ -22,7 +22,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
 env:
-  JUCE_VERSION: "8.0.12"
+  JUCE_VERSION: "9.0.1"
 
 jobs:
   release-script-tests:
@@ -162,6 +162,7 @@ jobs:
             libxrender-dev \
             libglu1-mesa-dev \
             mesa-common-dev \
+            libegl-dev \
             libglib2.0-dev
 
       - name: Configure CMake

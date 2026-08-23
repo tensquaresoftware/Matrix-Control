@@ -24,4 +24,4 @@ See `README.md` for the full per-platform instructions.
 
 - Target the C++ standard set in `CMakeLists.txt` (`CMAKE_CXX_STANDARD`).
 - Version SSOT: `project(Matrix-Control VERSION …)` in CMake → `PluginVersion`.
-- Refer to the JUCE 8 API: https://docs.juce.com
+- Refer to the JUCE 9 API: https://docs.juce.com

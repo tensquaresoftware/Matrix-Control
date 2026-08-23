@@ -75,9 +75,9 @@ set(ARTEFACTS_DIR_LINUX   "/home/guillaume/Dropbox/Dev/Artefacts")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(JUCE_DIR_WINDOWS "C:/Users/Guillaume/Dev/SDKs/JUCE")
-set(JUCE_DIR_MACOS   "/Volumes/Guillaume/Dev/SDKs/JUCE/")
-set(JUCE_DIR_LINUX   "/home/guillaume/Dev/SDKs/JUCE")
+set(JUCE_DIR_WINDOWS "C:/Users/Guillaume/Dev/SDKs/JUCE-9")
+set(JUCE_DIR_MACOS   "/Volumes/Guillaume/Dev/SDKs/JUCE-9/")
+set(JUCE_DIR_LINUX   "/home/guillaume/Dev/SDKs/JUCE-9")
 
 # Reference JUCE: priority cache (preset/-D), then ENV, then workspace per-OS, then platform default
 # Portable logic - works on any platform regardless of where the project was generated

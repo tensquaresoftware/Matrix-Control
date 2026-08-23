@@ -195,19 +195,19 @@ document a dated, motivated exception (`NOLINT` or comment) rather than obscure 
 - **Compiler:** Xcode 26
 - **Build system:** CMake
 - **Build directory:** `Builds/` (subfolders `macOS/`, `Windows/`, `Linux/`) — do not use `build/` at root
-- **Audio framework:** JUCE 8.0.12
+- **Audio framework:** JUCE 9.0.1
 
 ### 5.2 JUCE reference
 
-- **JUCE installation:** `/Applications/JUCE`
+- **JUCE installation:** `/Volumes/Guillaume/Dev/SDKs/JUCE-9` (override with `JUCE_DIR`)
 - **Official documentation:** https://docs.juce.com
-- **Modules:** `/Applications/JUCE/modules/`
-- **CMake:** `/Applications/JUCE/CMake/`
+- **Modules:** `${JUCE_DIR}/modules/`
+- **CMake:** `${JUCE_DIR}/CMake/`
 
 ### 5.3 Verification of generated code
 
 - Always refer to the most up-to-date JUCE documentation
-- Verify that each API, class, and method exists in JUCE 8
+- Verify that each API, class, and method exists in JUCE 9
 - Avoid any obsolete syntax (JUCE 7, JUCE 6, etc.)
 - Explicitly report if unsure about an API
 

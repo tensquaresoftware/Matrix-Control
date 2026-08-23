@@ -27,7 +27,7 @@ workflowType: architecture
 
 # Architecture Decision Document
 
-_Brownfield JUCE 8 plugin — extends existing descriptor-driven GUI and partial Core MIDI stack. Architecture v1.0 complete (steps 1–8)._
+_Brownfield JUCE 9 plugin — extends existing descriptor-driven GUI and partial Core MIDI stack. Architecture v1.0 complete (steps 1–8)._
 
 ---
 
@@ -49,7 +49,7 @@ _Brownfield JUCE 8 plugin — extends existing descriptor-driven GUI and partial
 
 | Constraint | Source |
 |---|---|
-| JUCE 8.0.12, C++17, CMake → `Builds/` | project-context |
+| JUCE 9.0.1, C++20, CMake → `Builds/` | project-context |
 | GUI → Core dependency direction (strict) | project-context, PRD NFR-4 |
 | Descriptor-driven APVTS; no parallel SysEx offset tables | D-057, FR-49 |
 | Brownfield: extend `Source/`, no tree migration until P-001 | D-001, project-context |
