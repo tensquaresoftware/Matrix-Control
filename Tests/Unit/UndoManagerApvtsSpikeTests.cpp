@@ -5,6 +5,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/EditorPath.h"
 #include "Core/MIDI/MidiActivityTracker.h"
 #include "Core/MIDI/PatchParameterSysExDispatcher.h"
@@ -15,6 +16,7 @@
 #include "Core/MIDI/SysEx/SysExConstants.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Shared/Definitions/ApvtsTypes.h"
+#include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -135,7 +137,6 @@ struct ProcessorPathHarness : UndoTestAudioProcessor, juce::ValueTree::Listener
     Core::PatchParameterSysExDispatcher dispatcher;
     std::unordered_set<juce::String> patchParameterIds_;
     bool suppressPatchParameterSysEx_ { false };
-    bool sysExDispatchEnabled_ { true };
 
     explicit ProcessorPathHarness(juce::AudioProcessorValueTreeState::ParameterLayout layout)
         : UndoTestAudioProcessor(std::move(layout))
@@ -143,13 +144,19 @@ struct ProcessorPathHarness : UndoTestAudioProcessor, juce::ValueTree::Listener
         , dispatcher(model,
                      [this](int parameterNumber, juce::uint8 packedValue)
                      {
-                         if (!sysExDispatchEnabled_)
+                         const bool deviceDetected = static_cast<bool>(
+                             apvts.state.getProperty("deviceDetected", false));
+                         const auto deviceType = MatrixDeviceTypes::fromApvtsString(
+                             apvts.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName).toString());
+                         const auto encoded = encoder.encodeRemoteParameterEdit(
+                             static_cast<juce::uint8>(parameterNumber),
+                             packedValue);
+
+                         if (!Core::maySendEditorSysEx(deviceDetected, deviceType, encoded))
                              return;
 
                          Core::EditorPath editorPath(queue, tracker);
-                         editorPath.enqueueSysEx(encoder.encodeRemoteParameterEdit(
-                             static_cast<juce::uint8>(parameterNumber),
-                             packedValue));
+                         editorPath.enqueueSysEx(encoded);
                      })
     {
         const auto frequencyDesc = findDco1FrequencyDescriptor();
@@ -214,7 +221,7 @@ public:
     {
         testUndoRedoRestoresValueModelAndSysEx();
         testNonEditorialPropertyDoesNotRecordUndo();
-        testUndoRestoresApvtsWhenSysExDispatchDisabled();
+        testUndoRestoresApvtsWhenDeviceNotDetected();
         testOneTransactionMemoryFootprint();
         testMultiWriteDragGroupsOneTransaction();
     }
@@ -224,17 +231,23 @@ private:
     {
         beginTest("Slider drag undo/redo restores APVTS, model, and 0x06 SysEx");
 
+        // Arrange
         const auto frequencyDesc = findDco1FrequencyDescriptor();
         expect(frequencyDesc.has_value());
 
         ProcessorPathHarness harness(makeDco1FrequencyLayout());
         const auto& parameterId = frequencyDesc->parameterId;
+        harness.apvts.state.setProperty("deviceDetected", true, nullptr);
+        harness.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                        MatrixDeviceTypes::kMatrix1000Id,
+                                        nullptr);
 
         writeIntParameterValue(harness.apvts, parameterId, 20);
         harness.mapper.apvtsToBuffer();
         harness.undoManager.clearUndoHistory();
         while (harness.queue.dequeue().has_value()) {}
 
+        // Act
         simulateSliderDrag(harness.apvts, harness.undoManager, parameterId, 45);
         expectEquals(readIntParameterValue(harness.apvts, parameterId), 45);
         expectEquals(static_cast<int>(harness.packedFrequencyByte()), 45);
@@ -243,6 +256,7 @@ private:
         expect(harness.undoManager.canUndo());
         harness.undoManager.undo();
 
+        // Assert — undo
         expectEquals(readIntParameterValue(harness.apvts, parameterId), 20);
         expectEquals(static_cast<int>(harness.packedFrequencyByte()), 20);
 
@@ -251,7 +265,11 @@ private:
         expect(sysExMatchesRemoteEdit(undoMsg->sysExData, static_cast<juce::uint8>(frequencyDesc->sysExId), 20));
         expect(harness.queue.isEmpty());
 
+        // Act — redo
+        expect(harness.undoManager.canRedo());
         harness.undoManager.redo();
+
+        // Assert — redo
         expectEquals(readIntParameterValue(harness.apvts, parameterId), 45);
         expectEquals(static_cast<int>(harness.packedFrequencyByte()), 45);
 
@@ -265,33 +283,41 @@ private:
     {
         beginTest("Non-editorial setProperty(nullptr) does not grow undo stack");
 
+        // Arrange
         ProcessorPathHarness harness(makeDco1FrequencyLayout());
         harness.undoManager.clearUndoHistory();
 
-        expect(!harness.undoManager.canUndo());
-        harness.apvts.state.setProperty("navigationProbe", 1, nullptr);
-        expect(!harness.undoManager.canUndo());
+        // Act
+        expectEquals(static_cast<int>(harness.undoManager.getUndoDescriptions().size()), 0);
+        harness.apvts.state.setProperty("deviceDetected", true, nullptr);
+
+        // Assert — AC#4 intent: non-editorial property must not grow the undo stack
+        expectEquals(static_cast<int>(harness.undoManager.getUndoDescriptions().size()), 0);
     }
 
-    void testUndoRestoresApvtsWhenSysExDispatchDisabled()
+    void testUndoRestoresApvtsWhenDeviceNotDetected()
     {
-        beginTest("Undo restores APVTS/model when SysEx dispatch is disabled");
+        beginTest("Undo restores APVTS/model when deviceDetected=false");
 
+        // Arrange
         const auto frequencyDesc = findDco1FrequencyDescriptor();
         expect(frequencyDesc.has_value());
 
         ProcessorPathHarness harness(makeDco1FrequencyLayout());
-        harness.sysExDispatchEnabled_ = false;
+        harness.apvts.state.setProperty("deviceDetected", false, nullptr);
         const auto& parameterId = frequencyDesc->parameterId;
 
         writeIntParameterValue(harness.apvts, parameterId, 15);
         harness.mapper.apvtsToBuffer();
         harness.undoManager.clearUndoHistory();
 
+        // Act
         simulateSliderDrag(harness.apvts, harness.undoManager, parameterId, 40);
         expect(harness.queue.isEmpty());
 
         harness.undoManager.undo();
+
+        // Assert
         expectEquals(readIntParameterValue(harness.apvts, parameterId), 15);
         expectEquals(static_cast<int>(harness.packedFrequencyByte()), 15);
         expect(harness.queue.isEmpty());
@@ -301,6 +327,7 @@ private:
     {
         beginTest("One slider drag records one undo transaction (memory sample)");
 
+        // Arrange
         const auto frequencyDesc = findDco1FrequencyDescriptor();
         expect(frequencyDesc.has_value());
 
@@ -310,8 +337,10 @@ private:
         writeIntParameterValue(harness.apvts, parameterId, 10);
         harness.undoManager.clearUndoHistory();
 
+        // Act
         simulateSliderDrag(harness.apvts, harness.undoManager, parameterId, 25);
 
+        // Assert
         expectEquals(harness.undoManager.getUndoDescriptions().size(), 1);
         expect(harness.undoManager.canUndo());
 
@@ -325,16 +354,22 @@ private:
     {
         beginTest("Multiple writes inside one gesture form one undo transaction");
 
+        // Arrange
         const auto frequencyDesc = findDco1FrequencyDescriptor();
         expect(frequencyDesc.has_value());
 
         ProcessorPathHarness harness(makeDco1FrequencyLayout());
         const auto& parameterId = frequencyDesc->parameterId;
+        harness.apvts.state.setProperty("deviceDetected", true, nullptr);
+        harness.apvts.state.setProperty(MatrixDeviceTypes::kApvtsPropertyName,
+                                        MatrixDeviceTypes::kMatrix1000Id,
+                                        nullptr);
 
         writeIntParameterValue(harness.apvts, parameterId, 5);
         harness.mapper.apvtsToBuffer();
         harness.undoManager.clearUndoHistory();
 
+        // Act
         harness.undoManager.beginNewTransaction();
         if (auto* param = harness.apvts.getParameter(parameterId))
             param->beginChangeGesture();
@@ -347,9 +382,20 @@ private:
 
         expectEquals(readIntParameterValue(harness.apvts, parameterId), 30);
         expectEquals(harness.undoManager.getUndoDescriptions().size(), 1);
+        while (harness.queue.dequeue().has_value()) {}
 
         harness.undoManager.undo();
+
+        // Assert
         expectEquals(readIntParameterValue(harness.apvts, parameterId), 5);
+        expectEquals(static_cast<int>(harness.packedFrequencyByte()), 5);
+
+        auto undoMsg = harness.queue.dequeue();
+        expect(undoMsg.has_value());
+        expect(sysExMatchesRemoteEdit(undoMsg->sysExData,
+                                      static_cast<juce::uint8>(frequencyDesc->sysExId),
+                                      5));
+        expect(harness.queue.isEmpty());
     }
 };
 

@@ -1146,3 +1146,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-manager-nav-debounce.md`
   summary: No settleInProgress guard if the user clicks Next/Previous again while the unsaved-edit confirm modal is open during Internal settle.
   evidence: Edge Case Hunter; confirm is typically a blocking modal, nested message-loop re-entry is rare; revisit if UAT sees nested navigations during the dialog.
+
+## Deferred from: code review of spec-12-1-spike-undomanager-on-apvts-with-one-slider-and-midi-proof (2026-08-24)
+
+- Gestes clavier / double-clic sans `ScopedDragNotification` sur `TSS::Slider` — story 12-4 couvre le groupement flèches clavier.
+
+- Pas de test deux drags consécutifs ni invalidation redo — hors périmètre spike ; à couvrir quand la pile undo sera complète.
+
+- Risque pollution undo par écritures programmatiques APVTS après branchement UndoManager — pattern `nullptr` déjà en place ; audit complet prévu story 12-5.
+
+- Helper `sysExMatchesRemoteEdit` dupliqué entre spike tests et `PatchParameterSysExDispatcherTests` — dette test mineure, extraction partagée optionnelle.

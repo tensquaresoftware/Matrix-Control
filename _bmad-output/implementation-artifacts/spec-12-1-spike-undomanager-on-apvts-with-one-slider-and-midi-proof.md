@@ -124,3 +124,27 @@ Test strategy: replicate `ProcessorPathHarness` with `juce::UndoManager`, `patch
 
 - Test target registered in root CMake test list.
   [`CMakeLists.txt:473`](../../CMakeLists.txt#L473)
+
+### Review Findings
+
+- [x] [Review][Decision] Faut-il ajouter un test widget (`TSS::Slider` + `SliderAttachment`) ou la preuve harness suffit pour cette spike ? — **Résolu : harness seul** (preuve Core suffisante pour cette spike ; vérification manuelle slider acceptée).
+
+- [x] [Review][Patch] Gate MIDI `deviceDetected` non testé avec le mécanisme réel [`Tests/Unit/UndoManagerApvtsSpikeTests.cpp`] — fixed
+
+- [x] [Review][Patch] AC#4 exige pile undo inchangée ; le test vérifie `getUndoDescriptions().size()` (équivalent JUCE de `getNumActions()`) [`Tests/Unit/UndoManagerApvtsSpikeTests.cpp`] — fixed
+
+- [x] [Review][Patch] Test multi-écriture incomplet : pas de vérif modèle ni SysEx après undo [`Tests/Unit/UndoManagerApvtsSpikeTests.cpp`] — fixed
+
+- [x] [Review][Patch] Test principal sans assertion `canRedo()` avant redo [`Tests/Unit/UndoManagerApvtsSpikeTests.cpp`] — fixed
+
+- [x] [Review][Patch] Propriété non éditoriale fictive remplacée par `deviceDetected` avec `nullptr` [`Tests/Unit/UndoManagerApvtsSpikeTests.cpp`] — fixed
+
+- [x] [Review][Patch] Structure AAA ajoutée dans les tests spike [`Tests/Unit/UndoManagerApvtsSpikeTests.cpp`] — fixed
+
+- [x] [Review][Defer] Gestes clavier / double-clic sans `ScopedDragNotification` [`Source/GUI/Widgets/Slider.cpp:222`] — deferred, story 12-4
+
+- [x] [Review][Defer] Pas de test deux drags consécutifs ni invalidation redo — deferred, hors périmètre spike
+
+- [x] [Review][Defer] Risque pollution undo par écritures programmatiques APVTS — deferred, story 12-5
+
+- [x] [Review][Defer] Helper `sysExMatchesRemoteEdit` dupliqué — deferred, dette test mineure
