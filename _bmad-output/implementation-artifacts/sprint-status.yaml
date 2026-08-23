@@ -1,5 +1,5 @@
 # generated: 2026-05-29
-# last_updated: 2026-07-25
+# last_updated: 08-24-2026 12:18
 # project: Matrix-Control
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-05-29
-last_updated: 2026-07-25
+last_updated: 08-24-2026 12:18
 project: Matrix-Control
 project_key: NOKEY
 tracking_system: file-system
@@ -215,7 +215,16 @@ development_status:
   epic-11-retrospective: optional
 
   # Epic V1: Pre-release deferred-work hardening (post implementation sprint)
-  epic-v1: in-progress
+  epic-v1: done
   v1-1-unsaved-navigation-consistency: done
   v1-2-device-connection-and-ports: done
   v1-3-release-hygiene-and-hardening: done
+
+  # Epic 12: Editorial Undo/Redo for Patch Editing
+  epic-12: in-progress
+  12-1-spike-undomanager-on-apvts-with-one-slider-and-midi-proof: in-progress
+  12-2-bulk-editorial-transactions-for-init-and-paste-module: backlog
+  12-3-interactive-display-gesture-transactions: backlog
+  12-4-matrix-mod-reorder-undo-and-keyboard-shortcuts: backlog
+  12-5-mutator-load-policy-dirty-tracker-and-core-tests: backlog
+  epic-12-retrospective: optional
