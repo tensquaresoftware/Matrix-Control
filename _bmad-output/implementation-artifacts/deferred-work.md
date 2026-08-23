@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of spec-12-3-interactive-display-gesture-transactions (2026-08-24)
+
+- I/O matrix “external sync during drag” row not covered — no test asserts listener-only refresh of a non-active parameter leaves undo stack unchanged during an open gesture.
+
 ## Deferred from: code review of spec-12-2-bulk-editorial-transactions-for-init-and-paste-module (2026-08-24)
 
 - PluginProcessorConstruction `beginEditorialTransaction` hook wiring has no dedicated test; `UndoManagerModuleBulkTests` harness duplicates the lambda.

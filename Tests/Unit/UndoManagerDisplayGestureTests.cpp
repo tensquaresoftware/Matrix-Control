@@ -248,6 +248,7 @@ public:
         testUndoDispatchesSysExForDisplayEdit();
         testTrackGeneratorUndoDispatchesSysEx();
         testDisplayDragUndoRedoRestoresValues();
+        testTrackGeneratorDisplayDragUndoRedoRestoresValues();
         testExternalParamWriteDuringGestureStaysOneTransaction();
         testNullUndoManagerDragDoesNotCrash();
     }
@@ -420,6 +421,31 @@ private:
 
         // Assert
         expectEquals(readIntParameterValue(harness.apvts, attackId), 30);
+    }
+
+    void testTrackGeneratorDisplayDragUndoRedoRestoresValues()
+    {
+        beginTest("Track Generator display drag undo then redo restores post-drag value");
+
+        // Arrange
+        const auto trackPointId = PluginIDs::PatchEditSection::FmTrackModule::ParameterWidgets::kTrackPoint3;
+        ProcessorPathHarness harness(makeDisplayGestureLayout());
+
+        writeIntParameterValue(harness.apvts, trackPointId, 5);
+        harness.mapper.apvtsToBuffer();
+        harness.undoManager.clearUndoHistory();
+
+        // Act
+        simulateDisplayDrag(harness, trackPointId, "Track Generator edit", { 12, 28, 40 });
+        expectEquals(readIntParameterValue(harness.apvts, trackPointId), 40);
+
+        harness.undoManager.undo();
+        expectEquals(readIntParameterValue(harness.apvts, trackPointId), 5);
+
+        harness.undoManager.redo();
+
+        // Assert
+        expectEquals(readIntParameterValue(harness.apvts, trackPointId), 40);
     }
 
     void testExternalParamWriteDuringGestureStaysOneTransaction()
