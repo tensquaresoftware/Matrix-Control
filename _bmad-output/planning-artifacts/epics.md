@@ -345,9 +345,23 @@ Automated multi-platform build and Core unit tests on GitHub Actions; release pi
 
 ---
 
-**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit) · **Infrastructure gate:** Epic 11 Story 11.1 (2026-07-11)
+### Epic 12: Editorial Undo/Redo for Patch Editing
 
-**Total:** 13 epics (incl. Epic U, Epic 11) · **68 stories** · Epic U = layout audit overlay (FR-43 geometry) · Epic U stories: U-IDs, U-0, U-0b, U-1…U-10 · Epic 11 = CI/CD infrastructure
+Users undo and redo editorial patch, master, and Matrix Mod changes with standard keyboard shortcuts; gestures group into single transactions; synth output and dirty state stay coherent after each step.
+
+**Capabilities covered:** CAP-1, CAP-2, CAP-3, CAP-4, CAP-5, CAP-6 (see `_bmad-output/specs/spec-undo-redo-patch-editing/SPEC.md`)
+
+**Depends on:** Epics 2, 5, 7, 9, 10 (APVTS→SysEx pipeline, Init/Paste actions, DirtyPatchTracker, direct display editing)
+
+**Canonical spec:** `_bmad-output/specs/spec-undo-redo-patch-editing/` (`SPEC.md`, `stories.yaml`, `undo-policy.md`, `keyboard-shortcuts.md`)
+
+**Story order:** 12.1 (spike) → 12.2 (bulk Init/Paste) → 12.3 (display gestures) → 12.4 (Matrix Mod reorder + shortcuts) → 12.5 (mutator/load policy + Core tests)
+
+---
+
+**Implementation sequence (D-058):** E0 → E1 → E2 → E3 → E4 → E5 → E6 → E7 → E8 → E9 → E10 · **Parallel track:** Epic U (GUI scale audit) · **Infrastructure gate:** Epic 11 Story 11.1 (2026-07-11) · **Post-v1 editorial:** Epic 12 (2026-08 spec)
+
+**Total:** 14 epics (incl. Epic U, Epic 11, Epic 12) · **73 stories** · Epic U = layout audit overlay (FR-43 geometry) · Epic U stories: U-IDs, U-0, U-0b, U-1…U-10 · Epic 11 = CI/CD infrastructure · Epic 12 = editorial undo/redo (5 stories)
 
 ---
 
@@ -1757,6 +1771,96 @@ So that the dev → PR → review → merge loop stays practical.
 **Candidate levers:** draft PR fast tier (macOS-only); tests-only PR builds; ccache/sccache; path filters for docs-only; **`ci-success` aggregate job** for stable branch protection checks.
 
 **Depends on:** Stories 11.1, 11.2 · **Does not modify:** `release.yml`
+
+---
+
+## Epic 12: Editorial Undo/Redo for Patch Editing
+
+Editorial undo/redo for patch editing — grouped gestures, keyboard shortcuts, synth resync, and dirty-state coherence. **Canonical contract:** `_bmad-output/specs/spec-undo-redo-patch-editing/SPEC.md` (CAP-1…CAP-6).
+
+**Depends on:** Epic 2 (APVTS→SysEx), Epic 5 (module Paste), Epic 7 (Init/Paste handlers), Epic 9 (`DirtyPatchTracker`), Epic 10 (direct display editing)
+
+### Story 12.1: Spike UndoManager on APVTS with one slider and MIDI proof
+
+As a developer,
+I want JUCE `UndoManager` wired into APVTS with one slider drag proving undo restores value and SysEx,
+So that the editorial undo epic has a validated technical foundation (CAP-1, CAP-4, CAP-5 foundations).
+
+**Acceptance Criteria:**
+
+**Given** `PluginProcessor` constructs APVTS with a non-null `UndoManager`
+**When** user drags one `ParameterCell` slider (`dco1Frequency`) and programmatic undo runs
+**Then** APVTS value restores to pre-drag state
+**And** SysEx 0x06 output matches restored parameter via existing model→queue path
+**And** no keyboard shortcuts, stack-clear policies, or `DirtyPatchTracker` changes in this story
+
+**Spec:** `stories.yaml` id `12-1` · **Story file:** `implementation-artifacts/spec-12-1-spike-undomanager-on-apvts-with-one-slider-and-midi-proof.md`
+
+### Story 12.2: Bulk editorial transactions for Init and Paste module
+
+As a sound designer,
+I want Init (I) and Paste (P) module actions to undo as a single step,
+So that resetting or pasting a module is reversible in one gesture (CAP-4 bulk cases, CAP-5 suppress compatibility).
+
+**Acceptance Criteria:**
+
+**Given** Story 12.1 spike merged
+**When** user triggers Init or Paste on a module via `ModuleActionHandler`
+**Then** all APVTS writes in that action form one `beginNewTransaction` undo step
+**And** one undo restores the entire module to its pre-action state
+**And** existing `suppress*` hooks prevent MIDI storms during bulk writes
+
+**Spec:** `stories.yaml` id `12-2` · **Covers:** CAP-4 (Init/Paste grouping), CAP-5
+
+### Story 12.3: Interactive display gesture transactions
+
+As a sound designer,
+I want envelope and Track Generator drags to undo as one step each,
+So that curve editing matches slider grouping expectations (CAP-4 display gestures).
+
+**Acceptance Criteria:**
+
+**Given** Stories 12.1–12.2
+**When** user drags envelope curves or Track Generator points (Stories 10.2/10.3 patterns)
+**Then** each full drag session is one undo transaction (not per-point micro-steps)
+**And** undo/redo restores pre/post gesture APVTS state with correct SysEx dispatch
+
+**Spec:** `stories.yaml` id `12-3` · **Covers:** CAP-4 (envelope, Track Generator)
+
+### Story 12.4: Matrix Mod reorder undo and keyboard shortcuts
+
+As a sound designer,
+I want Matrix Mod bus reorder and standard undo/redo shortcuts,
+So that editorial recovery matches platform conventions (CAP-3, CAP-4 reorder).
+
+**Acceptance Criteria:**
+
+**Given** Stories 12.1–12.3
+**When** user completes a Matrix Mod bus drag-reorder
+**Then** one undo restores pre-reorder bus layout
+**When** user presses Cmd/Ctrl+Z or Shift variant in Standalone or hosted plugin (per `keyboard-shortcuts.md` focus rules)
+**Then** editorial undo/redo runs without stealing shortcuts from text fields or modal dialogs
+**And** `Documentation/User/manuel-utilisateur.md` §7 documents shortcuts and grouping (removes no-undo statement)
+
+**Spec:** `stories.yaml` id `12-4` · **Covers:** CAP-2, CAP-3, CAP-4 (reorder)
+
+### Story 12.5: Mutator load policy dirty tracker and Core tests
+
+As a developer,
+I want stack-clear policies on load/paste/mutate and dirty-state coherence after undo/redo,
+So that editorial undo stays separate from Patch Mutator history and footer dirty indicator is trustworthy (CAP-6).
+
+**Acceptance Criteria:**
+
+**Given** Stories 12.1–12.4
+**When** user loads a patch, pastes a full patch, or runs MUTATE/RETRY
+**Then** editorial undo stack clears; loaded/mutated state is the new baseline (`undo-policy.md`)
+**When** user undoes or redoes editorial changes
+**Then** `DirtyPatchTracker` (`isDirty` / `syncApvtsAndIsDirty`) matches `undo-policy.md` edge matrix
+**And** undo/redo is disabled while Mutator Compare (`kCompareActive`) is active
+**And** Core unit tests in `Tests/Unit/` cover stack policy and dirty state
+
+**Spec:** `stories.yaml` id `12-5` · **Covers:** CAP-6 · **Done checkpoint:** spec complete, no open questions
 
 ---
 
