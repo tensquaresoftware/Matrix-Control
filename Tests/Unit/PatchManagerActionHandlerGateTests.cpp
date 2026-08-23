@@ -39,7 +39,7 @@ private:
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
         harness.gateState->allow = false;
 
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         // Gate was consulted and, on Cancel, coordinates stay put with no MIDI emitted.
         expectEquals(harness.gateState->calls, 1);
@@ -58,7 +58,7 @@ private:
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
         harness.gateState->allow = true;
 
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(harness.gateState->calls, 1);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 6);
@@ -244,7 +244,7 @@ private:
 
         SelectPatchFileLoadDispatcher dispatcher(harness);
         harness.gateState->allow = false;
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kLoadNextPatchFile, juce::var());
+        fireAdjacentNavigation(harness, ComputerPatches::StandaloneWidgets::kLoadNextPatchFile);
 
         expectEquals(harness.gateState->calls, 2);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(

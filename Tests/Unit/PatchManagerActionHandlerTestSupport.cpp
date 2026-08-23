@@ -55,6 +55,17 @@ namespace PatchManagerActionHandlerTestSupport
             if (!msg.has_value())
                 break;
 
+            if (msg->category == Core::MidiOutboundQueue::MessageCategory::kRealtime)
+            {
+                if (msg->midiMessage.isProgramChange())
+                {
+                    ++result.programChangeCount;
+                    result.lastProgramChange = msg->midiMessage.getProgramChangeNumber();
+                }
+
+                continue;
+            }
+
             if (msg->category != Core::MidiOutboundQueue::MessageCategory::kSysEx)
                 continue;
 
@@ -113,7 +124,9 @@ namespace PatchManagerActionHandlerTestSupport
                 if (pickReconciliationCallback)
                     return pickReconciliationCallback(internalSanitized, fileSanitized);
                 return std::optional<Core::NameReconciliationChoice>{};
-            }
+            },
+            Core::kPatchNavButtonDebounceMs,
+            Core::kComboboxPatchSendDebounceMs
         };
     }
 
@@ -205,20 +218,19 @@ namespace PatchManagerActionHandlerTestSupport
     void simulateSelectPatchFileDispatch(HandlerHarness& harness)
     {
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        harness.handler.flushComputerSelectDebouncerForTests();
     }
 
     void fireAdjacentNavigation(HandlerHarness& harness, const juce::String& adjacentPropertyId)
     {
-        const int beforeId = static_cast<int>(harness.proc.apvts.state.getProperty(
-            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
-            0));
         harness.handler.handleAction(adjacentPropertyId, juce::var());
-        const int afterId = static_cast<int>(harness.proc.apvts.state.getProperty(
-            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
-            0));
+        harness.handler.flushPatchNavDebouncerForTests();
+    }
 
-        if (afterId != beforeId)
-            simulateSelectPatchFileDispatch(harness);
+    void fireInternalPatchNavigation(HandlerHarness& harness, const juce::String& navigationPropertyId)
+    {
+        harness.handler.handleAction(navigationPropertyId, juce::var());
+        harness.handler.flushPatchNavDebouncerForTests();
     }
 
     void fireOpenAndDispatchLoad(HandlerHarness& harness)
@@ -233,6 +245,8 @@ namespace PatchManagerActionHandlerTestSupport
 
         if (afterId != beforeId)
             simulateSelectPatchFileDispatch(harness);
+        else
+            harness.handler.flushComputerSelectDebouncerForTests();
     }
 
     void setupComputerPatchesScan(HandlerHarness& harness, const juce::File& tempDir)
@@ -266,6 +280,7 @@ namespace PatchManagerActionHandlerTestSupport
 
         armed = false;
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        harness.handler.flushComputerSelectDebouncerForTests();
         armed = true;
     }
 }

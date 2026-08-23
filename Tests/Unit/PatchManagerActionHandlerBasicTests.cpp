@@ -333,7 +333,7 @@ private:
         initializePatchManagerState(harness.proc.apvts.state, 0, 5, true);
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
 
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 6);
@@ -354,7 +354,7 @@ private:
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
 
         for (int step = 0; step < 4; ++step)
-            harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+            fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 3);
@@ -374,7 +374,7 @@ private:
                                     false);
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
 
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)),
@@ -406,7 +406,7 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 0, 0, false);
 
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 1);
@@ -424,7 +424,7 @@ private:
         initializePatchManagerState(harness.proc.apvts.state, 9, 93, false);
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
 
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 9);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 94);

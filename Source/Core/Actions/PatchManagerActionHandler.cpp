@@ -38,6 +38,8 @@ namespace Core
         , pickSaveFile_(std::move(dependencies.pickSaveFile))
         , pickNameReconciliation_(std::move(dependencies.pickNameReconciliation))
         , hooks_(std::move(hooks))
+        , patchNavDebouncer_(dependencies.patchNavButtonDebounceMs)
+        , computerSelectDebouncer_(dependencies.computerSelectDebounceMs)
     {
         loadPatchNameOverlayFromApvts();
     }
@@ -360,7 +362,8 @@ namespace Core
     }
 
     void PatchManagerActionHandler::applyPatchCoordinates(const PatchCoordinates& coordinates,
-                                                          const DeviceMemoryLimits& limits)
+                                                          const DeviceMemoryLimits& limits,
+                                                          bool sendMidi)
     {
         if (hooks_.setSuppressPatchSelectionMidiSync)
             hooks_.setSuppressPatchSelectionMidiSync(true);
@@ -376,6 +379,9 @@ namespace Core
 
         if (hooks_.setSuppressPatchSelectionMidiSync)
             hooks_.setSuppressPatchSelectionMidiSync(false);
+
+        if (! sendMidi)
+            return;
 
         bool setBankSent = false;
         if (patchSelectionMidiSync_ != nullptr)

@@ -1141,3 +1141,8 @@ Original review bullets below remain for history; status for U-10-owned residual
   summary: `patchNotStoredInRam_` is still not persisted in session state — reloading a DAW project after INIT-without-STORE will not re-prompt until the user edits or INIT again.
   evidence: Chantier-1 deferred-work retained; chantier 3 uses live in-memory risk only at close hooks.
 
+## Deferred from: build spec-patch-manager-nav-debounce (2026-08-23)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-manager-nav-debounce.md`
+  summary: No settleInProgress guard if the user clicks Next/Previous again while the unsaved-edit confirm modal is open during Internal settle.
+  evidence: Edge Case Hunter; confirm is typically a blocking modal, nested message-loop re-entry is rare; revisit if UAT sees nested navigations during the dialog.

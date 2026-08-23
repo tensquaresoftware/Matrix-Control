@@ -12,6 +12,9 @@ namespace Core
 // 150 ms — no PRD millisecond value; aligns with human combobox scroll feel.
 inline constexpr int kComboboxPatchSendDebounceMs = 150;
 
+// Patch Manager Next/Previous button navigation settle window (separate from combobox 150).
+inline constexpr int kPatchNavButtonDebounceMs = 300;
+
 class ComboboxPatchSendDebouncer final : private juce::Timer
 {
 public:
@@ -19,6 +22,11 @@ public:
     ~ComboboxPatchSendDebouncer() override;
 
     void schedule(std::function<void()> callback);
+
+    // Drops a pending callback without running it (superseded / cancelled settle).
+    void cancel();
+
+    bool isPending() const noexcept { return isTimerRunning(); }
 
     // Unit-test seam — runs a pending debounced callback without wall-clock waits (CI-safe).
     void flushPendingSynchronouslyForTests();

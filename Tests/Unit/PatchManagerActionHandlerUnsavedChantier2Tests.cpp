@@ -61,7 +61,7 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 0, 3, false);
         harness.useSuccessfulDeviceDump();
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
         expect(! harness.handler.isPatchNotStoredInRam());
 
         harness.model.setName("EDITED!!");

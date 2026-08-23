@@ -81,7 +81,7 @@ namespace Core
 
         if (propertyId == kSelectPatchFile)
         {
-            handleLoadSelectedPatchFile(limits);
+            scheduleComputerSelectPatchLoad();
             return true;
         }
 
@@ -128,8 +128,8 @@ namespace Core
         if (propertyId != kLoadPreviousPatch && propertyId != kLoadNextPatch)
             return false;
 
-        if (! confirmPatchContextChange())
-            return true;
+        if (! pendingInternalNavBaseline_.has_value())
+            pendingInternalNavBaseline_ = captureInternalCoordinates(limits);
 
         const bool isNext = propertyId == kLoadNextPatch;
         const int direction = isNext ? 1 : -1;
@@ -138,29 +138,107 @@ namespace Core
         current.bank = getCurrentBank(limits);
         current.patch = getCurrentPatch(limits);
 
-        const auto priorCoordinates = captureInternalCoordinates(limits);
-        applyPatchCoordinates(limits.advancePatch(current, direction), limits);
-        beginPendingDeviceLoad(priorCoordinates);
-        loadCurrentPatchFromDevice(limits);
+        applyPatchCoordinates(limits.advancePatch(current, direction), limits, false);
+
+        abandonPendingDeviceLoad();
+        abandonPendingComputerSelectSettle();
+
+        patchNavDebouncer_.schedule([this]() { settleInternalPatchNavigation(); });
         return true;
+    }
+
+    void PatchManagerActionHandler::abandonPendingInternalNavSettle()
+    {
+        if (! pendingInternalNavBaseline_.has_value())
+            return;
+
+        const auto baseline = *pendingInternalNavBaseline_;
+        pendingInternalNavBaseline_.reset();
+        restoreInternalCoordinates(baseline, deviceMemoryLimits_());
+        abandonPendingDeviceLoad();
+    }
+
+    void PatchManagerActionHandler::abandonPendingComputerSelectSettle()
+    {
+        if (! computerSelectDebouncer_.isPending())
+            return;
+
+        computerSelectDebouncer_.cancel();
+        revertComputerPatchesSelectionIfNeeded(resolveComputerPatchesCancelRevertId());
+    }
+
+    void PatchManagerActionHandler::settleInternalPatchNavigation()
+    {
+        const auto limits = deviceMemoryLimits_();
+
+        if (! pendingInternalNavBaseline_.has_value())
+            return;
+
+        const auto baseline = *pendingInternalNavBaseline_;
+
+        if (! confirmPatchContextChange())
+        {
+            pendingInternalNavBaseline_.reset();
+            restoreInternalCoordinates(baseline, limits);
+            abandonPendingDeviceLoad();
+            return;
+        }
+
+        pendingInternalNavBaseline_.reset();
+
+        const PatchCoordinates finalCoords { getCurrentBank(limits), getCurrentPatch(limits) };
+        applyPatchCoordinates(finalCoords, limits, true);
+        beginPendingDeviceLoad(baseline);
+        loadCurrentPatchFromDevice(limits);
     }
 
     bool PatchManagerActionHandler::tryHandleComputerPatchFileNavigation(const juce::String& propertyId,
                                                                          const DeviceMemoryLimits& limits)
     {
         using namespace PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets;
+        juce::ignoreUnused(limits);
 
         if (propertyId != kLoadPreviousPatchFile && propertyId != kLoadNextPatchFile)
             return false;
 
-        const int beforeId = readComputerPatchesSelectedId();
         const bool isNext = propertyId == kLoadNextPatchFile;
+
+        suppressComputerPatchesSelectLoad_ = true;
         const auto nextId = advanceComputerPatchesSelection(isNext);
+        suppressComputerPatchesSelectLoad_ = false;
 
-        if (nextId.has_value() && *nextId == beforeId)
-            handleLoadSelectedPatchFile(limits);
+        if (! nextId.has_value())
+            return true;
 
+        scheduleComputerNavPatchLoad();
         return true;
+    }
+
+    void PatchManagerActionHandler::scheduleComputerSelectPatchLoad()
+    {
+        if (suppressComputerPatchesSelectLoad_)
+            return;
+
+        abandonPendingDeviceLoad();
+        // Drop Internal settle if the shared button debouncer was armed for Internal nav.
+        abandonPendingInternalNavSettle();
+        patchNavDebouncer_.cancel();
+
+        computerSelectDebouncer_.schedule([this]() { settleComputerPatchLoad(); });
+    }
+
+    void PatchManagerActionHandler::scheduleComputerNavPatchLoad()
+    {
+        abandonPendingDeviceLoad();
+        abandonPendingInternalNavSettle();
+        computerSelectDebouncer_.cancel();
+
+        patchNavDebouncer_.schedule([this]() { settleComputerPatchLoad(); });
+    }
+
+    void PatchManagerActionHandler::settleComputerPatchLoad()
+    {
+        handleLoadSelectedPatchFile(deviceMemoryLimits_());
     }
 
     bool PatchManagerActionHandler::tryHandleBankButtonSelection(const juce::String& propertyId,

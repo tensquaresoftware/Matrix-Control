@@ -118,6 +118,14 @@ namespace Core
         commitLoadedComputerPatchFile(limits, requestedId, resolution.file, *reconciliation);
     }
 
+    void PatchManagerActionHandler::loadSelectedPatchFileImmediately(const DeviceMemoryLimits& limits)
+    {
+        abandonPendingInternalNavSettle();
+        patchNavDebouncer_.cancel();
+        computerSelectDebouncer_.cancel();
+        handleLoadSelectedPatchFile(limits);
+    }
+
     PatchManagerActionHandler::SelectedPatchFileResolution
     PatchManagerActionHandler::makeLoadFailedResolution(const juce::String& message) const
     {

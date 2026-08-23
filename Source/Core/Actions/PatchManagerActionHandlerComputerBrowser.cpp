@@ -53,7 +53,7 @@ namespace Core
             nullptr);
 
         if (readComputerPatchesSelectedId() == beforeId && beforeId == kFirstPatchFileId)
-            handleLoadSelectedPatchFile(limits);
+            loadSelectedPatchFileImmediately(limits);
     }
 
     void PatchManagerActionHandler::resetComputerPatchesBrowserAfterSessionLoad()
@@ -231,6 +231,10 @@ namespace Core
 
     void PatchManagerActionHandler::abortComputerPatchesNavigation()
     {
+        abandonPendingInternalNavSettle();
+        patchNavDebouncer_.cancel();
+        computerSelectDebouncer_.cancel();
+
         if (pendingBrowserRestoreOnCancel_.has_value())
         {
             const auto snapshot = *pendingBrowserRestoreOnCancel_;

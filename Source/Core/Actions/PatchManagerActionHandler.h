@@ -17,6 +17,7 @@
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchNameOverlayStore.h"
 #include "Core/Services/UnsavedEditWarningPolicy.h"
+#include "Core/Util/ComboboxPatchSendDebouncer.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
 class MidiManager;
@@ -64,6 +65,8 @@ namespace Core
             PatchFolderPicker pickFolder;
             PatchSaveFilePicker pickSaveFile;
             PatchNameReconciliationPicker pickNameReconciliation;
+            int patchNavButtonDebounceMs = kPatchNavButtonDebounceMs;
+            int computerSelectDebounceMs = kComboboxPatchSendDebounceMs;
         };
 
         struct InternalCoordinatesSnapshot
@@ -115,6 +118,13 @@ namespace Core
         // Runs Store / Save / Save As for the unsaved-edit Persist choice. False = stay.
         bool tryPersistCurrentPatchFromUnsavedGate(UnsavedEditPersistKind persistKind);
 
+        // Unit-test seams — see ComboboxPatchSendDebouncer::flushPendingSynchronouslyForTests().
+        void flushPatchNavDebouncerForTests() { patchNavDebouncer_.flushPendingSynchronouslyForTests(); }
+        void flushComputerSelectDebouncerForTests()
+        {
+            computerSelectDebouncer_.flushPendingSynchronouslyForTests();
+        }
+
     private:
         enum class PatchNameResolvePurpose
         {
@@ -141,7 +151,9 @@ namespace Core
         void abortComputerPatchesNavigation();
         // Returns the id written to APVTS, or nullopt when navigation was a no-op.
         std::optional<int> advanceComputerPatchesSelection(bool isNext);
-        void applyPatchCoordinates(const PatchCoordinates& coordinates, const DeviceMemoryLimits& limits);
+        void applyPatchCoordinates(const PatchCoordinates& coordinates,
+                                   const DeviceMemoryLimits& limits,
+                                   bool sendMidi = true);
         InternalCoordinatesSnapshot captureInternalCoordinates(const DeviceMemoryLimits& limits) const;
         void restoreInternalCoordinates(const InternalCoordinatesSnapshot& snapshot,
                                         const DeviceMemoryLimits& limits);
@@ -165,6 +177,15 @@ namespace Core
         void handleSavePatchAs();
         void handleSavePatchFile();
         void handleLoadSelectedPatchFile(const DeviceMemoryLimits& limits);
+        void loadSelectedPatchFileImmediately(const DeviceMemoryLimits& limits);
+        void scheduleComputerSelectPatchLoad();
+        void scheduleComputerNavPatchLoad();
+        void settleInternalPatchNavigation();
+        void settleComputerPatchLoad();
+        // Restores UI coords and clears baseline when an Internal settle is dropped/superseded.
+        void abandonPendingInternalNavSettle();
+        // If a Computer-select settle is pending, cancel it and revert selection to committed.
+        void abandonPendingComputerSelectSettle();
         bool tryHandleInternalPatchNavigation(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleComputerPatchFileNavigation(const juce::String& propertyId,
                                                   const DeviceMemoryLimits& limits);
@@ -403,6 +424,9 @@ namespace Core
         int lastCommittedComputerPatchesSelectedId_ = 0;
         int lastStableComputerPatchesSelectedId_ = 0;
         bool suppressComputerPatchesSelectLoad_ = false;
+        ComboboxPatchSendDebouncer patchNavDebouncer_;
+        ComboboxPatchSendDebouncer computerSelectDebouncer_;
+        std::optional<InternalCoordinatesSnapshot> pendingInternalNavBaseline_;
         std::uint64_t deviceLoadGeneration_ = 0;
         std::optional<PendingDeviceLoad> pendingDeviceLoad_;
         bool patchNotStoredInRam_ = false;

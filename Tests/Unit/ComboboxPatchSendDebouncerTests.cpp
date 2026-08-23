@@ -12,6 +12,7 @@ public:
     {
         debouncer_rapidSchedule_firesOnce();
         debouncer_finalSelectionWins();
+        debouncer_cancel_dropsPending();
     }
 
 private:
@@ -43,6 +44,20 @@ private:
 
         debouncer.flushPendingSynchronouslyForTests();
         expectEquals(static_cast<int>(result), static_cast<int>('B'));
+    }
+
+    void debouncer_cancel_dropsPending()
+    {
+        beginTest("debouncer_cancel_dropsPending");
+
+        Core::ComboboxPatchSendDebouncer debouncer(kTestDebounceMs);
+        int callbackCount = 0;
+
+        debouncer.schedule([&callbackCount] { ++callbackCount; });
+        debouncer.cancel();
+        debouncer.flushPendingSynchronouslyForTests();
+
+        expectEquals(callbackCount, 0);
     }
 };
 

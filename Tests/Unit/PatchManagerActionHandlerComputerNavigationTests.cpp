@@ -227,7 +227,7 @@ private:
             nullptr);
 
         expect(! harness.patchLoadHookState->invoked);
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
         expect(harness.patchLoadHookState->invoked);
 
         tempDir.deleteRecursively();

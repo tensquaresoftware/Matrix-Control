@@ -41,7 +41,7 @@ private:
             1,
             nullptr);
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         const auto queued = scanQueue(harness.queue);
         expect(!queued.patchData);
@@ -73,7 +73,7 @@ private:
             1,
             nullptr);
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         const auto queued = scanQueue(harness.queue);
         expect(queued.patchData);
@@ -102,7 +102,7 @@ private:
             0,
             nullptr);
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.queue.isEmpty());
         expect(! harness.proc.apvts.state.getProperty("uiMessageText").toString().startsWith("Loaded "));
@@ -131,7 +131,7 @@ private:
 
         expect(tempDir.deleteRecursively());
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.queue.isEmpty());
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
@@ -160,7 +160,7 @@ private:
             99,
             nullptr);
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.queue.isEmpty());
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
@@ -196,7 +196,7 @@ private:
         const juce::uint8 garbage[] = { 0x00, 0x01, 0x02, 0x03 };
         expect(tempDir.getChildFile("Patch 71.syx").replaceWithData(garbage, sizeof(garbage)));
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "warning");
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString().isNotEmpty());
@@ -243,7 +243,7 @@ private:
                 return std::nullopt;
             };
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.model.getName() == "KEEP-ME");
         expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == patchNameBefore);
@@ -282,7 +282,7 @@ private:
             1,
             nullptr);
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatReconciliationNotice("INSIDE", false));
@@ -321,7 +321,7 @@ private:
             1,
             nullptr);
 
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());
+        simulateSelectPatchFileDispatch(harness);
 
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatReconciliationNotice("OUTSIDE", true));

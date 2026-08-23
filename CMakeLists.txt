@@ -459,6 +459,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerSaveTests.cpp
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
+        Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
         Tests/Unit/PatchNameOverlayStoreTests.cpp

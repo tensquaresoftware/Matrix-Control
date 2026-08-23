@@ -84,6 +84,8 @@ namespace PatchManagerActionHandlerTestSupport
         int setBankValue = -1;
         int patchNumber = -1;
         int patchSysExCount = 0;
+        int programChangeCount = 0;
+        int lastProgramChange = -1;
     };
 
     QueueScanResult scanQueue(Core::MidiOutboundQueue& queue);
@@ -160,10 +162,11 @@ namespace PatchManagerActionHandlerTestSupport
 
     void simulateSelectPatchFileDispatch(HandlerHarness& harness);
     void fireAdjacentNavigation(HandlerHarness& harness, const juce::String& adjacentPropertyId);
+    void fireInternalPatchNavigation(HandlerHarness& harness, const juce::String& navigationPropertyId);
     void fireOpenAndDispatchLoad(HandlerHarness& harness);
     void setupComputerPatchesScan(HandlerHarness& harness, const juce::File& tempDir);
 
-    // Mirrors production ActionDispatcher: SelectPatchFile property changes load synchronously.
+    // Mirrors production ActionDispatcher: SelectPatchFile property changes schedule a 150 ms load settle.
     struct SelectPatchFileLoadDispatcher : private juce::ValueTree::Listener
     {
         HandlerHarness& harness;

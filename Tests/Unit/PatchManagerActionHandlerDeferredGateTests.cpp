@@ -37,7 +37,7 @@ private:
 
         harness.dumpFakeState->available = false;
         harness.patchLoadHookState->invoked = false;
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 10);
@@ -64,7 +64,7 @@ private:
         harness.dumpFakeState->available = true;
         harness.dumpFakeState->response.clear();
         harness.patchLoadHookState->invoked = false;
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 4);
         expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
@@ -90,7 +90,7 @@ private:
 
         harness.dumpFakeState->deferCallback = true;
         harness.patchLoadHookState->invoked = false;
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 9);
 
@@ -123,7 +123,7 @@ private:
 
         SelectPatchFileLoadDispatcher dispatcher(harness);
         harness.gateState->allow = false;
-        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kLoadNextPatchFile, juce::var());
+        fireAdjacentNavigation(harness, ComputerPatches::StandaloneWidgets::kLoadNextPatchFile);
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
             ComputerPatches::StandaloneWidgets::kSelectPatchFile)), 2);
@@ -229,7 +229,7 @@ private:
 
         harness.dumpFakeState->available = true;
         harness.dumpFakeState->deferCallback = true;
-        harness.handler.handleAction(InternalPatches::kLoadNextPatch, juce::var());
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 5);
 
         harness.proc.apvts.state.setProperty(
