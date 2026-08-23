@@ -261,10 +261,8 @@ void PluginProcessor::validatePluginDescriptorsAtStartup()
     if (!validationResult.isValid)
     {
         DBG("SynthDescriptors validation failed:");
-        for (const auto& error : validationResult.errors)
-        {
-            DBG("  ERROR: " + error);
-        }
+        for (int i = 0; i < validationResult.errors.size(); ++i)
+            DBG("  ERROR: " + validationResult.errors[i]);
     }
 }
 

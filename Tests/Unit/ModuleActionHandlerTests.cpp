@@ -105,7 +105,12 @@ private:
                           [this](bool suppress) { suppressPatchSysEx = suppress; },
                           nullptr,
                           nullptr,
-                          {} })
+                          {},
+                          nullptr,
+                          nullptr,
+                          nullptr,
+                          nullptr,
+                          nullptr })
         {
         }
     };

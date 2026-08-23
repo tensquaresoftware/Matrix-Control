@@ -120,6 +120,9 @@ void PluginProcessor::createActionSubsystem()
         [this](bool suppress) { suppressMutatorHistorySelectionDebounce_ = suppress; },
         {},
         [this](const Core::PatchLoadContext& context) { patchLoadContext_ = context; },
+        {},
+        {},
+        {},
         {}};
 
     createPatchMutatorEngine(actionHooks);

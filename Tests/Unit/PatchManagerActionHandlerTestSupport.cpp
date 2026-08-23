@@ -89,8 +89,9 @@ namespace PatchManagerActionHandlerTestSupport
     void copyFixturePatchToDir(const juce::File& dir, const juce::String& fileName)
     {
         const auto source = fixturesPatchesDir().getChildFile(fileName);
+        const auto destination = dir.getChildFile(fileName);
         jassert(source.existsAsFile());
-        jassert(source.copyFileTo(dir.getChildFile(fileName)));
+        jassert(source.copyFileTo(destination));
     }
 
     void initializePatchManagerState(juce::ValueTree& state, int bank, int patch, bool bankLocked)

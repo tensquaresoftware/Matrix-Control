@@ -101,7 +101,6 @@ namespace TSS
         class PasteEnabledPropertyListener;
 
         Presentation presentation_ = Presentation::TitleOnly;
-        ColumnLayout columnLayout_ = ColumnLayout::PatchEdit;
         ButtonSet buttonSet_ = ButtonSet::None;
 
         ModuleHeaderLook look_{};

@@ -59,7 +59,6 @@ private:
 
     TSS::ISkin* skin_;
     ParameterType parameterType_;
-    ModuleType moduleType_;
     ParameterCellDimensions dimensions_;
     float uiScale_ = 1.0f;
 

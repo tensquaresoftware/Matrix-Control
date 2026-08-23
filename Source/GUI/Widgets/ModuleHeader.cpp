@@ -105,7 +105,6 @@ namespace TSS
     ModuleHeader::ModuleHeader(int width, int height, const ModuleHeaderLook& look, ColourVariant variant,
                                const juce::String& text, const ModuleHeaderDimensions& dimensions)
         : presentation_(Presentation::TitleOnly)
-        , columnLayout_(ColumnLayout::PatchEdit)
         , buttonSet_(ButtonSet::None)
         , look_(look)
         , dimensions_(dimensions)
@@ -120,7 +119,6 @@ namespace TSS
 
     ModuleHeader::ModuleHeader(const WithActionsSpec& spec)
         : presentation_(Presentation::TitleWithActions)
-        , columnLayout_(spec.columnLayout)
         , buttonSet_(spec.buttonSet)
         , look_(moduleHeaderLookFromSkin(spec.skin))
         , dimensions_(spec.dimensions)

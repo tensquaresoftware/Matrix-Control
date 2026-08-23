@@ -16,7 +16,6 @@ ParameterCell::~ParameterCell() = default;
 ParameterCell::ParameterCell(const Config& config)
     : skin_(&config.skin)
     , parameterType_(config.type)
-    , moduleType_(config.moduleType)
     , dimensions_(config.dimensions)
 {
     setOpaque(false);
