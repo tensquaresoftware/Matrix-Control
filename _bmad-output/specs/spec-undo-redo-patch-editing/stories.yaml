@@ -1,0 +1,54 @@
+- id: "12-1"
+  title: Spike UndoManager on APVTS with one slider and MIDI proof
+  description: >-
+    Wire JUCE UndoManager into APVTS construction, prove one ParameterCell
+    slider drag undo restores value and emits correct SysEx. Covers CAP-1,
+    CAP-4, CAP-5 foundations.
+  spec_checkpoint: true
+  invoke_dev_with: >-
+    Replace nullptr UndoManager in PluginProcessor apvts ctor. One slider path
+    only; document memory sample for one transaction. No keyboard shortcuts yet.
+    Run lint_touched.py on touched C++.
+
+- id: "12-2"
+  title: Bulk editorial transactions for Init and Paste module
+  description: >-
+    Init (I) and Paste (P) module actions form single undo transactions using
+    existing suppress hooks. Covers CAP-4 bulk cases and CAP-5 suppress
+    compatibility.
+  invoke_dev_with: >-
+    Follow ModuleActionHandler Init/Paste paths; beginNewTransaction before
+    bulk APVTS writes; verify one undo restores entire module.
+
+- id: "12-3"
+  title: Interactive display gesture transactions
+  description: >-
+    Envelope and Track Generator direct APVTS bindings group drags into one
+    undo step each. Covers CAP-4 display gestures without splitting ENV/TRACK
+    params per point.
+  invoke_dev_with: >-
+    Extend existing beginParameterGesture/endParameterGesture in envelope and
+    Track Generator bindings; align with Story 10.2/10.3 patterns.
+
+- id: "12-4"
+  title: Matrix Mod reorder undo and keyboard shortcuts
+  description: >-
+    Matrix Mod bus drag-reorder undo plus PluginEditor undo/redo shortcuts with
+    focus rules from keyboard-shortcuts.md. Covers CAP-3 and CAP-4 reorder.
+  invoke_dev_with: >-
+    Wire ModulationBusCell reorder completion as one transaction. Implement
+    Cmd/Ctrl+Z and Shift variant at PluginEditor; skip text fields and dialogs.
+    Update manuel-utilisateur.md §7.
+
+- id: "12-5"
+  title: Mutator load policy dirty tracker and Core tests
+  description: >-
+    Checkpoint clears on load paste mutate; DirtyPatchTracker coherence after
+    undo/redo; Core tests for stack policy. Covers CAP-6 and undo-policy.md
+    mutator/load matrix.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Implement stack clear on load/paste/mutate; undo disabled during Compare.
+    Unit tests in Tests/Unit/ for undo stack and dirty state. Policies confirmed
+    in SPEC (no open questions).
