@@ -161,6 +161,7 @@ namespace PatchManagerActionHandlerTestSupport
                 if (onResult)
                     onResult(state->response);
             },
+            nullptr,
             nullptr
         };
     }

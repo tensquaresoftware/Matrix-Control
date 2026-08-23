@@ -123,7 +123,8 @@ void PluginProcessor::createActionSubsystem()
         {},
         {},
         {},
-        {}};
+        {},
+        [this](const juce::String& name) { undoManager_.beginNewTransaction(name); }};
 
     createPatchMutatorEngine(actionHooks);
     createModuleActionHandler(actionHooks);

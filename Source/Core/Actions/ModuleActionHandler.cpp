@@ -392,6 +392,9 @@ namespace
         if (moduleGroupId.isEmpty())
             return true;
 
+        if (hooks_.beginEditorialTransaction)
+            hooks_.beginEditorialTransaction("Paste module");
+
         pushModuleToApvtsAndSysEx(moduleGroupId);
         return true;
     }
@@ -427,6 +430,9 @@ namespace
 
         if (hooks_.setSuppressPatchSysEx)
             hooks_.setSuppressPatchSysEx(true);
+
+        if (hooks_.beginEditorialTransaction)
+            hooks_.beginEditorialTransaction("Patch module init");
 
         const auto result = patchModuleInitService_->initModule(moduleGroupId);
 

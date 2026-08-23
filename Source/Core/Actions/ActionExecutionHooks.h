@@ -4,6 +4,8 @@
 #include <functional>
 #include <vector>
 
+#include <juce_core/juce_core.h>
+
 #include "Core/Services/PatchMutator/PatchLoadContext.h"
 
 namespace Core
@@ -31,6 +33,8 @@ namespace Core
         std::function<void(juce::uint8 patchNumber, DeviceDumpCallback onResult)> requestDeviceDump;
         // Stops Copy/Paste blink feedback after a successful paste (clipboard content kept).
         std::function<void()> disarmClipboardFeedback;
+        // Opens one editorial undo transaction before bulk APVTS writes (Init/Paste module).
+        std::function<void(const juce::String&)> beginEditorialTransaction;
     };
 
 } // namespace Core

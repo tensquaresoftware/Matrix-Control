@@ -78,16 +78,14 @@ void ApvtsPatchMapper::syncChoiceToBuffer(const PluginDescriptors::ChoiceParamet
 
 void ApvtsPatchMapper::pushIntToApvts(const PluginDescriptors::IntParameterDescriptor& d)
 {
-    auto* param = apvts_.getParameter(d.parameterId);
-    if (param != nullptr)
-        param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(model_.getValue(d))));
+    apvts_.getParameterAsValue(d.parameterId)
+        .setValue(static_cast<float>(model_.getValue(d)));
 }
 
 void ApvtsPatchMapper::pushChoiceToApvts(const PluginDescriptors::ChoiceParameterDescriptor& d)
 {
-    auto* param = apvts_.getParameter(d.parameterId);
-    if (param != nullptr)
-        param->setValueNotifyingHost(param->convertTo0to1(static_cast<float>(model_.getChoiceIndex(d))));
+    apvts_.getParameterAsValue(d.parameterId)
+        .setValue(static_cast<float>(model_.getChoiceIndex(d)));
 }
 
 std::vector<PluginDescriptors::IntParameterDescriptor> ApvtsPatchMapper::buildIntDescriptors()
