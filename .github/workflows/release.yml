@@ -129,6 +129,7 @@ jobs:
             libfreetype6-dev \
             libfontconfig1-dev \
             libx11-dev \
+            libxi-dev \
             libxcomposite-dev \
             libxcursor-dev \
             libxext-dev \
