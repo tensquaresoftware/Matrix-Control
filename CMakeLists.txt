@@ -477,6 +477,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerModuleBulkTests.cpp
         Tests/Unit/UndoManagerMatrixModReorderTests.cpp
         Tests/Unit/UndoManagerEditorialUndoApiTests.cpp
+        Tests/Unit/EditorialUndoRedoShortcutTests.cpp
         Tests/Unit/UndoManagerCheckpointPolicyTests.cpp
         Tests/Unit/UndoManagerDirtyStateTests.cpp
         Tests/Unit/UndoManagerSliderArrowTests.cpp
@@ -710,7 +711,7 @@ juce_add_plugin(Matrix-Control
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT TRUE
     IS_MIDI_EFFECT FALSE
-    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS TRUE
     COPY_PLUGIN_AFTER_BUILD ${COPY_PLUGIN_AFTER_BUILD_VALUE}
     VST3_CATEGORIES Instrument
     AU_MAIN_TYPE kAudioUnitType_MusicDevice

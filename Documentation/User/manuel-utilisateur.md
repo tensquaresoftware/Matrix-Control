@@ -250,7 +250,7 @@ Ces raccourcis annulent ou rétablissent la **dernière modification éditoriale
 
 **Profondeur :** l’historique conserve jusqu’à 100 étapes d’édition ; les plus anciennes sont effacées au-delà.
 
-Les raccourcis ne s’appliquent pas pendant la comparaison Patch Mutator (`Compare` actif), dans les champs texte (nom de patch, champs des Settings — l’annulation texte native du système s’applique alors), ni lorsqu’une fenêtre modale bloquante est ouverte (About, confirmation Master INIT, transfert de banque en cours). Dans la fenêtre Settings, les raccourcis patch restent actifs tant qu’aucun champ texte n’a le focus.
+Lorsque l’éditeur Matrix-Control a le focus, le plugin demande le clavier à l’hôte (Standalone et formats AU/VST3) pour que ces raccourcis lui soient livrés. Les raccourcis ne s’appliquent pas pendant la comparaison Patch Mutator (`Compare` actif), dans les champs texte (nom de patch, champs des Settings — l’annulation texte native du système s’applique alors), ni lorsqu’une fenêtre modale bloquante est ouverte (About, confirmation Master INIT, transfert de banque en cours). Dans la fenêtre Settings, les raccourcis patch restent actifs tant qu’aucun champ texte n’a le focus.
 
 **Hors périmètre undo :** `STORE`, `SAVE` / `SAVE AS`, import/export de banque et navigation entre patches ne sont pas annulables par ⌘Z / Ctrl+Z (seuls les changements de paramètres le sont).
 

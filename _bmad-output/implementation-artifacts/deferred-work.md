@@ -1183,3 +1183,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - Risque pollution undo par écritures programmatiques APVTS après branchement UndoManager — pattern `nullptr` déjà en place ; audit complet prévu story 12-5.
 
 - Helper `sysExMatchesRemoteEdit` dupliqué entre spike tests et `PatchParameterSysExDispatcherTests` — dette test mineure, extraction partagée optionnelle.
+
+## Deferred from: build spec-cap-3-undo-redo-keyboard-shortcuts (2026-08-24)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-cap-3-undo-redo-keyboard-shortcuts.md`
+  summary: No automated assertion that PluginEditor::tryHandleEditorialUndoRedoKey calls classifyEditorialUndoRedoShortcut — helper tests alone stay green if the editor reverts to getTextCharacter matching.
+  evidence: Verification Gap Reviewer; EditorialUndoRedoShortcutTests cover the pure helper only; PluginEditor keyPressed harness still deferred from story 12-4.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-cap-3-undo-redo-keyboard-shortcuts.md`
+  summary: No automated check that JucePlugin_EditorRequiresKeyboardFocus stays 1 after configure — hosted Cmd+Z delivery can regress with a green unit-test run.
+  evidence: Verification Gap Reviewer; currently verified by inspecting generated Defs.txt and manual Live UAT.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-cap-3-undo-redo-keyboard-shortcuts.md`
+  summary: Escape overlay blocking list is wider than the editorial-undo modal guard (e.g. Settings / native alerts / popups) — pre-existing asymmetry.
+  evidence: Blind Hunter; undo modal guard unchanged in CAP-3; revisit only if UAT shows Cmd+Z leaking through overlays Escape already treats as blocking.

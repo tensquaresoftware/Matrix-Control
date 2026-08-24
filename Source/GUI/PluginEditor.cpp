@@ -6,6 +6,7 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Helpers/EditorialUndoRedoShortcuts.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
 #include "GUI/Widgets/PatchNameDisplay.h"
@@ -214,8 +215,8 @@ void PluginEditor::prepareEditorialUndoRedo()
 
 bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)
 {
-    const auto keyChar = juce::CharacterFunctions::toLowerCase(key.getTextCharacter());
-    if (keyChar != 'z' || ! key.getModifiers().isCommandDown())
+    const auto shortcut = TSS::classifyEditorialUndoRedoShortcut(key);
+    if (shortcut == TSS::EditorialUndoRedoShortcut::kNone)
         return false;
 
     if (isEditorialUndoBlockedByTextFocus())
@@ -226,7 +227,7 @@ bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)
 
     prepareEditorialUndoRedo();
 
-    if (key.getModifiers().isShiftDown())
+    if (shortcut == TSS::EditorialUndoRedoShortcut::kRedo)
         pluginProcessor.performEditorialRedo();
     else
         pluginProcessor.performEditorialUndo();

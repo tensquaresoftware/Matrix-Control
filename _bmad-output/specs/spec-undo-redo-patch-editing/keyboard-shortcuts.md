@@ -35,6 +35,8 @@ Platform detection via JUCE `ModifierKeys::commandModifier` / standard key handl
 
 Identical shortcut behavior in Standalone and plugin host formats. No host-specific undo delegation in v1.
 
+`EDITOR_WANTS_KEYBOARD_FOCUS` must be `TRUE` in `juce_add_plugin` so hosts deliver Cmd/Ctrl+Z to the editor (`JucePlugin_EditorRequiresKeyboardFocus=1`). Runtime `setWantsKeyboardFocus` on the editor alone is not enough for many hosts (e.g. Ableton Live).
+
 ## Related shortcuts (unchanged)
 
 | Key | Action | Notes |
@@ -46,6 +48,7 @@ Identical shortcut behavior in Standalone and plugin host formats. No host-speci
 
 ## Implementation notes
 
+- Match shortcuts with `KeyPress` equality on keyCode `'z'` + `commandModifier` (and `shiftModifier` for redo), same pattern as `TestComponent` zoom. Do **not** use `getTextCharacter() == 'z'`: on macOS, JUCE clears `textCharacter` when Command is down.
 - GUI layer forwards undo/redo to Core (`PluginProcessor` or dedicated undo service) — Core performs `UndoManager::undo()` / `redo()`.
 - Check `canUndo()` / `canRedo()` before acting; no-op silently if stack empty.
 - Optional: suppress undo while MIDI bulk suppress hooks are active mid-operation (avoid partial undo during in-flight bulk).
