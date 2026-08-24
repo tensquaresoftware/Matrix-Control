@@ -181,8 +181,7 @@ private:
 
         expect(harness.proc.undoManager.canUndo());
 
-        harness.proc.undoManager.clearUndoHistory();
-        harness.handler.syncDirtySnapshotFromApvts();
+        harness.triggerEditorialCheckpoint();
 
         expect(! harness.proc.undoManager.canUndo());
         expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(harness.mapper,

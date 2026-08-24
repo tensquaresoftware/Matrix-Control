@@ -28,6 +28,17 @@ EnvelopeDisplayApvtsBinding::~EnvelopeDisplayApvtsBinding()
         apvts_.removeParameterListener(parameterId, this);
 }
 
+void EnvelopeDisplayApvtsBinding::setBeginEditorialTransaction(
+    std::function<void(const juce::String&)> beginEditorialTransaction)
+{
+    beginEditorialTransaction_ = std::move(beginEditorialTransaction);
+}
+
+void EnvelopeDisplayApvtsBinding::endActiveEditGesture()
+{
+    endParameterGesture();
+}
+
 void EnvelopeDisplayApvtsBinding::connectDisplayCallbacks()
 {
     display_.setOnValueChanged([this](int paramIndex, int newValue)
@@ -99,7 +110,9 @@ void EnvelopeDisplayApvtsBinding::beginParameterGesture(const juce::String& para
     if (param == nullptr)
         return;
 
-    if (auto* undoManager = apvts_.undoManager)
+    if (beginEditorialTransaction_)
+        beginEditorialTransaction_("Envelope edit");
+    else if (auto* undoManager = apvts_.undoManager)
         undoManager->beginNewTransaction("Envelope edit");
 
     param->beginChangeGesture();

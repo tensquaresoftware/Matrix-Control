@@ -29,6 +29,17 @@ TrackGeneratorDisplayApvtsBinding::~TrackGeneratorDisplayApvtsBinding()
         apvts_.removeParameterListener(parameterId, this);
 }
 
+void TrackGeneratorDisplayApvtsBinding::setBeginEditorialTransaction(
+    std::function<void(const juce::String&)> beginEditorialTransaction)
+{
+    beginEditorialTransaction_ = std::move(beginEditorialTransaction);
+}
+
+void TrackGeneratorDisplayApvtsBinding::endActiveEditGesture()
+{
+    endParameterGesture();
+}
+
 void TrackGeneratorDisplayApvtsBinding::connectDisplayCallbacks()
 {
     display_.setOnValueChanged([this](int pointIndex, int newValue)
@@ -100,7 +111,9 @@ void TrackGeneratorDisplayApvtsBinding::beginParameterGesture(const juce::String
     if (param == nullptr)
         return;
 
-    if (auto* undoManager = apvts_.undoManager)
+    if (beginEditorialTransaction_)
+        beginEditorialTransaction_("Track Generator edit");
+    else if (auto* undoManager = apvts_.undoManager)
         undoManager->beginNewTransaction("Track Generator edit");
 
     param->beginChangeGesture();

@@ -7,6 +7,7 @@
 #include "Core/Actions/ActionDispatcher.h"
 #include "Core/Actions/ActionPropertyRegistry.h"
 #include "Core/Actions/MutatorActionHandler.h"
+#include "Core/Actions/PatchManagerActionHandler.h"
 #include "Core/MIDI/MasterParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusParameterSysExDispatcher.h"
 #include "Core/MIDI/MatrixModBusReorderService.h"
@@ -18,6 +19,7 @@
 #include "Core/Services/PatchMutator/PatchMutatorEngine.h"
 #include "Loggers/ApvtsLogger.h"
 #include "Loggers/MidiLogger.h"
+#include "MIDI/MidiManager.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -93,7 +95,7 @@ void PluginProcessor::swapMatrixModBusContents(int fromBus, int toBus)
         || toBus < 0 || toBus >= Matrix1000Limits::kModulationBusCount)
         return;
 
-    undoManager_.beginNewTransaction("Matrix Mod reorder");
+    beginEditorialTransaction("Matrix Mod reorder");
 
     suppressMatrixModParameterSysEx_ = true;
     matrixModBusReorderService_->swapBusContents(fromBus, toBus);
@@ -281,8 +283,20 @@ bool PluginProcessor::performEditorialUndo()
     if (! canPerformEditorialUndo())
         return false;
 
-    undoManager_.undo();
-    return true;
+    suppressPatchParameterSysEx_ = true;
+    suppressMatrixModParameterSysEx_ = true;
+    suppressMasterParameterSysEx_ = true;
+
+    const bool ok = undoManager_.undo();
+
+    suppressPatchParameterSysEx_ = false;
+    suppressMatrixModParameterSysEx_ = false;
+    suppressMasterParameterSysEx_ = false;
+
+    if (ok)
+        resyncSynthAfterEditorialUndoRedo();
+
+    return ok;
 }
 
 bool PluginProcessor::performEditorialRedo()
@@ -290,8 +304,38 @@ bool PluginProcessor::performEditorialRedo()
     if (! canPerformEditorialRedo())
         return false;
 
-    undoManager_.redo();
-    return true;
+    suppressPatchParameterSysEx_ = true;
+    suppressMatrixModParameterSysEx_ = true;
+    suppressMasterParameterSysEx_ = true;
+
+    const bool ok = undoManager_.redo();
+
+    suppressPatchParameterSysEx_ = false;
+    suppressMatrixModParameterSysEx_ = false;
+    suppressMasterParameterSysEx_ = false;
+
+    if (ok)
+        resyncSynthAfterEditorialUndoRedo();
+
+    return ok;
+}
+
+void PluginProcessor::beginEditorialTransaction(const juce::String& transactionName)
+{
+    undoManager_.beginNewTransaction(transactionName);
+}
+
+void PluginProcessor::resyncSynthAfterEditorialUndoRedo()
+{
+    apvtsPatchMapper_->apvtsToBuffer();
+    apvtsMasterMapper_->apvtsToBuffer();
+    patchNameSyncer_->apvtsToBuffer();
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const int patchNumber = juce::jlimit(0, 255, getCurrentPatchNumberForMutator());
+    midiManager->sendFullPatchForAudition(patchModel_->data(),
+                                          static_cast<juce::uint8>(patchNumber),
+                                          limits.hasBankConcept());
 }
 
 void PluginProcessor::establishEditorialCheckpoint()

@@ -12,7 +12,23 @@
 #include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/Modules/PatchNameDisplayPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
+#include "GUI/Widgets/Slider.h"
 #include "Skins/Skin.h"
+
+namespace
+{
+    void cancelActiveSliderDragSessions(juce::Component& root)
+    {
+        if (auto* slider = dynamic_cast<TSS::Slider*>(&root))
+            slider->cancelActiveDragSession();
+
+        for (int i = 0; i < root.getNumChildComponents(); ++i)
+        {
+            if (auto* child = root.getChildComponent(i))
+                cancelActiveSliderDragSessions(*child);
+        }
+    }
+}
 
 using TSS::SkinColourId;
 
@@ -143,6 +159,18 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
     return juce::AudioProcessorEditor::keyPressed(key);
 }
 
+bool PluginEditor::isEditorialUndoBlockedByModalOverlay() const
+{
+    if (aboutWindow_ != nullptr && aboutWindow_->isVisible())
+        return true;
+    if (masterInitConfirmDialog_ != nullptr && masterInitConfirmDialog_->isVisible())
+        return true;
+    if (bankTransferProgressDialog_ != nullptr && bankTransferProgressDialog_->isVisible())
+        return true;
+
+    return false;
+}
+
 bool PluginEditor::isEditorialUndoBlockedByTextFocus() const
 {
     if (mainComponent_ == nullptr)
@@ -169,13 +197,34 @@ bool PluginEditor::isEditorialUndoBlockedByTextFocus() const
     return false;
 }
 
+void PluginEditor::prepareEditorialUndoRedo()
+{
+    unfocusAllComponents();
+
+    if (mainComponent_ != nullptr)
+    {
+        mainComponent_->getBodyPanel()
+            .getPatchEditPanel()
+            .getPatchEditDisplaysPanel()
+            .endActiveEditGestures();
+
+        cancelActiveSliderDragSessions(*mainComponent_);
+    }
+}
+
 bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)
 {
-    if (! key.isKeyCode(juce::KeyPress::zKey) || ! key.getModifiers().isCommandDown())
+    const auto keyChar = juce::CharacterFunctions::toLowerCase(key.getTextCharacter());
+    if (keyChar != 'z' || ! key.getModifiers().isCommandDown())
         return false;
 
-    if (isEscapeBlockedByOverlay() || isEditorialUndoBlockedByTextFocus())
+    if (isEditorialUndoBlockedByTextFocus())
+        return false;
+
+    if (isEditorialUndoBlockedByModalOverlay())
         return true;
+
+    prepareEditorialUndoRedo();
 
     if (key.getModifiers().isShiftDown())
         pluginProcessor.performEditorialRedo();

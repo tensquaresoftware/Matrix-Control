@@ -81,4 +81,6 @@ namespace PluginProcessorInternal
         return false;
 #endif
     }
+
+    inline constexpr int kEditorialUndoMaxStoredUnits = 100;
 }

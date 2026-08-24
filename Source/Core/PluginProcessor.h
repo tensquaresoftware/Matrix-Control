@@ -101,6 +101,7 @@ public:
     bool performEditorialUndo();
     bool performEditorialRedo();
 
+    void beginEditorialTransaction(const juce::String& transactionName);
     void establishEditorialCheckpoint();
 
     void startMidiThread();
@@ -386,6 +387,7 @@ private:
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
     bool isEditorialUndoRedoEnabled() const;
+    void resyncSynthAfterEditorialUndoRedo();
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
     void initializeClipboardFeedbackProperties();

@@ -222,6 +222,12 @@ namespace PatchManagerActionHandlerTestSupport
         }
     }
 
+    void HandlerHarness::triggerEditorialCheckpoint()
+    {
+        proc.undoManager.clearUndoHistory();
+        handler.syncDirtySnapshotFromApvts();
+    }
+
     void simulateSelectPatchFileDispatch(HandlerHarness& harness)
     {
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSelectPatchFile, juce::var());

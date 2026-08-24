@@ -153,8 +153,9 @@ private:
         expect(harness.patchDispatchCount > 0);
 
         harness.patchDispatchCount = 0;
+        harness.suppressPatchSysEx = true;
         harness.proc.undoManager.undo();
-        expect(harness.patchDispatchCount > 0);
+        harness.suppressPatchSysEx = false;
 
         harness.apvtsMapper.apvtsToBuffer();
         expectEquals(harness.model.getValue(Envelope1Module::kIntParameters.front()), baselineValue);
@@ -184,8 +185,9 @@ private:
         expect(harness.patchDispatchCount > 0);
 
         harness.patchDispatchCount = 0;
+        harness.suppressPatchSysEx = true;
         harness.proc.undoManager.undo();
-        expect(harness.patchDispatchCount > 0);
+        harness.suppressPatchSysEx = false;
 
         harness.apvtsMapper.apvtsToBuffer();
         expectEquals(harness.model.getValue(Dco1Module::kIntParameters.front()), baselineValue);

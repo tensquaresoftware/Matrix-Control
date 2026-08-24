@@ -126,3 +126,30 @@ void PatchEditDisplaysPanel::setUiScale(float uiScale)
     resized();
     repaint();
 }
+
+void PatchEditDisplaysPanel::setBeginEditorialTransaction(
+    std::function<void(const juce::String&)> beginEditorialTransaction)
+{
+    const auto wire = [&](const auto& binding)
+    {
+        if (binding != nullptr)
+            binding->setBeginEditorialTransaction(beginEditorialTransaction);
+    };
+
+    wire(envelope1Binding_);
+    wire(envelope2Binding_);
+    wire(envelope3Binding_);
+    wire(trackGeneratorBinding_);
+}
+
+void PatchEditDisplaysPanel::endActiveEditGestures()
+{
+    if (envelope1Binding_ != nullptr)
+        envelope1Binding_->endActiveEditGesture();
+    if (envelope2Binding_ != nullptr)
+        envelope2Binding_->endActiveEditGesture();
+    if (envelope3Binding_ != nullptr)
+        envelope3Binding_->endActiveEditGesture();
+    if (trackGeneratorBinding_ != nullptr)
+        trackGeneratorBinding_->endActiveEditGesture();
+}

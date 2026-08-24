@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: code review of spec-undo-redo-patch-editing epic transversal (2026-08-24)
+
+- Master-parameter editorial undo/redo has no `UndoManager*` test coverage (CAP-1 master scope).
+- Matrix Mod module Init/Paste `beginEditorialTransaction` paths untested (patch-module bulk tests only).
+- Patch load checkpoints (device dump, computer `.syx`, Internal Patches navigation) not asserted end-to-end via `PatchManagerActionHandler` — `UndoManagerCheckpointPolicyTests` seam test manually clears stack instead of calling `establishEditorialCheckpoint()`.
+- Slider/display widget undo tests simulate harness writes or run keys without stack assertions — production `TSS::Slider` / display binding paths not regression-protected.
+- Undo-policy edge rows untested: two edits + one undo → still dirty; mutate → tweak → undo reverts tweak only; display redo SysEx resync; compare-active blocks redo (undo-only test today).
+- Envelope display grouping: multi-parameter drag session tests only `kAttack` within one undo step.
+- `PluginProcessor::swapMatrixModBusContents` reorder undo covered only via local `UndoReorderHarness`, not processor integration.
+
 ## Deferred from: code review of spec-12-4-matrix-mod-reorder-undo-and-keyboard-shortcuts (2026-08-24)
 
 - No automated `PluginEditor::keyPressed` undo/redo test — AC4 is covered by manual verification in spec; GUI harness cost deferred for v1.

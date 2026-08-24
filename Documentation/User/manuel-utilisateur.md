@@ -240,13 +240,19 @@ Chaque mouvement de bouton, de curseur ou de menu déroulant est transmis au syn
 | Annuler la dernière modification | ⌘Z | Ctrl+Z |
 | Rétablir | ⌘⇧Z | Ctrl+Shift+Z |
 
-Ces raccourcis annulent ou rétablissent la **dernière modification éditoriale** du patch (paramètres, Matrix Mod, etc.). Ils ne remplacent pas l’historique du Patch Mutator ni le bouton `C` (Compare).
+Ces raccourcis annulent ou rétablissent la **dernière modification éditoriale** du patch (paramètres patch, paramètres master, Matrix Mod). Ils ne remplacent pas l’historique du Patch Mutator ni le bouton `C` (Compare).
 
-**Nouvelle baseline :** charger un patch (synthé ou fichier), coller un patch complet (Internal Patches), ou lancer `MUTATE` / `RETRY` dans le Patch Mutator efface l’historique d’annulation éditoriale : l’état affiché devient la nouvelle référence (on ne peut plus annuler avant ce point).
+**Nouvelle baseline :** charger un patch (synthé ou fichier), naviguer vers un autre patch dans Internal Patches, importer une banque, coller un patch complet (Internal Patches), ou lancer `MUTATE` / `RETRY` dans le Patch Mutator efface l’historique d’annulation éditoriale : l’état affiché devient la nouvelle référence (on ne peut plus annuler avant ce point).
 
-**Groupement :** un glisser de curseur à la souris = une étape d’annulation. Les flèches du clavier sur un curseur focalisé sont groupées : toutes les pressions jusqu’à la perte de focus forment une seule étape (pas une étape par flèche). Un réordonnancement complet d’un bus Matrix Mod (glisser-déposer) = une étape.
+**Groupement :** un glisser de curseur à la souris = une étape d’annulation. Les flèches du clavier sur un curseur focalisé sont groupées : toutes les pressions jusqu’à la perte de focus forment une seule étape (pas une étape par flèche). Un drag interactif sur une enveloppe ou le Track Generator = une étape (tous les paramètres touchés pendant le geste). Les boutons `I` (Init module) et `P` (Paste module) sur un module = chacun une étape. Un réordonnancement complet d’un bus Matrix Mod (glisser-déposer) = une étape.
 
-Les raccourcis ne s’appliquent pas pendant la comparaison Patch Mutator (`Compare` actif), dans les champs texte (nom de patch, paramètres des Settings), ni lorsqu’une fenêtre modale est ouverte (Settings, About, transfert de banque, etc.).
+**Indicateur « patch modifié » :** si vous annulez jusqu’à retrouver l’état du chargement, l’indicateur redevient propre ; s’il reste une différence, il reste affiché.
+
+**Profondeur :** l’historique conserve jusqu’à 100 étapes d’édition ; les plus anciennes sont effacées au-delà.
+
+Les raccourcis ne s’appliquent pas pendant la comparaison Patch Mutator (`Compare` actif), dans les champs texte (nom de patch, champs des Settings — l’annulation texte native du système s’applique alors), ni lorsqu’une fenêtre modale bloquante est ouverte (About, confirmation Master INIT, transfert de banque en cours). Dans la fenêtre Settings, les raccourcis patch restent actifs tant qu’aucun champ texte n’a le focus.
+
+**Hors périmètre undo :** `STORE`, `SAVE` / `SAVE AS`, import/export de banque et navigation entre patches ne sont pas annulables par ⌘Z / Ctrl+Z (seuls les changements de paramètres le sont).
 
 Pour sécuriser votre travail sur la durée, utilisez aussi `STORE` (écriture dans la mémoire du synthé), `SAVE` / `SAVE AS` (fichier sur l’ordinateur), ou le bouton `C` (Compare) du module `PATCH MUTATOR` lorsque vous explorez des variations.
 

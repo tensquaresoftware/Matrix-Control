@@ -155,6 +155,7 @@ namespace PatchManagerActionHandlerTestSupport
 
         void fireDeferredDump();
         void useSuccessfulDeviceDump();
+        void triggerEditorialCheckpoint();
 
     private:
         Core::PatchManagerActionHandler::Dependencies makeDependencies();

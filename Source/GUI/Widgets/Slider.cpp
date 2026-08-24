@@ -240,6 +240,12 @@ namespace TSS
         setValue(defaultValue_, juce::sendNotificationSync);
     }
 
+    void Slider::cancelActiveDragSession()
+    {
+        dragNotification_.reset();
+        arrowKeyDragNotification_.reset();
+    }
+
     void Slider::focusGained(juce::Component::FocusChangeType)
     {
         if (isEnabled())

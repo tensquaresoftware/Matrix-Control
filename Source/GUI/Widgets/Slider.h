@@ -45,6 +45,8 @@ namespace TSS
 
         bool keyPressed(const juce::KeyPress& key) override;
 
+        void cancelActiveDragSession();
+
     private:
         inline constexpr static int kValueBarPadding_ = 1;
         inline constexpr static float kFocusBorderThickness_ = 1.0f;

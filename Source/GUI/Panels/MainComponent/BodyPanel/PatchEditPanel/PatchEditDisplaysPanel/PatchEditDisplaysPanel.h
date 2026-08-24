@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -29,6 +30,9 @@ public:
     void setUiScale(float uiScale);
 
     PatchNameDisplayPanel& getPatchNameDisplayPanel() noexcept { return *patchNameDisplayPanel_; }
+
+    void setBeginEditorialTransaction(std::function<void(const juce::String&)> beginEditorialTransaction);
+    void endActiveEditGestures();
 
 private:
     PatchEditDisplaysPanelDimensions dims_;

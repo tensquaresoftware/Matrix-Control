@@ -2,6 +2,7 @@
 
 #include <array>
 #include <atomic>
+#include <functional>
 #include <memory>
 
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -29,12 +30,16 @@ public:
                                       const ParameterIds& parameterIds);
     ~TrackGeneratorDisplayApvtsBinding() override;
 
+    void setBeginEditorialTransaction(std::function<void(const juce::String&)> beginEditorialTransaction);
+    void endActiveEditGesture();
+
 private:
     inline static constexpr int kIntParameterMax {63};
 
     juce::AudioProcessorValueTreeState& apvts_;
     TSS::TrackGeneratorDisplay& display_;
     ParameterIds parameterIds_;
+    std::function<void(const juce::String&)> beginEditorialTransaction_;
     juce::AudioProcessorParameter* activeGestureParameter_ {nullptr};
     // Shared so queued callAsync lambdas can still skip mid-drag after this binding is destroyed.
     std::shared_ptr<std::atomic<juce::AudioProcessorParameter*>> activeGestureGate_ {

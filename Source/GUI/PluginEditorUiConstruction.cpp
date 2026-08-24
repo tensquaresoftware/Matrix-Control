@@ -55,6 +55,15 @@ void PluginEditor::createUiShell()
             {
                 pluginProcessor.commitPatchNameRename(newName);
             });
+
+        mainComponent_->getBodyPanel()
+            .getPatchEditPanel()
+            .getPatchEditDisplaysPanel()
+            .setBeginEditorialTransaction(
+                [this](const juce::String& name)
+                {
+                    pluginProcessor.beginEditorialTransaction(name);
+                });
     }
 
     mainComponent_->setMasterInitConfirmationGate(
