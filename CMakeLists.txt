@@ -474,6 +474,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerDisplayGestureTests.cpp
         Tests/Unit/UndoManagerModuleBulkTestSupport.cpp
         Tests/Unit/UndoManagerModuleBulkTests.cpp
+        Tests/Unit/UndoManagerMatrixModReorderTests.cpp
+        Tests/Unit/UndoManagerEditorialUndoApiTests.cpp
+        Tests/Unit/UndoManagerSliderArrowTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
@@ -496,6 +499,7 @@ if(MATRIX_BUILD_TESTS)
 
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
+        Source/GUI/Widgets/Slider.cpp
         Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Init/InitDefaults.cpp

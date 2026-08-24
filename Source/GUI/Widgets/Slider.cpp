@@ -58,6 +58,14 @@ namespace TSS
         repaint();
     }
 
+    void Slider::openArrowKeyDragSessionIfNeeded()
+    {
+        if (arrowKeyDragNotification_ != nullptr)
+            return;
+
+        arrowKeyDragNotification_ = std::make_unique<juce::Slider::ScopedDragNotification>(*this);
+    }
+
     juce::String Slider::getUnit() const
     {
         return unit_;
@@ -244,12 +252,13 @@ namespace TSS
     void Slider::focusLost(juce::Component::FocusChangeType)
     {
         hasFocus_ = false;
+        arrowKeyDragNotification_.reset();
         repaint();
     }
 
     bool Slider::keyPressed(const juce::KeyPress& key)
     {
-        if (! isEnabled() || ! hasKeyboardFocus(true))
+        if (! isEnabled() || ! hasFocus_)
             return false;
 
         if (key == juce::KeyPress::returnKey)
@@ -263,12 +272,14 @@ namespace TSS
 
         if (isIncrementKey(key.getKeyCode()))
         {
+            openArrowKeyDragSessionIfNeeded();
             updateValueWithStep(step, true);
             return true;
         }
 
         if (isDecrementKey(key.getKeyCode()))
         {
+            openArrowKeyDragSessionIfNeeded();
             updateValueWithStep(step, false);
             return true;
         }

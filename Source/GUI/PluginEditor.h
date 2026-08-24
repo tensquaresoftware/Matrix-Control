@@ -138,6 +138,8 @@ private:
     void valueTreeRedirected(juce::ValueTree&) override;
 
     bool isEscapeBlockedByOverlay() const;
+    bool isEditorialUndoBlockedByTextFocus() const;
+    bool tryHandleEditorialUndoRedoKey(const juce::KeyPress& key);
 
     void openSettingsWindow();
     void closeSettingsWindow();

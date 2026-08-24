@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of spec-12-4-matrix-mod-reorder-undo-and-keyboard-shortcuts (2026-08-24)
+
+- No automated `PluginEditor::keyPressed` undo/redo test — AC4 is covered by manual verification in spec; GUI harness cost deferred for v1.
+- Envelope/TrackGenerator binding `getUndoManager()` → `apvts_.undoManager` — minor supporting fix outside listed tasks.
+- Manual §7 omits undo-policy extras (checkpoint clears, stack depth, dirty state) — AC6 satisfied; fuller manual alignment deferred to story 12-5 stack-clear work.
+
 ## Deferred from: code review of spec-12-3-interactive-display-gesture-transactions (2026-08-24)
 
 - I/O matrix “external sync during drag” row not covered — no test asserts listener-only refresh of a non-active parameter leaves undo stack unchanged during an open gesture.

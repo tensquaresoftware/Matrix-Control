@@ -42,9 +42,12 @@ void ApvtsPatchMapper::pushBusToApvts(int busIndex)
     const auto& intParams = kModulationBusIntParameters[static_cast<size_t>(busIndex)];
     const auto& choiceParams = kModulationBusChoiceParameters[static_cast<size_t>(busIndex)];
 
-    pushIntToApvts(intParams[0]);
-    pushChoiceToApvts(choiceParams[0]);
-    pushChoiceToApvts(choiceParams[1]);
+    apvts_.getParameterAsValue(intParams[0].parameterId)
+        .setValue(static_cast<float>(model_.getValue(intParams[0])));
+    apvts_.getParameterAsValue(choiceParams[0].parameterId)
+        .setValue(static_cast<float>(model_.getChoiceIndex(choiceParams[0])));
+    apvts_.getParameterAsValue(choiceParams[1].parameterId)
+        .setValue(static_cast<float>(model_.getChoiceIndex(choiceParams[1])));
 }
 
 void ApvtsPatchMapper::pushModuleToApvts(const juce::String& moduleGroupId)

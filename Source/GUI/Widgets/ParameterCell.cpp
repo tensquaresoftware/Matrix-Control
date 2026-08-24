@@ -60,6 +60,7 @@ void ParameterCell::createSliderWidget(TSS::ISkin& skin, WidgetFactory& factory,
         apvts,
         parameterId,
         *slider_);
+
     addAndMakeVisible(*slider_);
 }
 

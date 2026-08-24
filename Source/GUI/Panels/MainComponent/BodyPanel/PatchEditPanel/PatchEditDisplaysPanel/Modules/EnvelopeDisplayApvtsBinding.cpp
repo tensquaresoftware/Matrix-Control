@@ -99,7 +99,7 @@ void EnvelopeDisplayApvtsBinding::beginParameterGesture(const juce::String& para
     if (param == nullptr)
         return;
 
-    if (auto* undoManager = apvts_.getUndoManager())
+    if (auto* undoManager = apvts_.undoManager)
         undoManager->beginNewTransaction("Envelope edit");
 
     param->beginChangeGesture();

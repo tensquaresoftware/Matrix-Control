@@ -78,6 +78,7 @@ void ModulationBusCell::createAmountSlider(WidgetFactory& factory, const juce::S
         apvts_,
         amountParamId,
         *amountSlider_);
+
     addAndMakeVisible(*amountSlider_);
 }
 

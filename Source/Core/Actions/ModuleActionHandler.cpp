@@ -141,6 +141,9 @@ namespace
         if (!isSectionInit && busIndex < 0)
             return false;
 
+        if (hooks_.beginEditorialTransaction)
+            hooks_.beginEditorialTransaction("Matrix Mod init");
+
         if (hooks_.setSuppressMatrixModSysEx)
             hooks_.setSuppressMatrixModSysEx(true);
 
@@ -339,6 +342,9 @@ namespace
                           "error");
             return true;
         }
+
+        if (hooks_.beginEditorialTransaction)
+            hooks_.beginEditorialTransaction("Paste Matrix Mod");
 
         pushMatrixModulationToApvtsAndSysEx();
 

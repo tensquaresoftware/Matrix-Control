@@ -233,7 +233,20 @@ Une fois le synthé détecté et un patch chargé (voir [section 9](#9-choisir-u
 
 Chaque mouvement de bouton, de curseur ou de menu déroulant est transmis au synthé. Vous entendez immédiatement le résultat sur la machine (et éventuellement via l’entrée audio en Standalone).
 
-Matrix-Control ne propose pas de fonction annuler / rétablir (`Undo` / `Redo`). Pour sécuriser votre travail, utilisez `STORE` (écriture dans la mémoire du synthé), `SAVE` / `SAVE AS` (fichier sur l’ordinateur), ou le bouton `C` (Compare) du module `PATCH MUTATOR` lorsque vous explorez des variations.
+### Annuler / rétablir (`Undo` / `Redo`)
+
+| Action | macOS | Windows / Linux |
+|--------|-------|-----------------|
+| Annuler la dernière modification | ⌘Z | Ctrl+Z |
+| Rétablir | ⌘⇧Z | Ctrl+Shift+Z |
+
+Ces raccourcis annulent ou rétablissent la **dernière modification éditoriale** du patch (paramètres, Matrix Mod, etc.). Ils ne remplacent pas l’historique du Patch Mutator ni le bouton `C` (Compare).
+
+**Groupement :** un glisser de curseur à la souris = une étape d’annulation. Les flèches du clavier sur un curseur focalisé sont groupées : toutes les pressions jusqu’à la perte de focus forment une seule étape (pas une étape par flèche). Un réordonnancement complet d’un bus Matrix Mod (glisser-déposer) = une étape.
+
+Les raccourcis ne s’appliquent pas pendant la comparaison Patch Mutator (`Compare` actif), dans les champs texte (nom de patch, paramètres des Settings), ni lorsqu’une fenêtre modale est ouverte (Settings, About, transfert de banque, etc.).
+
+Pour sécuriser votre travail sur la durée, utilisez aussi `STORE` (écriture dans la mémoire du synthé), `SAVE` / `SAVE AS` (fichier sur l’ordinateur), ou le bouton `C` (Compare) du module `PATCH MUTATOR` lorsque vous explorez des variations.
 
 ### Boutons `I` / `C` / `P`
 

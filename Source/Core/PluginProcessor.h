@@ -96,6 +96,11 @@ public:
     juce::UndoManager& getUndoManager() noexcept { return undoManager_; }
     const juce::UndoManager& getUndoManager() const noexcept { return undoManager_; }
 
+    bool canPerformEditorialUndo() const;
+    bool canPerformEditorialRedo() const;
+    bool performEditorialUndo();
+    bool performEditorialRedo();
+
     void startMidiThread();
     void stopMidiThread();
 
@@ -378,6 +383,7 @@ private:
     void dispatchMasterParameterChange(const juce::String& parameterId);
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
+    bool isEditorialUndoRedoEnabled() const;
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
     void initializeClipboardFeedbackProperties();

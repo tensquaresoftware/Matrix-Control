@@ -19,6 +19,7 @@
 #include "Loggers/ApvtsLogger.h"
 #include "Loggers/MidiLogger.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 using namespace PluginProcessorInternal;
@@ -84,6 +85,15 @@ void PluginProcessor::swapMatrixModBusContents(int fromBus, int toBus)
 {
     if (matrixModBusReorderService_ == nullptr)
         return;
+
+    if (fromBus == toBus)
+        return;
+
+    if (fromBus < 0 || fromBus >= Matrix1000Limits::kModulationBusCount
+        || toBus < 0 || toBus >= Matrix1000Limits::kModulationBusCount)
+        return;
+
+    undoManager_.beginNewTransaction("Matrix Mod reorder");
 
     suppressMatrixModParameterSysEx_ = true;
     matrixModBusReorderService_->swapBusContents(fromBus, toBus);
@@ -247,4 +257,39 @@ void PluginProcessor::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChang
     refreshClipboardPasteEnabledProperties();
     disarmClipboardFeedbackSession();
     applyPreferredStandaloneAudioFromForDeviceType();
+}
+
+bool PluginProcessor::isEditorialUndoRedoEnabled() const
+{
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
+    return ! static_cast<bool>(apvts.state.getProperty(MutatorState::kCompareActive, false));
+}
+
+bool PluginProcessor::canPerformEditorialUndo() const
+{
+    return isEditorialUndoRedoEnabled() && undoManager_.canUndo();
+}
+
+bool PluginProcessor::canPerformEditorialRedo() const
+{
+    return isEditorialUndoRedoEnabled() && undoManager_.canRedo();
+}
+
+bool PluginProcessor::performEditorialUndo()
+{
+    if (! canPerformEditorialUndo())
+        return false;
+
+    undoManager_.undo();
+    return true;
+}
+
+bool PluginProcessor::performEditorialRedo()
+{
+    if (! canPerformEditorialRedo())
+        return false;
+
+    undoManager_.redo();
+    return true;
 }

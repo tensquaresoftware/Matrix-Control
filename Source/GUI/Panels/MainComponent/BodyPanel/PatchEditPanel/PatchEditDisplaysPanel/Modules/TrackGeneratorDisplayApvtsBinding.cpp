@@ -100,7 +100,7 @@ void TrackGeneratorDisplayApvtsBinding::beginParameterGesture(const juce::String
     if (param == nullptr)
         return;
 
-    if (auto* undoManager = apvts_.getUndoManager())
+    if (auto* undoManager = apvts_.undoManager)
         undoManager->beginNewTransaction("Track Generator edit");
 
     param->beginChangeGesture();

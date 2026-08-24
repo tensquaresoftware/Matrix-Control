@@ -6,6 +6,10 @@
 #include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Dialogs/MasterInitConfirmDialog.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/PatchEditDisplaysPanel.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditPanel.h"
+#include "GUI/Widgets/PatchNameDisplay.h"
+#include "GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditDisplaysPanel/Modules/PatchNameDisplayPanel.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "GUI/Settings/SettingsWindow.h"
 #include "Skins/Skin.h"
@@ -123,6 +127,9 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
         return true;
     }
 
+    if (tryHandleEditorialUndoRedoKey(key))
+        return true;
+
 #if JUCE_DEBUG
     if (uiElementsTestVisible_
         && testComponent_ != nullptr
@@ -134,4 +141,46 @@ bool PluginEditor::keyPressed(const juce::KeyPress& key)
 #endif
 
     return juce::AudioProcessorEditor::keyPressed(key);
+}
+
+bool PluginEditor::isEditorialUndoBlockedByTextFocus() const
+{
+    if (mainComponent_ == nullptr)
+        return false;
+
+    auto& patchNameDisplay = mainComponent_->getBodyPanel()
+                                 .getPatchEditPanel()
+                                 .getPatchEditDisplaysPanel()
+                                 .getPatchNameDisplayPanel()
+                                 .getPatchNameDisplay();
+
+    if (patchNameDisplay.isEditing())
+        return true;
+
+    if (auto* focused = juce::Component::getCurrentlyFocusedComponent())
+    {
+        for (auto* component = focused; component != nullptr; component = component->getParentComponent())
+        {
+            if (dynamic_cast<const juce::TextEditor*>(component) != nullptr)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)
+{
+    if (! key.isKeyCode(juce::KeyPress::zKey) || ! key.getModifiers().isCommandDown())
+        return false;
+
+    if (isEscapeBlockedByOverlay() || isEditorialUndoBlockedByTextFocus())
+        return true;
+
+    if (key.getModifiers().isShiftDown())
+        pluginProcessor.performEditorialRedo();
+    else
+        pluginProcessor.performEditorialUndo();
+
+    return true;
 }
