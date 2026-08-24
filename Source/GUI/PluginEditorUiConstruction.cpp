@@ -41,30 +41,7 @@ void PluginEditor::createUiShell()
             pluginProcessor.swapMatrixModBusContents(fromBus, toBus);
         });
 
-    {
-        auto& patchNameDisplayPanel = mainComponent_->getBodyPanel()
-            .getPatchEditPanel()
-            .getPatchEditDisplaysPanel()
-            .getPatchNameDisplayPanel();
-
-        patchNameDisplayPanel.setCanEditProvider(
-            [this]() { return pluginProcessor.canEditPatchName(); });
-
-        patchNameDisplayPanel.setRenameCommitHandler(
-            [this](const juce::String& newName)
-            {
-                pluginProcessor.commitPatchNameRename(newName);
-            });
-
-        mainComponent_->getBodyPanel()
-            .getPatchEditPanel()
-            .getPatchEditDisplaysPanel()
-            .setBeginEditorialTransaction(
-                [this](const juce::String& name)
-                {
-                    pluginProcessor.beginEditorialTransaction(name);
-                });
-    }
+    wirePatchEditDisplayBindings();
 
     mainComponent_->setMasterInitConfirmationGate(
         [this](const juce::String& /*initPropertyId*/,
@@ -79,6 +56,29 @@ void PluginEditor::createUiShell()
 #endif
 
     updateSkin();
+}
+
+void PluginEditor::wirePatchEditDisplayBindings()
+{
+    auto& displaysPanel = mainComponent_->getBodyPanel()
+        .getPatchEditPanel()
+        .getPatchEditDisplaysPanel();
+    auto& patchNameDisplayPanel = displaysPanel.getPatchNameDisplayPanel();
+
+    patchNameDisplayPanel.setCanEditProvider(
+        [this]() { return pluginProcessor.canEditPatchName(); });
+
+    patchNameDisplayPanel.setRenameCommitHandler(
+        [this](const juce::String& newName)
+        {
+            pluginProcessor.commitPatchNameRename(newName);
+        });
+
+    displaysPanel.setBeginEditorialTransaction(
+        [this](const juce::String& name)
+        {
+            pluginProcessor.beginEditorialTransaction(name);
+        });
 }
 
 #if JUCE_DEBUG

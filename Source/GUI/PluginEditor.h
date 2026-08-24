@@ -91,6 +91,7 @@ private:
     void wirePatchAndMutatorBindings();
     void wireBankTransferBindings();
     void createUiShell();
+    void wirePatchEditDisplayBindings();
     void restoreAndWireHeader();
     void attachEditorRuntimeListeners();
 
