@@ -190,6 +190,7 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/ActionPropertyRegistry.cpp
     Source/Core/Actions/ModuleActionHandler.cpp
     Source/Core/Actions/PatchManagerActionHandler.cpp
+    Source/Core/Actions/PatchManagerActionHandlerSnapshot.cpp
     Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
@@ -476,6 +477,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerModuleBulkTests.cpp
         Tests/Unit/UndoManagerMatrixModReorderTests.cpp
         Tests/Unit/UndoManagerEditorialUndoApiTests.cpp
+        Tests/Unit/UndoManagerCheckpointPolicyTests.cpp
+        Tests/Unit/UndoManagerDirtyStateTests.cpp
         Tests/Unit/UndoManagerSliderArrowTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
         Tests/Unit/EditorPathTests.cpp
@@ -546,6 +549,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/ActionPropertyRegistry.cpp
         Source/Core/Actions/ModuleActionHandler.cpp
         Source/Core/Actions/PatchManagerActionHandler.cpp
+        Source/Core/Actions/PatchManagerActionHandlerSnapshot.cpp
         Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp

@@ -51,6 +51,9 @@ MutatorActionResult PatchMutatorEngine::mutate()
 
     pushResultToEditorAndSynth(working);
 
+    if (hooks_.onEditorialCheckpoint)
+        hooks_.onEditorialCheckpoint();
+
     selectedRootIndex_ = rootIndex;
     selectedRetryIndex_ = MutationHistoryStore::kRootOnly;
     initialSelected_ = false;
@@ -94,6 +97,9 @@ MutatorActionResult PatchMutatorEngine::retry()
         return makeHistoryLimitResult();
 
     pushResultToEditorAndSynth(working);
+
+    if (hooks_.onEditorialCheckpoint)
+        hooks_.onEditorialCheckpoint();
 
     selectedRetryIndex_ = retryIndex;
     initialSelected_ = false;

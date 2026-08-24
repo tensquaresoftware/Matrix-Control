@@ -125,6 +125,9 @@ namespace Core
             computerSelectDebouncer_.flushPendingSynchronouslyForTests();
         }
 
+        // APVTS-synced dirty baseline without clearing editorial undo (Processor checkpoint leg).
+        void syncDirtySnapshotFromApvts();
+
     private:
         enum class PatchNameResolvePurpose
         {
@@ -143,6 +146,7 @@ namespace Core
         // `includeUnsavedEditWarning` selects FR-51 risk + history vs history-only.
         bool confirmPatchContextChange(bool includeUnsavedEditWarning = true);
         void captureCleanSnapshot();
+        void establishEditorialCheckpoint();
         void markPatchNotStoredInRam() noexcept { patchNotStoredInRam_ = true; }
         void revertComputerPatchesSelectionIfNeeded(int previousSelectedId);
         void rememberComputerPatchesSelection(int selectedId);

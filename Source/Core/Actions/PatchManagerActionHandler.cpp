@@ -229,20 +229,6 @@ namespace Core
             || hooks_.confirmPatchContextChange(includeUnsavedEditWarning);
     }
 
-    void PatchManagerActionHandler::captureCleanSnapshot()
-    {
-        if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
-            return;
-
-        apvtsPatchMapper_->apvtsToBuffer();
-        if (patchNameSyncer_ != nullptr)
-            patchNameSyncer_->apvtsToBuffer();
-
-        patchModel_->normalizeNameEncoding();
-        dirtyPatchTracker_->captureSnapshot(*patchModel_);
-        patchNotStoredInRam_ = false;
-    }
-
     bool PatchManagerActionHandler::isCurrentBankStoreAllowed() const
     {
         if (! deviceMemoryLimits_)

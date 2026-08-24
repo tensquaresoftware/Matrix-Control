@@ -33,6 +33,8 @@ namespace Core
         std::function<void(juce::uint8 patchNumber, DeviceDumpCallback onResult)> requestDeviceDump;
         // Stops Copy/Paste blink feedback after a successful paste (clipboard content kept).
         std::function<void()> disarmClipboardFeedback;
+        // Clears editorial undo stack and refreshes DirtyPatchTracker snapshot (load/paste/mutate).
+        std::function<void()> onEditorialCheckpoint;
         // Opens one editorial undo transaction before bulk APVTS writes (Init/Paste module).
         std::function<void(const juce::String&)> beginEditorialTransaction;
     };

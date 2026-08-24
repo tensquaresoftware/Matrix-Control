@@ -162,6 +162,11 @@ namespace PatchManagerActionHandlerTestSupport
                     onResult(state->response);
             },
             nullptr,
+            [this]()
+            {
+                proc.undoManager.clearUndoHistory();
+                handler.syncDirtySnapshotFromApvts();
+            },
             nullptr
         };
     }

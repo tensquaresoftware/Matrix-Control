@@ -152,7 +152,7 @@ namespace Core
 
         using namespace PatchManagerActionHandlerInternal;
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
-        captureCleanSnapshot();
+        establishEditorialCheckpoint();
         clearPendingDeviceLoad();
 
         noteDevicePatchOrigin(bank, patch);

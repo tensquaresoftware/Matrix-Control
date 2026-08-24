@@ -124,6 +124,7 @@ void PluginProcessor::createActionSubsystem()
         {},
         {},
         {},
+        [this]() { establishEditorialCheckpoint(); },
         [this](const juce::String& name) { undoManager_.beginNewTransaction(name); }};
 
     createPatchMutatorEngine(actionHooks);

@@ -242,6 +242,8 @@ Chaque mouvement de bouton, de curseur ou de menu déroulant est transmis au syn
 
 Ces raccourcis annulent ou rétablissent la **dernière modification éditoriale** du patch (paramètres, Matrix Mod, etc.). Ils ne remplacent pas l’historique du Patch Mutator ni le bouton `C` (Compare).
 
+**Nouvelle baseline :** charger un patch (synthé ou fichier), coller un patch complet (Internal Patches), ou lancer `MUTATE` / `RETRY` dans le Patch Mutator efface l’historique d’annulation éditoriale : l’état affiché devient la nouvelle référence (on ne peut plus annuler avant ce point).
+
 **Groupement :** un glisser de curseur à la souris = une étape d’annulation. Les flèches du clavier sur un curseur focalisé sont groupées : toutes les pressions jusqu’à la perte de focus forment une seule étape (pas une étape par flèche). Un réordonnancement complet d’un bus Matrix Mod (glisser-déposer) = une étape.
 
 Les raccourcis ne s’appliquent pas pendant la comparaison Patch Mutator (`Compare` actif), dans les champs texte (nom de patch, paramètres des Settings), ni lorsqu’une fenêtre modale est ouverte (Settings, About, transfert de banque, etc.).

@@ -9,6 +9,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/Actions/ActionExecutionHooks.h"
+#include "Core/Factories/ApvtsFactory.h"
 #include "Core/Actions/PatchManagerActionHandler.h"
 #include "Core/Init/InitDefaults.h"
 #include "Core/Init/InitTemplateLoader.h"
@@ -50,10 +51,11 @@ namespace PatchManagerActionHandlerTestSupport
     public:
         TestAudioProcessorPatchManager()
             : juce::AudioProcessor(BusesProperties())
-            , apvts(*this, nullptr, "P", {})
+            , apvts(*this, &undoManager, "P", ApvtsFactory::createParameterLayout())
         {
         }
 
+        juce::UndoManager undoManager;
         juce::AudioProcessorValueTreeState apvts;
 
         const juce::String getName() const override { return "Test"; }

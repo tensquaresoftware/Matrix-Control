@@ -101,6 +101,8 @@ public:
     bool performEditorialUndo();
     bool performEditorialRedo();
 
+    void establishEditorialCheckpoint();
+
     void startMidiThread();
     void stopMidiThread();
 

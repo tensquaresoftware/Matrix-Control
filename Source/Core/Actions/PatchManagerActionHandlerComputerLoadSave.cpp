@@ -225,7 +225,7 @@ namespace Core
     {
         abandonPendingDeviceLoad();
         syncLoadedPatchToApvts();
-        captureCleanSnapshot();
+        establishEditorialCheckpoint();
 
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();

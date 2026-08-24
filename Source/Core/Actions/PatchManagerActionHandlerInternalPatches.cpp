@@ -313,6 +313,8 @@ namespace Core
         using namespace PatchManagerActionHandlerInternal;
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
 
+        establishEditorialCheckpoint();
+
         if (hooks_.onPatchLoaded)
             hooks_.onPatchLoaded();
 
@@ -353,7 +355,7 @@ namespace Core
 
         using namespace PatchManagerActionHandlerInternal;
         pushPatchModelToApvtsWithSuppress(apvts_, hooks_, *apvtsPatchMapper_, patchNameSyncer_);
-        captureCleanSnapshot();
+        establishEditorialCheckpoint();
         markPatchNotStoredInRam();
 
         if (hooks_.onPatchLoaded)

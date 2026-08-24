@@ -128,6 +128,7 @@ Core::ActionExecutionHooks makeBulkUndoHooks(ModuleBulkUndoHarnessBase& harness,
         nullptr,
         nullptr,
         nullptr,
+        nullptr,
         [&undoManager](const juce::String& name) { undoManager.beginNewTransaction(name); }};
 }
 

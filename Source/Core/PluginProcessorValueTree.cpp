@@ -293,3 +293,11 @@ bool PluginProcessor::performEditorialRedo()
     undoManager_.redo();
     return true;
 }
+
+void PluginProcessor::establishEditorialCheckpoint()
+{
+    undoManager_.clearUndoHistory();
+
+    if (patchManagerActionHandler_ != nullptr)
+        patchManagerActionHandler_->syncDirtySnapshotFromApvts();
+}
