@@ -141,9 +141,8 @@ struct MutateCheckpointHarness
     void writeProbeParam(int value)
     {
         const auto& descriptor = firstPatchIntDescriptor();
-        proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(
-            static_cast<float>(value - descriptor.minValue)
-            / static_cast<float>(descriptor.maxValue - descriptor.minValue));
+        // getParameterAsValue stores the denormalised parameter domain (same as getRawParameterValue).
+        proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(static_cast<float>(value));
     }
 };
 
@@ -176,8 +175,7 @@ private:
 
         const auto& descriptor = firstPatchIntDescriptor();
         harness.proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(
-            static_cast<float>(descriptor.minValue + 5 - descriptor.minValue)
-            / static_cast<float>(descriptor.maxValue - descriptor.minValue));
+            static_cast<float>(descriptor.minValue + 5));
 
         expect(harness.proc.undoManager.canUndo());
 
@@ -205,8 +203,7 @@ private:
 
         const auto& descriptor = firstPatchIntDescriptor();
         harness.proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(
-            static_cast<float>(descriptor.minValue + 5 - descriptor.minValue)
-            / static_cast<float>(descriptor.maxValue - descriptor.minValue));
+            static_cast<float>(descriptor.minValue + 5));
 
         expect(harness.proc.undoManager.canUndo());
 

@@ -105,9 +105,8 @@ struct DirtyStateHarness
     void writeProbeValue(int value)
     {
         const auto& descriptor = firstPatchIntDescriptor();
-        proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(
-            static_cast<float>(value - descriptor.minValue)
-            / static_cast<float>(descriptor.maxValue - descriptor.minValue));
+        // getParameterAsValue stores the denormalised parameter domain (same as getRawParameterValue).
+        proc.apvts.getParameterAsValue(descriptor.parameterId).setValue(static_cast<float>(value));
     }
 
     bool isDirtyViaSync()
