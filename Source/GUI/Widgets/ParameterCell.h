@@ -5,6 +5,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/WidgetDimensions.h"
+#include "GUI/Helpers/ApvtsUndoableParameterAttachments.h"
 
 namespace TSS
 {
@@ -67,8 +68,8 @@ private:
     std::unique_ptr<TSS::ComboBox> comboBox_;
     std::unique_ptr<TSS::HorizontalSeparator> separator_;
 
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> sliderAttachment_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> comboBoxAttachment_;
+    std::unique_ptr<TSS::ApvtsUndoableSliderAttachment> sliderAttachment_;
+    std::unique_ptr<TSS::ApvtsUndoableComboBoxAttachment> comboBoxAttachment_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterCell)
 };

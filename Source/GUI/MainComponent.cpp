@@ -106,3 +106,16 @@ void MainComponent::setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirm
 {
     bodyPanel.setMasterInitConfirmationGate(std::move(gate));
 }
+
+void MainComponent::setEditorialUndoRedoKeyHandler(std::function<bool(const juce::KeyPress&)> handler)
+{
+    editorialUndoRedoKeyHandler_ = std::move(handler);
+}
+
+bool MainComponent::keyPressed(const juce::KeyPress& key)
+{
+    if (editorialUndoRedoKeyHandler_ != nullptr && editorialUndoRedoKeyHandler_(key))
+        return true;
+
+    return juce::Component::keyPressed(key);
+}

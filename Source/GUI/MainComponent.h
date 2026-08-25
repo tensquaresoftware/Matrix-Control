@@ -48,6 +48,11 @@ public:
 
     void setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
+    /** Routes editorial Undo/Redo shortcuts from deep widget focus (Matrix Mod combos, etc.). */
+    void setEditorialUndoRedoKeyHandler(std::function<bool(const juce::KeyPress&)> handler);
+
+    bool keyPressed(const juce::KeyPress& key) override;
+
 #if JUCE_DEBUG
     void setUiElementsTestVisible(bool visible);
     juce::Rectangle<int> getUiElementsTestAreaBounds() const;
@@ -65,6 +70,8 @@ private:
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;
     FooterPanel footerPanel;
+
+    std::function<bool(const juce::KeyPress&)> editorialUndoRedoKeyHandler_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

@@ -7,6 +7,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "GUI/Layout/WidgetDimensions.h"
+#include "GUI/Helpers/ApvtsUndoableParameterAttachments.h"
 
 namespace TSS
 {
@@ -98,9 +99,9 @@ private:
     std::unique_ptr<TSS::Button> initButton_;
     std::unique_ptr<TSS::HorizontalSeparator> separator_;
 
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> sourceAttachment_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> amountAttachment_;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> destinationAttachment_;
+    std::unique_ptr<TSS::ApvtsUndoableComboBoxAttachment> sourceAttachment_;
+    std::unique_ptr<TSS::ApvtsUndoableSliderAttachment> amountAttachment_;
+    std::unique_ptr<TSS::ApvtsUndoableComboBoxAttachment> destinationAttachment_;
 
     juce::AudioProcessorValueTreeState& apvts_;
     juce::String busId_;

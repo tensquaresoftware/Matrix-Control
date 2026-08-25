@@ -98,6 +98,7 @@ public:
 
     bool canPerformEditorialUndo() const;
     bool canPerformEditorialRedo() const;
+    bool isEditorialUndoRedoEnabled() const;
     bool performEditorialUndo();
     bool performEditorialRedo();
 
@@ -386,7 +387,6 @@ private:
     void dispatchMasterParameterChange(const juce::String& parameterId);
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
-    bool isEditorialUndoRedoEnabled() const;
     void resyncSynthAfterEditorialUndoRedo();
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();

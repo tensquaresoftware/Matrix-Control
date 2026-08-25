@@ -8,6 +8,7 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ComboBox.h"
+#include "GUI/Helpers/ApvtsUndoableParameterAttachments.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/HorizontalSeparator.h"
@@ -58,7 +59,7 @@ void ModulationBusCell::createSourceComboBox(WidgetFactory& factory, const juce:
         *skin_,
         dimensions_.sourceComboBoxWidth,
         dimensions_.sourceComboBoxHeight);
-    sourceAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+    sourceAttachment_ = std::make_unique<TSS::ApvtsUndoableComboBoxAttachment>(
         apvts_,
         sourceParamId,
         *sourceComboBox_);
@@ -74,7 +75,7 @@ void ModulationBusCell::createAmountSlider(WidgetFactory& factory, const juce::S
         *skin_,
         dimensions_.amountSliderWidth,
         dimensions_.amountSliderHeight);
-    amountAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+    amountAttachment_ = std::make_unique<TSS::ApvtsUndoableSliderAttachment>(
         apvts_,
         amountParamId,
         *amountSlider_);
@@ -99,7 +100,7 @@ void ModulationBusCell::createDestinationComboBox(const juce::String& destinatio
         destinationComboBox_->addItem(choice, destinationComboBox_->getNumItems() + 1);
     }
     destinationComboBox_->setSelectedItemIndex(destinationDesc.defaultIndex);
-    destinationAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+    destinationAttachment_ = std::make_unique<TSS::ApvtsUndoableComboBoxAttachment>(
         apvts_,
         destinationParamId,
         *destinationComboBox_);

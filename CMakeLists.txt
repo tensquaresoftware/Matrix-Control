@@ -231,6 +231,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Factories/DimensionFactory.cpp
     Source/GUI/Factories/DimensionFactoryBuilders.cpp
     Source/GUI/Helpers/GrayedControlHelper.cpp
+    Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
     Source/GUI/Helpers/CompareLockBinder.cpp
     Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
@@ -478,6 +479,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerMatrixModReorderTests.cpp
         Tests/Unit/UndoManagerEditorialUndoApiTests.cpp
         Tests/Unit/EditorialUndoRedoShortcutTests.cpp
+        Tests/Unit/UndoManagerMatrixModSourceChoiceTests.cpp
         Tests/Unit/UndoManagerCheckpointPolicyTests.cpp
         Tests/Unit/UndoManagerDirtyStateTests.cpp
         Tests/Unit/UndoManagerSliderArrowTests.cpp
@@ -504,6 +506,7 @@ if(MATRIX_BUILD_TESTS)
         Source/GUI/Layout/WidgetDimensionRegistry.cpp
         Source/GUI/Panels/Reusable/ModulePanelConfigBuilder.cpp
         Source/GUI/Widgets/Slider.cpp
+        Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
         Tests/Unit/MigratedModulePanelLayouts.cpp
         Source/Shared/Definitions/PluginDescriptorsPatchManager.cpp
         Source/Core/Init/InitDefaults.cpp

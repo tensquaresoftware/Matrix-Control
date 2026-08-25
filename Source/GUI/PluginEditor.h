@@ -25,6 +25,7 @@ class MasterInitConfirmDialog;
 class BankTransferProgressDialog;
 
 class PluginEditor : public juce::AudioProcessorEditor,
+                     private juce::KeyListener,
                      private juce::ChangeListener,
                      private juce::ValueTree::Listener
 {
@@ -36,6 +37,7 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& e) override;
     bool keyPressed(const juce::KeyPress& key) override;
+    bool keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent) override;
 
     /** Refresh header MIDI port combos after an OS MIDI device-list change. */
     void refreshMidiPortListsFromOsChange();

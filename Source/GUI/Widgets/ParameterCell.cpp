@@ -9,6 +9,7 @@
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HorizontalSeparator.h"
 #include "GUI/Factories/WidgetFactory.h"
+#include "GUI/Helpers/ApvtsUndoableParameterAttachments.h"
 
 
 ParameterCell::~ParameterCell() = default;
@@ -56,7 +57,7 @@ void ParameterCell::createSliderWidget(TSS::ISkin& skin, WidgetFactory& factory,
         skin,
         dimensions_.controlWidth,
         dimensions_.sliderHeight);
-    sliderAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+    sliderAttachment_ = std::make_unique<TSS::ApvtsUndoableSliderAttachment>(
         apvts,
         parameterId,
         *slider_);
@@ -71,7 +72,7 @@ void ParameterCell::createComboBoxWidget(TSS::ISkin& skin, WidgetFactory& factor
         skin,
         dimensions_.controlWidth,
         dimensions_.comboBoxHeight);
-    comboBoxAttachment_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+    comboBoxAttachment_ = std::make_unique<TSS::ApvtsUndoableComboBoxAttachment>(
         apvts,
         parameterId,
         *comboBox_);

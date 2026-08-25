@@ -50,6 +50,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
 PluginEditor::~PluginEditor()
 {
+    removeKeyListener(this);
     pluginProcessor.setMutatorDefragLimitModalGate({});
     pluginProcessor.setMutatorExportCollisionModalGate({});
     pluginProcessor.setMutatorHistoryGateModalGate({});
@@ -200,8 +201,6 @@ bool PluginEditor::isEditorialUndoBlockedByTextFocus() const
 
 void PluginEditor::prepareEditorialUndoRedo()
 {
-    unfocusAllComponents();
-
     if (mainComponent_ != nullptr)
     {
         mainComponent_->getBodyPanel()
@@ -211,6 +210,12 @@ void PluginEditor::prepareEditorialUndoRedo()
 
         cancelActiveSliderDragSessions(*mainComponent_);
     }
+}
+
+bool PluginEditor::keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent)
+{
+    juce::ignoreUnused(originatingComponent);
+    return tryHandleEditorialUndoRedoKey(key);
 }
 
 bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)
@@ -225,12 +230,21 @@ bool PluginEditor::tryHandleEditorialUndoRedoKey(const juce::KeyPress& key)
     if (isEditorialUndoBlockedByModalOverlay())
         return true;
 
+    if (! pluginProcessor.isEditorialUndoRedoEnabled())
+        return true;
+
+    const bool isRedo = shortcut == TSS::EditorialUndoRedoShortcut::kRedo;
+
+    if (isRedo ? ! pluginProcessor.canPerformEditorialRedo()
+               : ! pluginProcessor.canPerformEditorialUndo())
+        return true;
+
     prepareEditorialUndoRedo();
 
-    if (shortcut == TSS::EditorialUndoRedoShortcut::kRedo)
-        pluginProcessor.performEditorialRedo();
-    else
-        pluginProcessor.performEditorialUndo();
+    const bool performed = isRedo ? pluginProcessor.performEditorialRedo()
+                                  : pluginProcessor.performEditorialUndo();
+
+    juce::ignoreUnused(performed);
 
     return true;
 }

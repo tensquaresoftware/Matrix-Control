@@ -225,6 +225,11 @@ void PluginEditor::attachEditorRuntimeListeners()
     pluginProcessor.getApvts().state.addListener(this);
 
     setWantsKeyboardFocus(true);
+    setFocusContainerType(juce::Component::FocusContainerType::keyboardFocusContainer);
+    addKeyListener(this);
+    mainComponent_->addKeyListener(this);
+    mainComponent_->setEditorialUndoRedoKeyHandler(
+        [this](const juce::KeyPress& key) { return tryHandleEditorialUndoRedoKey(key); });
     syncUiScaleFromEditor();
 #if JUCE_DEBUG
     layoutUiElementsTestComponent();
