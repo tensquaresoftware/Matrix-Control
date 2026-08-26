@@ -13,11 +13,11 @@ namespace PluginDisplayNames
 
     namespace HeaderPanel
     {
-        constexpr const char* kEditorMidiFromLabel = "MIDI FROM :";
-        constexpr const char* kMidiToLabel         = "MIDI TO :";
-        constexpr const char* kKeyboardFromLabel   = "KEYBOARD FROM :";
-        constexpr const char* kAudioFromLabel      = "AUDIO FROM :";
-        constexpr const char* kInputGainLabel      = "INPUT GAIN :";
+        constexpr const char* kEditorMidiFromLabel = "MIDI FROM";
+        constexpr const char* kMidiToLabel         = "MIDI TO";
+        constexpr const char* kKeyboardFromLabel   = "KEYBOARD FROM";
+        constexpr const char* kAudioFromLabel      = "AUDIO FROM";
+        constexpr const char* kInputGainLabel      = "INPUT GAIN";
         constexpr const char* kNoInputSentinel     = "NO INPUT";
         constexpr const char* kNoOutputSentinel    = "NO OUTPUT";
         constexpr const char* kHostDisplay         = "HOST";

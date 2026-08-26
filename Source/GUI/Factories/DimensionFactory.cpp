@@ -185,6 +185,9 @@ namespace
             .ledSize = Atoms::Widths::Indicator::kLedSize,
             .gap = Panels::Header::kGap,
             .packetExternalGap = Panels::Header::kPacketExternalGap,
+            .labelToControlGap = Panels::Header::kLabelToControlGap,
+            .keyboardFromLabelToComboGap = Panels::Header::kKeyboardFromLabelToComboGap,
+            .audioFromLabelToComboGap = Panels::Header::kAudioFromLabelToComboGap,
             .editorMidiFromLabelWidth = Panels::Header::kEditorMidiFromLabelWidth,
             .midiToLabelWidth = Panels::Header::kMidiToLabelWidth,
             .keyboardFromLabelWidth = Panels::Header::kKeyboardFromLabelWidth,
@@ -198,6 +201,7 @@ namespace
             .panicButtonWidth = Panels::Header::kPanicButtonWidth,
             .undoButtonWidth = Panels::Header::kUndoButtonWidth,
             .redoButtonWidth = Panels::Header::kRedoButtonWidth,
+            .redoToPanicGap = Panels::Header::kRedoToPanicGap,
         };
     }
 

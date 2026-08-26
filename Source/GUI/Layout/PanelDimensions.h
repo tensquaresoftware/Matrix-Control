@@ -26,6 +26,9 @@ struct HeaderPanelDimensions
     int ledSize;
     int gap;
     int packetExternalGap;
+    int labelToControlGap;
+    int keyboardFromLabelToComboGap;
+    int audioFromLabelToComboGap;
     int editorMidiFromLabelWidth;
     int midiToLabelWidth;
     int keyboardFromLabelWidth;
@@ -39,6 +42,7 @@ struct HeaderPanelDimensions
     int panicButtonWidth;
     int undoButtonWidth;
     int redoButtonWidth;
+    int redoToPanicGap;
 };
 
 struct FooterPanelDimensions

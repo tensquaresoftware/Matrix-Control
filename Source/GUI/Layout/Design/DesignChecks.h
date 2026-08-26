@@ -18,6 +18,8 @@ namespace TSS::Design
                   "Header editor MIDI from label width must be on the design ÷4 grid");
     static_assert(Panels::Header::kInputGainLabelToSliderGap % 4 == 0,
                   "Header input gain label-to-slider gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kRedoToPanicGap % 4 == 0,
+                  "Header redo-to-panic gap must be on the design ÷4 grid");
     static_assert(Panels::Header::kPanicButtonWidth % 4 == 0,
                   "Header panic button width must be on the design ÷4 grid");
     static_assert(Panels::Header::kUndoButtonWidth % 4 == 0,

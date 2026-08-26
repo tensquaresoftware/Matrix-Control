@@ -28,6 +28,9 @@ namespace
         float keyboardFromLabelWidth = 0.0f;
         float audioFromLabelWidth = 0.0f;
         float inputGainLabelWidth = 0.0f;
+        float labelToControlGap = 0.0f;
+        float keyboardFromLabelToComboGap = 0.0f;
+        float audioFromLabelToComboGap = 0.0f;
         float inputGainLabelToSliderGap = 0.0f;
         float portComboWidth = 0.0f;
         float inputGainSliderWidth = 0.0f;
@@ -59,6 +62,9 @@ namespace
             m.keyboardFromLabelWidth = static_cast<float>(dimensions.keyboardFromLabelWidth) * sf;
             m.audioFromLabelWidth = static_cast<float>(dimensions.audioFromLabelWidth) * sf;
             m.inputGainLabelWidth = static_cast<float>(dimensions.inputGainLabelWidth) * sf;
+            m.labelToControlGap = static_cast<float>(dimensions.labelToControlGap) * sf;
+            m.keyboardFromLabelToComboGap = static_cast<float>(dimensions.keyboardFromLabelToComboGap) * sf;
+            m.audioFromLabelToComboGap = static_cast<float>(dimensions.audioFromLabelToComboGap) * sf;
             m.inputGainLabelToSliderGap = static_cast<float>(dimensions.inputGainLabelToSliderGap) * sf;
             m.portComboWidth = static_cast<float>(dimensions.portComboBoxWidth) * sf;
             m.inputGainSliderWidth = static_cast<float>(dimensions.inputGainSliderWidth) * sf;
@@ -99,7 +105,8 @@ namespace
         {
             label.setBounds(juce::roundToInt(x_), y_, juce::roundToInt(labelWidth), h_);
             label.setUiScale(uiScale_);
-            x_ += labelWidth + (followingGap >= 0.0f ? followingGap : gap_);
+            const float gapAfter = juce::approximatelyEqual(followingGap, -1.0f) ? gap_ : followingGap;
+            x_ += labelWidth + gapAfter;
         }
 
         void placeCombo(TSS::ComboBox& combo, float comboWidth)
@@ -153,6 +160,52 @@ namespace
         float ledSize_;
         float uiScale_;
     };
+
+    struct HeaderActionButtonCluster
+    {
+        const HeaderPanelDimensions& dimensions;
+        const HeaderLayoutMetrics& metrics;
+        float uiScale;
+        int boundsRight;
+        TSS::Button& undo;
+        TSS::Button& redo;
+        TSS::Button& panic;
+    };
+
+    void placeActionButtonsFromRight(const HeaderActionButtonCluster& cluster)
+    {
+        const int panicW = juce::roundToInt(static_cast<float>(cluster.dimensions.panicButtonWidth) * cluster.uiScale);
+        const int rightPad = juce::roundToInt(static_cast<float>(cluster.dimensions.rightPadding) * cluster.uiScale);
+        const int redoToPanicGap = juce::roundToInt(static_cast<float>(cluster.dimensions.redoToPanicGap) * cluster.uiScale);
+        const int undoRedoGap = juce::roundToInt(cluster.metrics.gap);
+
+        const int redoW = juce::roundToInt(cluster.metrics.redoButtonWidth);
+        const int undoW = juce::roundToInt(cluster.metrics.undoButtonWidth);
+
+        const int panicX = cluster.boundsRight - rightPad - panicW;
+        const int redoX = panicX - redoToPanicGap - redoW;
+        const int undoX = redoX - undoRedoGap - undoW;
+
+        cluster.panic.setBounds(panicX, cluster.metrics.controlY, panicW, cluster.metrics.controlHeightPx);
+        cluster.redo.setBounds(redoX, cluster.metrics.controlY, redoW, cluster.metrics.controlHeightPx);
+        cluster.undo.setBounds(undoX, cluster.metrics.controlY, undoW, cluster.metrics.controlHeightPx);
+
+        cluster.panic.setUiScale(cluster.uiScale);
+        cluster.redo.setUiScale(cluster.uiScale);
+        cluster.undo.setUiScale(cluster.uiScale);
+    }
+
+    void placeStandaloneFlowActionButtons(PacketPlacer& placer, const HeaderActionButtonCluster& cluster)
+    {
+        placer.placeButton(cluster.undo, cluster.metrics.undoButtonWidth);
+        placer.placeButton(cluster.redo, cluster.metrics.redoButtonWidth);
+
+        const int panicW = juce::roundToInt(static_cast<float>(cluster.dimensions.panicButtonWidth) * cluster.uiScale);
+        const int rightPad = juce::roundToInt(static_cast<float>(cluster.dimensions.rightPadding) * cluster.uiScale);
+        const int panicX = cluster.boundsRight - rightPad - panicW;
+        cluster.panic.setBounds(panicX, cluster.metrics.controlY, panicW, cluster.metrics.controlHeightPx);
+        cluster.panic.setUiScale(cluster.uiScale);
+    }
 }
 
 void HeaderPanel::resized()
@@ -168,7 +221,7 @@ void HeaderPanel::resized()
     PacketPlacer placer(metrics.contentStartX, metrics, uiScale_);
 
     placer.placeLed(instrumentActivityLed_);
-    placer.placeLabel(keyboardFromLabel_, metrics.keyboardFromLabelWidth);
+    placer.placeLabel(keyboardFromLabel_, metrics.keyboardFromLabelWidth, metrics.keyboardFromLabelToComboGap);
     placer.placeCombo(keyboardFromComboBox_, metrics.portComboWidth);
     placer.endPacket();
 
@@ -178,13 +231,13 @@ void HeaderPanel::resized()
     placer.endPacket();
 
     placer.placeLed(midiToActivityLed_);
-    placer.placeLabel(midiToLabel_, metrics.midiToLabelWidth);
+    placer.placeLabel(midiToLabel_, metrics.midiToLabelWidth, metrics.labelToControlGap);
     placer.placeCombo(midiToComboBox_, metrics.portComboWidth);
     placer.endPacket();
 
     if (!isPluginMode_)
     {
-        placer.placeLabel(audioFromLabel_, metrics.audioFromLabelWidth);
+        placer.placeLabel(audioFromLabel_, metrics.audioFromLabelWidth, metrics.audioFromLabelToComboGap);
         placer.placeCombo(audioFromComboBox_, metrics.portComboWidth);
         placer.endPacket();
 
@@ -194,12 +247,11 @@ void HeaderPanel::resized()
         placer.endPacket();
     }
 
-    placer.placeButton(undoButton_, metrics.undoButtonWidth);
-    placer.placeButton(redoButton_, metrics.redoButtonWidth);
+    const HeaderActionButtonCluster actionButtons {
+        dimensions_, metrics, uiScale_, getLocalBounds().getRight(), undoButton_, redoButton_, panicButton_ };
 
-    const int panicW = juce::roundToInt(static_cast<float>(dimensions_.panicButtonWidth) * uiScale_);
-    const int rightPad = juce::roundToInt(static_cast<float>(dimensions_.rightPadding) * uiScale_);
-    const int panicX = getLocalBounds().getRight() - rightPad - panicW;
-    panicButton_.setBounds(panicX, metrics.controlY, panicW, metrics.controlHeightPx);
-    panicButton_.setUiScale(uiScale_);
+    if (isPluginMode_)
+        placeActionButtonsFromRight(actionButtons);
+    else
+        placeStandaloneFlowActionButtons(placer, actionButtons);
 }

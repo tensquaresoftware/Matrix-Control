@@ -150,9 +150,9 @@ C’est l’étape la plus importante. Tant que le synthé n’est pas reconnu, 
 
 | Libellé à l’écran | Rôle |
 |-------------------|------|
-| `EDITOR MIDI FROM :` | Ce que le synthé **envoie** à l’éditeur (réponses, contenu d’un patch). Sélectionnez le port branché sur le MIDI OUT du synthé. Si rien n’est choisi : `NO INPUT`. |
-| `MIDI TO :` | Ce que l’éditeur **envoie** au synthé. Sélectionnez le port branché sur le MIDI IN du synthé. Si rien n’est choisi : `NO OUTPUT`. |
-| `KEYBOARD FROM :` | Provenance des notes jouées. En **plugin** : fixé à `HOST` (géré par le DAW), non modifiable. En **Standalone** : vous choisissez un clavier maître MIDI ou un port MIDI. |
+| `MIDI FROM` | Ce que le synthé **envoie** à l’éditeur (réponses, contenu d’un patch). Sélectionnez le port branché sur le MIDI OUT du synthé. Si rien n’est choisi : `NO INPUT`. |
+| `MIDI TO` | Ce que l’éditeur **envoie** au synthé. Sélectionnez le port branché sur le MIDI IN du synthé. Si rien n’est choisi : `NO OUTPUT`. |
+| `KEYBOARD FROM` | Provenance des notes jouées. En **plugin** : fixé à `HOST` (géré par le DAW), non modifiable. En **Standalone** : vous choisissez un clavier maître MIDI ou un port MIDI. |
 
 Des voyants situés à côté des listes clignotent lorsque des messages MIDI circulent.
 
