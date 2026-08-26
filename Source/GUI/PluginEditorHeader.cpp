@@ -68,6 +68,12 @@ void PluginEditor::wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel)
 {
     headerPanel.getUndoButton().onClick = [this]
     {
+        if (isEditorialUndoBlockedByTextFocus())
+            return;
+
+        if (isEditorialUndoBlockedByModalOverlay())
+            return;
+
         if (! pluginProcessor.canPerformEditorialUndo())
             return;
 
@@ -77,6 +83,12 @@ void PluginEditor::wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel)
 
     headerPanel.getRedoButton().onClick = [this]
     {
+        if (isEditorialUndoBlockedByTextFocus())
+            return;
+
+        if (isEditorialUndoBlockedByModalOverlay())
+            return;
+
         if (! pluginProcessor.canPerformEditorialRedo())
             return;
 
