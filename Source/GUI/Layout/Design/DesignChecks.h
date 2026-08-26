@@ -14,6 +14,16 @@ namespace TSS::Design
     static_assert(Panels::Header::kLogoHeight % 4 == 0, "Header logo height must be on the design ÷4 grid");
     static_assert(Panels::Header::kLogoFontHeight % 4 == 0, "Header logo font height must be on the design ÷4 grid");
     static_assert(Panels::Header::kLogoGapAfter % 4 == 0, "Header logo gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kEditorMidiFromLabelWidth % 4 == 0,
+                  "Header editor MIDI from label width must be on the design ÷4 grid");
+    static_assert(Panels::Header::kInputGainLabelToSliderGap % 4 == 0,
+                  "Header input gain label-to-slider gap must be on the design ÷4 grid");
+    static_assert(Panels::Header::kPanicButtonWidth % 4 == 0,
+                  "Header panic button width must be on the design ÷4 grid");
+    static_assert(Panels::Header::kUndoButtonWidth % 4 == 0,
+                  "Header undo button width must be on the design ÷4 grid");
+    static_assert(Panels::Header::kRedoButtonWidth % 4 == 0,
+                  "Header redo button width must be on the design ÷4 grid");
     static_assert(Panels::Body::kHeight == 728, "BodyPanel height");
     static_assert(Panels::Footer::kHeight == 32, "FooterPanel height");
     static_assert(Panels::Footer::kBandHeight == 24, "Footer column band height");

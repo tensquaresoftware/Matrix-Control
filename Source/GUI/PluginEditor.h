@@ -157,6 +157,7 @@ private:
     SettingsPanel* getSettingsPanelIfOpen();
     void wireSettingsPanel(SettingsPanel& panel);
     void wireHeaderPanel(HeaderPanel& headerPanel);
+    void wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel);
     void restoreSettingsPanelFromState(SettingsPanel& panel);
     void restoreHeaderPanelFromState(HeaderPanel& headerPanel);
     void updateSettingsWindowLayout(float uiScale);

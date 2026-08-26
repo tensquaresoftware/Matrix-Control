@@ -50,6 +50,9 @@ void PluginEditor::HeaderRefreshTimer::timerCallback()
     headerPanel_.getMidiToActivityLed().setLevel(
         tracker.getActivityLevel(Core::MidiActivityTracker::Path::kOutbound));
 
+    headerPanel_.syncEditorialUndoRedoAvailability(processor_.canPerformEditorialUndo(),
+                                                   processor_.canPerformEditorialRedo());
+
     const auto realtimeDepth = processor_.getMidiManager().getRealtimeOutboundDepth();
     if (queuePressureMonitor_.update(realtimeDepth, juce::Time::getMillisecondCounter()))
     {

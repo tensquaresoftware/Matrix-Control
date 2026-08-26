@@ -186,14 +186,15 @@ namespace TSS::Design
             // Half of the former 4 px bottom edge border (removed): nudge content down to re-center.
             inline constexpr int kContentVerticalOffset = 2;
             inline constexpr int kLogoFontHeight = 20;
-            inline constexpr int kLogoGapAfter = 32;
+            inline constexpr int kLogoGapAfter = 28;
             inline constexpr int kLogoPopupColumnWidth = 80;
             inline constexpr int kLeftPadding = 12;
             inline constexpr int kRightPadding = 12;
             inline constexpr int kControlHeight = 20;
             inline constexpr int kGap = 4;
             inline constexpr int kPacketExternalGap = kGap * 4;
-            inline constexpr int kEditorMidiFromLabelWidth = 88;
+            inline constexpr int kEditorMidiFromLabelWidth = 48;
+            inline constexpr int kInputGainLabelToSliderGap = 0;
             inline constexpr int kMidiToLabelWidth = 40;
             inline constexpr int kKeyboardFromLabelWidth = 84;
             inline constexpr int kAudioFromLabelWidth = 64;
@@ -201,7 +202,9 @@ namespace TSS::Design
             inline constexpr int kPortComboBoxWidth = 112;
             inline constexpr int kInputGainSliderWidth = 60;
             inline constexpr int kPeakIndicatorWidth = 12;
-            inline constexpr int kPanicButtonWidth = 56;
+            inline constexpr int kPanicButtonWidth = 36;
+            inline constexpr int kUndoButtonWidth = 36;
+            inline constexpr int kRedoButtonWidth = 36;
         }
 
         namespace Footer

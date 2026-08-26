@@ -190,11 +190,14 @@ namespace
             .keyboardFromLabelWidth = Panels::Header::kKeyboardFromLabelWidth,
             .audioFromLabelWidth = Panels::Header::kAudioFromLabelWidth,
             .inputGainLabelWidth = Panels::Header::kInputGainLabelWidth,
+            .inputGainLabelToSliderGap = Panels::Header::kInputGainLabelToSliderGap,
             .portComboBoxWidth = Panels::Header::kPortComboBoxWidth,
             .inputGainSliderWidth = Panels::Header::kInputGainSliderWidth,
             .peakIndicatorWidth = Panels::Header::kPeakIndicatorWidth,
             .rightPadding = Panels::Header::kRightPadding,
             .panicButtonWidth = Panels::Header::kPanicButtonWidth,
+            .undoButtonWidth = Panels::Header::kUndoButtonWidth,
+            .redoButtonWidth = Panels::Header::kRedoButtonWidth,
         };
     }
 

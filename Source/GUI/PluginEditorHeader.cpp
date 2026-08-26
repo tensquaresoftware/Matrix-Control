@@ -54,12 +54,35 @@ void PluginEditor::wireHeaderPanel(HeaderPanel& headerPanel)
         pluginProcessor.getMidiManager().sendPanic();
     };
 
+    wireHeaderEditorialUndoRedoButtons(headerPanel);
+
 #if JUCE_DEBUG
     headerPanel.onUiTestsToggleRequested = [this]
     {
         setUiElementsTestVisible(!uiElementsTestVisible_);
     };
 #endif
+}
+
+void PluginEditor::wireHeaderEditorialUndoRedoButtons(HeaderPanel& headerPanel)
+{
+    headerPanel.getUndoButton().onClick = [this]
+    {
+        if (! pluginProcessor.canPerformEditorialUndo())
+            return;
+
+        prepareEditorialUndoRedo();
+        pluginProcessor.performEditorialUndo();
+    };
+
+    headerPanel.getRedoButton().onClick = [this]
+    {
+        if (! pluginProcessor.canPerformEditorialRedo())
+            return;
+
+        prepareEditorialUndoRedo();
+        pluginProcessor.performEditorialRedo();
+    };
 }
 
 void PluginEditor::restoreHeaderPanelFromState(HeaderPanel& headerPanel)

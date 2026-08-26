@@ -84,6 +84,14 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
                            inputGainNormalizedFill,
                            inputGainFormatValue})
     , peakIndicator_(dimensions.peakIndicatorWidth, dimensions.controlHeight)
+    , undoButton_(dimensions.undoButtonWidth,
+                   dimensions.controlHeight,
+                   TSS::buttonLookFromSkin(skin),
+                   PluginDisplayNames::HeaderPanel::kUndo)
+    , redoButton_(dimensions.redoButtonWidth,
+                   dimensions.controlHeight,
+                   TSS::buttonLookFromSkin(skin),
+                   PluginDisplayNames::HeaderPanel::kRedo)
     , panicButton_(dimensions.panicButtonWidth,
                    dimensions.controlHeight,
                    TSS::buttonLookFromSkin(skin),
@@ -91,11 +99,7 @@ HeaderPanel::HeaderPanel(TSS::ISkin& skin, const HeaderPanelDimensions& dimensio
 {
     setOpaque(true);
     wireLogoCallbacks();
-    panicButton_.onClick = [this]
-    {
-        if (onPanicRequested)
-            onPanicRequested();
-    };
+    wireActionButtons();
     addChildControls(skin);
     populateMidiPortLists();
     syncPanicEnabledFromMidiToSelection();

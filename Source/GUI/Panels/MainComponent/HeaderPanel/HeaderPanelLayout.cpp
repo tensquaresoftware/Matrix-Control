@@ -4,6 +4,7 @@
 #include "HeaderPanel.h"
 
 #include "GUI/Layout/ScaledLayout.h"
+#include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/Led.h"
@@ -27,9 +28,12 @@ namespace
         float keyboardFromLabelWidth = 0.0f;
         float audioFromLabelWidth = 0.0f;
         float inputGainLabelWidth = 0.0f;
+        float inputGainLabelToSliderGap = 0.0f;
         float portComboWidth = 0.0f;
         float inputGainSliderWidth = 0.0f;
         float peakIndicatorWidth = 0.0f;
+        float undoButtonWidth = 0.0f;
+        float redoButtonWidth = 0.0f;
         int logoX = 0;
         int logoWidth = 0;
         int logoHeight = 0;
@@ -55,9 +59,12 @@ namespace
             m.keyboardFromLabelWidth = static_cast<float>(dimensions.keyboardFromLabelWidth) * sf;
             m.audioFromLabelWidth = static_cast<float>(dimensions.audioFromLabelWidth) * sf;
             m.inputGainLabelWidth = static_cast<float>(dimensions.inputGainLabelWidth) * sf;
+            m.inputGainLabelToSliderGap = static_cast<float>(dimensions.inputGainLabelToSliderGap) * sf;
             m.portComboWidth = static_cast<float>(dimensions.portComboBoxWidth) * sf;
             m.inputGainSliderWidth = static_cast<float>(dimensions.inputGainSliderWidth) * sf;
             m.peakIndicatorWidth = static_cast<float>(dimensions.peakIndicatorWidth) * sf;
+            m.undoButtonWidth = static_cast<float>(dimensions.undoButtonWidth) * sf;
+            m.redoButtonWidth = static_cast<float>(dimensions.redoButtonWidth) * sf;
             m.ledSize = static_cast<float>(dimensions.ledSize) * sf;
             m.ledSizePx = juce::roundToInt(m.ledSize);
             m.ledY = bounds.getY() + (bounds.getHeight() - m.ledSizePx) / 2 + contentYOffset;
@@ -88,11 +95,11 @@ namespace
         {
         }
 
-        void placeLabel(TSS::Label& label, float labelWidth)
+        void placeLabel(TSS::Label& label, float labelWidth, float followingGap = -1.0f)
         {
             label.setBounds(juce::roundToInt(x_), y_, juce::roundToInt(labelWidth), h_);
             label.setUiScale(uiScale_);
-            x_ += labelWidth + gap_;
+            x_ += labelWidth + (followingGap >= 0.0f ? followingGap : gap_);
         }
 
         void placeCombo(TSS::ComboBox& combo, float comboWidth)
@@ -121,6 +128,13 @@ namespace
             peak.setBounds(juce::roundToInt(x_), y_, juce::roundToInt(peakWidth), h_);
             peak.setUiScale(uiScale_);
             x_ += peakWidth + gap_;
+        }
+
+        void placeButton(TSS::Button& button, float buttonWidth)
+        {
+            button.setBounds(juce::roundToInt(x_), y_, juce::roundToInt(buttonWidth), h_);
+            button.setUiScale(uiScale_);
+            x_ += buttonWidth + gap_;
         }
 
         void endPacket()
@@ -174,11 +188,14 @@ void HeaderPanel::resized()
         placer.placeCombo(audioFromComboBox_, metrics.portComboWidth);
         placer.endPacket();
 
-        placer.placeLabel(inputGainLabel_, metrics.inputGainLabelWidth);
+        placer.placeLabel(inputGainLabel_, metrics.inputGainLabelWidth, metrics.inputGainLabelToSliderGap);
         placer.placeSlider(inputGainSlider_, metrics.inputGainSliderWidth);
         placer.placePeak(peakIndicator_, metrics.peakIndicatorWidth);
         placer.endPacket();
     }
+
+    placer.placeButton(undoButton_, metrics.undoButtonWidth);
+    placer.placeButton(redoButton_, metrics.redoButtonWidth);
 
     const int panicW = juce::roundToInt(static_cast<float>(dimensions_.panicButtonWidth) * uiScale_);
     const int rightPad = juce::roundToInt(static_cast<float>(dimensions_.rightPadding) * uiScale_);

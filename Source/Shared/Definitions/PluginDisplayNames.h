@@ -13,7 +13,7 @@ namespace PluginDisplayNames
 
     namespace HeaderPanel
     {
-        constexpr const char* kEditorMidiFromLabel = "EDITOR MIDI FROM :";
+        constexpr const char* kEditorMidiFromLabel = "MIDI FROM :";
         constexpr const char* kMidiToLabel         = "MIDI TO :";
         constexpr const char* kKeyboardFromLabel   = "KEYBOARD FROM :";
         constexpr const char* kAudioFromLabel      = "AUDIO FROM :";
@@ -27,6 +27,8 @@ namespace PluginDisplayNames
         constexpr const char* kLogoSkinSection     = "SKIN";
         constexpr const char* kLogoUiScaleSection  = "UI SCALE";
         constexpr const char* kPanic               = "PANIC";
+        constexpr const char* kUndo                = "UNDO";
+        constexpr const char* kRedo                = "REDO";
     }
 
     namespace FooterPanel

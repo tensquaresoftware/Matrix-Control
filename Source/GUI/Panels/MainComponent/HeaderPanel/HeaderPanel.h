@@ -73,6 +73,7 @@ public:
     void setPanicQueuePressureAlert(bool active);
     void setPanicMidiOutputAvailable(bool available);
     void syncPanicEnabledFromMidiToSelection();
+    void syncEditorialUndoRedoAvailability(bool canUndo, bool canRedo);
 
     TSS::ComboBox& getMidiFromComboBox() { return midiFromComboBox_; }
     TSS::ComboBox& getMidiToComboBox() { return midiToComboBox_; }
@@ -83,11 +84,14 @@ public:
     TSS::ComboBox& getAudioFromComboBox() { return audioFromComboBox_; }
     TSS::Slider& getInputGainSlider() { return inputGainSlider_; }
     TSS::PeakIndicator& getPeakIndicator() { return peakIndicator_; }
+    TSS::Button& getUndoButton() { return undoButton_; }
+    TSS::Button& getRedoButton() { return redoButton_; }
     TSS::Button& getPanicButton() { return panicButton_; }
 
 private:
     void showLogoPopup();
     void wireLogoCallbacks();
+    void wireActionButtons();
     void addChildControls(TSS::ISkin& skin);
     void applyPanicButtonLook();
 
@@ -125,6 +129,8 @@ private:
     TSS::Label inputGainLabel_;
     TSS::Slider inputGainSlider_;
     TSS::PeakIndicator peakIndicator_;
+    TSS::Button undoButton_;
+    TSS::Button redoButton_;
     TSS::Button panicButton_;
 
     std::vector<juce::String> midiFromPortIdentifiers_;

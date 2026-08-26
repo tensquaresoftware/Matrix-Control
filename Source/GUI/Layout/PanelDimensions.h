@@ -31,11 +31,14 @@ struct HeaderPanelDimensions
     int keyboardFromLabelWidth;
     int audioFromLabelWidth;
     int inputGainLabelWidth;
+    int inputGainLabelToSliderGap;
     int portComboBoxWidth;
     int inputGainSliderWidth;
     int peakIndicatorWidth;
     int rightPadding;
     int panicButtonWidth;
+    int undoButtonWidth;
+    int redoButtonWidth;
 };
 
 struct FooterPanelDimensions

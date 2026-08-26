@@ -35,6 +35,18 @@ void HeaderPanel::wireLogoCallbacks()
     };
 }
 
+void HeaderPanel::wireActionButtons()
+{
+    panicButton_.onClick = [this]
+    {
+        if (onPanicRequested)
+            onPanicRequested();
+    };
+
+    undoButton_.setEnabled(false);
+    redoButton_.setEnabled(false);
+}
+
 void HeaderPanel::addChildControls(TSS::ISkin& skin)
 {
     addAndMakeVisible(logo_);
@@ -64,6 +76,8 @@ void HeaderPanel::addChildControls(TSS::ISkin& skin)
     addAndMakeVisible(inputGainSlider_);
     peakIndicator_.setSkin(skin);
     addAndMakeVisible(peakIndicator_);
+    addAndMakeVisible(undoButton_);
+    addAndMakeVisible(redoButton_);
     addAndMakeVisible(panicButton_);
 }
 
@@ -120,5 +134,13 @@ void HeaderPanel::setSkin(TSS::ISkin& skin)
     inputGainLabel_.setLook(TSS::darkPanelLabelLookFromSkin(skin));
     inputGainSlider_.setLook(TSS::sliderLookFromSkin(skin));
     peakIndicator_.setSkin(skin);
+    undoButton_.setLook(TSS::buttonLookFromSkin(skin));
+    redoButton_.setLook(TSS::buttonLookFromSkin(skin));
     applyPanicButtonLook();
+}
+
+void HeaderPanel::syncEditorialUndoRedoAvailability(bool canUndo, bool canRedo)
+{
+    undoButton_.setEnabled(canUndo);
+    redoButton_.setEnabled(canRedo);
 }
