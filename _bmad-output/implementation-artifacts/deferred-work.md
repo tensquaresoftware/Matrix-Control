@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: code review of commit d8e20d0 — editorial undo MIDI resync + stack depth (2026-08-26)
+
+- **Tests sur le vrai `PluginProcessor`** — la politique MIDI editorial (quiet window, coalesce cancel, ordre resync/flush) est vérifiée via `EditorialUndoMidiHarness` dupliqué, pas via `PluginProcessor::performEditorialUndo()` ; une régression production pourrait repasser inaperçue malgré le smoke MIDI Monitor validé manuellement.
+- **Limites undo production non épinglées** — `fullApvtsLayoutWithProductionUndoLimitsAllowsThreeSequentialUndos` injecte `(100, 100)` dans le harness ; un revert de la ligne `PluginProcessor.cpp` ne ferait pas échouer les tests.
+- **Params master absents des tests MIDI editorial** — `EditorialUndoMidiHarness` n’exerce pas `suppressMasterParameterSysEx_` ni `apvtsMasterMapper` dans le resync ; branche master non couverte par les nouveaux tests.
+- **Doc `undo-policy.md` incomplète** — pas de scénarios MIDI dans la edge matrix ; pas de doc du couplage `setMaxNumberOfStoredUnits(max, minTransactionsToKeep)` ; pas de note sur le blocage granular SysEx pendant la fenêtre quiet ~500 ms après undo/redo.
+- **Test d’éviction à 101 transactions** — contrainte SPEC « 100 transactions avec éviction du plus ancien » non vérifiée par ce commit (hors périmètre du bugfix 3-undo).
+
 ## Deferred from: code review of spec-undo-redo-patch-editing epic transversal (2026-08-24)
 
 - Master-parameter editorial undo/redo has no `UndoManager*` test coverage (CAP-1 master scope).
