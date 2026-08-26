@@ -1,3 +1,4 @@
+#include <bitset>
 #include <memory>
 #include <unordered_set>
 
