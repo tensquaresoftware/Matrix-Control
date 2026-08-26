@@ -78,7 +78,8 @@ PluginProcessor::PluginProcessor()
     createSysExDispatchers();
     createInitAndFileServices();
     createActionSubsystem();
-    undoManager_.setMaxNumberOfStoredUnits(PluginProcessorInternal::kEditorialUndoMaxStoredUnits, 1);
+    undoManager_.setMaxNumberOfStoredUnits(PluginProcessorInternal::kEditorialUndoMaxStoredUnits,
+                                           PluginProcessorInternal::kEditorialUndoMaxStoredUnits);
     finishConstructionSetup();
 }
 

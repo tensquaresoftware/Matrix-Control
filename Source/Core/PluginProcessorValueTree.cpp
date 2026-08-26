@@ -151,7 +151,7 @@ void PluginProcessor::dispatchPatchOrMatrixModParameterChange(const juce::String
 
     if (matrixModParameterIds_.count(parameterId) > 0)
     {
-        if (suppressMatrixModParameterSysEx_)
+        if (suppressMatrixModParameterSysEx_ || isEditorialResyncGranularMidiQuiet())
             return;
 
         apvtsPatchMapper_->apvtsToBuffer();
@@ -159,7 +159,7 @@ void PluginProcessor::dispatchPatchOrMatrixModParameterChange(const juce::String
         return;
     }
 
-    if (suppressPatchParameterSysEx_)
+    if (suppressPatchParameterSysEx_ || isEditorialResyncGranularMidiQuiet())
         return;
 
     apvtsPatchMapper_->apvtsToBuffer();
@@ -171,7 +171,7 @@ void PluginProcessor::dispatchMasterParameterChange(const juce::String& paramete
     if (masterParameterIds_.count(parameterId) == 0)
         return;
 
-    if (suppressMasterParameterSysEx_)
+    if (suppressMasterParameterSysEx_ || isEditorialResyncGranularMidiQuiet())
         return;
 
     apvtsMasterMapper_->apvtsToBuffer();
@@ -283,18 +283,28 @@ bool PluginProcessor::performEditorialUndo()
     if (! canPerformEditorialUndo())
         return false;
 
+    beginEditorialResyncGranularMidiQuietPeriod();
+
+    if (matrixModSysExCoalesceTimer_ != nullptr)
+        matrixModSysExCoalesceTimer_->cancelPending();
+
     suppressPatchParameterSysEx_ = true;
     suppressMatrixModParameterSysEx_ = true;
     suppressMasterParameterSysEx_ = true;
 
     const bool ok = undoManager_.undo();
 
+    if (ok)
+        resyncSynthAfterEditorialUndoRedo();
+
+    PluginProcessorInternal::flushDeferredApvtsParameterSync(apvts);
+
+    if (matrixModSysExCoalesceTimer_ != nullptr)
+        matrixModSysExCoalesceTimer_->cancelPending();
+
     suppressPatchParameterSysEx_ = false;
     suppressMatrixModParameterSysEx_ = false;
     suppressMasterParameterSysEx_ = false;
-
-    if (ok)
-        resyncSynthAfterEditorialUndoRedo();
 
     return ok;
 }
@@ -304,18 +314,28 @@ bool PluginProcessor::performEditorialRedo()
     if (! canPerformEditorialRedo())
         return false;
 
+    beginEditorialResyncGranularMidiQuietPeriod();
+
+    if (matrixModSysExCoalesceTimer_ != nullptr)
+        matrixModSysExCoalesceTimer_->cancelPending();
+
     suppressPatchParameterSysEx_ = true;
     suppressMatrixModParameterSysEx_ = true;
     suppressMasterParameterSysEx_ = true;
 
     const bool ok = undoManager_.redo();
 
+    if (ok)
+        resyncSynthAfterEditorialUndoRedo();
+
+    PluginProcessorInternal::flushDeferredApvtsParameterSync(apvts);
+
+    if (matrixModSysExCoalesceTimer_ != nullptr)
+        matrixModSysExCoalesceTimer_->cancelPending();
+
     suppressPatchParameterSysEx_ = false;
     suppressMatrixModParameterSysEx_ = false;
     suppressMasterParameterSysEx_ = false;
-
-    if (ok)
-        resyncSynthAfterEditorialUndoRedo();
 
     return ok;
 }
@@ -336,6 +356,18 @@ void PluginProcessor::resyncSynthAfterEditorialUndoRedo()
     midiManager->sendFullPatchForAudition(patchModel_->data(),
                                           static_cast<juce::uint8>(patchNumber),
                                           limits.hasBankConcept());
+}
+
+void PluginProcessor::beginEditorialResyncGranularMidiQuietPeriod()
+{
+    editorialResyncGranularMidiQuietUntilMs_ =
+        juce::Time::getMillisecondCounter()
+        + static_cast<juce::uint32>(PluginProcessorInternal::kEditorialUndoRedoGranularMidiQuietMs);
+}
+
+bool PluginProcessor::isEditorialResyncGranularMidiQuiet() const
+{
+    return juce::Time::getMillisecondCounter() < editorialResyncGranularMidiQuietUntilMs_;
 }
 
 void PluginProcessor::establishEditorialCheckpoint()

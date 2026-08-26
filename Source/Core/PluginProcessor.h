@@ -289,6 +289,12 @@ private:
                 startTimer(kCoalesceDelayMs);
         }
 
+        void cancelPending() noexcept
+        {
+            stopTimer();
+            pendingBuses_.reset();
+        }
+
     private:
         void timerCallback() override
         {
@@ -388,6 +394,8 @@ private:
     void dispatchMutatorHistorySelectionChange(const juce::String& parameterId);
     void handleDeviceTypePropertyChange(const juce::String& propertyName);
     void resyncSynthAfterEditorialUndoRedo();
+    void beginEditorialResyncGranularMidiQuietPeriod();
+    bool isEditorialResyncGranularMidiQuiet() const;
     void initializeClipboardPasteEnabledProperties();
     void refreshClipboardPasteEnabledProperties();
     void initializeClipboardFeedbackProperties();
@@ -471,6 +479,7 @@ private:
     bool suppressPatchParameterSysEx_ { false };
     bool suppressPatchSelectionMidiSync_ { false };
     bool suppressMutatorHistorySelectionDebounce_ { false };
+    juce::uint32 editorialResyncGranularMidiQuietUntilMs_ { 0 };
     bool developmentLoggingStarted_ { false };
     std::unique_ptr<DeferredMidiPortSyncTimer> deferredMidiPortSyncTimer_;
     juce::MidiDeviceListConnection midiDeviceListConnection_;

@@ -102,9 +102,9 @@ Treat as new baseline — stack cleared, no redo into pre-checkpoint state:
 
 ## MIDI resync after undo/redo
 
-- APVTS UndoManager restores parameter values → existing `valueTreePropertyChanged` → `apvtsToBuffer()` → SysEx dispatch.
-- Respect existing `suppressPatchParameterSysEx_`, `suppressMatrixModParameterSysEx_`, `suppressMasterParameterSysEx_` during bulk internal restore if undo batches many params.
-- Matrix Mod coalesce behavior must not regress (Story 2.10 reorder path).
+- Editorial undo/redo (`performEditorialUndo` / `performEditorialRedo`): begin a ~500 ms granular-MIDI quiet window (`kEditorialUndoRedoGranularMidiQuietMs`), cancel any pending Matrix Mod coalesce timer, keep all `suppress*` flags true through `undo()`/`redo()`, `resyncSynthAfterEditorialUndoRedo()` (full patch via `sendFullPatchForAudition` — 0x0D on Matrix-1000), and `flushDeferredApvtsParameterSync(apvts)` (`copyState()` while suppress still active), cancel coalesce again, then clear suppress. `dispatchPatchOrMatrixModParameterChange` / `dispatchMasterParameterChange` honour the quiet window so deferred APVTS flushes and coalesce cannot emit 0x06 / 0x0B / 0x03 after the resync.
+- Live Matrix Mod edits (outside editorial undo/redo): unchanged — coalesced 0x0B per bus (~40 ms).
+- Bulk paths (init module, paste module, Matrix Mod reorder): existing suppress + explicit dispatch — no regression (Story 2.10 reorder path).
 
 ## User manual
 

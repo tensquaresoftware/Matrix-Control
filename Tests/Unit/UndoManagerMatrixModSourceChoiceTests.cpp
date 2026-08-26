@@ -1,8 +1,11 @@
+#include <limits>
 #include <memory>
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_core/juce_core.h>
 
+#include "Core/Factories/ApvtsFactory.h"
+#include "Core/PluginProcessorInternal.h"
 #include "GUI/Helpers/ApvtsUndoableParameterAttachments.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -73,10 +76,13 @@ void populateMatrixModSourceCombo(juce::ComboBox& comboBox)
 class MatrixModSourceHarness : public juce::AudioProcessor
 {
 public:
-    explicit MatrixModSourceHarness(juce::AudioProcessorValueTreeState::ParameterLayout layout)
+    explicit MatrixModSourceHarness(juce::AudioProcessorValueTreeState::ParameterLayout layout,
+                                    int maxStoredUnits = std::numeric_limits<int>::max(),
+                                    int minTransactionsToKeep = 1)
         : juce::AudioProcessor(BusesProperties())
         , apvts(*this, &undoManager, "P", std::move(layout))
     {
+        undoManager.setMaxNumberOfStoredUnits(maxStoredUnits, minTransactionsToKeep);
     }
 
     MatrixModSourceHarness()
@@ -155,6 +161,7 @@ public:
         undoableComboBoxAttachmentRecordsUndoAfterSelection();
         undoableComboBoxAttachmentRecordsUndoAfterPopupStyleSelection();
         threeBusSourceAttachmentsAllowThreeUndos();
+        fullApvtsLayoutWithProductionUndoLimitsAllowsThreeSequentialUndos();
         threePopupStyleBusSelectionsAllowThreeUndos();
         undoableSliderAttachmentRecordsOneTransactionPerDragSession();
         notifyingHostWithFlushRecordsUndoAfterCompleteGesture();
@@ -195,6 +202,54 @@ private:
 
         harness.undoManager.undo();
         expectEquals(harness.readSourceIndex(), 0);
+    }
+
+    void fullApvtsLayoutWithProductionUndoLimitsAllowsThreeSequentialUndos()
+    {
+        beginTest("fullApvtsLayoutWithProductionUndoLimitsAllowsThreeSequentialUndos");
+
+        MatrixModSourceHarness harness(
+            ApvtsFactory::createParameterLayout(),
+            PluginProcessorInternal::kEditorialUndoMaxStoredUnits,
+            PluginProcessorInternal::kEditorialUndoMaxStoredUnits);
+        namespace BusIds = PluginIDs::MatrixModulationSection::ModulationBus::ParameterWidgets;
+
+        const juce::String sourceIds[] = { BusIds::kBus0Source, BusIds::kBus1Source, BusIds::kBus2Source };
+        juce::ComboBox comboBoxes[3];
+        std::unique_ptr<TSS::ApvtsUndoableComboBoxAttachment> attachments[3];
+
+        for (int bus = 0; bus < 3; ++bus)
+        {
+            populateMatrixModSourceCombo(comboBoxes[bus]);
+            attachments[bus] = std::make_unique<TSS::ApvtsUndoableComboBoxAttachment>(
+                harness.apvts,
+                sourceIds[bus],
+                comboBoxes[bus]);
+        }
+
+        for (int bus = 0; bus < 3; ++bus)
+        {
+            comboBoxes[bus].setSelectedItemIndex(bus + 1, juce::sendNotificationSync);
+            expectEquals(harness.readSourceIndex(sourceIds[bus]), bus + 1);
+            expect(harness.undoManager.canUndo());
+        }
+
+        expectEquals(static_cast<int>(harness.undoManager.getUndoDescriptions().size()), 3);
+        expect(harness.undoManager.getNumberOfUnitsTakenUpByStoredCommands()
+               > PluginProcessorInternal::kEditorialUndoMaxStoredUnits);
+
+        harness.undoManager.undo();
+        expectEquals(harness.readSourceIndex(sourceIds[2]), 0);
+        expect(harness.undoManager.canUndo());
+        expect(harness.undoManager.canRedo());
+
+        harness.undoManager.undo();
+        expectEquals(harness.readSourceIndex(sourceIds[1]), 0);
+        expect(harness.undoManager.canUndo());
+
+        harness.undoManager.undo();
+        expectEquals(harness.readSourceIndex(sourceIds[0]), 0);
+        expect(! harness.undoManager.canUndo());
     }
 
     void threeBusSourceAttachmentsAllowThreeUndos()

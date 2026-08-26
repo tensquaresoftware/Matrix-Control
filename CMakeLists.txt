@@ -480,6 +480,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerEditorialUndoApiTests.cpp
         Tests/Unit/EditorialUndoRedoShortcutTests.cpp
         Tests/Unit/UndoManagerMatrixModSourceChoiceTests.cpp
+        Tests/Unit/UndoManagerEditorialUndoMidiTests.cpp
         Tests/Unit/UndoManagerCheckpointPolicyTests.cpp
         Tests/Unit/UndoManagerDirtyStateTests.cpp
         Tests/Unit/UndoManagerSliderArrowTests.cpp

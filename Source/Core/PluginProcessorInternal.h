@@ -82,5 +82,14 @@ namespace PluginProcessorInternal
 #endif
     }
 
-    inline constexpr int kEditorialUndoMaxStoredUnits = 100;
+    inline constexpr int kEditorialUndoMaxStoredUnits = 100; // transaction depth (see undo-policy.md)
+
+    // Covers APVTS deferred flush (20–500 ms), Matrix Mod coalesce (40 ms), and SysEx queue delay.
+    inline constexpr int kEditorialUndoRedoGranularMidiQuietMs = 500;
+
+    inline void flushDeferredApvtsParameterSync(juce::AudioProcessorValueTreeState& apvts)
+    {
+        // setValueNotifyingHost can queue ValueTree sync on APVTS's internal timer; copyState() forces flush.
+        (void) apvts.copyState();
+    }
 }
