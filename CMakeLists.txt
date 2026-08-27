@@ -485,6 +485,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/UndoManagerDirtyStateTests.cpp
         Tests/Unit/UndoManagerSliderArrowTests.cpp
         Tests/Unit/PatchParameterSysExDispatcherTests.cpp
+        Tests/Unit/PatchParameterSysExComplianceTests.cpp
+        Tests/Unit/MatrixModBusParameterSysExComplianceTests.cpp
+        Tests/Unit/MasterParameterSysExComplianceTests.cpp
         Tests/Unit/EditorPathTests.cpp
         Tests/Unit/AudioPassthroughProcessorTests.cpp
         Tests/Unit/AudioInputSourceCatalogTests.cpp
