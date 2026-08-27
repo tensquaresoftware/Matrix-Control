@@ -10,6 +10,7 @@
 #include "Core/Init/InitDefaults.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "SysExWireCompliance.h"
 
 /**
  * Unit tests for SysExEncoder
@@ -29,7 +30,9 @@ public:
         testRequestMessageEncoding();
         testChecksumCalculation();
         testRemoteParameterEditEncoding();
+        testRemoteParameterEditDangerousPackedBytes();
         testMatrixModBusEditEncoding();
+        testMatrixModBusEditDangerousPackedBytes();
         testSetBankEncoding();
         testStoreEditBufferEncoding();
         testUnlockBankEncoding();
@@ -214,12 +217,42 @@ private:
             expect(maskedData[4] == static_cast<juce::uint8>(paramWithHighBit & 0x7F));
         }
 
-        beginTest("Remote Parameter Edit (0x06) — packed value above 127 passed through");
+        beginTest("Remote Parameter Edit (0x06) — packed signed values masked to 7 bits");
         {
-            const juce::uint8 signedPackedByte = 251;
-            auto packed = encoder.encodeRemoteParameterEdit(1, signedPackedByte);
-            const auto* packedData = static_cast<const juce::uint8*>(packed.getData());
-            expect(packedData[5] == signedPackedByte);
+            // Patch-RAM packing: -5 → 0xFB, -63 → 0xC1, -9 → 0xF7 (EOX if sent raw).
+            // On the wire the synth expects bit 6 as sign (0x7B / 0x41 / 0x77).
+            auto packedNeg5 = encoder.encodeRemoteParameterEdit(1, 251);
+            expect(static_cast<const juce::uint8*>(packedNeg5.getData())[5] == 0x7B);
+
+            auto packedNeg63 = encoder.encodeRemoteParameterEdit(66, 0xC1);
+            expect(static_cast<const juce::uint8*>(packedNeg63.getData())[5] == 0x41);
+
+            auto packedNeg9 = encoder.encodeRemoteParameterEdit(66, 0xF7);
+            const auto* neg9 = static_cast<const juce::uint8*>(packedNeg9.getData());
+            expect(neg9[5] == 0x77);
+            expect(neg9[6] == SysExConstants::kSysExEnd);
+            expectEquals(static_cast<int>(packedNeg9.getSize()), 7);
+        }
+    }
+
+    void testRemoteParameterEditDangerousPackedBytes()
+    {
+        beginTest("Remote Parameter Edit (0x06) — all high-bit packed bytes masked on wire");
+
+        SysExEncoder encoder;
+        const juce::uint8 param = 1;
+
+        for (int raw = 0x80; raw <= 0xFF; ++raw)
+        {
+            const auto packedRaw = static_cast<juce::uint8>(raw);
+            const juce::uint8 expectedWire = static_cast<juce::uint8>(packedRaw & 0x7F);
+            auto message = encoder.encodeRemoteParameterEdit(param, packedRaw);
+
+            expectEquals(static_cast<int>(message.getSize()), 7);
+            const auto* data = static_cast<const juce::uint8*>(message.getData());
+            expect(data[5] == expectedWire);
+            expect(data[6] == SysExConstants::kSysExEnd);
+            expect(SysExWireCompliance::assertValidSysExDataBytes(message));
         }
     }
 
@@ -248,12 +281,52 @@ private:
         expect(data[7] == destination);
         expect(data[8] == SysExConstants::kSysExEnd);
 
-        beginTest("Matrix Mod Bus Edit (0x0B) — signed amount above 127 passed through");
+        beginTest("Matrix Mod Bus Edit (0x0B) — signed amount masked to 7 bits");
         {
-            const juce::uint8 signedPackedByte = 251;
+            const juce::uint8 signedPackedByte = 251; // -5 as 8-bit TC → 0x7B on the wire
             auto signedMessage = encoder.encodeMatrixModBusEdit(0, 1, signedPackedByte, 2);
             const auto* signedData = static_cast<const juce::uint8*>(signedMessage.getData());
-            expect(signedData[6] == signedPackedByte);
+            expect(signedData[6] == 0x7B);
+        }
+    }
+
+    void testMatrixModBusEditDangerousPackedBytes()
+    {
+        beginTest("Matrix Mod Bus Edit (0x0B) — all high-bit fields masked on wire");
+
+        SysExEncoder encoder;
+        const juce::uint8 safeBus = 0;
+        const juce::uint8 safeSource = 1;
+        const juce::uint8 safeAmount = 2;
+        const juce::uint8 safeDest = 3;
+
+        for (int raw = 0x80; raw <= 0xFF; ++raw)
+        {
+            const auto packedRaw = static_cast<juce::uint8>(raw);
+            const juce::uint8 expectedWire = static_cast<juce::uint8>(packedRaw & 0x7F);
+
+            auto busMessage = encoder.encodeMatrixModBusEdit(packedRaw, safeSource, safeAmount, safeDest);
+            expectEquals(static_cast<int>(busMessage.getSize()),
+                         static_cast<int>(SysExConstants::kMatrixModBusMessageLength));
+            const auto* busData = static_cast<const juce::uint8*>(busMessage.getData());
+            expect(busData[4] == expectedWire);
+            expect(busData[8] == SysExConstants::kSysExEnd);
+            expect(SysExWireCompliance::assertValidSysExDataBytes(busMessage));
+
+            auto sourceMessage = encoder.encodeMatrixModBusEdit(safeBus, packedRaw, safeAmount, safeDest);
+            const auto* sourceData = static_cast<const juce::uint8*>(sourceMessage.getData());
+            expect(sourceData[5] == expectedWire);
+            expect(SysExWireCompliance::assertValidSysExDataBytes(sourceMessage));
+
+            auto amountMessage = encoder.encodeMatrixModBusEdit(safeBus, safeSource, packedRaw, safeDest);
+            const auto* amountData = static_cast<const juce::uint8*>(amountMessage.getData());
+            expect(amountData[6] == expectedWire);
+            expect(SysExWireCompliance::assertValidSysExDataBytes(amountMessage));
+
+            auto destMessage = encoder.encodeMatrixModBusEdit(safeBus, safeSource, safeAmount, packedRaw);
+            const auto* destData = static_cast<const juce::uint8*>(destMessage.getData());
+            expect(destData[7] == expectedWire);
+            expect(SysExWireCompliance::assertValidSysExDataBytes(destMessage));
         }
     }
 

@@ -126,11 +126,12 @@ private:
         dispatcher.dispatch(modDesc->parameterId);
 
         const size_t offset = Core::PackedFieldCodec::safeOffset(modDesc->sysExOffset, Core::PatchModel::kBufferSize);
-        const juce::uint8 expectedPacked = model.data()[offset];
+        const juce::uint8 expectedPackedOnWire =
+            static_cast<juce::uint8>(model.data()[offset] & 0x7F);
 
         auto msg = queue.dequeue();
         expect(msg.has_value());
-        expect(sysExMatchesRemoteEdit(msg->sysExData, 1, expectedPacked));
+        expect(sysExMatchesRemoteEdit(msg->sysExData, 1, expectedPackedOnWire));
         expect(queue.isEmpty());
     }
 

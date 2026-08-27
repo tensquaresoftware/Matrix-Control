@@ -81,6 +81,7 @@ private:
         const size_t amountOffset = Core::PackedFieldCodec::safeOffset(intParams[0].sysExOffset,
                                                                        Core::PatchModel::kBufferSize);
         const juce::uint8 expectedAmount = model.data()[amountOffset];
+        const juce::uint8 expectedAmountOnWire = static_cast<juce::uint8>(expectedAmount & 0x7F);
         const juce::uint8 expectedSource = static_cast<juce::uint8>(5);
         const juce::uint8 expectedDestination = static_cast<juce::uint8>(12);
 
@@ -108,7 +109,7 @@ private:
             auto msg = queue.dequeue();
             expect(msg.has_value());
             expect(msg->sysExData == expectedMessage);
-            expect(sysExMatchesMatrixModBusEdit(msg->sysExData, 0, expectedSource, expectedAmount, expectedDestination));
+            expect(sysExMatchesMatrixModBusEdit(msg->sysExData, 0, expectedSource, expectedAmountOnWire, expectedDestination));
         }
 
         expect(queue.isEmpty());

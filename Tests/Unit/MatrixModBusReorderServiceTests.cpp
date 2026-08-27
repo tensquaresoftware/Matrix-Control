@@ -194,7 +194,8 @@ private:
         expect(firstMsg.has_value());
         expect(secondMsg.has_value());
         expect(sysExMatchesMatrixModBusEdit(firstMsg->sysExData, 0, 2, 31, 7));
-        expect(sysExMatchesMatrixModBusEdit(secondMsg->sysExData, 7, 5, expectedAmountBus7, 12));
+        expect(sysExMatchesMatrixModBusEdit(secondMsg->sysExData, 7, 5,
+            static_cast<juce::uint8>(expectedAmountBus7 & 0x7F), 12));
         expect(harness.queue.isEmpty());
     }
 
@@ -427,7 +428,7 @@ private:
         expect(secondMsg.has_value());
         expect(sysExMatchesMatrixModBusEdit(firstMsg->sysExData, 0, 1, 22, 3));
         expect(sysExMatchesMatrixModBusEdit(secondMsg->sysExData, 1, 4,
-            readModelByte(harness.model, bus1Amount.sysExOffset), 9));
+            static_cast<juce::uint8>(readModelByte(harness.model, bus1Amount.sysExOffset) & 0x7F), 9));
         expect(harness.queue.isEmpty());
     }
 };
