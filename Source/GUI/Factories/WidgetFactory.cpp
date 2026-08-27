@@ -28,14 +28,10 @@ std::unique_ptr<TSS::Slider> WidgetFactory::createSliderFromDescriptor(
         height,
         TSS::sliderLookFromSkin(skin),
         TSS::SliderConfig{
-            static_cast<double>(desc->minValue),
-            static_cast<double>(desc->maxValue),
-            static_cast<double>(desc->defaultValue),
-            1.0,
-            {},
-            {},
-            {},
-            {}});
+            .minValue = static_cast<double>(desc->minValue),
+            .maxValue = static_cast<double>(desc->maxValue),
+            .defaultValue = static_cast<double>(desc->defaultValue),
+            .step = 1.0});
     return slider;
 }
 

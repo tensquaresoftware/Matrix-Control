@@ -1205,3 +1205,20 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-cap-3-undo-redo-keyboard-shortcuts.md`
   summary: Escape overlay blocking list is wider than the editorial-undo modal guard (e.g. Settings / native alerts / popups) — pre-existing asymmetry.
   evidence: Blind Hunter; undo modal guard unchanged in CAP-3; revisit only if UAT shows Cmd+Z leaking through overlays Escape already treats as blocking.
+
+## Deferred from: build spec-vcf-vca-dco-mix-balance-ui (2026-08-27)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
+  summary: Verify the longer "DCO 2 | DCO 1 MIX" ParameterCell label fits without clipping at current Patch Edit label width.
+  evidence: Blind Hunter; Label uses drawText without ellipsis; UAT visual check preferred over layout redesign in this oneshot.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
+  summary: User manual VCF/VCA bullet still says generic "balance des oscillateurs" without the new on-screen label.
+  evidence: Blind Hunter; Documentation/User/manuel-utilisateur.md; docs pass optional after UAT.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
+  summary: ~~No automated or TestSliders harness coverage for reverseHorizontalUi fill and left/right key mapping.~~ **Superseded 2026-08-27**: reverseHorizontalUi removed after UAT; gesture stayed normal.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
+  summary: Parameter IDs remain kBalance / vcfVcaBalance while UI and Oberheim docs say Mix — rename would touch SysEx maps and automation IDs.
+  evidence: Blind Hunter; intentional keep for this UI-only change; unreleased but still a wider chore.

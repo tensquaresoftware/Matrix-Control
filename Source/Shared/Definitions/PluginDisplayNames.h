@@ -520,7 +520,8 @@ namespace PluginDisplayNames
                 constexpr const char* kDco2Frequency  = "DCO 2 FREQUENCY";
                 constexpr const char* kDco2PulseWidth = "DCO 2 PULSE WIDTH";
                 constexpr const char* kDco2WaveShape  = "DCO 2 WAVE SHAPE";
-                constexpr const char* kDco1Dco2Mix    = "DCO 1 | DCO 2 MIX";
+                // Mix polarity (confirmed on hardware): 0 = DCO 2 only, 63 = DCO 1 only.
+                constexpr const char* kDco1Dco2Mix    = "DCO 2 | DCO 1 MIX";
                 constexpr const char* kVcfFmByDco1    = "VCF FM BY DCO 1";
                 constexpr const char* kVcfFrequency   = "VCF FREQUENCY";
                 constexpr const char* kVcfResonance   = "VCF RESONANCE";
@@ -692,7 +693,7 @@ namespace PluginDisplayNames
 
             namespace ParameterWidgets
             {
-                constexpr const char* kBalance                = "BALANCE";
+                constexpr const char* kBalance                = ChoiceLists::ModulationBus::Destination::kDco1Dco2Mix;
                 constexpr const char* kFrequency              = "FREQUENCY";
                 constexpr const char* kFrequencyModByEnv1     = "FREQ < ENV 1";
                 constexpr const char* kFrequencyModByPressure = "FREQ < PRESSURE";
