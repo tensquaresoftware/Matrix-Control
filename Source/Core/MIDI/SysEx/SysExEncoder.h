@@ -27,7 +27,9 @@ public:
                                                       juce::uint8 channel = 0x00);
 
     juce::MemoryBlock encodeRequestMessage(juce::uint8 requestType, juce::uint8 patchNumber = 0) const;
+    // value/amount may be 8-bit packed signed (bit 7 set); both are masked to 7 bits on the wire.
     juce::MemoryBlock encodeRemoteParameterEdit(juce::uint8 parameterNumber, juce::uint8 value) const;
+    // bus/source/amount/destination may carry bit 7 set in RAM; all are masked to 7 bits on the wire.
     juce::MemoryBlock encodeMatrixModBusEdit(juce::uint8 bus,
                                              juce::uint8 source,
                                              juce::uint8 amount,

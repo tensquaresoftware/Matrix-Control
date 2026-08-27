@@ -106,13 +106,17 @@ juce::MemoryBlock SysExEncoder::encodeRequestMessage(juce::uint8 requestType, ju
 
 juce::MemoryBlock SysExEncoder::encodeRemoteParameterEdit(juce::uint8 parameterNumber, juce::uint8 value) const
 {
+    // Packed signed fields are 8-bit two's complement in RAM (bit 7 set when negative).
+    // Remote Edit is a MIDI data byte: keep bit 7 clear; the synth sign-extends bit 6
+    // into bit 7 (Oberheim Matrix-1000 MIDI Spec). Sending raw 0xF7/-9 would EOX early;
+    // 0xFF/-1 would be interpreted as System Reset.
     const juce::uint8 message[] {
         SysExConstants::kSysExStart,
         SysExConstants::kManufacturerIdOberheim,
         SysExConstants::kDeviceIdMatrix1000,
         SysExConstants::Opcode::kRemoteParameterEdit,
         static_cast<juce::uint8>(parameterNumber & 0x7F),
-        value,
+        static_cast<juce::uint8>(value & 0x7F),
         SysExConstants::kSysExEnd
     };
 
@@ -177,15 +181,16 @@ juce::MemoryBlock SysExEncoder::encodeMatrixModBusEdit(juce::uint8 bus,
                                                        juce::uint8 amount,
                                                        juce::uint8 destination) const
 {
+    // Same 7-bit MIDI data rule as Remote Parameter Edit — especially for signed Amount.
     const juce::uint8 message[] {
         SysExConstants::kSysExStart,
         SysExConstants::kManufacturerIdOberheim,
         SysExConstants::kDeviceIdMatrix1000,
         SysExConstants::Opcode::kRemoteParameterEditMatrix,
-        bus,
-        source,
-        amount,
-        destination,
+        static_cast<juce::uint8>(bus & 0x7F),
+        static_cast<juce::uint8>(source & 0x7F),
+        static_cast<juce::uint8>(amount & 0x7F),
+        static_cast<juce::uint8>(destination & 0x7F),
         SysExConstants::kSysExEnd
     };
 
