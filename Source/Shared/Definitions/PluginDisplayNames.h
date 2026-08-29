@@ -1106,6 +1106,8 @@ namespace PluginDisplayNames
             {
                 constexpr const char* kAmount         = "AMOUNT";
                 constexpr const char* kRandom         = "RANDOM";
+                constexpr const char* kMode           = "MODE";
+                constexpr const char* kPitch          = "PITCH";
                 constexpr const char* kHistory        = "HISTORY";
                 constexpr const char* kEmptyHistorySentinel = "<EMPTY>";
                 const juce::String    kHistoryRootSentinel =
@@ -1131,6 +1133,60 @@ namespace PluginDisplayNames
                 constexpr const char* kEnableLfo1           = "L1";
                 constexpr const char* kEnableLfo2           = "L2";
                 constexpr const char* kEnableMatrixMod      = "MM";
+            }
+
+            // MODE / PITCH combo items — ALL CAPS, ordered like Core::MutationMode and
+            // Core::MutationPitchMode so the stored index and the menu row always agree.
+            namespace ChoiceLists
+            {
+                namespace MutationMode
+                {
+                    constexpr const char* kKindred = "KINDRED";
+                    constexpr const char* kDrift   = "DRIFT";
+                    constexpr const char* kWarp    = "WARP";
+                    constexpr const char* kWild    = "WILD";
+
+                    constexpr const char* kAll[] = { kKindred, kDrift, kWarp, kWild };
+
+                    static_assert(sizeof(kAll) / sizeof(kAll[0]) == 4,
+                                  "MODE ChoiceList length must stay aligned with Core::MutationMode");
+                }
+
+                namespace MutationPitch
+                {
+                    constexpr const char* kPreserve  = "PRESERVE";
+                    constexpr const char* kConsonant = "CONSONANT";
+                    constexpr const char* kDissonant = "DISSONANT";
+                    constexpr const char* kFree      = "FREE";
+
+                    // Closed-face abbreviations for the 56 px PITCH control (menu stays full).
+                    constexpr const char* kConsonantClosed = "CONS";
+                    constexpr const char* kDissonantClosed = "DIS";
+
+                    constexpr const char* kAll[] = { kPreserve, kConsonant, kDissonant, kFree };
+
+                    static_assert(sizeof(kAll) / sizeof(kAll[0]) == 4,
+                                  "PITCH ChoiceList length must stay aligned with Core::MutationPitchMode");
+
+                    // Octave window rows under CONSONANT / DISSONANT, e.g. "± 3 OCT".
+                    // Clamp matches MutationCalibration::kMin/MaxPitchOctaves (1..5).
+                    inline juce::String formatOctaveWindow(int octaves)
+                    {
+                        constexpr int kMinOctaves = 1;
+                        constexpr int kMaxOctaves = 5;
+                        const int clamped = juce::jlimit(kMinOctaves, kMaxOctaves, octaves);
+                        return juce::String::fromUTF8("\xc2\xb1") + " " + juce::String(clamped) + " OCT";
+                    }
+
+                    // Closed face companion, e.g. "±5" — same ± glyph as the open menu.
+                    inline juce::String formatOctaveWindowClosed(int octaves)
+                    {
+                        constexpr int kMinOctaves = 1;
+                        constexpr int kMaxOctaves = 5;
+                        const int clamped = juce::jlimit(kMinOctaves, kMaxOctaves, octaves);
+                        return juce::String::fromUTF8("\xc2\xb1") + juce::String(clamped);
+                    }
+                }
             }
 
             // Footer + dialog copy for the session-load / Compare features. English only.

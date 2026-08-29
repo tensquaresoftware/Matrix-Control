@@ -2,6 +2,7 @@
 
 #include <juce_data_structures/juce_data_structures.h>
 
+#include "Core/Services/PatchMutator/MutationPolicy.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -46,6 +47,34 @@ namespace Core::MutatorSessionPersistence
         return false;
     }
 
+    // MODE and PITCH are the recipe surface the user actually sees, so they are always
+    // present and always inside the range the combo boxes offer.
+    inline void initializeModeAndPitchState(juce::ValueTree& state)
+    {
+        namespace Mutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
+
+        const auto clampStoredIndex = [&state](const char* propertyId, int lowest, int highest, int defaultValue)
+        {
+            const int stored = state.hasProperty(propertyId)
+                                   ? static_cast<int>(state.getProperty(propertyId))
+                                   : defaultValue;
+            state.setProperty(propertyId, juce::jlimit(lowest, highest, stored), nullptr);
+        };
+
+        clampStoredIndex(Mutator::kMode,
+                         0,
+                         Core::kMutationModeCount - 1,
+                         static_cast<int>(Core::MutationMode::kDrift));
+        clampStoredIndex(Mutator::kPitch,
+                         0,
+                         Core::kMutationPitchModeCount - 1,
+                         static_cast<int>(Core::MutationPitchMode::kPreserve));
+        clampStoredIndex(Mutator::kPitchOctaves,
+                         Core::MutationCalibration::kMinPitchOctaves,
+                         Core::MutationCalibration::kMaxPitchOctaves,
+                         Core::MutationCalibration::kDefaultPitchOctaves);
+    }
+
     inline void initializeRecipeState(juce::ValueTree& state)
     {
         namespace Mutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
@@ -73,6 +102,8 @@ namespace Core::MutatorSessionPersistence
             state.setProperty(Mutator::kRandom,
                               clampRecipePercent(static_cast<int>(state.getProperty(Mutator::kRandom))),
                               nullptr);
+
+        initializeModeAndPitchState(state);
 
         for (const auto* toggleId : detail::kRecipeModuleToggleIds)
         {

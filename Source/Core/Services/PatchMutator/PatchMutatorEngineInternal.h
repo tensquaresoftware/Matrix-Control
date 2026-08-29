@@ -2,6 +2,7 @@
 
 #include "Core/Actions/ActionExecutionHooks.h"
 #include "Core/Models/ApvtsPatchMapper.h"
+#include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
@@ -19,10 +20,21 @@ namespace PatchMutatorEngineInternal
     namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
     namespace CompareMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
-    constexpr const char* kNoOpRecipeFooterMessage = "Set Amount and Random above 0 to mutate.";
+    // Shipped defaults: a recognizable drift, with the patch's tuning left alone.
+    constexpr int kDefaultModeIndex = static_cast<int>(Core::MutationMode::kDrift);
+    constexpr int kDefaultPitchIndex = static_cast<int>(Core::MutationPitchMode::kPreserve);
+
+    // RETRY diversity heuristic: a handful of re-rolls, and "different enough" means a few
+    // mutable bytes apart from the previous mutation.
+    constexpr int kRetryDiversityAttempts = 4;
+    constexpr int kRetryDiversityMinChangedBytes = 3;
+    constexpr size_t kMutableByteRangeStart = 8;
+
     constexpr const char* kNoModuleScopeFooterMessage = "Enable at least one module to mutate.";
     constexpr const char* kNoMutationChangeFooterMessage =
-        "Mutation made no changes. Try higher Amount or Random.";
+        "No changes. Try a wider MODE or more modules.";
+    constexpr const char* kRetryTooSimilarFooterMessage =
+        "RETRY too similar. Try a wider MODE or more modules.";
     constexpr const char* kHistoryLimitFooterMessage = "Mutation history is full. Defrag to continue.";
     constexpr const char* kEmptyHistoryFooterMessage = "Mutation history is empty.";
     constexpr const char* kNoSelectionFooterMessage = "No valid mutation history entry selected.";
@@ -123,15 +135,27 @@ namespace PatchMutatorEngineInternal
         return PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kHistoryRootSentinel;
     }
 
-    inline int readPatchMutatorPercent(juce::AudioProcessorValueTreeState& apvts,
-                                       const juce::Identifier& propertyId,
-                                       int defaultValue)
+    inline int readMutatorStateIndex(const juce::ValueTree& state,
+                                     const juce::Identifier& propertyId,
+                                     int defaultValue)
     {
-        auto* rawValue = apvts.getRawParameterValue(propertyId);
-        if (rawValue != nullptr)
-            return juce::jlimit(0, 100, juce::roundToInt(rawValue->load()));
+        if (! state.hasProperty(propertyId))
+            return defaultValue;
 
-        return juce::jlimit(0, 100, static_cast<int>(apvts.state.getProperty(propertyId, defaultValue)));
+        return static_cast<int>(state.getProperty(propertyId, defaultValue));
+    }
+
+    inline int countDifferingMutableBytes(const Core::PatchModel& left, const Core::PatchModel& right)
+    {
+        int differing = 0;
+
+        for (size_t i = kMutableByteRangeStart; i < Core::PatchModel::kBufferSize; ++i)
+        {
+            if (left.data()[i] != right.data()[i])
+                ++differing;
+        }
+
+        return differing;
     }
 
     inline void pushPatchModelToApvtsWithSuppress(juce::AudioProcessorValueTreeState& apvts,

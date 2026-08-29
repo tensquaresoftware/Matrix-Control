@@ -169,9 +169,8 @@ std::optional<MutationEntry> PatchMutatorEngine::getEntry(int rootIndex, int ret
 std::optional<MutatorActionResult> PatchMutatorEngine::validateMutationRecipe(
     const MutationRecipe& recipe) const
 {
-    if (recipe.amountPercent == 0 || recipe.randomPercent == 0)
-        return makeWarningResult(kNoOpRecipeFooterMessage);
-
+    // MODE guarantees a non-zero Amount x Random pair, so module scope is the only gate
+    // left here. A recipe that still cannot move anything is caught by the algorithm.
     if (! recipe.hasAnyModuleEnabled())
         return makeWarningResult(kNoModuleScopeFooterMessage);
 
@@ -207,13 +206,56 @@ bool PatchMutatorEngine::applyRecipeMutation(PatchModel& working, const Mutation
     return algorithm_.apply(working, recipe, rngSource);
 }
 
+PatchMutatorEngine::DiverseMutationOutcome PatchMutatorEngine::applyDiverseRecipeMutation(
+    PatchModel& working,
+    const MutationRecipe& recipe,
+    const PatchModel& previousResult)
+{
+    PatchModel parentSnapshot;
+    parentSnapshot.loadFrom(working.data());
+
+    bool haveUsableRoll = false;
+
+    for (int attempt = 0; attempt < kRetryDiversityAttempts; ++attempt)
+    {
+        working.loadFrom(parentSnapshot.data());
+
+        if (! applyRecipeMutation(working, recipe))
+            continue;
+
+        haveUsableRoll = true;
+
+        if (countDifferingMutableBytes(working, previousResult) >= kRetryDiversityMinChangedBytes)
+            return DiverseMutationOutcome::kApplied;
+    }
+
+    working.loadFrom(parentSnapshot.data());
+
+    if (! haveUsableRoll)
+        return DiverseMutationOutcome::kNoUsableRoll;
+
+    // Kindred-scale recipes often never clear the diversity bar — tell the user rather
+    // than filing a near-clone into History.
+    return DiverseMutationOutcome::kTooSimilar;
+}
+
 MutationRecipe PatchMutatorEngine::buildRecipeFromApvts() const
 {
     const auto& state = apvts_.state;
 
     MutationRecipe recipe;
-    recipe.amountPercent = readPatchMutatorPercent(apvts_, PatchMutator::kAmount, 50);
-    recipe.randomPercent = readPatchMutatorPercent(apvts_, PatchMutator::kRandom, 25);
+    recipe.mode = mutationModeFromIndex(readMutatorStateIndex(state, PatchMutator::kMode, kDefaultModeIndex));
+    recipe.pitchMode = mutationPitchModeFromIndex(
+        readMutatorStateIndex(state, PatchMutator::kPitch, kDefaultPitchIndex));
+    recipe.pitchOctaveWindow = juce::jlimit(
+        MutationCalibration::kMinPitchOctaves,
+        MutationCalibration::kMaxPitchOctaves,
+        readMutatorStateIndex(state, PatchMutator::kPitchOctaves, MutationCalibration::kDefaultPitchOctaves));
+
+    // Legacy Amount / Random may still live in the session state, but MODE owns the
+    // curve inputs from here on.
+    recipe.applyModeCalibration();
+
     recipe.enableDco1 = readBoolProperty(state, PatchMutator::kEnableDco1, false);
     recipe.enableDco2 = readBoolProperty(state, PatchMutator::kEnableDco2, false);
     recipe.enableVcfVca = readBoolProperty(state, PatchMutator::kEnableVcfVca, false);

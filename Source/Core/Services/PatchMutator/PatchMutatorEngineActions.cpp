@@ -12,6 +12,21 @@ using namespace PatchMutatorEngineInternal;
 namespace Core
 {
 
+const char* PatchMutatorEngine::footerForDiverseMutation(DiverseMutationOutcome outcome) noexcept
+{
+    switch (outcome)
+    {
+        case DiverseMutationOutcome::kApplied:
+            return nullptr;
+        case DiverseMutationOutcome::kTooSimilar:
+            return kRetryTooSimilarFooterMessage;
+        case DiverseMutationOutcome::kNoUsableRoll:
+            return kNoMutationChangeFooterMessage;
+    }
+
+    return kNoMutationChangeFooterMessage;
+}
+
 MutatorActionResult PatchMutatorEngine::mutate()
 {
     applySelectionFromApvts();
@@ -84,8 +99,14 @@ MutatorActionResult PatchMutatorEngine::retry()
     PatchModel working;
     working.loadFrom(selectedEntry->parentSnapshot.data());
 
-    if (! applyRecipeMutation(working, recipe))
-        return makeWarningResult(kNoMutationChangeFooterMessage);
+    PatchModel previousResult;
+    previousResult.loadFrom(selectedEntry->result.data());
+
+    if (const auto* diversityFooter = footerForDiverseMutation(
+            applyDiverseRecipeMutation(working, recipe, previousResult)))
+    {
+        return makeWarningResult(diversityFooter);
+    }
 
     const auto retryIndexOpt = historyStore_.peekNextRetryIndex(rootIndex);
     if (! retryIndexOpt.has_value())

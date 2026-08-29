@@ -169,6 +169,10 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchMutator/MutationNaming.cpp
     Source/Core/Services/PatchMutator/HistoryDefragService.cpp
     Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
+    Source/Core/Services/PatchMutator/MutationPolicy.cpp
+    Source/Core/Services/PatchMutator/MutationPitchPolicy.cpp
+    Source/Core/Services/PatchMutator/MutationMatrixModPolicy.cpp
+    Source/Core/Services/PatchMutator/MutationPostApply.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngineActions.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngineHistory.cpp
@@ -413,6 +417,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutationNamingTests.cpp
         Tests/Unit/HistoryDefragServiceTests.cpp
         Tests/Unit/MutationAlgorithmTests.cpp
+        Tests/Unit/MutationCalibrationTests.cpp
+        Tests/Unit/MutationAntiSilenceTests.cpp
         Tests/Unit/PatchMutatorEngineTestSupport.cpp
         Tests/Unit/PatchMutatorEngineMutateTests.cpp
         Tests/Unit/PatchMutatorEngineRetryTests.cpp
@@ -532,6 +538,10 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchMutator/MutationNaming.cpp
         Source/Core/Services/PatchMutator/HistoryDefragService.cpp
         Source/Core/Services/PatchMutator/MutationAlgorithm.cpp
+        Source/Core/Services/PatchMutator/MutationPolicy.cpp
+        Source/Core/Services/PatchMutator/MutationPitchPolicy.cpp
+        Source/Core/Services/PatchMutator/MutationMatrixModPolicy.cpp
+        Source/Core/Services/PatchMutator/MutationPostApply.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngineActions.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngineHistory.cpp

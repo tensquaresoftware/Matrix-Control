@@ -141,6 +141,19 @@ namespace Core
         std::optional<MutatorActionResult> validateMutationRecipe(const MutationRecipe& recipe) const;
         std::optional<MutatorActionResult> validateRetryPreconditions(int& outRootIndex) const;
         bool applyRecipeMutation(PatchModel& working, const MutationRecipe& recipe);
+
+        enum class DiverseMutationOutcome
+        {
+            kApplied,
+            kNoUsableRoll,
+            kTooSimilar
+        };
+
+        // Re-rolls a few times so a second try on the same parent is not a near-clone.
+        DiverseMutationOutcome applyDiverseRecipeMutation(PatchModel& working,
+                                                          const MutationRecipe& recipe,
+                                                          const PatchModel& previousResult);
+        static const char* footerForDiverseMutation(DiverseMutationOutcome outcome) noexcept;
         // resolveAuditionBuffer: empty history -> live editor; selectedRootIndex_ < 0 -> highest sorted root
         // (root-only); missing entry at selection -> root-only entry or live editor fallback.
         // MUTATE-only — returns selected entry result, not parentSnapshot (D-083).

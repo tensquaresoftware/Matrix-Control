@@ -648,8 +648,16 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
+                // Legacy recipe percentages — persisted for session migration only; MODE owns
+                // Amount / Random at MUTATE / RETRY time.
                 constexpr const char* kAmount         = "patchMutatorAmount";
                 constexpr const char* kRandom         = "patchMutatorRandom";
+
+                constexpr const char* kMode           = "patchMutatorMode";
+                constexpr const char* kPitch          = "patchMutatorPitch";
+                // Second level of the PITCH combo: octave window for CONSONANT / DISSONANT.
+                constexpr const char* kPitchOctaves   = "patchMutatorPitchOctaves";
+
                 constexpr const char* kHistory          = "patchMutatorHistory";
                 constexpr const char* kHistoryPrevious  = "patchMutatorHistoryPrevious";
                 constexpr const char* kHistoryNext      = "patchMutatorHistoryNext";
