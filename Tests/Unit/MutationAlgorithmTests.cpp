@@ -32,12 +32,21 @@ private:
         return model;
     }
 
-    static Core::MutationRecipe makeFullRecipe()
+    // Golden vectors pin every recipe input explicitly, so a change to the shipped
+    // MutationRecipe defaults can never silently move an expected byte.
+    static Core::MutationRecipe makeGoldenVectorRecipe(int amountPercent, int randomPercent)
     {
         Core::MutationRecipe recipe;
-        recipe.amountPercent = 100;
-        recipe.randomPercent = 100;
+        recipe.amountPercent = amountPercent;
+        recipe.randomPercent = randomPercent;
+        recipe.mode = Core::MutationMode::kDrift;
+        recipe.pitchMode = Core::MutationPitchMode::kFree;
         return recipe;
+    }
+
+    static Core::MutationRecipe makeFullRecipe()
+    {
+        return makeGoldenVectorRecipe(100, 100);
     }
 
     static Core::MutationRecipe recipeWithOnlyDco1Enabled()
@@ -98,9 +107,7 @@ private:
         const auto input = makeInitPatchModel();
         auto working = input;
 
-        Core::MutationRecipe recipe;
-        recipe.amountPercent = 0;
-        recipe.randomPercent = 50;
+        auto recipe = makeGoldenVectorRecipe(0, 50);
         recipe.enableDco1 = true;
 
         Core::SeededRandom rng(0x12345678U);
@@ -117,9 +124,7 @@ private:
         const auto input = makeInitPatchModel();
         auto working = input;
 
-        Core::MutationRecipe recipe;
-        recipe.amountPercent = 50;
-        recipe.randomPercent = 0;
+        auto recipe = makeGoldenVectorRecipe(50, 0);
         recipe.enableDco1 = true;
 
         Core::SeededRandom rng(0x12345678U);
@@ -156,9 +161,7 @@ private:
         const auto input = makeInitPatchModel();
         auto working = input;
 
-        Core::MutationRecipe recipe;
-        recipe.amountPercent = 50;
-        recipe.randomPercent = 100;
+        auto recipe = makeGoldenVectorRecipe(50, 100);
         recipe.enableMatrixMod = true;
 
         Core::SeededRandom rng(0x4D61746DU);
@@ -192,9 +195,7 @@ private:
         const auto input = makeInitPatchModel();
         auto working = input;
 
-        Core::MutationRecipe recipe;
-        recipe.amountPercent = 50;
-        recipe.randomPercent = 100;
+        auto recipe = makeGoldenVectorRecipe(50, 100);
         recipe.enableMatrixMod = false;
 
         Core::SeededRandom rng(0x4D61746DU);

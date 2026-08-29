@@ -47,6 +47,9 @@ namespace PatchMutatorEngineTestSupport
     {
         proc.apvts.state.setProperty(PatchMutator::kAmount, amount, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kRandom, random, nullptr);
+        // Legacy Amount / Random no longer reach the algorithm. WILD + FREE is the MODE
+        // equivalent of the wide-open jitter these tests were written against.
+        setMode(Core::MutationMode::kWild, Core::MutationPitchMode::kFree);
         proc.apvts.state.setProperty(PatchMutator::kEnableDco1, enableDco1, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableDco2, false, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableVcfVca, false, nullptr);
@@ -58,6 +61,12 @@ namespace PatchMutatorEngineTestSupport
         proc.apvts.state.setProperty(PatchMutator::kEnableLfo1, false, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableLfo2, false, nullptr);
         proc.apvts.state.setProperty(PatchMutator::kEnableMatrixMod, false, nullptr);
+    }
+
+    void EngineHarness::setMode(Core::MutationMode mode, Core::MutationPitchMode pitchMode)
+    {
+        proc.apvts.state.setProperty(PatchMutator::kMode, static_cast<int>(mode), nullptr);
+        proc.apvts.state.setProperty(PatchMutator::kPitch, static_cast<int>(pitchMode), nullptr);
     }
 
     Core::MutationHistoryStore& EngineHarness::store()

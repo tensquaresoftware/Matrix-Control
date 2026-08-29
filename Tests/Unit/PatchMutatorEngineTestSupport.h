@@ -92,6 +92,7 @@ namespace PatchMutatorEngineTestSupport
         EngineHarness();
 
         void setRecipe(int amount, int random, bool enableDco1 = true);
+        void setMode(Core::MutationMode mode, Core::MutationPitchMode pitchMode);
         Core::MutationHistoryStore& store();
         void applySelectionFromApvts();
         Core::PatchModel resolveAuditionBuffer();

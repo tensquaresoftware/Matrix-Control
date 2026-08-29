@@ -12,7 +12,7 @@ public:
         mutate_preservesUserPatchName();
         mutate_gapAllocation();
         mutate_limitBlocks();
-        mutate_noOpRecipe_blocked();
+        mutate_legacyZeroAmount_doesNotOverrideMode();
         mutate_noModuleToggle_blocked();
         mutate_fromAuditionedRetry();
         mutate_sendsSysExOnce();
@@ -81,17 +81,19 @@ private:
         expect(result.defragModalRequested);
     }
 
-    void mutate_noOpRecipe_blocked()
+    // Legacy Amount / Random may still sit in a restored session; MODE owns the curve inputs.
+    void mutate_legacyZeroAmount_doesNotOverrideMode()
     {
-        beginTest("mutate_noOpRecipe_blocked");
+        beginTest("mutate_legacyZeroAmount_doesNotOverrideMode");
 
         EngineHarness harness;
-        harness.setRecipe(0, 100, true);
+        harness.setRecipe(0, 0, true);
+        harness.setMode(Core::MutationMode::kWild, Core::MutationPitchMode::kFree);
 
         const auto result = harness.engine.mutate();
-        expect(! result.success);
-        expectEquals(harness.engine.rootCount(), 0);
-        expectEquals(countPatchSysExMessages(harness.queue), 0);
+        expect(result.success);
+        expectEquals(harness.engine.rootCount(), 1);
+        expectEquals(countPatchSysExMessages(harness.queue), 1);
     }
 
     void mutate_noModuleToggle_blocked()

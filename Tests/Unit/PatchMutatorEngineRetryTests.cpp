@@ -1,6 +1,10 @@
 #include "PatchMutatorEngineTestSupport.h"
+#include "MutationCalibrationTestSupport.h"
+
+#include "Core/Services/PatchMutator/PatchMutatorEngineInternal.h"
 
 using namespace PatchMutatorEngineTestSupport;
+using namespace MutationCalibrationTestSupport;
 
 class PatchMutatorEngineRetryTests : public juce::UnitTest
 {
@@ -15,7 +19,9 @@ public:
         retry_fromSelectedRetry_usesThatEntryParentSnapshot();
         retry_gapAllocation();
         retry_limitBlocks();
-        retry_noOpRecipe_blocked();
+        retry_legacyZeroAmount_doesNotOverrideMode();
+        retry_consecutiveRetries_areNotIdentical();
+        retry_tooSimilar_warnsWithoutHistory();
         retry_sendsSysExOnce();
         retry_matrix1000_sendsEditBuffer();
         retry_neverDeletesExistingRetries();
@@ -162,12 +168,14 @@ private:
         expect(result.defragModalRequested);
     }
 
-    void retry_noOpRecipe_blocked()
+    // Legacy Amount / Random may still sit in a restored session; MODE owns the curve inputs.
+    void retry_legacyZeroAmount_doesNotOverrideMode()
     {
-        beginTest("retry_noOpRecipe_blocked");
+        beginTest("retry_legacyZeroAmount_doesNotOverrideMode");
 
         EngineHarness harness;
-        harness.setRecipe(0, 100, true);
+        harness.setRecipe(0, 0, true);
+        harness.setMode(Core::MutationMode::kWild, Core::MutationPitchMode::kFree);
 
         auto m00 = makeDistinctBuffer(91);
         auto m00Parent = makeDistinctBuffer(92);
@@ -175,7 +183,77 @@ private:
         expect(harness.store().insertRoot(0, m00, m00Parent));
 
         const auto result = harness.engine.retry();
+        expect(result.success);
+        expectEquals(harness.store().retryCount(0), 1);
+        expectEquals(countPatchSysExMessages(harness.queue), 1);
+    }
+
+    // Two RETRY presses on the same parent must not hand back the same patch twice.
+    void retry_consecutiveRetries_areNotIdentical()
+    {
+        beginTest("retry_consecutiveRetries_areNotIdentical");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, true);
+
+        auto m00 = makeDistinctBuffer(131);
+        auto m00Parent = makeDistinctBuffer(132);
+        Core::MutationNaming::applyPatchName(m00, 0);
+        expect(harness.store().insertRoot(0, m00, m00Parent));
+
+        expect(harness.engine.retry().success);
+        expect(harness.engine.retry().success);
+
+        const auto first = harness.engine.getEntry(0, 0);
+        const auto second = harness.engine.getEntry(0, 1);
+        expect(first.has_value());
+        expect(second.has_value());
+        if (! first.has_value() || ! second.has_value())
+            return;
+
+        expect(std::memcmp(first->result.data(),
+                           second->result.data(),
+                           Core::PatchModel::kBufferSize)
+               != 0);
+
+        // The diversity re-roll aims for a few mutable bytes of distance, not just any
+        // single byte, so a second RETRY reads as a genuinely different patch.
+        int changedMutableBytes = 0;
+        for (size_t offset = PatchMutatorEngineInternal::kMutableByteRangeStart;
+             offset < Core::PatchModel::kBufferSize;
+             ++offset)
+        {
+            if (first->result.data()[offset] != second->result.data()[offset])
+                ++changedMutableBytes;
+        }
+
+        expectGreaterOrEqual(changedMutableBytes,
+                             PatchMutatorEngineInternal::kRetryDiversityMinChangedBytes);
+    }
+
+    // Kindred + Matrix Modulation alone often moves only one Amount byte — below the
+    // diversity bar — so RETRY must warn instead of filing a near-clone.
+    void retry_tooSimilar_warnsWithoutHistory()
+    {
+        beginTest("retry_tooSimilar_warnsWithoutHistory");
+
+        EngineHarness harness;
+        harness.setRecipe(100, 100, false);
+        harness.setMode(Core::MutationMode::kKindred, Core::MutationPitchMode::kFree);
+        harness.proc.apvts.state.setProperty(PatchMutator::kEnableMatrixMod, true, nullptr);
+
+        auto parent = makeInitPatchModel();
+        clearAllMatrixModBuses(parent);
+        writeMatrixModBus(parent, { 0, SourceNames::kLfo1, DestinationNames::kDco1PulseWidth, 0 });
+
+        auto resultPatch = parent;
+        Core::MutationNaming::applyPatchName(resultPatch, 0);
+        expect(harness.store().insertRoot(0, resultPatch, parent));
+
+        const auto result = harness.engine.retry();
         expect(! result.success);
+        expectEquals(result.footerMessage,
+                     juce::String(PatchMutatorEngineInternal::kRetryTooSimilarFooterMessage));
         expectEquals(harness.store().retryCount(0), 0);
         expectEquals(countPatchSysExMessages(harness.queue), 0);
     }
