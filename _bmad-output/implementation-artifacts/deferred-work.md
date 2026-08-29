@@ -1,5 +1,18 @@
 # Deferred Work
 
+## Deferred from: code review of spec-patch-mutator-playable-calibration.md (2026-08-29)
+
+- **Incomplete calibration / anti-silence tests** — motion guarantee, Preserve destination invent, choice-step limits, Consonant/Dissonant set membership, active-DCO cardinality, escalated ENV floors and FM nudge are only partly covered; re-open in the tests review chunk.
+- **Kindred LFO “rates that breathe”** — addendum A4 #4 is SHOULD; Kindred soft-avoid of very-slow + deep toward volume not implemented in this Must ship.
+- **Unused `amplitudeDestinations` catalog** — built in `MatrixModChoiceCatalog` but never read; cleanup after Must patches land.
+- **Engine boundary tests** — APVTS MODE/PITCH/octaves → recipe, forced RETRY diversity re-roll, and no-change footer copy lack direct assertions; cover in tests chunk.
+- **Legacy Amount/Random surface** — descriptors and session defaults still present for migration; not primary UI; cleanup follow-on.
+- **MODE-aware RETRY diversity threshold** — fixed 3-byte bar for all MODEs; Kindred may hit fallback often (A4 #5 SHOULD).
+- **Pitch UI helper / recipe-property / Compare-lock tests** — pure id helpers and property list untested; cover in tests chunk.
+- **MODE/PITCH component ids** — hand-built combos lack WidgetFactory SSOT ids; harness tooling follow-on.
+- **Compare inactive paint on HierarchicalComboBox** — Compare lock uses setEnabled only (same as History); optional setInactiveAppearance polish.
+- **Remaining calibration test gaps (after chunk 4 triage)** — Consonant/Dissonant set membership + octave window; choice-step / WaveSelect CHOIX / active-DCO cardinality; escalated ENV + FM nudge; filter/Mix through full apply; engine buildRecipeFromApvts A/R + octaves; pitch UI id helpers / compact labels; soft probabilistic gates; Preserve empty-timbre invent.
+
 ## Deferred from: code review of commit d8e20d0 — editorial undo MIDI resync + stack depth (2026-08-26)
 
 - **Tests sur le vrai `PluginProcessor`** — la politique MIDI editorial (quiet window, coalesce cancel, ordre resync/flush) est vérifiée via `EditorialUndoMidiHarness` dupliqué, pas via `PluginProcessor::performEditorialUndo()` ; une régression production pourrait repasser inaperçue malgré le smoke MIDI Monitor validé manuellement.
@@ -1222,3 +1235,33 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-vcf-vca-dco-mix-balance-ui.md`
   summary: Parameter IDs remain kBalance / vcfVcaBalance while UI and Oberheim docs say Mix — rename would touch SysEx maps and automation IDs.
   evidence: Blind Hunter; intentional keep for this UI-only change; unreleased but still a wider chore.
+
+## Deferred from: spec-patch-mutator-playable-calibration (2026-08-29)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: Family-gesture coupled moves during jitter (envelope contour / Frequency+Resonance as a family) remain post-pass only.
+  evidence: Addendum Must track #2; Blind Hunter — Frequency+Resonance rescue is post-apply, not coordinated during jitter.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: Kindred LFO “rates that breathe” soft-avoid (very slow + deep toward volume) not implemented.
+  evidence: Addendum Must track #4 / A6.5 LFO soft guidance; no LFO Speed/Amplitude Kindred policy.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: Hard Amp floor when an LFO is the sole VCA opener (MM relay + dead VCA2←ENV2) not implemented.
+  evidence: Addendum A6.5 LFO escalation; only ENV1/ENV3 risk-source floors exist today.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: Sync-specific CHOIX that widens toward Wild still uses generic MODE choice-step limits.
+  evidence: Addendum A7.1 Sync freer toward Wild; Blind Hunter.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: MM risk Amount clamp may over-limit intentional strong positives on risk destinations.
+  evidence: Addendum focuses on unfavorable (esp. negative) Amounts; current clamp is a hard window — Ask First retune.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: Legacy Amount/Random APVTS descriptors remain for migration while MODE/PITCH drive MUTATE.
+  evidence: Spec Always allows migration leftovers; Blind Hunter noted host-automation surface — follow-on cleanup.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
+  summary: Should items not shipped — guard indicator, dead→playable golden, Unison/Keyboard LOCK through Warp, measured Noise inject.
+  evidence: Spec Ask First / Should; deferred to keep Must shippable.

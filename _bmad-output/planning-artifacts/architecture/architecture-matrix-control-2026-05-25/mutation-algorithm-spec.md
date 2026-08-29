@@ -13,7 +13,7 @@ sources:
   - ../../../implementation-artifacts/6-1-mutationalgorithm-specification.md
   - ../../../implementation-artifacts/6-16-matrix-mod-recipe-toggle.md
 created: 2026-06-19
-updated: 2026-07-15
+updated: 2026-08-29
 ---
 
 # MutationAlgorithm Specification
@@ -23,6 +23,8 @@ Normative rules for the Patch Mutator buffer transform (`MutationAlgorithm::appl
 **Scope:** Algorithm transform only. MUTATE/RETRY history semantics (D-083), naming (Story 6.3), SysEx enqueue (Story 6.4), and GUI wiring (Stories 6.6–6.12, 7.4, 6.16) are out of scope for the transform itself; Story 6.16 amends the Matrix Mod recipe gate.
 
 **Status:** `APPROVED` — owner sign-off 2026-06-19 (Story 6.1 AC #9). Matrix Mod scope: **Option A′ (recipe-gated)** — Option A superseded 2026-07-15 (Story 6.16).
+
+**Playable calibration:** MODE + Pitch UI, policy table, post-apply anti-silence guards, and Matrix Modulation MODE ladder are specified in the companion addendum [`mutation-algorithm-spec-addendum-playable-calibration.md`](mutation-algorithm-spec-addendum-playable-calibration.md) (draft, 2026-08-29). Where that addendum conflicts with this document on playability / MODE / Pitch / MM scaling, the addendum wins; Amount×Random curve math (§4) and Option A′ (§7.1) remain as written here unless the addendum explicitly amends them.
 
 ---
 
@@ -432,6 +434,7 @@ Init Matrix Mod slice (104–115): `00 00 00 00 00 00 00 00 00 00 00 00`.
 | 2026-06-19 | 1.0 | Owner sign-off: Option A confirmed; early exit §3 updated; approved for Story 6.4 |
 | 2026-06-19 | 1.0.1 | Code review fixes: §6 kNoSysExId exception, §7 eligibility path, apply() return rule, cross-refs, GV-02, Appendix B |
 | 2026-07-15 | 1.1 | Story 6.16: Option A superseded by Option A′ (`enableMatrixMod` recipe gate); §2.2.1, §5.1, §7.1, GV-02/GV-03 updated |
+| 2026-08-29 | 1.1 | Cross-ref only: playable-calibration addendum (MODE / Pitch / policy + post-apply); no change to §4 curve math or A′ |
 
 ---
 
