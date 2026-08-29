@@ -1,16 +1,17 @@
 // Extracted from PatchMutatorPanel.cpp for modular maintenance.
-// Widget construction for amount / random / history rows.
+// Widget construction for mode / pitch / history rows.
 
 #include "PatchMutatorPanel.h"
 #include "PatchMutatorPanelInternal.h"
 
+#include "Core/Services/PatchMutator/MutationPolicy.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HierarchicalComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ModuleHeader.h"
-#include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Toggle.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -43,47 +44,30 @@ std::unique_ptr<TSS::Toggle> PatchMutatorPanel::makeRecipeToggle(TSS::ISkin& ski
     return toggle;
 }
 
-std::unique_ptr<TSS::Slider> PatchMutatorPanel::makePercentRecipeSlider(TSS::ISkin& skin,
-                                                                       const char* widgetId,
-                                                                       double fallbackDefault)
+void PatchMutatorPanel::setupModeLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    const auto* desc = findMutatorIntDescriptor(widgetId);
-    auto slider = std::make_unique<TSS::Slider>(
-        dims_.sliders.patchMutatorWidth,
-        dims_.sliders.standardHeight,
-        TSS::sliderLookFromSkin(skin),
-        TSS::SliderConfig{
-            desc != nullptr ? static_cast<double>(desc->minValue) : 1.0,
-            desc != nullptr ? static_cast<double>(desc->maxValue) : 100.0,
-            desc != nullptr ? static_cast<double>(desc->defaultValue) : fallbackDefault,
-            1.0,
-            PluginDisplayNames::Units::kPercent,
-            {},
-            {},
-            {}});
-
-    auto* rawSlider = slider.get();
-    slider->onValueChange = [this, rawSlider, widgetId]
-    {
-        if (recipeHydrating_)
-            return;
-
-        apvts_.state.setProperty(widgetId, static_cast<int>(rawSlider->getValue()), nullptr);
-    };
-    addAndMakeVisible(*slider);
-    return slider;
-}
-
-void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
-{
-    amountLabel_ = std::make_unique<TSS::Label>(
+    modeLabel_ = std::make_unique<TSS::Label>(
         dims_.labels.patchMutatorWidth,
         dims_.labels.height,
         TSS::labelLookFromSkin(skin),
-        MutatorDisplayNames::kAmount);
-    addAndMakeVisible(*amountLabel_);
+        MutatorDisplayNames::kMode);
+    addAndMakeVisible(*modeLabel_);
 
-    amountSlider_ = makePercentRecipeSlider(skin, MutatorWidgets::kAmount, 50.0);
+    modeComboBox_ = std::make_unique<TSS::ComboBox>(
+        dims_.comboBoxes.patchMutatorHistoryWidth,
+        dims_.comboBoxes.standardHeight,
+        TSS::comboBoxLookFromSkin(skin));
+    modeComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    modeComboBox_->setPopupVerticalPlacement(TSS::PopupVerticalPlacement::Above);
+
+    for (int modeIndex = 0; modeIndex < Core::kMutationModeCount; ++modeIndex)
+        modeComboBox_->addItem(MutatorChoiceLists::MutationMode::kAll[modeIndex], modeIndex + 1);
+
+    modeComboBox_->onChange = [this]
+    {
+        handleModeComboSelectionChange();
+    };
+    addAndMakeVisible(*modeComboBox_);
 
     mutateButton_ = widgetFactory.createStandaloneButton(
         MutatorWidgets::kMutate, skin, dims_.buttons.height);
@@ -99,16 +83,49 @@ void PatchMutatorPanel::setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetF
                                              MutatorWidgets::kEnableRampPortamento);
 }
 
-void PatchMutatorPanel::setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
+void PatchMutatorPanel::setupPitchLine(TSS::ISkin& skin, WidgetFactory& widgetFactory)
 {
-    randomLabel_ = std::make_unique<TSS::Label>(
+    pitchLabel_ = std::make_unique<TSS::Label>(
         dims_.labels.patchMutatorWidth,
         dims_.labels.height,
         TSS::labelLookFromSkin(skin),
-        MutatorDisplayNames::kRandom);
-    addAndMakeVisible(*randomLabel_);
+        MutatorDisplayNames::kPitch);
+    addAndMakeVisible(*pitchLabel_);
 
-    randomSlider_ = makePercentRecipeSlider(skin, MutatorWidgets::kRandom, 25.0);
+    pitchComboBox_ = std::make_unique<TSS::HierarchicalComboBox>(
+        dims_.comboBoxes.patchMutatorHistoryWidth,
+        dims_.comboBoxes.standardHeight,
+        TSS::comboBoxLookFromSkin(skin));
+    pitchComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+    pitchComboBox_->setPopupVerticalPlacement(TSS::PopupVerticalPlacement::Above);
+
+    for (int pitchIndex = 0; pitchIndex < Core::kMutationPitchModeCount; ++pitchIndex)
+    {
+        const int primaryId = pitchPrimaryIdForMode(pitchIndex);
+        pitchComboBox_->addPrimaryItem(primaryId,
+                                       MutatorChoiceLists::MutationPitch::kAll[pitchIndex],
+                                       false,
+                                       pitchClosedPrimaryLabel(pitchIndex));
+
+        if (! Core::pitchModeUsesOctaveWindow(Core::mutationPitchModeFromIndex(pitchIndex)))
+            continue;
+
+        for (int octaves = Core::MutationCalibration::kMinPitchOctaves;
+             octaves <= Core::MutationCalibration::kMaxPitchOctaves;
+             ++octaves)
+        {
+            pitchComboBox_->addChildItem(primaryId,
+                                         pitchChildIdFor(primaryId, octaves),
+                                         MutatorChoiceLists::MutationPitch::formatOctaveWindow(octaves),
+                                         MutatorChoiceLists::MutationPitch::formatOctaveWindowClosed(octaves));
+        }
+    }
+
+    pitchComboBox_->onChange = [this]
+    {
+        handlePitchComboSelectionChange();
+    };
+    addAndMakeVisible(*pitchComboBox_);
 
     retryButton_ = widgetFactory.createStandaloneButton(
         MutatorWidgets::kRetry, skin, dims_.buttons.height);

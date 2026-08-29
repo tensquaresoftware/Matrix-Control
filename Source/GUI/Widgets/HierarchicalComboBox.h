@@ -28,8 +28,15 @@ namespace TSS
         PopupVerticalPlacement getPopupVerticalPlacement() const override { return popupVerticalPlacement_; }
 
         void clear();
-        void addPrimaryItem(int id, const juce::String& label, bool isSentinel = false);
-        void addChildItem(int primaryId, int id, const juce::String& label);
+        void addPrimaryItem(int id,
+                            const juce::String& label,
+                            bool isSentinel = false,
+                            const juce::String& closedLabel = {});
+        void addChildItem(int primaryId,
+                          int id,
+                          const juce::String& label,
+                          const juce::String& closedLabel = {});
+
 
         void setSelectedPrimaryId(int primaryId, juce::NotificationType notification = juce::sendNotification);
         void setSelectedChildId(int childId, juce::NotificationType notification = juce::sendNotification);
@@ -67,12 +74,15 @@ namespace TSS
         {
             int id = 0;
             juce::String label;
+            // Optional shorter face when the control is closed; empty = use label.
+            juce::String closedLabel;
         };
 
         struct PrimaryItem
         {
             int id = 0;
             juce::String label;
+            juce::String closedLabel;
             bool isSentinel = false;
             std::vector<ChildItem> children;
 

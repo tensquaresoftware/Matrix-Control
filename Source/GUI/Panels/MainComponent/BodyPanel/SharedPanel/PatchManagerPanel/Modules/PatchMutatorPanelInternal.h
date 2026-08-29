@@ -3,7 +3,7 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Toggle.h"
-#include "Shared/Definitions/PluginDescriptors.h"
+#include "Core/Services/PatchMutator/MutationPolicy.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
 
@@ -17,6 +17,7 @@
 namespace PatchMutatorPanelInternal
 {
     namespace MutatorDisplayNames = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
+    namespace MutatorChoiceLists = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::ChoiceLists;
     namespace MutatorIds = PluginIDs::PatchManagerSection::PatchMutatorModule;
     namespace MutatorState = MutatorIds::StateProperties;
     namespace MutatorWidgets = MutatorIds::StandaloneWidgets;
@@ -81,29 +82,22 @@ namespace PatchMutatorPanelInternal
                                       MutatorState::kInitialSnapshotAvailable });
     }
 
-    inline const PluginDescriptors::IntParameterDescriptor* findMutatorIntDescriptor(const char* parameterId)
+    // PITCH combo ids: level 1 carries the pitch mode, level 2 the octave window.
+    // Child id packs primary * 10 + octaves, so the octave window must stay a single digit.
+    static_assert(Core::MutationCalibration::kMaxPitchOctaves < 10,
+                  "pitchChildIdFor encodes octaves in the ones place");
+    inline int pitchPrimaryIdForMode(int pitchModeIndex) { return pitchModeIndex + 1; }
+    inline int pitchModeIndexForPrimaryId(int primaryId) { return primaryId - 1; }
+    inline int pitchChildIdFor(int primaryId, int octaves) { return primaryId * 10 + octaves; }
+    inline int pitchOctavesForChildId(int childId) { return childId % 10; }
+
+    inline juce::String pitchClosedPrimaryLabel(int pitchModeIndex)
     {
-        const auto& descriptors = PluginDescriptors::PatchManagerSection::PatchMutatorModule::kIntParameters;
-
-        for (const auto& descriptor : descriptors)
-        {
-            if (descriptor.parameterId == parameterId)
-                return &descriptor;
-        }
-
-        return nullptr;
-    }
-
-    inline void hydrateIntSlider(TSS::Slider* slider,
-                                 const juce::ValueTree& state,
-                                 const char* propertyId,
-                                 int defaultValue)
-    {
-        if (slider == nullptr)
-            return;
-
-        slider->setValue(static_cast<double>(static_cast<int>(state.getProperty(propertyId, defaultValue))),
-                         juce::dontSendNotification);
+        if (pitchModeIndex == static_cast<int>(Core::MutationPitchMode::kConsonant))
+            return MutatorChoiceLists::MutationPitch::kConsonantClosed;
+        if (pitchModeIndex == static_cast<int>(Core::MutationPitchMode::kDissonant))
+            return MutatorChoiceLists::MutationPitch::kDissonantClosed;
+        return {};
     }
 
     inline void hydrateToggleBinding(TSS::Toggle* toggle,
@@ -120,8 +114,9 @@ namespace PatchMutatorPanelInternal
     inline bool isRecipePropertyId(const juce::String& propertyName)
     {
         static constexpr const char* kRecipePropertyIds[] = {
-            MutatorWidgets::kAmount,
-            MutatorWidgets::kRandom,
+            MutatorWidgets::kMode,
+            MutatorWidgets::kPitch,
+            MutatorWidgets::kPitchOctaves,
             MutatorWidgets::kEnableDco1,
             MutatorWidgets::kEnableDco2,
             MutatorWidgets::kEnableVcfVca,

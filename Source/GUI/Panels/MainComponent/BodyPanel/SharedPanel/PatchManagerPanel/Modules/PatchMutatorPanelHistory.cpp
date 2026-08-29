@@ -6,6 +6,7 @@
 
 #include "Core/Services/PatchMutator/MutationNaming.h"
 #include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HierarchicalComboBox.h"
 
 using namespace PatchMutatorPanelInternal;
@@ -365,8 +366,8 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
         control->setEnabled(! compareActive);
     };
 
-    lockControl(amountSlider_.get());
-    lockControl(randomSlider_.get());
+    lockControl(modeComboBox_.get());
+    lockControl(pitchComboBox_.get());
     lockControl(dco1Toggle_.get());
     lockControl(dco2Toggle_.get());
     lockControl(vcfVcaToggle_.get());

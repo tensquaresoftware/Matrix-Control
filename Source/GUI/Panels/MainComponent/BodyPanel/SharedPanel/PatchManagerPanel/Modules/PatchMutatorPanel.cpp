@@ -3,12 +3,13 @@
 
 #include <vector>
 
+#include "Core/Services/PatchMutator/MutatorSessionPersistence.h"
 #include "GUI/Factories/WidgetFactory.h"
 #include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HierarchicalComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ModuleHeader.h"
-#include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Toggle.h"
 
 using namespace PatchMutatorPanelInternal;
@@ -78,8 +79,8 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
 {
     setOpaque(false);
     setupModuleHeader(skin, widgetFactory);
-    setupAmountLine(skin, widgetFactory);
-    setupRandomLine(skin, widgetFactory);
+    setupModeLine(skin, widgetFactory);
+    setupPitchLine(skin, widgetFactory);
     setupHistoryLine(skin, widgetFactory);
 
     if (! apvts_.state.hasProperty(MutatorState::kCompareActive))
@@ -143,24 +144,84 @@ void PatchMutatorPanel::refreshRecipeFromApvts()
     auto& state = apvts_.state;
 
     recipeHydrating_ = true;
-
-    const auto clampRecipePercentProperty = [&state](const char* propertyId, int defaultValue)
-    {
-        const int raw = state.hasProperty(propertyId)
-                            ? static_cast<int>(state.getProperty(propertyId))
-                            : defaultValue;
-        const int clamped = juce::jlimit(1, 100, raw);
-
-        if (! state.hasProperty(propertyId) || static_cast<int>(state.getProperty(propertyId)) != clamped)
-            state.setProperty(propertyId, clamped, nullptr);
-    };
-
-    clampRecipePercentProperty(MutatorWidgets::kAmount, 50);
-    clampRecipePercentProperty(MutatorWidgets::kRandom, 25);
-
-    hydrateIntSlider(amountSlider_.get(), state, MutatorWidgets::kAmount, 50);
-    hydrateIntSlider(randomSlider_.get(), state, MutatorWidgets::kRandom, 25);
+    Core::MutatorSessionPersistence::initializeModeAndPitchState(state);
+    hydrateModeFromApvts(state);
+    hydratePitchFromApvts(state);
     hydrateRecipeTogglesFromApvts(state);
+    recipeHydrating_ = false;
+}
+
+void PatchMutatorPanel::hydrateModeFromApvts(const juce::ValueTree& state)
+{
+    if (modeComboBox_ == nullptr)
+        return;
+
+    const int modeIndex = juce::jlimit(0,
+                                       Core::kMutationModeCount - 1,
+                                       static_cast<int>(state.getProperty(MutatorWidgets::kMode)));
+    modeComboBox_->setSelectedItemIndex(modeIndex, juce::dontSendNotification);
+}
+
+void PatchMutatorPanel::hydratePitchFromApvts(const juce::ValueTree& state)
+{
+    if (pitchComboBox_ == nullptr)
+        return;
+
+    const int pitchIndex = juce::jlimit(0,
+                                        Core::kMutationPitchModeCount - 1,
+                                        static_cast<int>(state.getProperty(MutatorWidgets::kPitch)));
+    const int octaves = juce::jlimit(Core::MutationCalibration::kMinPitchOctaves,
+                                     Core::MutationCalibration::kMaxPitchOctaves,
+                                     static_cast<int>(state.getProperty(MutatorWidgets::kPitchOctaves)));
+
+    const int primaryId = pitchPrimaryIdForMode(pitchIndex);
+    const bool hasOctaveWindow =
+        Core::pitchModeUsesOctaveWindow(Core::mutationPitchModeFromIndex(pitchIndex));
+
+    pitchComboBox_->setSelectedIds(primaryId,
+                                   hasOctaveWindow ? pitchChildIdFor(primaryId, octaves) : 0,
+                                   juce::dontSendNotification);
+}
+
+void PatchMutatorPanel::handleModeComboSelectionChange()
+{
+    if (recipeHydrating_ || modeComboBox_ == nullptr)
+        return;
+
+    const int modeIndex = modeComboBox_->getSelectedItemIndex();
+    if (modeIndex < 0)
+        return;
+
+    apvts_.state.setProperty(MutatorWidgets::kMode,
+                             juce::jlimit(0, Core::kMutationModeCount - 1, modeIndex),
+                             nullptr);
+}
+
+void PatchMutatorPanel::handlePitchComboSelectionChange()
+{
+    if (recipeHydrating_ || pitchComboBox_ == nullptr)
+        return;
+
+    const int primaryId = pitchComboBox_->getSelectedPrimaryId();
+    const int pitchIndex = pitchModeIndexForPrimaryId(primaryId);
+
+    if (pitchIndex < 0 || pitchIndex >= Core::kMutationPitchModeCount)
+        return;
+
+    recipeHydrating_ = true;
+
+    // PRESERVE and FREE have no sub-menu, so the stored octave window simply stays put.
+    const int childId = pitchComboBox_->getSelectedChildId();
+    if (childId != 0)
+    {
+        apvts_.state.setProperty(MutatorWidgets::kPitchOctaves,
+                                 juce::jlimit(Core::MutationCalibration::kMinPitchOctaves,
+                                              Core::MutationCalibration::kMaxPitchOctaves,
+                                              pitchOctavesForChildId(childId)),
+                                 nullptr);
+    }
+
+    apvts_.state.setProperty(MutatorWidgets::kPitch, pitchIndex, nullptr);
     recipeHydrating_ = false;
 }
 

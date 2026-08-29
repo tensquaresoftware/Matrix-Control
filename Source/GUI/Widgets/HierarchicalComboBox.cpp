@@ -61,19 +61,25 @@ namespace TSS
         repaint();
     }
 
-    void HierarchicalComboBox::addPrimaryItem(int id, const juce::String& label, bool isSentinel)
+    void HierarchicalComboBox::addPrimaryItem(int id,
+                                              const juce::String& label,
+                                              bool isSentinel,
+                                              const juce::String& closedLabel)
     {
-        primaryItems_.push_back({ id, label, isSentinel, {} });
+        primaryItems_.push_back({ id, label, closedLabel, isSentinel, {} });
     }
 
-    void HierarchicalComboBox::addChildItem(int primaryId, int id, const juce::String& label)
+    void HierarchicalComboBox::addChildItem(int primaryId,
+                                            int id,
+                                            const juce::String& label,
+                                            const juce::String& closedLabel)
     {
         for (auto& primary : primaryItems_)
         {
             if (primary.id != primaryId || ! primary.isSelectable())
                 continue;
 
-            primary.children.push_back({ id, label });
+            primary.children.push_back({ id, label, closedLabel });
             return;
         }
     }
@@ -201,13 +207,15 @@ namespace TSS
         if (primary->isSentinel)
             return primary->label;
 
+        const auto primaryFace = primary->closedLabel.isNotEmpty() ? primary->closedLabel : primary->label;
+
         if (selectedChildId_ != 0)
         {
             if (const auto* child = findChildItem(*primary, selectedChildId_))
             {
                 const auto trimmedChildLabel = child->label.trim();
                 if (trimmedChildLabel == "-" || trimmedChildLabel == juce::String::fromUTF8("\xe2\x80\x94"))
-                    return primary->label;
+                    return primaryFace;
 
                 // Full patch names (Mxx / Mxx-Ryy) replace the closed-control text.
                 if (trimmedChildLabel == primary->label
@@ -216,11 +224,12 @@ namespace TSS
                     return trimmedChildLabel;
                 }
 
-                return primary->label + " " + child->label;
+                const auto childFace = child->closedLabel.isNotEmpty() ? child->closedLabel : child->label;
+                return primaryFace + " " + childFace;
             }
         }
 
-        return primary->label;
+        return primaryFace;
     }
 
     const HierarchicalComboBox::PrimaryItem* HierarchicalComboBox::findPrimaryItem(int primaryId) const

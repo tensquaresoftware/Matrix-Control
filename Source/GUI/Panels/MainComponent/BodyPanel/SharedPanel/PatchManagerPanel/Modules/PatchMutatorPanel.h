@@ -13,8 +13,8 @@ namespace TSS
     class ISkin;
     class ModuleHeader;
     class Label;
-    class Slider;
     class Button;
+    class ComboBox;
     class HierarchicalComboBox;
     class Toggle;
 }
@@ -44,12 +44,12 @@ public:
 private:
     class ActionEnabledPropertyListener;
 
-    struct SliderLineLayoutArgs
+    struct RecipeRowLayoutArgs
     {
         int x = 0;
         int y = 0;
         TSS::Label* label = nullptr;
-        TSS::Slider* slider = nullptr;
+        juce::Component* control = nullptr;
         TSS::Button* button = nullptr;
         TSS::Toggle* const* toggles = nullptr;
         int toggleCount = 0;
@@ -63,8 +63,8 @@ private:
 
     std::unique_ptr<TSS::ModuleHeader> moduleHeader_;
 
-    std::unique_ptr<TSS::Label> amountLabel_;
-    std::unique_ptr<TSS::Slider> amountSlider_;
+    std::unique_ptr<TSS::Label> modeLabel_;
+    std::unique_ptr<TSS::ComboBox> modeComboBox_;
     std::unique_ptr<TSS::Button> mutateButton_;
     std::unique_ptr<TSS::Toggle> dco1Toggle_;
     std::unique_ptr<TSS::Toggle> dco2Toggle_;
@@ -72,8 +72,8 @@ private:
     std::unique_ptr<TSS::Toggle> fmTrackToggle_;
     std::unique_ptr<TSS::Toggle> rampPortamentoToggle_;
 
-    std::unique_ptr<TSS::Label> randomLabel_;
-    std::unique_ptr<TSS::Slider> randomSlider_;
+    std::unique_ptr<TSS::Label> pitchLabel_;
+    std::unique_ptr<TSS::HierarchicalComboBox> pitchComboBox_;
     std::unique_ptr<TSS::Button> retryButton_;
     std::unique_ptr<TSS::Toggle> env1Toggle_;
     std::unique_ptr<TSS::Toggle> env2Toggle_;
@@ -123,17 +123,14 @@ private:
 
     // Setup (PatchMutatorPanelSetup.cpp).
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupAmountLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupRandomLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupModeLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupPitchLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void setupHistoryLine(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     void wireHistoryComboBox(TSS::ISkin& skin);
     void setupHistoryActionButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
     std::unique_ptr<TSS::Toggle> makeRecipeToggle(TSS::ISkin& skin,
                                                   const char* displayName,
                                                   const char* widgetId);
-    std::unique_ptr<TSS::Slider> makePercentRecipeSlider(TSS::ISkin& skin,
-                                                         const char* widgetId,
-                                                         double fallbackDefault);
     void connectButtonToApvts(TSS::Button* button, const char* widgetId);
     void connectToggleToApvts(TSS::Toggle* toggle, const char* widgetId);
 
@@ -141,12 +138,16 @@ private:
     void propagateSkinsToControlWidgets(TSS::ISkin& skin);
     void propagateSkinsToToggleWidgets(TSS::ISkin& skin);
     void applyUiScaleToWidgets(float sf);
-    void layoutSliderLine(const SliderLineLayoutArgs& args);
+    void layoutRecipeRow(const RecipeRowLayoutArgs& args);
     void layoutHistoryLine(int x, int y);
 
     // Recipe hydrate (PatchMutatorPanel.cpp).
     void refreshRecipeFromApvts();
     void hydrateRecipeTogglesFromApvts(const juce::ValueTree& state);
+    void hydrateModeFromApvts(const juce::ValueTree& state);
+    void hydratePitchFromApvts(const juce::ValueTree& state);
+    void handleModeComboSelectionChange();
+    void handlePitchComboSelectionChange();
     static bool isRecipeProperty(const juce::String& propertyName);
     void timerCallback() override;
 

@@ -8,10 +8,10 @@
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Widgets/Button.h"
+#include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HierarchicalComboBox.h"
 #include "GUI/Widgets/Label.h"
 #include "GUI/Widgets/ModuleHeader.h"
-#include "GUI/Widgets/Slider.h"
 #include "GUI/Widgets/Toggle.h"
 
 using namespace PatchMutatorPanelInternal;
@@ -90,25 +90,25 @@ void PatchMutatorPanel::resized()
     const int row1Y = row0Y + rowStep;
     const int row2Y = row1Y + rowStep;
 
-    TSS::Toggle* amountToggles[] = {
+    TSS::Toggle* modeRowToggles[] = {
         dco1Toggle_.get(), dco2Toggle_.get(), vcfVcaToggle_.get(),
         fmTrackToggle_.get(), rampPortamentoToggle_.get()
     };
-    layoutSliderLine({
+    layoutRecipeRow({
         0, row0Y,
-        amountLabel_.get(), amountSlider_.get(), mutateButton_.get(),
-        amountToggles, 5,
+        modeLabel_.get(), modeComboBox_.get(), mutateButton_.get(),
+        modeRowToggles, 5,
         dims_.buttons.patchMutatorMutateWidth
     });
 
-    TSS::Toggle* randomToggles[] = {
+    TSS::Toggle* pitchRowToggles[] = {
         env1Toggle_.get(), env2Toggle_.get(), env3Toggle_.get(),
         lfo1Toggle_.get(), lfo2Toggle_.get()
     };
-    layoutSliderLine({
+    layoutRecipeRow({
         0, row1Y,
-        randomLabel_.get(), randomSlider_.get(), retryButton_.get(),
-        randomToggles, 5,
+        pitchLabel_.get(), pitchComboBox_.get(), retryButton_.get(),
+        pitchRowToggles, 5,
         dims_.buttons.patchMutatorRetryWidth
     });
 
@@ -119,11 +119,11 @@ void PatchMutatorPanel::resized()
 void PatchMutatorPanel::applyUiScaleToWidgets(float sf)
 {
     applyUiScale(moduleHeader_, sf);
-    applyUiScale(amountLabel_, sf);
-    applyUiScale(amountSlider_, sf);
+    applyUiScale(modeLabel_, sf);
+    applyUiScale(modeComboBox_, sf);
     applyUiScale(mutateButton_, sf);
-    applyUiScale(randomLabel_, sf);
-    applyUiScale(randomSlider_, sf);
+    applyUiScale(pitchLabel_, sf);
+    applyUiScale(pitchComboBox_, sf);
     applyUiScale(retryButton_, sf);
     applyUiScale(historyLabel_, sf);
     applyUiScale(historyComboBox_, sf);
@@ -146,20 +146,22 @@ void PatchMutatorPanel::applyUiScaleToWidgets(float sf)
     applyUiScale(enableMatrixModToggle_, sf);
 }
 
-void PatchMutatorPanel::layoutSliderLine(const SliderLineLayoutArgs& args)
+void PatchMutatorPanel::layoutRecipeRow(const RecipeRowLayoutArgs& args)
 {
     const float sf = uiScale_;
 
     const int labelW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.labels.patchMutatorWidth), sf);
     const int labelH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.labels.height), sf);
-    const int sliderW = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sliders.patchMutatorWidth), sf);
-    const int sliderH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.sliders.standardHeight), sf);
+    const int controlW = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.comboBoxes.patchMutatorHistoryWidth), sf);
+    const int controlH = TSS::ScaledLayout::scaledInt(
+        static_cast<float>(dims_.comboBoxes.standardHeight), sf);
     const int buttonW = TSS::ScaledLayout::scaledInt(static_cast<float>(args.actionButtonWidth), sf);
     const int buttonH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.buttons.height), sf);
     const int interGap = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.interControlGap), sf);
     const int rowH = TSS::ScaledLayout::scaledInt(static_cast<float>(dims_.layout.contentRowHeight), sf);
     const int labelY = args.y + (rowH - labelH) / 2;
-    const int sliderY = args.y + (rowH - sliderH) / 2;
+    const int controlY = args.y + (rowH - controlH) / 2;
 
     // Fixed-width successive strip — no float origin / step × index (U-7 Init precedent)
     int cursorX = args.x;
@@ -168,9 +170,9 @@ void PatchMutatorPanel::layoutSliderLine(const SliderLineLayoutArgs& args)
         args.label->setBounds(cursorX, labelY, labelW, labelH);
     cursorX += labelW + interGap;
 
-    if (args.slider != nullptr)
-        args.slider->setBounds(cursorX, sliderY, sliderW, sliderH);
-    cursorX += sliderW + interGap;
+    if (args.control != nullptr)
+        args.control->setBounds(cursorX, controlY, controlW, controlH);
+    cursorX += controlW + interGap;
 
     if (args.button != nullptr)
         args.button->setBounds(cursorX, args.y, buttonW, buttonH);
@@ -256,16 +258,29 @@ void PatchMutatorPanel::setUiScale(float uiScale)
 void PatchMutatorPanel::propagateSkinsToControlWidgets(TSS::ISkin& skin)
 {
     applyLook(moduleHeader_, TSS::moduleHeaderLookFromSkin(skin));
-    applyLook(amountLabel_, TSS::labelLookFromSkin(skin));
-    applyLook(amountSlider_, TSS::sliderLookFromSkin(skin));
-    applyLook(randomLabel_, TSS::labelLookFromSkin(skin));
-    applyLook(randomSlider_, TSS::sliderLookFromSkin(skin));
+    applyLook(modeLabel_, TSS::labelLookFromSkin(skin));
+    applyLook(pitchLabel_, TSS::labelLookFromSkin(skin));
     applyLook(historyLabel_, TSS::labelLookFromSkin(skin));
+
+    const auto comboBoxLook = TSS::comboBoxLookFromSkin(skin);
+    const auto popupMenuLook = TSS::popupMenuLookFromSkin(skin);
+
+    if (modeComboBox_ != nullptr)
+    {
+        modeComboBox_->setLook(comboBoxLook);
+        modeComboBox_->setPopupMenuLook(popupMenuLook);
+    }
+
+    if (pitchComboBox_ != nullptr)
+    {
+        pitchComboBox_->setLook(comboBoxLook);
+        pitchComboBox_->setPopupMenuLook(popupMenuLook);
+    }
 
     if (historyComboBox_ != nullptr)
     {
-        historyComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
-        historyComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        historyComboBox_->setLook(comboBoxLook);
+        historyComboBox_->setPopupMenuLook(popupMenuLook);
     }
 
     applyLook(mutateButton_, TSS::buttonLookFromSkin(skin));
