@@ -18,7 +18,8 @@ namespace TSS
  * Writes via getParameterAsValue().setValue during display drags; refreshes the display from parameter listeners.
  * Does not touch sliders or Env panels.
  */
-class EnvelopeDisplayApvtsBinding : private juce::AudioProcessorValueTreeState::Listener
+class EnvelopeDisplayApvtsBinding : private juce::AudioProcessorValueTreeState::Listener,
+                                    private juce::ValueTree::Listener
 {
 public:
     static constexpr int kParameterCount {5};
@@ -57,6 +58,7 @@ private:
     void applyDisplayValue(int paramIndex, int value);
 
     void parameterChanged(const juce::String& parameterId, float newValue) override;
+    void valueTreeRedirected(juce::ValueTree& treeWhosePropertyHasChanged) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EnvelopeDisplayApvtsBinding)
 };

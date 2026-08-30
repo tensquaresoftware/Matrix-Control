@@ -12,6 +12,7 @@ EnvelopeDisplayApvtsBinding::EnvelopeDisplayApvtsBinding(juce::AudioProcessorVal
     for (const char* parameterId : parameterIds_)
         apvts_.addParameterListener(parameterId, this);
 
+    apvts_.state.addListener(this);
     connectDisplayCallbacks();
     syncAllFromApvts();
 }
@@ -23,6 +24,8 @@ EnvelopeDisplayApvtsBinding::~EnvelopeDisplayApvtsBinding()
     display_.setOnValueChanged(nullptr);
     display_.setOnEditGestureBegin(nullptr);
     display_.setOnEditGestureEnd(nullptr);
+
+    apvts_.state.removeListener(this);
 
     for (const char* parameterId : parameterIds_)
         apvts_.removeParameterListener(parameterId, this);
@@ -190,4 +193,9 @@ void EnvelopeDisplayApvtsBinding::parameterChanged(const juce::String& parameter
                 default: break;
             }
         });
+}
+
+void EnvelopeDisplayApvtsBinding::valueTreeRedirected(juce::ValueTree&)
+{
+    syncAllFromApvts();
 }

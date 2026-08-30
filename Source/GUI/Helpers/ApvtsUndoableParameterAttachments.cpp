@@ -74,6 +74,19 @@ namespace TSS
             if (apvts.undoManager != nullptr)
                 apvts.undoManager->beginNewTransaction("Parameter edit: " + parameterId);
         }
+
+        float readDenormalisedParameter(juce::AudioProcessorValueTreeState& apvts,
+                                        juce::RangedAudioParameter* parameter,
+                                        const juce::String& parameterId)
+        {
+            if (auto* raw = apvts.getRawParameterValue(parameterId))
+                return raw->load();
+
+            if (parameter != nullptr)
+                return parameter->convertFrom0to1(parameter->getValue());
+
+            return 0.0f;
+        }
     }
 
     ApvtsUndoableSliderAttachment::ApvtsUndoableSliderAttachment(juce::AudioProcessorValueTreeState& apvts,
@@ -83,28 +96,45 @@ namespace TSS
         , parameterId_(parameterId)
         , slider_(slider)
         , parameter_(getRangedParameterOrNull(apvts_, parameterId_))
-        , parameterValue_(apvts.getParameterAsValue(parameterId_))
     {
         jassert(parameter_ != nullptr);
         configureSliderRange(slider_, *parameter_);
-        parameterValue_.addListener(this);
+
+        if (parameter_ != nullptr)
+            parameter_->addListener(this);
+
+        apvts_.state.addListener(this);
+        rebindParameterValue();
         slider_.addListener(this);
-        syncSliderFromParameterValue();
+        syncSliderFromParameter();
     }
 
     ApvtsUndoableSliderAttachment::~ApvtsUndoableSliderAttachment()
     {
+        cancelPendingUpdate();
         slider_.removeListener(this);
         parameterValue_.removeListener(this);
+        apvts_.state.removeListener(this);
+
+        if (parameter_ != nullptr)
+            parameter_->removeListener(this);
     }
 
-    void ApvtsUndoableSliderAttachment::syncSliderFromParameterValue()
+    void ApvtsUndoableSliderAttachment::rebindParameterValue()
+    {
+        parameterValue_.removeListener(this);
+        parameterValue_ = apvts_.getParameterAsValue(parameterId_);
+        parameterValue_.addListener(this);
+    }
+
+    void ApvtsUndoableSliderAttachment::syncSliderFromParameter()
     {
         if (parameter_ == nullptr)
             return;
 
         const juce::ScopedValueSetter<bool> scope(ignoreCallbacks_, true);
-        slider_.setValue(static_cast<double>(parameterValue_.getValue()), juce::dontSendNotification);
+        slider_.setValue(static_cast<double>(readDenormalisedParameter(apvts_, parameter_, parameterId_)),
+                         juce::dontSendNotification);
     }
 
     void ApvtsUndoableSliderAttachment::writeSliderValueToParameter(bool beginNewEditorialStep)
@@ -114,12 +144,14 @@ namespace TSS
 
         const auto denormalised = static_cast<float>(slider_.getValue());
 
-        if (juce::approximatelyEqual(static_cast<float>(parameterValue_.getValue()), denormalised))
+        if (juce::approximatelyEqual(readDenormalisedParameter(apvts_, parameter_, parameterId_),
+                                     denormalised))
             return;
 
         if (beginNewEditorialStep)
             beginEditorialParameterEdit(apvts_, parameterId_);
 
+        rebindParameterValue();
         parameterValue_.setValue(denormalised);
     }
 
@@ -149,7 +181,25 @@ namespace TSS
         if (ignoreCallbacks_)
             return;
 
-        syncSliderFromParameterValue();
+        syncSliderFromParameter();
+    }
+
+    void ApvtsUndoableSliderAttachment::parameterValueChanged(int, float)
+    {
+        triggerAsyncUpdate();
+    }
+
+    void ApvtsUndoableSliderAttachment::parameterGestureChanged(int, bool) {}
+
+    void ApvtsUndoableSliderAttachment::handleAsyncUpdate()
+    {
+        syncSliderFromParameter();
+    }
+
+    void ApvtsUndoableSliderAttachment::valueTreeRedirected(juce::ValueTree&)
+    {
+        rebindParameterValue();
+        syncSliderFromParameter();
     }
 
     void ApvtsUndoableSliderAttachment::sliderDragStarted(juce::Slider*)
@@ -177,24 +227,50 @@ namespace TSS
         : apvts_(apvts)
         , parameterId_(parameterId)
         , comboBox_(comboBox)
-        , parameterValue_(apvts.getParameterAsValue(parameterId_))
     {
+        if (auto* parameter = apvts_.getParameter(parameterId_))
+            parameter->addListener(this);
+
+        apvts_.state.addListener(this);
+        rebindParameterValue();
         comboBox_.addListener(this);
-        parameterValue_.addListener(this);
-        syncComboBoxFromParameterValue();
+        syncComboBoxFromParameter();
     }
 
     ApvtsUndoableComboBoxAttachment::~ApvtsUndoableComboBoxAttachment()
     {
+        cancelPendingUpdate();
         comboBox_.removeListener(this);
         parameterValue_.removeListener(this);
+        apvts_.state.removeListener(this);
+
+        if (auto* parameter = apvts_.getParameter(parameterId_))
+            parameter->removeListener(this);
     }
 
-    void ApvtsUndoableComboBoxAttachment::syncComboBoxFromParameterValue()
+    void ApvtsUndoableComboBoxAttachment::rebindParameterValue()
     {
-        const auto selectedIndex = juce::roundToInt(static_cast<float>(parameterValue_.getValue()));
+        parameterValue_.removeListener(this);
+        parameterValue_ = apvts_.getParameterAsValue(parameterId_);
+        parameterValue_.addListener(this);
+    }
+
+    int ApvtsUndoableComboBoxAttachment::readChoiceIndexFromParameter() const
+    {
+        if (const auto* choice = dynamic_cast<const juce::AudioParameterChoice*>(
+                apvts_.getParameter(parameterId_)))
+            return choice->getIndex();
+
+        if (auto* raw = apvts_.getRawParameterValue(parameterId_))
+            return juce::roundToInt(raw->load());
+
+        return 0;
+    }
+
+    void ApvtsUndoableComboBoxAttachment::syncComboBoxFromParameter()
+    {
         const juce::ScopedValueSetter<bool> scope(ignoreCallbacks_, true);
-        comboBox_.setSelectedItemIndex(selectedIndex, juce::dontSendNotification);
+        comboBox_.setSelectedItemIndex(readChoiceIndexFromParameter(), juce::dontSendNotification);
     }
 
     void ApvtsUndoableComboBoxAttachment::writeComboBoxSelectionToParameter()
@@ -206,11 +282,11 @@ namespace TSS
         if (selectedIndex < 0)
             return;
 
-        const auto currentIndex = juce::roundToInt(static_cast<float>(parameterValue_.getValue()));
-        if (currentIndex == selectedIndex)
+        if (readChoiceIndexFromParameter() == selectedIndex)
             return;
 
         beginEditorialParameterEdit(apvts_, parameterId_);
+        rebindParameterValue();
         parameterValue_.setValue(static_cast<float>(selectedIndex));
     }
 
@@ -221,7 +297,25 @@ namespace TSS
         if (ignoreCallbacks_)
             return;
 
-        syncComboBoxFromParameterValue();
+        syncComboBoxFromParameter();
+    }
+
+    void ApvtsUndoableComboBoxAttachment::parameterValueChanged(int, float)
+    {
+        triggerAsyncUpdate();
+    }
+
+    void ApvtsUndoableComboBoxAttachment::parameterGestureChanged(int, bool) {}
+
+    void ApvtsUndoableComboBoxAttachment::handleAsyncUpdate()
+    {
+        syncComboBoxFromParameter();
+    }
+
+    void ApvtsUndoableComboBoxAttachment::valueTreeRedirected(juce::ValueTree&)
+    {
+        rebindParameterValue();
+        syncComboBoxFromParameter();
     }
 
     void ApvtsUndoableComboBoxAttachment::comboBoxChanged(juce::ComboBox*)
