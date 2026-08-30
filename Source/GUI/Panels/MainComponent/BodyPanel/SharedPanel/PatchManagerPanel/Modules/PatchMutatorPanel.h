@@ -23,6 +23,7 @@ class WidgetFactory;
 
 class PatchMutatorPanel : public juce::Component,
                           public juce::ValueTree::Listener,
+                          private juce::AudioProcessorValueTreeState::Listener,
                           private juce::Timer
 {
 public:
@@ -43,6 +44,8 @@ public:
 
 private:
     class ActionEnabledPropertyListener;
+
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
 
     struct RecipeRowLayoutArgs
     {
@@ -114,6 +117,8 @@ private:
     void refreshCompareUiState();
     void applyCompareControlLock(bool compareActive);
     void applyCompareBlinkState(bool compareActive);
+    void refreshPitchControlEnabled();
+    bool hasMutableAudibleDco() const;
     void handleHistoryComboSelectionChange();
     void applyHistoryRootSelectionChange(int newRootIndex, int childId);
     void syncHistorySelectionFromApvts();

@@ -11,6 +11,7 @@
 #include <memory>
 #include <utility>
 
+#include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_data_structures/juce_data_structures.h>
 
 // Free helpers shared by PatchMutatorPanel.cpp and its companion .cpp files.
@@ -109,6 +110,18 @@ namespace PatchMutatorPanelInternal
 
         toggle->setToggleState(static_cast<bool>(state.getProperty(propertyId, false)),
                                juce::dontSendNotification);
+    }
+
+    inline bool isWaveSelectAudible(const juce::AudioProcessorValueTreeState& apvts,
+                                    const char* waveSelectParameterId)
+    {
+        const auto* param = dynamic_cast<const juce::AudioParameterChoice*>(
+            apvts.getParameter(waveSelectParameterId));
+        if (param == nullptr)
+            return false;
+
+        return param->getIndex()
+               != param->choices.indexOf(juce::String(PluginDisplayNames::ChoiceLists::WaveSelect::kOff));
     }
 
     inline bool isRecipePropertyId(const juce::String& propertyName)

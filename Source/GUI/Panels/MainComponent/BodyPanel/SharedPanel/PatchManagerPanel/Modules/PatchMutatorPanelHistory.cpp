@@ -8,6 +8,7 @@
 #include "GUI/Widgets/Button.h"
 #include "GUI/Widgets/ComboBox.h"
 #include "GUI/Widgets/HierarchicalComboBox.h"
+#include "GUI/Widgets/Label.h"
 
 using namespace PatchMutatorPanelInternal;
 
@@ -320,6 +321,33 @@ void PatchMutatorPanel::applyCompareBlinkState(bool compareActive)
     compareButton_->setAlpha(1.0f);
 }
 
+bool PatchMutatorPanel::hasMutableAudibleDco() const
+{
+    namespace Dco1 = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
+    namespace Dco2 = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
+
+    const auto& state = apvts_.state;
+    const bool dco1Mutable = static_cast<bool>(state.getProperty(MutatorWidgets::kEnableDco1, false));
+    const bool dco2Mutable = static_cast<bool>(state.getProperty(MutatorWidgets::kEnableDco2, false));
+
+    return (dco1Mutable && isWaveSelectAudible(apvts_, Dco1::kWaveSelect))
+           || (dco2Mutable && isWaveSelectAudible(apvts_, Dco2::kWaveSelect));
+}
+
+void PatchMutatorPanel::refreshPitchControlEnabled()
+{
+    if (pitchComboBox_ == nullptr)
+        return;
+
+    const bool compareActive = static_cast<bool>(
+        apvts_.state.getProperty(MutatorState::kCompareActive, false));
+    const bool enabled = ! compareActive && hasMutableAudibleDco();
+
+    pitchComboBox_->setEnabled(enabled);
+    if (pitchLabel_ != nullptr)
+        pitchLabel_->setEnabled(enabled);
+}
+
 void PatchMutatorPanel::refreshCompareUiState()
 {
     const bool compareActive = static_cast<bool>(
@@ -367,7 +395,7 @@ void PatchMutatorPanel::applyCompareControlLock(bool compareActive)
     };
 
     lockControl(modeComboBox_.get());
-    lockControl(pitchComboBox_.get());
+    refreshPitchControlEnabled();
     lockControl(dco1Toggle_.get());
     lockControl(dco2Toggle_.get());
     lockControl(vcfVcaToggle_.get());
