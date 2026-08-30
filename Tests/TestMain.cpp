@@ -18,39 +18,76 @@ protected:
     }
 };
 
+void collectTestsMatchingArgs(int argc, char** argv, juce::Array<juce::UnitTest*>& outSelected)
+{
+    for (int argIndex = 1; argIndex < argc; ++argIndex)
+    {
+        const juce::String needle(argv[argIndex]);
+        if (needle.isEmpty())
+            continue;
+
+        for (auto* unitTest : juce::UnitTest::getAllTests())
+            if (unitTest->getName().containsIgnoreCase(needle))
+                outSelected.addIfNotAlreadyThere(unitTest);
+    }
+}
+
+int countAndReportFailures(const juce::UnitTestRunner& runner)
+{
+    int failures = 0;
+
+    for (int i = 0; i < runner.getNumResults(); ++i)
+    {
+        const auto* result = runner.getResult(i);
+        if (result == nullptr)
+            continue;
+
+        failures += result->failures;
+
+        if (result->failures <= 0)
+            continue;
+
+        std::cerr << "SUMMARY FAIL: " << result->unitTestName
+                  << " / " << result->subcategoryName
+                  << " (" << result->failures << ")" << std::endl;
+
+        for (const auto& message : result->messages)
+            std::cerr << "  " << message << std::endl;
+    }
+
+    std::cerr << "TEST SUMMARY: " << failures << " failure(s)" << std::endl;
+    std::cerr.flush();
+    return failures;
+}
+
 } // namespace
 
 // Console entry point for the Matrix-Control unit test runner. Every UnitTest
 // subclass registers itself statically, so running all tests requires no manual
-// registration here. Returns a non-zero exit code when any test fails so the
-// runner can gate CI / local builds.
-int main(int, char**)
+// registration here. Optional argv tokens filter by unit-test name substring
+// (e.g. `Matrix-Control_Tests MutationPlayability`). Returns a non-zero exit
+// code when any test fails so the runner can gate CI / local builds.
+int main(int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI juceInitialiser;
 
     StderrUnitTestRunner runner;
     runner.setAssertOnFailure(false);
-    runner.runAllTests();
 
-    int failures = 0;
-    for (int i = 0; i < runner.getNumResults(); ++i)
+    if (argc <= 1)
     {
-        const auto* result = runner.getResult(i);
-        failures += result->failures;
-
-        if (result->failures > 0)
-        {
-            std::cerr << "SUMMARY FAIL: " << result->unitTestName
-                      << " / " << result->subcategoryName
-                      << " (" << result->failures << ")" << std::endl;
-
-            for (const auto& message : result->messages)
-                std::cerr << "  " << message << std::endl;
-        }
+        runner.runAllTests();
+        return countAndReportFailures(runner) == 0 ? 0 : 1;
     }
 
-    std::cerr << "TEST SUMMARY: " << failures << " failure(s)" << std::endl;
-    std::cerr.flush();
+    juce::Array<juce::UnitTest*> selected;
+    collectTestsMatchingArgs(argc, argv, selected);
+    if (selected.isEmpty())
+    {
+        std::cerr << "No unit tests matched the given name filter(s)." << std::endl;
+        return 1;
+    }
 
-    return failures == 0 ? 0 : 1;
+    runner.runTests(selected);
+    return countAndReportFailures(runner) == 0 ? 0 : 1;
 }

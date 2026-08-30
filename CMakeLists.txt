@@ -419,6 +419,9 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/MutationAlgorithmTests.cpp
         Tests/Unit/MutationCalibrationTests.cpp
         Tests/Unit/MutationAntiSilenceTests.cpp
+        Tests/Unit/MutationPlayabilityOracle.cpp
+        Tests/Unit/MutationPlayabilityCorpusTests.cpp
+        Tests/Unit/MutationFilterPathRearmTests.cpp
         Tests/Unit/PatchMutatorEngineTestSupport.cpp
         Tests/Unit/PatchMutatorEngineMutateTests.cpp
         Tests/Unit/PatchMutatorEngineRetryTests.cpp

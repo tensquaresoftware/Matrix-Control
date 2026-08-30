@@ -1271,3 +1271,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playable-calibration.md`
   summary: Should items not shipped — guard indicator, dead→playable golden, Unison/Keyboard LOCK through Warp, measured Noise inject.
   evidence: Spec Ask First / Should; deferred to keep Must shippable.
+
+## Deferred from: review of spec-patch-mutator-playability-unit-tests.md (2026-08-30)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playability-unit-tests.md`
+  summary: ROM corpus under Tests/Fixtures/Patches/ROM/ is still untracked and must be committed before CI can stay green.
+  evidence: Suite loads 16 listed paths from that tree; clean checkout without those files fails corpus_romFixturesArePresent.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playability-unit-tests.md`
+  summary: After MM opener restore, wave-select cardinality and mix-vs-silent-DCO guards are not re-armed (only filter + MM role guards).
+  evidence: Edge/blind review of finishMatrixModPass; corpus currently green but a restored MM→mix path could theoretically reopen a silence class.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playability-unit-tests.md`
+  summary: Oracle skips VCA2 floor when any live MM→VCA2 exists, without checking opener amount adequacy.
+  evidence: Edge hunter on checkAmplitudePath / matrixModDrivesVca2Volume; production openers usually repair this, but oracle gap remains.

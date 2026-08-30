@@ -410,8 +410,7 @@ void applyPostMutationGuards(PatchModel& inOut,
     // Matrix Modulation has already been jittered at this point, so its risk roles are
     // read from the working patch rather than from the seed.
     applyMatrixModRoleGuards(inOut, recipe);
-    guardFilterSmother(inOut, recipe);
-    guardFilterOpenEnvelope(inOut, recipe);
+    applyFilterPathGuards(inOut, recipe);
     guardWaveSelectCardinality(inOut, seed, recipe, facts);
     guardMixAgainstSilentOscillator(inOut, recipe);
     nudgeFmAmountForInterest(inOut, recipe, facts);
@@ -422,6 +421,12 @@ void applyMatrixModRoleGuards(PatchModel& inOut, const MutationRecipe& recipe)
     const auto roles = MutationMatrixModRoles::read(inOut);
     guardAmplitudePath(inOut, recipe, roles);
     guardEscalatedEnvelopeRoles(inOut, recipe, roles);
+}
+
+void applyFilterPathGuards(PatchModel& inOut, const MutationRecipe& recipe)
+{
+    guardFilterSmother(inOut, recipe);
+    guardFilterOpenEnvelope(inOut, recipe);
 }
 
 namespace

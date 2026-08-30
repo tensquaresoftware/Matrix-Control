@@ -3,6 +3,9 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/Init/InitDefaults.h"
+#include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExDecoder.h"
+#include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Services/PatchMutator/MutationAlgorithm.h"
 #include "Core/Services/PatchMutator/MutationMatrixModPolicy.h"
 #include "Core/Services/PatchMutator/MutationPostApply.h"
@@ -29,6 +32,14 @@ namespace MutationCalibrationTestSupport
 
     // Enough rolls that a policy violation cannot hide behind one lucky draw.
     constexpr int kTrialCount = 32;
+    // Local stress pass only — keep off by default so CI stays in the seconds band.
+    constexpr int kWideTrialCount = 128;
+    constexpr bool kEnableWideTrials = false;
+
+    inline int activeTrialCount() noexcept
+    {
+        return kEnableWideTrials ? kWideTrialCount : kTrialCount;
+    }
 
     inline int readInt(const Core::PatchModel& patch, const char* parameterId)
     {
@@ -138,5 +149,118 @@ namespace MutationCalibrationTestSupport
         Core::MutationAlgorithm algorithm;
         algorithm.apply(working, recipe, rng);
         return working;
+    }
+
+    inline Core::MutationRecipe makeFullyEnabledRecipe(Core::MutationMode mode,
+                                                       Core::MutationPitchMode pitchMode)
+    {
+        auto recipe = makeRecipe(mode, pitchMode);
+        recipe.enableDco1 = true;
+        recipe.enableDco2 = true;
+        recipe.enableVcfVca = true;
+        recipe.enableFmTrack = true;
+        recipe.enableRampPortamento = true;
+        recipe.enableEnvelope1 = true;
+        recipe.enableEnvelope2 = true;
+        recipe.enableEnvelope3 = true;
+        recipe.enableLfo1 = true;
+        recipe.enableLfo2 = true;
+        recipe.enableMatrixMod = true;
+        return recipe;
+    }
+
+    inline juce::File fixturesRoot()
+    {
+        return juce::File(MATRIX_TEST_FIXTURES_DIR);
+    }
+
+    // Relative path under Tests/Fixtures (e.g. "Patches/ROM/BANK 2/P00 - OBXA-11.syx").
+    inline bool loadPatchFromFixtureRelative(const juce::String& relativePath,
+                                             Core::PatchModel& outModel)
+    {
+        juce::MemoryBlock raw;
+        if (! fixturesRoot().getChildFile(relativePath).loadFileAsData(raw))
+            return false;
+
+        SysExParser parser;
+        SysExDecoder decoder(parser);
+        juce::uint8 decoded[SysExConstants::kPatchPackedDataSize] = {};
+        if (! decoder.decodePatchSysEx(raw, decoded))
+            return false;
+
+        outModel.loadFrom(decoded);
+        return true;
+    }
+
+    // Spec corpus: banks 2–9, two patches each (exact filenames).
+    inline constexpr const char* kRomCorpusRelativePaths[] = {
+        "Patches/ROM/BANK 2/P00 - OBXA-11.syx",
+        "Patches/ROM/BANK 2/P29 - AMBIANCE.syx",
+        "Patches/ROM/BANK 3/P03 - HALO.syx",
+        "Patches/ROM/BANK 3/P99 - SYNCAGE.syx",
+        "Patches/ROM/BANK 4/P34 - CS-80.syx",
+        "Patches/ROM/BANK 4/P19 - BIGBRA$$.syx",
+        "Patches/ROM/BANK 5/P11 - SYNBASS.syx",
+        "Patches/ROM/BANK 5/P68 - OSC SYNC.syx",
+        "Patches/ROM/BANK 6/P10 - 1000STRG.syx",
+        "Patches/ROM/BANK 6/P79 - SOLEMN.syx",
+        "Patches/ROM/BANK 7/P04 - ARP-2600.syx",
+        "Patches/ROM/BANK 7/P73 - SLAP 2.syx",
+        "Patches/ROM/BANK 8/P03 - BANJO.syx",
+        "Patches/ROM/BANK 8/P73 - NOISE-DN.syx",
+        "Patches/ROM/BANK 9/P01 - MIKPIANO.syx",
+        "Patches/ROM/BANK 9/P11 - OB8 JUMP.syx",
+    };
+
+    inline Core::PatchModel makeTrapDeadAmplitude()
+    {
+        auto patch = makeInitPatchModel();
+        clearAllMatrixModBuses(patch);
+        writeChoiceByName(patch, Dco1Ids::kWaveSelect, WaveSelectNames::kWave);
+        writeChoiceByName(patch, Dco2Ids::kWaveSelect, WaveSelectNames::kWave);
+        writeInt(patch, VcfVcaIds::kVca1Volume, 0);
+        writeInt(patch, VcfVcaIds::kVca2ModByEnv2, 0);
+        writeInt(patch, Env2Ids::kAmplitude, 0);
+        return patch;
+    }
+
+    inline Core::PatchModel makeTrapDualWaveOff()
+    {
+        auto patch = makeInitPatchModel();
+        clearAllMatrixModBuses(patch);
+        writeChoiceByName(patch, Dco1Ids::kWaveSelect, WaveSelectNames::kOff);
+        writeChoiceByName(patch, Dco2Ids::kWaveSelect, WaveSelectNames::kOff);
+        return patch;
+    }
+
+    inline Core::PatchModel makeTrapFilterSmother()
+    {
+        auto patch = makeInitPatchModel();
+        clearAllMatrixModBuses(patch);
+        writeInt(patch, VcfVcaIds::kFrequency, 0);
+        writeInt(patch, VcfVcaIds::kResonance, 0);
+        return patch;
+    }
+
+    inline Core::PatchModel makeTrapMixTowardSilentDco()
+    {
+        auto patch = makeInitPatchModel();
+        clearAllMatrixModBuses(patch);
+        writeChoiceByName(patch, Dco1Ids::kWaveSelect, WaveSelectNames::kOff);
+        writeChoiceByName(patch, Dco2Ids::kWaveSelect, WaveSelectNames::kWave);
+        // Mix polarity: 63 = DCO 1 only — points at the silent oscillator.
+        writeInt(patch, VcfVcaIds::kBalance, 63);
+        return patch;
+    }
+
+    inline Core::PatchModel makeTrapNegativeMmTowardVca1()
+    {
+        auto patch = makeInitPatchModel();
+        clearAllMatrixModBuses(patch);
+        // Low base volume so a deep negative MM amount can actually smother amplitude.
+        writeInt(patch, VcfVcaIds::kVca1Volume, 10);
+        writeMatrixModBus(patch,
+                          { 0, SourceNames::kLfo1, DestinationNames::kVca1Volume, -63 });
+        return patch;
     }
 } // namespace MutationCalibrationTestSupport

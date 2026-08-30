@@ -39,6 +39,10 @@ namespace Core
     // Call again after MM motion so a revived risk bus still lifts ENV floors.
     void applyMatrixModRoleGuards(PatchModel& inOut, const MutationRecipe& recipe);
 
+    // Filter couple + ENV 1 open amp. Call again after MM opener restore — motion may
+    // revive a VCF FREQUENCY bus after the first post-apply pass already ran.
+    void applyFilterPathGuards(PatchModel& inOut, const MutationRecipe& recipe);
+
     // A4 #2 — couple cutoff↔resonance and envelope Attack→Decay/Release after int jitter.
     void applyFamilyGestures(PatchModel& inOut, const PatchModel& seed, const MutationRecipe& recipe);
 

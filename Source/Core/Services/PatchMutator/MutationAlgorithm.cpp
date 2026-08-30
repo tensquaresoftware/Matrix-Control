@@ -120,6 +120,23 @@ namespace
 
         return offIndex == 0 && descriptor.choices.size() > 1 ? 1 : 0;
     }
+
+    void finishMatrixModPass(PatchModel& inOut,
+                             const PatchModel& seed,
+                             const MutationRecipe& recipe,
+                             IRandomSource& rng)
+    {
+        if (! recipe.enableMatrixMod)
+            return;
+
+        capMatrixModRiskAmounts(inOut);
+        ensureMatrixModMotion(inOut, recipe.mode, recipe.pitchMode, rng);
+        ensureMatrixModAmplitudeOpeners(inOut, seed, recipe);
+        ensureMatrixModFilterOpeners(inOut, seed, recipe);
+        // Motion / opener restore may revive a risk or VCF bus after the first guard pass.
+        applyMatrixModRoleGuards(inOut, recipe);
+        applyFilterPathGuards(inOut, recipe);
+    }
 } // namespace
 
 bool MutationAlgorithm::apply(PatchModel& inOut, const MutationRecipe& recipe, IRandomSource& rng) const
@@ -156,17 +173,7 @@ bool MutationAlgorithm::apply(PatchModel& inOut, const MutationRecipe& recipe, I
     applyFamilyGestures(inOut, before, recipe);
     mutateChoiceDescriptors(inOut, pass);
     applyPostMutationGuards(inOut, before, recipe, seedFacts);
-
-    if (recipe.enableMatrixMod)
-    {
-        capMatrixModRiskAmounts(inOut);
-        ensureMatrixModMotion(inOut, recipe.mode, recipe.pitchMode, rng);
-        ensureMatrixModAmplitudeOpeners(inOut, before, recipe);
-        ensureMatrixModFilterOpeners(inOut, before, recipe);
-        // Motion / opener restore may revive a risk bus after the first guard pass — re-arm.
-        applyMatrixModRoleGuards(inOut, recipe);
-    }
-
+    finishMatrixModPass(inOut, before, recipe, rng);
     restoreProtectedNameBytes(before, inOut);
 
     return anyByteChangedInRange(before, inOut, kMutableRangeStart, PatchModel::kBufferSize);
