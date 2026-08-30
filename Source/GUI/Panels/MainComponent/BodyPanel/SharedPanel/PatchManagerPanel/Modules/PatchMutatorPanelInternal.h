@@ -115,13 +115,17 @@ namespace PatchMutatorPanelInternal
     inline bool isWaveSelectAudible(const juce::AudioProcessorValueTreeState& apvts,
                                     const char* waveSelectParameterId)
     {
-        const auto* param = dynamic_cast<const juce::AudioParameterChoice*>(
-            apvts.getParameter(waveSelectParameterId));
-        if (param == nullptr)
-            return false;
+        // Prefer the live AudioParameterChoice index — Wave Select SSOT puts OFF at 0.
+        if (const auto* choice = dynamic_cast<const juce::AudioParameterChoice*>(
+                apvts.getParameter(waveSelectParameterId)))
+        {
+            return choice->getIndex() > 0;
+        }
 
-        return param->getIndex()
-               != param->choices.indexOf(juce::String(PluginDisplayNames::ChoiceLists::WaveSelect::kOff));
+        if (auto* raw = apvts.getRawParameterValue(waveSelectParameterId))
+            return juce::roundToInt(raw->load()) > 0;
+
+        return false;
     }
 
     inline bool isRecipePropertyId(const juce::String& propertyName)

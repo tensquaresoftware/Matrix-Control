@@ -162,6 +162,11 @@ namespace TSS
         ComboBoxClosedControlHelper::applyPopupClosed(isPopupOpen_, *this);
     }
 
+    void HierarchicalComboBox::enablementChanged()
+    {
+        repaint();
+    }
+
     void HierarchicalComboBox::commitSelectionFromPopup(int primaryId, int childId)
     {
         commitSelection(primaryId, childId, juce::sendNotification);

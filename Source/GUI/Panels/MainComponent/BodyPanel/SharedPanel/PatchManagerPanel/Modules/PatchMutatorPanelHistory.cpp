@@ -344,6 +344,7 @@ void PatchMutatorPanel::refreshPitchControlEnabled()
     const bool enabled = ! compareActive && hasMutableAudibleDco();
 
     pitchComboBox_->setEnabled(enabled);
+    pitchComboBox_->setInactiveAppearance(! enabled);
     if (pitchLabel_ != nullptr)
         pitchLabel_->setEnabled(enabled);
 }

@@ -67,6 +67,8 @@ namespace TSS
         void notifyPopupOpened() override;
         void notifyPopupClosed() override;
 
+        void enablementChanged() override;
+
         static int getBaseHeight() { return ComboBoxControlMetrics::kDefaultHeight; }
 
     private:

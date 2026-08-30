@@ -23,7 +23,6 @@ class WidgetFactory;
 
 class PatchMutatorPanel : public juce::Component,
                           public juce::ValueTree::Listener,
-                          private juce::AudioProcessorValueTreeState::Listener,
                           private juce::Timer
 {
 public:
@@ -44,8 +43,7 @@ public:
 
 private:
     class ActionEnabledPropertyListener;
-
-    void parameterChanged(const juce::String& parameterID, float newValue) override;
+    class WaveSelectParameterListener;
 
     struct RecipeRowLayoutArgs
     {
@@ -95,6 +93,7 @@ private:
     std::unique_ptr<TSS::Toggle> enableMatrixModToggle_;
 
     std::unique_ptr<ActionEnabledPropertyListener> actionEnabledListener_;
+    std::unique_ptr<WaveSelectParameterListener> waveSelectParameterListener_;
 
     juce::Array<int> mutateRootIndices_;
     juce::Array<int> retryIndices_;
@@ -118,6 +117,10 @@ private:
     void applyCompareControlLock(bool compareActive);
     void applyCompareBlinkState(bool compareActive);
     void refreshPitchControlEnabled();
+    void schedulePitchControlEnabledRefresh();
+    void schedulePitchControlEnabledBootRefresh();
+    void bindWaveSelectPitchListeners();
+    void unbindWaveSelectPitchListeners();
     bool hasMutableAudibleDco() const;
     void handleHistoryComboSelectionChange();
     void applyHistoryRootSelectionChange(int newRootIndex, int childId);

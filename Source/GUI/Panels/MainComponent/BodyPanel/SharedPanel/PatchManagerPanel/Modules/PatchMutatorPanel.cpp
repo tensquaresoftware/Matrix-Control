@@ -69,6 +69,26 @@ private:
     std::vector<ActionEnabledBinding> bindings_;
 };
 
+// Direct parameter listener — fires on UI edits and pushChoiceToApvts, independent of APVTS ValueTree flush.
+class PatchMutatorPanel::WaveSelectParameterListener : public juce::AudioProcessorParameter::Listener
+{
+public:
+    explicit WaveSelectParameterListener(PatchMutatorPanel& owner)
+        : owner_(owner)
+    {
+    }
+
+    void parameterValueChanged(int, float) override
+    {
+        owner_.schedulePitchControlEnabledRefresh();
+    }
+
+    void parameterGestureChanged(int, bool) override {}
+
+private:
+    PatchMutatorPanel& owner_;
+};
+
 PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
                                      const PatchMutatorPanelDimensions& dims,
                                      WidgetFactory& widgetFactory,
@@ -95,16 +115,15 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
             { MutatorState::kDeleteEnabled, deleteButton_.get() },
             { MutatorState::kClearEnabled, clearButton_.get() } });
 
-    namespace Dco1 = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
-    namespace Dco2 = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
-    apvts_.addParameterListener(Dco1::kWaveSelect, this);
-    apvts_.addParameterListener(Dco2::kWaveSelect, this);
+    waveSelectParameterListener_ = std::make_unique<WaveSelectParameterListener>(*this);
+    bindWaveSelectPitchListeners();
 
     apvts_.state.addListener(this);
     refreshRecipeFromApvts();
     refreshHistoryComboBox();
     refreshCompareUiState();
     refreshPitchControlEnabled();
+    schedulePitchControlEnabledBootRefresh();
 
     setSize(dims_.width, dims_.height);
 }
@@ -112,10 +131,7 @@ PatchMutatorPanel::PatchMutatorPanel(TSS::ISkin& skin,
 PatchMutatorPanel::~PatchMutatorPanel()
 {
     stopTimer();
-    namespace Dco1 = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
-    namespace Dco2 = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
-    apvts_.removeParameterListener(Dco1::kWaveSelect, this);
-    apvts_.removeParameterListener(Dco2::kWaveSelect, this);
+    unbindWaveSelectPitchListeners();
     apvts_.state.removeListener(this);
 }
 
@@ -142,31 +158,80 @@ void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
 
 void PatchMutatorPanel::valueTreeRedirected(juce::ValueTree&)
 {
+    bindWaveSelectPitchListeners();
     refreshRecipeFromApvts();
     refreshHistoryComboBox();
     refreshCompareUiState();
     refreshPitchControlEnabled();
+    // Session restore / strip can settle Wave Select after this redirect — re-check briefly.
+    schedulePitchControlEnabledBootRefresh();
 }
 
-void PatchMutatorPanel::parameterChanged(const juce::String& parameterID, float)
+void PatchMutatorPanel::schedulePitchControlEnabledRefresh()
 {
-    namespace Dco1 = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
-    namespace Dco2 = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
-
-    if (parameterID != Dco1::kWaveSelect && parameterID != Dco2::kWaveSelect)
-        return;
-
-    if (juce::MessageManager::getInstance()->isThisTheMessageThread())
-    {
-        refreshPitchControlEnabled();
-        return;
-    }
-
     juce::MessageManager::callAsync([safeThis = juce::Component::SafePointer<PatchMutatorPanel>(this)]
     {
         if (safeThis != nullptr)
             safeThis->refreshPitchControlEnabled();
     });
+}
+
+void PatchMutatorPanel::schedulePitchControlEnabledBootRefresh()
+{
+    // Filet: host restore and MIDI-port strip can change Wave Select after the first paint
+    // without a reliable listener tick. Rebind + refresh on the next turns.
+    const auto schedulePass = [safeThis = juce::Component::SafePointer<PatchMutatorPanel>(this)](int delayMs)
+    {
+        const auto run = [safeThis]
+        {
+            if (safeThis == nullptr)
+                return;
+
+            safeThis->bindWaveSelectPitchListeners();
+            safeThis->refreshPitchControlEnabled();
+        };
+
+        if (delayMs <= 0)
+            juce::MessageManager::callAsync(run);
+        else
+            juce::Timer::callAfterDelay(delayMs, run);
+    };
+
+    schedulePass(0);
+    schedulePass(50);
+    schedulePass(250);
+}
+
+void PatchMutatorPanel::unbindWaveSelectPitchListeners()
+{
+    namespace Dco1 = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
+    namespace Dco2 = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
+
+    if (waveSelectParameterListener_ == nullptr)
+        return;
+
+    if (auto* parameter = apvts_.getParameter(Dco1::kWaveSelect))
+        parameter->removeListener(waveSelectParameterListener_.get());
+
+    if (auto* parameter = apvts_.getParameter(Dco2::kWaveSelect))
+        parameter->removeListener(waveSelectParameterListener_.get());
+}
+
+void PatchMutatorPanel::bindWaveSelectPitchListeners()
+{
+    namespace Dco1 = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
+    namespace Dco2 = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
+
+    unbindWaveSelectPitchListeners();
+
+    if (waveSelectParameterListener_ == nullptr)
+        return;
+
+    if (auto* parameter = apvts_.getParameter(Dco1::kWaveSelect))
+        parameter->addListener(waveSelectParameterListener_.get());
+
+    if (auto* parameter = apvts_.getParameter(Dco2::kWaveSelect))
+        parameter->addListener(waveSelectParameterListener_.get());
 }
 
 bool PatchMutatorPanel::isRecipeProperty(const juce::String& propertyName)
