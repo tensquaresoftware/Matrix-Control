@@ -172,6 +172,7 @@ set(PLUGIN_SOURCES
     Source/Core/Services/PatchMutator/MutationPolicy.cpp
     Source/Core/Services/PatchMutator/MutationPitchPolicy.cpp
     Source/Core/Services/PatchMutator/MutationMatrixModPolicy.cpp
+    Source/Core/Services/PatchMutator/MutationMatrixModOpeners.cpp
     Source/Core/Services/PatchMutator/MutationPostApply.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
     Source/Core/Services/PatchMutator/PatchMutatorEngineActions.cpp
@@ -544,6 +545,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Services/PatchMutator/MutationPolicy.cpp
         Source/Core/Services/PatchMutator/MutationPitchPolicy.cpp
         Source/Core/Services/PatchMutator/MutationMatrixModPolicy.cpp
+    Source/Core/Services/PatchMutator/MutationMatrixModOpeners.cpp
         Source/Core/Services/PatchMutator/MutationPostApply.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngine.cpp
         Source/Core/Services/PatchMutator/PatchMutatorEngineActions.cpp
