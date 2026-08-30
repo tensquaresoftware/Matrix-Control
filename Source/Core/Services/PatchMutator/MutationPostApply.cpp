@@ -20,6 +20,8 @@ namespace
     namespace Env3 = PluginIDs::PatchEditSection::Envelope3Module::ParameterWidgets;
     namespace WaveSelectNames = PluginDisplayNames::ChoiceLists::WaveSelect;
     namespace SourceNames = PluginDisplayNames::ChoiceLists::ModulationBus::Source;
+    namespace TriggerModeNames = PluginDisplayNames::ChoiceLists::TriggerMode;
+    namespace EnvelopeModeNames = PluginDisplayNames::ChoiceLists::EnvelopeMode;
 
     int readInt(const PatchModel& patch, const char* parameterId)
     {
@@ -82,13 +84,79 @@ namespace
                + (isWaveSelectActive(patch, Dco2::kWaveSelect) ? 1 : 0);
     }
 
-    void constrainNegativeDepth(PatchModel& inOut, const char* parameterId)
+    int choiceIndexOf(const char* parameterId, const char* choiceName)
     {
-        const int current = readInt(inOut, parameterId);
-        if (current >= MutationCalibration::kNegativeDepthFloorWhenBaseLow)
+        const auto* descriptor = findMutationChoiceDescriptor(parameterId);
+        return descriptor != nullptr ? descriptor->choices.indexOf(juce::String(choiceName)) : -1;
+    }
+
+    void setChoiceByName(PatchModel& inOut, const char* parameterId, const char* choiceName)
+    {
+        const int index = choiceIndexOf(parameterId, choiceName);
+        if (index >= 0)
+            setWaveSelectChoiceIndex(inOut, parameterId, index);
+    }
+
+    juce::String readChoiceName(const PatchModel& patch, const char* parameterId)
+    {
+        const auto* descriptor = findMutationChoiceDescriptor(parameterId);
+        if (descriptor == nullptr)
+            return {};
+
+        const int index = patch.getChoiceIndex(*descriptor);
+        if (! juce::isPositiveAndBelow(index, descriptor->choices.size()))
+            return {};
+
+        return descriptor->choices[index];
+    }
+
+    bool isExternalEnvelopeTrigger(const juce::String& triggerName)
+    {
+        return triggerName == TriggerModeNames::kXtrig
+               || triggerName == TriggerModeNames::kXmtrig
+               || triggerName == TriggerModeNames::kXreset
+               || triggerName == TriggerModeNames::kXmrst;
+    }
+
+    bool isNonKeyboardVolumeEnvelopeMode(const juce::String& modeName)
+    {
+        return modeName == EnvelopeModeNames::kDadr
+               || modeName == EnvelopeModeNames::kFree
+               || modeName == EnvelopeModeNames::kBoth;
+    }
+
+    // ENV 2 opens VCA 2: it must answer the keyboard, not an external pedal (Cas 7).
+    void guardEnv2KeyboardVolumePath(PatchModel& inOut, const MutationRecipe& recipe)
+    {
+        if (! recipe.enableEnvelope2)
             return;
 
-        setInt(inOut, parameterId, MutationCalibration::kNegativeDepthFloorWhenBaseLow);
+        if (readInt(inOut, VcfVca::kVca2ModByEnv2) <= 0)
+            return;
+
+        if (isExternalEnvelopeTrigger(readChoiceName(inOut, Env2::kTriggerMode)))
+            setChoiceByName(inOut, Env2::kTriggerMode, TriggerModeNames::kStrig);
+
+        if (isNonKeyboardVolumeEnvelopeMode(readChoiceName(inOut, Env2::kEnvelopeMode)))
+            setChoiceByName(inOut, Env2::kEnvelopeMode, EnvelopeModeNames::kNormal);
+
+        const int delay = readInt(inOut, Env2::kDelay);
+        if (delay > MutationCalibration::kEnv2DelayCeilingWhenVolumePath)
+            setInt(inOut, Env2::kDelay, MutationCalibration::kEnv2DelayCeilingWhenVolumePath);
+    }
+
+    void constrainNegativeDepth(PatchModel& inOut, const char* parameterId, int floorValue)
+    {
+        const int current = readInt(inOut, parameterId);
+        if (current >= floorValue)
+            return;
+
+        setInt(inOut, parameterId, floorValue);
+    }
+
+    void constrainNegativeDepth(PatchModel& inOut, const char* parameterId)
+    {
+        constrainNegativeDepth(inOut, parameterId, MutationCalibration::kNegativeDepthFloorWhenBaseLow);
     }
 
     // A6.1 — the hardwired amplitude path must never collapse.
@@ -106,11 +174,9 @@ namespace
             if (! roles.drivesVca2Volume)
                 raiseIntToFloor(inOut, VcfVca::kVca2ModByEnv2, MutationCalibration::kVca2ModByEnv2Floor);
 
-            if (readInt(inOut, VcfVca::kVca1Volume)
-                <= MutationCalibration::kVca1VolumeFloor + MutationCalibration::kLowBaseMargin)
-            {
-                constrainNegativeDepth(inOut, VcfVca::kVca1ModByVelocity);
-            }
+            // Velocity soft-kill even when Volume is healthy (Cas 5: -18 with Volume ~62).
+            constrainNegativeDepth(inOut, VcfVca::kVca1ModByVelocity,
+                                   MutationCalibration::kVelocityNegativeFloor);
         }
 
         if (! recipe.enableEnvelope2)
@@ -118,11 +184,19 @@ namespace
 
         raiseIntToFloor(inOut, Env2::kAmplitude, MutationCalibration::kEnv2AmplitudeFloor);
 
-        if (readInt(inOut, Env2::kAmplitude)
-            <= MutationCalibration::kEnv2AmplitudeFloor + MutationCalibration::kLowBaseMargin)
+        constrainNegativeDepth(inOut, Env2::kAmplitudeModByVelocity,
+                               MutationCalibration::kVelocityNegativeFloor);
+
+        // ENV 2 is the hardwired volume envelope: sustain 0 + short release dies under the finger.
+        if (readInt(inOut, VcfVca::kVca2ModByEnv2) > 0
+            && readInt(inOut, Env2::kSustain) <= 0
+            && readInt(inOut, Env2::kRelease) < MutationCalibration::kEnv2ReleaseShortThreshold)
         {
-            constrainNegativeDepth(inOut, Env2::kAmplitudeModByVelocity);
+            raiseIntToFloor(inOut, Env2::kSustain,
+                            MutationCalibration::kEnv2SustainFloorWhenReleaseShort);
         }
+
+        guardEnv2KeyboardVolumePath(inOut, recipe);
     }
 
     // A6.5 — a filter or FM envelope that also drives a risk destination becomes critical.
@@ -138,6 +212,7 @@ namespace
     }
 
     // A6.2 — a closed filter with no resonance to rescue it reads as silence.
+    // FREQ < ENV 1 / PRESSURE can also smother while the static cutoff still looks open.
     void guardFilterSmother(PatchModel& inOut, const MutationRecipe& recipe)
     {
         if (! recipe.enableVcfVca)
@@ -152,11 +227,40 @@ namespace
             setInt(inOut, VcfVca::kFrequency, MutationCalibration::kVcfFrequencyRescueValue);
         }
 
-        if (readInt(inOut, VcfVca::kFrequency) >= MutationCalibration::kVcfFrequencyLowThreshold)
-            return;
-
+        // Always — not only when cutoff is already low (Cas 4 smoke: -63 with cutoff ~119).
         constrainNegativeDepth(inOut, VcfVca::kFrequencyModByEnv1);
         constrainNegativeDepth(inOut, VcfVca::kFrequencyModByPressure);
+
+        // Near-zero resonance + Matrix Mod wiggling cutoff → raise a little resonance (Cas 3).
+        if (readInt(inOut, VcfVca::kResonance) < MutationCalibration::kVcfResonanceNearZeroThreshold
+            && matrixModDrivesVcfFrequency(inOut))
+        {
+            raiseIntToFloor(inOut, VcfVca::kResonance,
+                            MutationCalibration::kVcfResonanceWhenFrequencyModulatedFloor);
+        }
+
+        // Banjo-style: MM opens the filter — keep static cutoff out of the mud (Cas 6).
+        if (readInt(inOut, VcfVca::kFrequency) < MutationCalibration::kVcfFrequencyComfortableOpen
+            && matrixModDrivesVcfFrequency(inOut))
+        {
+            raiseIntToFloor(inOut, VcfVca::kFrequency,
+                            MutationCalibration::kVcfFrequencyComfortableOpen);
+        }
+    }
+
+    // FREQ < ENV 1 is how a closed filter still plucks — ENV 1 amp must not collapse (Cas 6).
+    void guardFilterOpenEnvelope(PatchModel& inOut, const MutationRecipe& recipe)
+    {
+        if (! recipe.enableVcfVca || ! recipe.enableEnvelope1)
+            return;
+
+        if (readInt(inOut, VcfVca::kFrequencyModByEnv1)
+            < MutationCalibration::kFilterEnvOpenModThreshold)
+        {
+            return;
+        }
+
+        raiseIntToFloor(inOut, Env1::kAmplitude, MutationCalibration::kEscalatedEnvelopeAmplitudeFloor);
     }
 
     // A noise seed stays a noise seed: no other DCO 2 shape reproduces it.
@@ -307,6 +411,7 @@ void applyPostMutationGuards(PatchModel& inOut,
     // read from the working patch rather than from the seed.
     applyMatrixModRoleGuards(inOut, recipe);
     guardFilterSmother(inOut, recipe);
+    guardFilterOpenEnvelope(inOut, recipe);
     guardWaveSelectCardinality(inOut, seed, recipe, facts);
     guardMixAgainstSilentOscillator(inOut, recipe);
     nudgeFmAmountForInterest(inOut, recipe, facts);

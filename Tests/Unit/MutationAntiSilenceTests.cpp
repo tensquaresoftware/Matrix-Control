@@ -1,5 +1,7 @@
 #include "MutationCalibrationTestSupport.h"
 
+#include <cstring>
+
 using namespace MutationCalibrationTestSupport;
 
 // A mutation may be strange, but it must still make a sound: sacred amplitude parameters,
@@ -17,10 +19,21 @@ public:
         seedRelay_freesVca2EnvelopeDepthFromItsLock();
         guard_vca1VolumeStaysAboveFloor();
         guard_closedFilterWithoutResonanceIsReopened();
+        guard_openCutoffStillConstrainsNegativeFreqEnvMod();
+        guard_nearZeroResonanceWithVcfFreqMmIsRaised();
         guard_dualWaveSelectOffIsRepaired();
         guard_dualWaveSelectOffSeedIsRepaired();
         guard_mixMovesOffASilentOscillator();
         guard_disabledModuleIsNeverRepaired();
+        guard_env2SustainZeroWithShortReleaseIsRaised();
+        guard_seedAmplitudeOpenerIsRestored();
+        guard_seedAmplitudeOpenerSurvivesApply();
+        guard_velocitySoftKillIsClampedEvenWithHealthyVolume();
+        guard_lfoIntoVcaAmountIsCapped();
+        guard_banjoStyleFilterOpenKeepsEnv1Amplitude();
+        guard_seedFilterOpenerAmountIsRestored();
+        guard_env2ExternalTriggerIsForcedToStrig();
+        guard_env2DadrAndLongDelayAreTamedForVolumePath();
     }
 
 private:
@@ -156,6 +169,49 @@ private:
                      Core::MutationCalibration::kVcfFrequencyRescueValue);
     }
 
+    void guard_openCutoffStillConstrainsNegativeFreqEnvMod()
+    {
+        beginTest("guard_openCutoffStillConstrainsNegativeFreqEnvMod");
+
+        const auto seed = makeInitPatchModel();
+
+        auto ducked = seed;
+        writeInt(ducked, VcfVcaIds::kFrequency, 119);
+        writeInt(ducked, VcfVcaIds::kResonance, 53);
+        writeInt(ducked, VcfVcaIds::kFrequencyModByEnv1, -63);
+        writeInt(ducked, VcfVcaIds::kFrequencyModByPressure, -40);
+
+        auto recipe = makeRecipe(Core::MutationMode::kDrift, Core::MutationPitchMode::kFree);
+        recipe.enableVcfVca = true;
+
+        Core::applyPostMutationGuards(ducked, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        expectEquals(readInt(ducked, VcfVcaIds::kFrequencyModByEnv1),
+                     Core::MutationCalibration::kNegativeDepthFloorWhenBaseLow);
+        expectEquals(readInt(ducked, VcfVcaIds::kFrequencyModByPressure),
+                     Core::MutationCalibration::kNegativeDepthFloorWhenBaseLow);
+    }
+
+    void guard_nearZeroResonanceWithVcfFreqMmIsRaised()
+    {
+        beginTest("guard_nearZeroResonanceWithVcfFreqMmIsRaised");
+
+        auto seed = makeInitPatchModel();
+        clearAllMatrixModBuses(seed);
+        writeInt(seed, VcfVcaIds::kFrequency, 61);
+        writeInt(seed, VcfVcaIds::kResonance, 1);
+        writeMatrixModBus(seed, { 0, SourceNames::kLfo2, DestinationNames::kVcfFrequency, 32 });
+
+        auto working = seed;
+        auto recipe = makeRecipe(Core::MutationMode::kDrift, Core::MutationPitchMode::kFree);
+        recipe.enableVcfVca = true;
+
+        Core::applyPostMutationGuards(working, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        expectEquals(readInt(working, VcfVcaIds::kResonance),
+                     Core::MutationCalibration::kVcfResonanceWhenFrequencyModulatedFloor);
+    }
+
     void guard_dualWaveSelectOffIsRepaired()
     {
         beginTest("guard_dualWaveSelectOffIsRepaired");
@@ -239,6 +295,202 @@ private:
         Core::applyPostMutationGuards(collapsed, seed, recipe, Core::MutationSeedFacts::read(seed));
 
         expectEquals(readInt(collapsed, VcfVcaIds::kVca1Volume), volumeBefore);
+    }
+
+    void guard_env2SustainZeroWithShortReleaseIsRaised()
+    {
+        beginTest("guard_env2SustainZeroWithShortReleaseIsRaised");
+
+        auto seed = makeInitPatchModel();
+        writeInt(seed, VcfVcaIds::kVca2ModByEnv2, 63);
+        writeInt(seed, Env2Ids::kSustain, 0);
+        writeInt(seed, Env2Ids::kRelease, 3);
+
+        auto working = seed;
+        auto recipe = makeRecipe(Core::MutationMode::kWarp, Core::MutationPitchMode::kFree);
+        recipe.enableEnvelope2 = true;
+
+        Core::applyPostMutationGuards(working, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        expectEquals(readInt(working, Env2Ids::kSustain),
+                     Core::MutationCalibration::kEnv2SustainFloorWhenReleaseShort);
+    }
+
+    void guard_seedAmplitudeOpenerIsRestored()
+    {
+        beginTest("guard_seedAmplitudeOpenerIsRestored");
+
+        auto seed = makeInitPatchModel();
+        clearAllMatrixModBuses(seed);
+        writeInt(seed, VcfVcaIds::kVca1Volume, 0);
+        writeMatrixModBus(seed, { 0, SourceNames::kEnvelope2, DestinationNames::kVca1Volume, 50 });
+
+        auto working = seed;
+        clearAllMatrixModBuses(working);
+        writeMatrixModBus(working, { 0, SourceNames::kLfo1, DestinationNames::kVca1Volume, 40 });
+
+        auto recipe = makeRecipe(Core::MutationMode::kWarp, Core::MutationPitchMode::kFree);
+        recipe.enableMatrixMod = true;
+
+        Core::ensureMatrixModAmplitudeOpeners(working, seed, recipe);
+
+        expectEquals(working.getChoiceIndex(busSource(0)), seed.getChoiceIndex(busSource(0)));
+        expectEquals(working.getChoiceIndex(busDestination(0)), seed.getChoiceIndex(busDestination(0)));
+        expectEquals(working.getValue(busAmount(0)),
+                     juce::jmin(seed.getValue(busAmount(0)),
+                                Core::MutationCalibration::kMatrixModRiskAmountCeiling));
+    }
+
+    void guard_seedAmplitudeOpenerSurvivesApply()
+    {
+        beginTest("guard_seedAmplitudeOpenerSurvivesApply");
+
+        auto seed = makeInitPatchModel();
+        clearAllMatrixModBuses(seed);
+        writeInt(seed, VcfVcaIds::kVca1Volume, 0);
+        writeMatrixModBus(seed, { 0, SourceNames::kEnvelope2, DestinationNames::kVca1Volume, 50 });
+
+        auto recipe = makeRecipe(Core::MutationMode::kWarp, Core::MutationPitchMode::kFree);
+        recipe.enableMatrixMod = true;
+        recipe.enableVcfVca = true;
+
+        const auto result = mutated(seed, recipe, 0xA11D0001U);
+        auto afterGuard = result;
+        Core::ensureMatrixModAmplitudeOpeners(afterGuard, seed, recipe);
+
+        // Apply already kept a stable opener, so a second ensure is a no-op.
+        expect(std::memcmp(result.data(), afterGuard.data(), Core::PatchModel::kBufferSize) == 0);
+    }
+
+    void guard_velocitySoftKillIsClampedEvenWithHealthyVolume()
+    {
+        beginTest("guard_velocitySoftKillIsClampedEvenWithHealthyVolume");
+
+        auto seed = makeInitPatchModel();
+        writeInt(seed, VcfVcaIds::kVca1Volume, 62);
+        writeInt(seed, VcfVcaIds::kVca1ModByVelocity, -18);
+
+        auto working = seed;
+        auto recipe = makeRecipe(Core::MutationMode::kWarp, Core::MutationPitchMode::kFree);
+        recipe.enableVcfVca = true;
+
+        Core::applyPostMutationGuards(working, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        expect(readInt(working, VcfVcaIds::kVca1ModByVelocity)
+               >= Core::MutationCalibration::kVelocityNegativeFloor);
+    }
+
+    void guard_lfoIntoVcaAmountIsCapped()
+    {
+        beginTest("guard_lfoIntoVcaAmountIsCapped");
+
+        auto working = makeInitPatchModel();
+        clearAllMatrixModBuses(working);
+        writeMatrixModBus(working, { 0, SourceNames::kLfo1, DestinationNames::kVca1Volume, 38 });
+
+        Core::capMatrixModRiskAmounts(working);
+
+        expect(std::abs(working.getValue(busAmount(0)))
+               <= Core::MutationCalibration::kMatrixModTremoloAmountCeiling);
+    }
+
+    void guard_banjoStyleFilterOpenKeepsEnv1Amplitude()
+    {
+        beginTest("guard_banjoStyleFilterOpenKeepsEnv1Amplitude");
+
+        auto seed = makeInitPatchModel();
+        clearAllMatrixModBuses(seed);
+        writeInt(seed, VcfVcaIds::kFrequency, 0);
+        writeInt(seed, VcfVcaIds::kResonance, 0);
+        writeInt(seed, VcfVcaIds::kFrequencyModByEnv1, 63);
+        writeInt(seed, Env1Ids::kAmplitude, 50);
+        writeMatrixModBus(seed, { 0, SourceNames::kTrack, DestinationNames::kVcfFrequency, 59 });
+
+        auto working = seed;
+        writeInt(working, VcfVcaIds::kFrequency, 40);
+        writeInt(working, Env1Ids::kAmplitude, 4);
+        writeMatrixModBus(working, { 0, SourceNames::kTrack, DestinationNames::kVcfFrequency, 40 });
+
+        auto recipe = makeRecipe(Core::MutationMode::kWarp, Core::MutationPitchMode::kFree);
+        recipe.enableVcfVca = true;
+        recipe.enableEnvelope1 = true;
+        recipe.enableMatrixMod = true;
+
+        Core::applyPostMutationGuards(working, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        expect(readInt(working, Env1Ids::kAmplitude)
+               >= Core::MutationCalibration::kEscalatedEnvelopeAmplitudeFloor);
+        expect(readInt(working, VcfVcaIds::kFrequency)
+               >= Core::MutationCalibration::kVcfFrequencyComfortableOpen);
+    }
+
+    void guard_seedFilterOpenerAmountIsRestored()
+    {
+        beginTest("guard_seedFilterOpenerAmountIsRestored");
+
+        auto seed = makeInitPatchModel();
+        clearAllMatrixModBuses(seed);
+        writeInt(seed, VcfVcaIds::kFrequency, 0);
+        writeMatrixModBus(seed, { 0, SourceNames::kTrack, DestinationNames::kVcfFrequency, 59 });
+
+        auto working = seed;
+        clearAllMatrixModBuses(working);
+        writeMatrixModBus(working, { 0, SourceNames::kLfo1, DestinationNames::kVcfResonance, 20 });
+
+        auto recipe = makeRecipe(Core::MutationMode::kWarp, Core::MutationPitchMode::kFree);
+        recipe.enableMatrixMod = true;
+
+        Core::ensureMatrixModFilterOpeners(working, seed, recipe);
+
+        expectEquals(working.getChoiceIndex(busSource(0)), seed.getChoiceIndex(busSource(0)));
+        expectEquals(working.getChoiceIndex(busDestination(0)), seed.getChoiceIndex(busDestination(0)));
+        expectEquals(working.getValue(busAmount(0)),
+                     Core::MutationCalibration::kMatrixModRiskAmountCeiling);
+    }
+
+    void guard_env2ExternalTriggerIsForcedToStrig()
+    {
+        beginTest("guard_env2ExternalTriggerIsForcedToStrig");
+
+        auto seed = makeInitPatchModel();
+        writeInt(seed, VcfVcaIds::kVca2ModByEnv2, 63);
+        writeChoiceByName(seed, Env2Ids::kTriggerMode, TriggerModeNames::kXmtrig);
+
+        auto working = seed;
+        auto recipe = makeRecipe(Core::MutationMode::kWild, Core::MutationPitchMode::kPreserve);
+        recipe.enableEnvelope2 = true;
+
+        Core::applyPostMutationGuards(working, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        const auto* trigger = Core::findMutationChoiceDescriptor(Env2Ids::kTriggerMode);
+        expect(trigger != nullptr);
+        expectEquals(working.getChoiceIndex(*trigger),
+                     trigger->choices.indexOf(juce::String(TriggerModeNames::kStrig)));
+    }
+
+    void guard_env2DadrAndLongDelayAreTamedForVolumePath()
+    {
+        beginTest("guard_env2DadrAndLongDelayAreTamedForVolumePath");
+
+        auto seed = makeInitPatchModel();
+        writeInt(seed, VcfVcaIds::kVca2ModByEnv2, 63);
+        writeInt(seed, Env2Ids::kDelay, 23);
+        writeChoiceByName(seed, Env2Ids::kEnvelopeMode, EnvelopeModeNames::kDadr);
+        writeChoiceByName(seed, Env2Ids::kTriggerMode, TriggerModeNames::kStrig);
+
+        auto working = seed;
+        auto recipe = makeRecipe(Core::MutationMode::kWild, Core::MutationPitchMode::kPreserve);
+        recipe.enableEnvelope2 = true;
+
+        Core::applyPostMutationGuards(working, seed, recipe, Core::MutationSeedFacts::read(seed));
+
+        expect(readInt(working, Env2Ids::kDelay)
+               <= Core::MutationCalibration::kEnv2DelayCeilingWhenVolumePath);
+
+        const auto* mode = Core::findMutationChoiceDescriptor(Env2Ids::kEnvelopeMode);
+        expect(mode != nullptr);
+        expectEquals(working.getChoiceIndex(*mode),
+                     mode->choices.indexOf(juce::String(EnvelopeModeNames::kNormal)));
     }
 };
 

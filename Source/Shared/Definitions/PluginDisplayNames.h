@@ -1154,7 +1154,8 @@ namespace PluginDisplayNames
 
                 namespace MutationPitch
                 {
-                    constexpr const char* kPreserve  = "PRESERVE";
+                    // Short face label: PRESERVE truncates in the 56 px slot; KEEP fits.
+                    constexpr const char* kPreserve  = "KEEP";
                     constexpr const char* kConsonant = "CONSONANT";
                     constexpr const char* kDissonant = "DISSONANT";
                     constexpr const char* kFree      = "FREE";

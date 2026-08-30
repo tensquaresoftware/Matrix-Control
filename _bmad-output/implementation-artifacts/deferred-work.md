@@ -13,6 +13,12 @@
 - **Compare inactive paint on HierarchicalComboBox** — Compare lock uses setEnabled only (same as History); optional setInactiveAppearance polish.
 - **Remaining calibration test gaps (after chunk 4 triage)** — Consonant/Dissonant set membership + octave window; choice-step / WaveSelect CHOIX / active-DCO cardinality; escalated ENV + FM nudge; filter/Mix through full apply; engine buildRecipeFromApvts A/R + octaves; pitch UI id helpers / compact labels; soft probabilistic gates; Preserve empty-timbre invent.
 
+## Deferred from: smoke playable calibration (2026-08-29)
+
+- None outstanding from silence cases 1–7 (ENV 2 sustain/release; MM amplitude openers; FREQ&lt;ENV1 negative depth; near-zero resonance + MM→VCF freq; velocity soft-kill + LFO→VCA tremolo cap; Banjo-style filter openers + ENV 1 amp; ENV 2 external trigger / DADR / long delay → keyboard volume path). UI: PRESERVE→KEEP shipped; ± glyph OK on PT Sans Narrow; KINDRED at width limit (monitor only).
+- **PITCH Consonant/Dissonant contract** — shipped as relative DCO1↔DCO2 intervals (unison/3rd/4th/5th/8ve vs tense set); MODE repick ladder. Still open: greying PITCH when no audible mutable DCO; optional joint transpose under Warp/Wild.
+- **MutationMatrixModPolicy.cpp over light file-size gate** — useful lines ~430 after Cas 5–6 openers; split helpers on next MM policy touch.
+
 ## Deferred from: code review of commit d8e20d0 — editorial undo MIDI resync + stack depth (2026-08-26)
 
 - **Tests sur le vrai `PluginProcessor`** — la politique MIDI editorial (quiet window, coalesce cancel, ordre resync/flush) est vérifiée via `EditorialUndoMidiHarness` dupliqué, pas via `PluginProcessor::performEditorialUndo()` ; une régression production pourrait repasser inaperçue malgré le smoke MIDI Monitor validé manuellement.

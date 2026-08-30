@@ -161,7 +161,9 @@ bool MutationAlgorithm::apply(PatchModel& inOut, const MutationRecipe& recipe, I
     {
         capMatrixModRiskAmounts(inOut);
         ensureMatrixModMotion(inOut, recipe.mode, recipe.pitchMode, rng);
-        // Motion may revive a risk bus after the first guard pass — re-arm amplitude floors.
+        ensureMatrixModAmplitudeOpeners(inOut, before, recipe);
+        ensureMatrixModFilterOpeners(inOut, before, recipe);
+        // Motion / opener restore may revive a risk bus after the first guard pass — re-arm.
         applyMatrixModRoleGuards(inOut, recipe);
     }
 

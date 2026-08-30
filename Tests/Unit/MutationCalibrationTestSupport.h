@@ -17,9 +17,13 @@ namespace MutationCalibrationTestSupport
     namespace Dco1Ids = PluginIDs::PatchEditSection::Dco1Module::ParameterWidgets;
     namespace Dco2Ids = PluginIDs::PatchEditSection::Dco2Module::ParameterWidgets;
     namespace VcfVcaIds = PluginIDs::PatchEditSection::VcfVcaModule::ParameterWidgets;
+    namespace Env1Ids = PluginIDs::PatchEditSection::Envelope1Module::ParameterWidgets;
+    namespace Env2Ids = PluginIDs::PatchEditSection::Envelope2Module::ParameterWidgets;
     namespace WaveSelectNames = PluginDisplayNames::ChoiceLists::WaveSelect;
     namespace SourceNames = PluginDisplayNames::ChoiceLists::ModulationBus::Source;
     namespace DestinationNames = PluginDisplayNames::ChoiceLists::ModulationBus::Destination;
+    namespace TriggerModeNames = PluginDisplayNames::ChoiceLists::TriggerMode;
+    namespace EnvelopeModeNames = PluginDisplayNames::ChoiceLists::EnvelopeMode;
 
     constexpr int kBusCount = ::Matrix1000Limits::kModulationBusCount;
 

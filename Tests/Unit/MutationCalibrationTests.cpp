@@ -1,6 +1,7 @@
 #include "MutationCalibrationTestSupport.h"
 
 #include <cmath>
+#include <iterator>
 
 using namespace MutationCalibrationTestSupport;
 
@@ -17,7 +18,10 @@ public:
         modeConstants_driveAmountAndRandomAboveZero();
         pitchPreserve_keepsDcoFrequency();
         pitchPreserve_keepsMatrixModPitchBus();
-        kindredAndDrift_preserveDcoInterval();
+        free_kindredAndDrift_preserveDcoInterval();
+        consonant_wild_relativeIntervalIsMusical();
+        dissonant_wild_relativeIntervalIsTense();
+        consonant_kindred_snapsIllegalRelative();
         kindredMatrixMod_touchesLiveBusAmountsOnly();
         matrixModRiskDestination_amountIsCapped();
         motion_deadLiveBusAmountIsRevived();
@@ -105,33 +109,131 @@ private:
         }
     }
 
-    void kindredAndDrift_preserveDcoInterval()
+    static bool relativeMatchesSet(int relative,
+                                   const int* bases,
+                                   int baseCount,
+                                   int octaveWindow)
     {
-        beginTest("kindredAndDrift_preserveDcoInterval");
+        const int windowSemitones = octaveWindow * Core::kSemitonesPerOctave;
+
+        for (int i = 0; i < baseCount; ++i)
+        {
+            const int base = bases[i];
+            if (base == 0)
+            {
+                if (relative == 0)
+                    return true;
+                continue;
+            }
+
+            for (int delta = base; delta <= windowSemitones; delta += Core::kSemitonesPerOctave)
+            {
+                if (relative == delta || relative == -delta)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    void free_kindredAndDrift_preserveDcoInterval()
+    {
+        beginTest("free_kindredAndDrift_preserveDcoInterval");
 
         auto seed = makeInitPatchModel();
         writeInt(seed, Dco1Ids::kFrequency, 24);
         writeInt(seed, Dco2Ids::kFrequency, 31);
-        const int seedInterval = readInt(seed, Dco1Ids::kFrequency) - readInt(seed, Dco2Ids::kFrequency);
+        const int seedInterval = readInt(seed, Dco2Ids::kFrequency) - readInt(seed, Dco1Ids::kFrequency);
 
         for (const auto mode : { Core::MutationMode::kKindred, Core::MutationMode::kDrift })
         {
-            for (const auto pitchMode : { Core::MutationPitchMode::kConsonant,
-                                          Core::MutationPitchMode::kDissonant,
-                                          Core::MutationPitchMode::kFree })
-            {
-                auto recipe = makeRecipe(mode, pitchMode);
-                recipe.enableDco1 = true;
-                recipe.enableDco2 = true;
+            auto recipe = makeRecipe(mode, Core::MutationPitchMode::kFree);
+            recipe.enableDco1 = true;
+            recipe.enableDco2 = true;
 
-                for (int trial = 0; trial < kTrialCount; ++trial)
-                {
-                    const auto result = mutated(seed, recipe, static_cast<juce::uint32>(0x1A70 + trial));
-                    expectEquals(readInt(result, Dco1Ids::kFrequency)
-                                     - readInt(result, Dco2Ids::kFrequency),
-                                 seedInterval);
-                }
+            for (int trial = 0; trial < kTrialCount; ++trial)
+            {
+                const auto result = mutated(seed, recipe, static_cast<juce::uint32>(0x1A70 + trial));
+                expectEquals(readInt(result, Dco2Ids::kFrequency) - readInt(result, Dco1Ids::kFrequency),
+                             seedInterval);
             }
+        }
+    }
+
+    void consonant_wild_relativeIntervalIsMusical()
+    {
+        beginTest("consonant_wild_relativeIntervalIsMusical");
+
+        constexpr int kConsonantBases[] = { 0, 3, 4, 5, 7, 12 };
+        constexpr int kOctaves = 1;
+
+        auto seed = makeInitPatchModel();
+        // Minor second between oscillators — not consonant.
+        writeInt(seed, Dco1Ids::kFrequency, 24);
+        writeInt(seed, Dco2Ids::kFrequency, 25);
+
+        auto recipe = makeRecipe(Core::MutationMode::kWild, Core::MutationPitchMode::kConsonant);
+        recipe.enableDco1 = true;
+        recipe.enableDco2 = true;
+        recipe.pitchOctaveWindow = kOctaves;
+
+        for (int trial = 0; trial < kTrialCount; ++trial)
+        {
+            const auto result = mutated(seed, recipe, static_cast<juce::uint32>(0xC05A + trial));
+            const int relative = readInt(result, Dco2Ids::kFrequency) - readInt(result, Dco1Ids::kFrequency);
+            expect(relativeMatchesSet(relative, kConsonantBases,
+                                      static_cast<int>(std::size(kConsonantBases)), kOctaves));
+        }
+    }
+
+    void dissonant_wild_relativeIntervalIsTense()
+    {
+        beginTest("dissonant_wild_relativeIntervalIsTense");
+
+        constexpr int kDissonantBases[] = { 1, 2, 6, 8, 9, 10, 11 };
+        constexpr int kOctaves = 1;
+
+        auto seed = makeInitPatchModel();
+        // Perfect fifth — consonant, must leave the dissonant set under Wild.
+        writeInt(seed, Dco1Ids::kFrequency, 24);
+        writeInt(seed, Dco2Ids::kFrequency, 31);
+
+        auto recipe = makeRecipe(Core::MutationMode::kWild, Core::MutationPitchMode::kDissonant);
+        recipe.enableDco1 = true;
+        recipe.enableDco2 = true;
+        recipe.pitchOctaveWindow = kOctaves;
+
+        for (int trial = 0; trial < kTrialCount; ++trial)
+        {
+            const auto result = mutated(seed, recipe, static_cast<juce::uint32>(0xD155 + trial));
+            const int relative = readInt(result, Dco2Ids::kFrequency) - readInt(result, Dco1Ids::kFrequency);
+            expect(relativeMatchesSet(relative, kDissonantBases,
+                                      static_cast<int>(std::size(kDissonantBases)), kOctaves));
+        }
+    }
+
+    void consonant_kindred_snapsIllegalRelative()
+    {
+        beginTest("consonant_kindred_snapsIllegalRelative");
+
+        constexpr int kConsonantBases[] = { 0, 3, 4, 5, 7, 12 };
+        constexpr int kOctaves = 2;
+
+        auto seed = makeInitPatchModel();
+        writeInt(seed, Dco1Ids::kFrequency, 30);
+        writeInt(seed, Dco2Ids::kFrequency, 32); // major second
+
+        auto recipe = makeRecipe(Core::MutationMode::kKindred, Core::MutationPitchMode::kConsonant);
+        recipe.enableDco1 = true;
+        recipe.enableDco2 = true;
+        recipe.pitchOctaveWindow = kOctaves;
+
+        for (int trial = 0; trial < kTrialCount; ++trial)
+        {
+            const auto result = mutated(seed, recipe, static_cast<juce::uint32>(0xC1A0 + trial));
+            const int relative = readInt(result, Dco2Ids::kFrequency) - readInt(result, Dco1Ids::kFrequency);
+            expect(relativeMatchesSet(relative, kConsonantBases,
+                                      static_cast<int>(std::size(kConsonantBases)), kOctaves));
         }
     }
 

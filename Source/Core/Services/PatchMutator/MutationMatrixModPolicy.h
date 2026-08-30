@@ -5,6 +5,7 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchMutator/MutationPolicy.h"
 #include "Core/Services/PatchMutator/MutationRandomSource.h"
+#include "Core/Services/PatchMutator/MutationRecipe.h"
 
 namespace Core
 {
@@ -40,6 +41,7 @@ namespace Core
 
         bool isRiskDestination(int destinationIndex) const;
         bool isPitchDestination(int destinationIndex) const;
+        bool isAmplitudeDestination(int destinationIndex) const;
         int sourceIndexFor(const char* displayName) const;
     };
 
@@ -83,7 +85,20 @@ namespace Core
                                MutationPitchMode pitchMode,
                                IRandomSource& rng);
 
+    // If the seed opened amplitude through Matrix Modulation (ENV/Track/Velocity → VCA…),
+    // Warp/Wild must not leave the patch with only LFO tremolo (or nothing) on those paths.
+    void ensureMatrixModAmplitudeOpeners(PatchModel& inOut,
+                                         const PatchModel& seed,
+                                         const MutationRecipe& recipe);
+
+    // Banjo-style seeds: closed filter opened by TRACK (etc.) → VCF FREQUENCY must keep a
+    // usable Amount after mutation.
+    void ensureMatrixModFilterOpeners(PatchModel& inOut,
+                                      const PatchModel& seed,
+                                      const MutationRecipe& recipe);
+
     bool matrixModDrivesVca2Volume(const PatchModel& seed);
+    bool matrixModDrivesVcfFrequency(const PatchModel& patch);
     bool matrixModSourceDrivesRiskDestination(const PatchModel& seed, const char* sourceDisplayName);
 
 } // namespace Core

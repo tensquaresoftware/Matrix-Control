@@ -26,8 +26,8 @@ context:
 **Always:**
 - Anti-silence on every MODE; write only enabled Mutator toggles; full-patch read OK.
 - MODE → named `kModeAmountPercent` / `kModeRandomPercent` (placeholders Kindred 20/15, Drift 45/30, Warp 70/55, Wild 95/85); A>0 and R>0 so MODE never early-exits alone.
-- UI labels `MODE` / `PITCH`; combo items ALL CAPS (`KINDRED`…`WILD`; `PRESERVE`, `CONSONANT`/`DISSONANT` ±N OCT children, `FREE`); 56 px slots; Amount/Random not primary.
-- Pitch Preserve blocks DCO FREQUENCY + MM pitch dests; Kindred/Drift preserve DCO1–DCO2 interval when both mutable; Consonant/Dissonant = discrete deltas; Free = MODE-scaled §4.1 neighborhood.
+- UI labels `MODE` / `PITCH`; combo items ALL CAPS (`KINDRED`…`WILD`; `KEEP`, `CONSONANT`/`DISSONANT` ±N OCT children, `FREE`); 56 px slots; Amount/Random not primary.
+- Pitch Preserve blocks DCO FREQUENCY + MM pitch dests; Free + Kindred/Drift preserve DCO1–DCO2 interval via joint jump; Consonant/Dissonant set the *relative* DCO1↔DCO2 interval from musical sets (MODE repick ladder); Free alone = MODE-scaled §4.1 neighborhood.
 - Kindred MM = Amounts on live buses only; no inventing MM→VCA2 relay in v1; English-only strings.
 - Legacy Amount/Random MAY persist for migration but MUST NOT override MODE at MUTATE/RETRY.
 
@@ -81,7 +81,8 @@ context:
 - Given Kindred + MM on, when mutate runs, then MM changes Amounts on live buses only (no free lethal Source/Dest birth).
 - Given enableMatrixMod false, when mutate runs, then bytes 104–133 unchanged.
 - Given Mutator panel open, when inspecting recipe row, then MODE and PITCH (ALL CAPS) occupy former Amount/Random slots and Amount/Random are not primary.
-- Given Kindred/Drift, both DCO freqs mutable, Pitch ≠ PRESERVE, when pitch jumps, then DCO1–DCO2 interval is preserved.
+- Given Kindred/Drift + Free, both DCO freqs mutable, when pitch jumps, then DCO1–DCO2 interval is preserved.
+- Given Consonant/Dissonant + both DCO freqs mutable, when pitch plans, then DCO2−DCO1 is in the musical set for that pitch mode within ±N oct (Wild always re-picks; Kindred/Drift often keep a legal relative or snap).
 
 ## Design Notes
 

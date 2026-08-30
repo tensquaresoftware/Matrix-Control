@@ -71,10 +71,18 @@ namespace Core
         constexpr int kVca1VolumeFloor = 34;
         constexpr int kVca2ModByEnv2Floor = 40;
         constexpr int kEnv2AmplitudeFloor = 28;
+        // Sustain 0 + short release makes ENV 2 (hardwired → VCA 2) feel like silence.
+        constexpr int kEnv2SustainFloorWhenReleaseShort = 10;
+        constexpr int kEnv2ReleaseShortThreshold = 8;
+        // External ENV 2 triggers never open under Keyboard From Host (Cas 7).
+        constexpr int kEnv2DelayCeilingWhenVolumePath = 8;
         constexpr int kEscalatedEnvelopeAmplitudeFloor = 24;
         constexpr int kVcfFrequencyLowThreshold = 20;
         constexpr int kVcfResonanceRescueThreshold = 32;
         constexpr int kVcfFrequencyRescueValue = 40;
+        // Near-zero resonance + Matrix Mod moving cutoff → raise a little so LFO/Track cannot smother.
+        constexpr int kVcfResonanceNearZeroThreshold = 8;
+        constexpr int kVcfResonanceWhenFrequencyModulatedFloor = 20;
         // How deep a negative modulation may still go once its base value is already low.
         constexpr int kNegativeDepthFloorWhenBaseLow = -20;
         constexpr int kLowBaseMargin = 8;
@@ -84,6 +92,23 @@ namespace Core
         constexpr int kMatrixModRiskAmountFloor = -20;
         constexpr int kMatrixModRiskAmountCeiling = 40;
         constexpr int kMatrixModMotionAmount = 24;
+        // Positive Amount that still opens a VCA / ENV 2 Amp bus in practice.
+        constexpr int kMatrixModAmplitudeOpenerMinAmount = 12;
+        // TRACK/LFO/etc. → VCF FREQUENCY must stay useful when the seed filter was closed.
+        constexpr int kMatrixModFilterOpenerMinAmount = 24;
+        // LFO/Vibrato → VCA must not dig a tremolo hole through the noise floor.
+        constexpr int kMatrixModTremoloAmountCeiling = 12;
+        // Velocity soft-kill: never let the mutator push deeper than this (Cas 5).
+        constexpr int kVelocityNegativeFloor = -8;
+        // FREQ < ENV 1 strong + cutoff still modest → ENV 1 amp must actually open the filter.
+        constexpr int kFilterEnvOpenModThreshold = 32;
+        constexpr int kVcfFrequencyComfortableOpen = 50;
+
+        // Consonant/Dissonant: chance to re-pick the DCO1↔DCO2 relative interval (else keep
+        // if already legal, or snap to nearest). Warp/Wild always re-pick.
+        constexpr float kPitchRelativeRepickKindred = 0.18f;
+        constexpr float kPitchRelativeRepickDrift = 0.45f;
+        constexpr float kPitchRelativeRepickWarpWild = 1.0f;
 
         // Sacred amplitude parameters keep a very narrow jitter span even in Wild.
         constexpr float kSacredNeighborhoodScale = 0.15f;

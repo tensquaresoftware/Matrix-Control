@@ -210,7 +210,7 @@ void PatchMutatorPanel::handlePitchComboSelectionChange()
 
     recipeHydrating_ = true;
 
-    // PRESERVE and FREE have no sub-menu, so the stored octave window simply stays put.
+    // KEEP and FREE have no sub-menu, so the stored octave window simply stays put.
     const int childId = pitchComboBox_->getSelectedChildId();
     if (childId != 0)
     {

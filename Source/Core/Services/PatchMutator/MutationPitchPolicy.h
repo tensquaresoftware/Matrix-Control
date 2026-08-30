@@ -38,6 +38,8 @@ namespace Core
     bool pitchPreserveBlocksMutation(MutationPitchMode pitchMode) noexcept;
 
     // Consumes random draws only for the DCOs the caller marked writable.
+    // Consonant/Dissonant (both writable): set DCO1↔DCO2 relative interval from the musical set.
+    // Free: neighborhood jitter; Kindred/Drift keep the seed interval via a joint jump.
     MutationPitchPlan planPitchJumps(const MutationPitchRequest& request, IRandomSource& rng);
 
 } // namespace Core
