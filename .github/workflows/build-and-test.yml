@@ -32,10 +32,10 @@ jobs:
       - name: Checkout Matrix-Control
         uses: actions/checkout@v5
 
-      - name: Run release script unit tests
+      - name: Run release and quality script unit tests
         run: |
           python3 -m pip install -r Scripts/release/requirements-test.txt
-          python3 -m pytest Scripts/release/tests/ -q
+          python3 -m pytest Scripts/release/tests/ Scripts/quality/tests/ -q
 
   quality-gate:
     name: quality-gate
@@ -54,18 +54,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          chmod +x Scripts/quality/run_quality_gate.sh
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE_REF="origin/${{ github.base_ref }}"
             git fetch origin "${{ github.base_ref }}" --depth=1 || true
-            python3 Scripts/quality/lint_touched.py --base "$BASE_REF"
+            Scripts/quality/run_quality_gate.sh --base "origin/${{ github.base_ref }}"
           else
             # Push to main: analyse files changed in this push range when available
             BEFORE="${{ github.event.before }}"
             if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
               && git rev-parse --verify "$BEFORE" >/dev/null 2>&1; then
-              python3 Scripts/quality/lint_touched.py --base "$BEFORE"
+              Scripts/quality/run_quality_gate.sh --base "$BEFORE"
             else
-              python3 Scripts/quality/lint_touched.py --base "HEAD~1"
+              Scripts/quality/run_quality_gate.sh --base "HEAD~1"
             fi
           fi
 

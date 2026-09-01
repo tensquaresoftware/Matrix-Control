@@ -5,6 +5,7 @@ Quality gate for Matrix-Control — anti-drift on the ticket diff.
 Usage:
   python3 Scripts/quality/lint_touched.py
   python3 Scripts/quality/lint_touched.py --base origin/main
+  Scripts/quality/run_quality_gate.sh          # manual / pre-push / CI wrapper
   python3 Scripts/quality/lint_touched.py --all
   python3 Scripts/quality/lint_touched.py --all --report-worst 20
 
@@ -94,16 +95,30 @@ def is_gate_target(rel: str) -> bool:
     return (REPO_ROOT / rel).is_file()
 
 
-def collect_changed_files(base: str) -> list[str]:
-    sets: list[list[str]] = [
-        git_lines(["git", "diff", "--name-only", "--diff-filter=ACMR", "HEAD"]),
-        git_lines(["git", "diff", "--name-only", "--diff-filter=ACMR", "--cached"]),
-        git_lines(["git", "ls-files", "--others", "--exclude-standard"]),
-    ]
-    if git_lines(["git", "rev-parse", "--verify", base]):
+def collect_changed_files(base: str, head: str = "HEAD") -> list[str]:
+    sets: list[list[str]] = []
+    if head == "HEAD":
+        sets.extend(
+            [
+                git_lines(["git", "diff", "--name-only", "--diff-filter=ACMR", "HEAD"]),
+                git_lines(
+                    ["git", "diff", "--name-only", "--diff-filter=ACMR", "--cached"]
+                ),
+                git_lines(["git", "ls-files", "--others", "--exclude-standard"]),
+            ]
+        )
+    if git_lines(["git", "rev-parse", "--verify", base]) and git_lines(
+        ["git", "rev-parse", "--verify", head]
+    ):
         sets.append(
             git_lines(
-                ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{base}...HEAD"]
+                [
+                    "git",
+                    "diff",
+                    "--name-only",
+                    "--diff-filter=ACMR",
+                    f"{base}...{head}",
+                ]
             )
         )
     return sorted({f for batch in sets for f in batch if is_gate_target(f)})
@@ -145,7 +160,7 @@ def max_nesting_in_range(lines: list[str], start: int, end: int) -> int:
     return max(0, max_depth - 1)
 
 
-def parse_diff_line_ranges(base: str) -> dict[str, set[int]]:
+def parse_diff_line_ranges(base: str, head: str = "HEAD") -> dict[str, set[int]]:
     """Map path -> set of new-file line numbers touched (unified diff -U0)."""
     ranges: dict[str, set[int]] = defaultdict(set)
     hunk_re = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
@@ -169,25 +184,27 @@ def parse_diff_line_ranges(base: str) -> dict[str, set[int]]:
             for n in range(start, start + count):
                 ranges[current].add(n)
 
-    # Worktree + index + branch range
     blobs: list[str] = []
-    for cmd in (
-        ["git", "diff", "-U0", "HEAD"],
-        ["git", "diff", "-U0", "--cached"],
+    if head == "HEAD":
+        for cmd in (
+            ["git", "diff", "-U0", "HEAD"],
+            ["git", "diff", "-U0", "--cached"],
+        ):
+            try:
+                blobs.append(
+                    subprocess.check_output(
+                        cmd, cwd=REPO_ROOT, text=True, stderr=subprocess.DEVNULL
+                    )
+                )
+            except subprocess.CalledProcessError:
+                pass
+    if git_lines(["git", "rev-parse", "--verify", base]) and git_lines(
+        ["git", "rev-parse", "--verify", head]
     ):
         try:
             blobs.append(
                 subprocess.check_output(
-                    cmd, cwd=REPO_ROOT, text=True, stderr=subprocess.DEVNULL
-                )
-            )
-        except subprocess.CalledProcessError:
-            pass
-    if git_lines(["git", "rev-parse", "--verify", base]):
-        try:
-            blobs.append(
-                subprocess.check_output(
-                    ["git", "diff", "-U0", f"{base}...HEAD"],
+                    ["git", "diff", "-U0", f"{base}...{head}"],
                     cwd=REPO_ROOT,
                     text=True,
                     stderr=subprocess.DEVNULL,
@@ -199,12 +216,12 @@ def parse_diff_line_ranges(base: str) -> dict[str, set[int]]:
     for blob in blobs:
         ingest(blob)
 
-    # Untracked files: treat every line as changed
-    for rel in git_lines(["git", "ls-files", "--others", "--exclude-standard"]):
-        if not is_gate_target(rel):
-            continue
-        text = (REPO_ROOT / rel).read_text(encoding="utf-8", errors="replace")
-        ranges[rel] = set(range(1, len(text.splitlines()) + 1))
+    if head == "HEAD":
+        for rel in git_lines(["git", "ls-files", "--others", "--exclude-standard"]):
+            if not is_gate_target(rel):
+                continue
+            text = (REPO_ROOT / rel).read_text(encoding="utf-8", errors="replace")
+            ranges[rel] = set(range(1, len(text.splitlines()) + 1))
 
     return ranges
 
@@ -428,6 +445,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Matrix-Control C++ quality gate")
     parser.add_argument("--base", default="origin/main")
     parser.add_argument(
+        "--head",
+        default="HEAD",
+        help="Diff tip ref (default HEAD; pre-push uses the local SHA being pushed)",
+    )
+    parser.add_argument(
         "--all",
         action="store_true",
         help="Full-tree diagnostic (historical debt)",
@@ -453,8 +475,18 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if not full_tree and not git_lines(["git", "rev-parse", "--verify", args.head]):
+        print(
+            f"Quality gate FAILED — git head ref not found: {args.head}",
+            file=sys.stderr,
+        )
+        return 1
 
-    files = collect_all_files() if full_tree else collect_changed_files(args.base)
+    files = (
+        collect_all_files()
+        if full_tree
+        else collect_changed_files(args.base, args.head)
+    )
 
     if not files:
         print(
@@ -470,7 +502,7 @@ def main() -> int:
         for f in files:
             print(f"  - {f}")
 
-    line_map = None if full_tree else parse_diff_line_ranges(args.base)
+    line_map = None if full_tree else parse_diff_line_ranges(args.base, args.head)
 
     findings: list[Finding] = []
     for rel in files:

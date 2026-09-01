@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Git pre-push hook — opt-in via Scripts/quality/install-git-hooks.sh
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+exec "$REPO_ROOT/Scripts/quality/run_quality_gate.sh" --pre-push

@@ -310,6 +310,38 @@ The script only judges **touched** C++ under `Source/` and `Tests/`. Untouched h
 
 When in doubt, look at existing `Source/Core` code and `CONVENTIONS.md`.
 
+### Before pushing (optional local gate)
+
+CI runs `lint_touched.py` on every push to `main` and on every PR (**quality-gate** job, ~seconds).
+To catch the same failures **before** `git push`, install the opt-in pre-push hook once:
+
+```bash
+python3 -m pip install -r Scripts/quality/requirements.txt
+bash Scripts/quality/install-git-hooks.sh
+```
+
+After that, each `git push` runs the shared runner (`Scripts/quality/run_quality_gate.sh`) on the commits
+you are about to send. The diff base matches CI logic: remote tip for an existing branch, or
+`origin/main` on a first push without upstream.
+
+Manual check (same analyser, includes uncommitted worktree changes):
+
+```bash
+python3 Scripts/quality/lint_touched.py
+# or explicit base:
+Scripts/quality/run_quality_gate.sh --base origin/main
+```
+
+Temporary bypass when you accept the risk:
+
+```bash
+SKIP_QUALITY_GATE=1 git push
+git push --no-verify
+```
+
+The hook does **not** run a full JUCE build — only the quality gate. Keep compiling and running
+`Matrix-Control_Tests` as your main pre-commit loop (see [Continuous Integration](#continuous-integration)).
+
 ------
 
 ## Commit Message Convention

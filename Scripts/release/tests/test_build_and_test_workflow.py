@@ -47,6 +47,7 @@ def test_build_and_test_workflow_structure():
 
     assert (PROJECT_ROOT / "Scripts" / "quality" / "requirements.txt").is_file()
     assert (PROJECT_ROOT / "Scripts" / "quality" / "lint_touched.py").is_file()
+    assert (PROJECT_ROOT / "Scripts" / "quality" / "run_quality_gate.sh").is_file()
 
     quality_gate = jobs["quality-gate"]
     quality_runs = [
@@ -57,7 +58,7 @@ def test_build_and_test_workflow_structure():
     assert any(
         "pip install -r Scripts/quality/requirements.txt" in run for run in quality_runs
     )
-    assert any("Scripts/quality/lint_touched.py" in run for run in quality_runs)
+    assert any("Scripts/quality/run_quality_gate.sh" in run for run in quality_runs)
 
     build_job = jobs["build-and-test"]
     assert build_job["needs"] == [
