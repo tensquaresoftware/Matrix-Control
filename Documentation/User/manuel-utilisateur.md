@@ -385,6 +385,14 @@ Deux emplacements distincts :
 
 Seul le format `.syx` est pris en charge. Il n’existe pas, dans cette version, d’import d’une banque entière d’un seul geste, ni de tags ou de favoris.
 
+**Format des fichiers sauvés par Matrix-Control**
+
+Les fichiers `.syx` enregistrés par `SAVE` / `SAVE AS`, par l’export de banque (`BANK UTILITY`) ou par l’export Patch Mutator utilisent le format **Edit Buffer** (opcode SysEx `0x0D`). Sur un Matrix-1000, vous pouvez les réécouter sans risque d’écraser un emplacement RAM : rechargez-les dans Matrix-Control, ou envoyez-les avec un gestionnaire SysEx (SysEx Librarian, etc.) — le patch ira dans le **buffer d’édition**, pas dans un slot mémoire.
+
+- **Import** : Matrix-Control accepte aussi les fichiers `.syx` **externes** au format classique (opcode `0x01`, factory, communauté, etc.).
+- **Bank Import** (`BANK UTILITY`) : c’est la voie pour **écrire volontairement** une banque complète dans la mémoire du synthé, slot par slot.
+- **Fichiers tiers en `0x01`** : un renvoi direct via SysEx Librarian écrit dans un **slot Oberheim** (comportement du fichier source, pas de Matrix-Control).
+
 Après un parcours de dossier, le bas de fenêtre peut indiquer combien de fichiers sont valides ou invalides, ou confirmer un chargement / une sauvegarde (`Loaded…`, `Saved…`).
 
 ### Lorsque le nom du fichier et le nom interne du patch divergent

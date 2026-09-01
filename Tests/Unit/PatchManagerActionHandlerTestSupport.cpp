@@ -1,5 +1,7 @@
 #include "PatchManagerActionHandlerTestSupport.h"
 
+#include "PatchFixturePaths.h"
+
 namespace PatchManagerActionHandlerTestSupport
 {
     namespace
@@ -77,7 +79,7 @@ namespace PatchManagerActionHandlerTestSupport
 
     juce::File fixturesPatchesDir()
     {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Patches");
+        return PatchTestFixtures::patchFixturesRoot();
     }
 
     juce::File createTempScanDir()
@@ -88,7 +90,7 @@ namespace PatchManagerActionHandlerTestSupport
 
     void copyFixturePatchToDir(const juce::File& dir, const juce::String& fileName)
     {
-        const auto source = fixturesPatchesDir().getChildFile(fileName);
+        const auto source = PatchTestFixtures::resolvePatchFixtureFile(fileName);
         const auto destination = dir.getChildFile(fileName);
         jassert(source.existsAsFile());
         jassert(source.copyFileTo(destination));

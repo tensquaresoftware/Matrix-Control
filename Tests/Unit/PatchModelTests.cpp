@@ -7,6 +7,7 @@
 #include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/PatchModel.h"
+#include "PatchFixturePaths.h"
 #include "Shared/Definitions/PluginDescriptors.h"
 
 // Unit tests for Core::PatchModel — the 134-byte packed single-patch buffer.
@@ -28,11 +29,6 @@ public:
     }
 
 private:
-    static juce::File fixturesPatchesDir()
-    {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Patches");
-    }
-
     struct ReferencePatch
     {
         const char* fileName;
@@ -57,7 +53,7 @@ private:
             beginTest(juce::String("Round-trip ") + patch.fileName);
 
             juce::MemoryBlock original;
-            const bool loaded = fixturesPatchesDir().getChildFile(patch.fileName).loadFileAsData(original);
+            const bool loaded = PatchTestFixtures::resolvePatchFixtureFile(patch.fileName).loadFileAsData(original);
             expect(loaded, "Fixture should load from disk");
 
             juce::uint8 decoded[SysExConstants::kPatchPackedDataSize] = {};
@@ -174,7 +170,7 @@ private:
         SysExDecoder decoder(parser);
 
         juce::MemoryBlock original;
-        expect(fixturesPatchesDir().getChildFile("Patch 71.syx").loadFileAsData(original),
+        expect(PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx").loadFileAsData(original),
                "Patch 71 fixture should load");
 
         juce::uint8 decoded[SysExConstants::kPatchPackedDataSize] = {};

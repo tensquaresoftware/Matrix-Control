@@ -71,8 +71,10 @@ namespace Core
         explicit PatchFileService(SysExDecoder& decoder) noexcept;
 
         PatchFolderScanResult scanFolder(const juce::File& folder);
-        // patchNumber stamps the SysEx header slot byte (bank export needs the real slot 0-99;
-        // Computer Patches Save/Save As always pass 0 — the encoded slot is irrelevant on load).
+        // patchNumber is retained for call-site compatibility (bank export passes slot 0-99) but
+        // does not affect the SysEx header: all on-disk .syx use opcode 0x0D with header byte 0.
+        // Slot semantics live in the filename (e.g. bank export Pxx stems) and Bank Import, not
+        // in the SysEx slot byte.
         PatchFileSaveResult savePatchSysExFile(const juce::File& targetFile,
                                                const juce::uint8* packedData,
                                                SysExEncoder& encoder,

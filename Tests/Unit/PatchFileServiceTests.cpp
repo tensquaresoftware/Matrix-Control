@@ -9,19 +9,16 @@
 #include "Core/Init/InitDefaults.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchFileService.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
 #include "Core/Services/PatchMutator/MutationHistoryStore.h"
 #include "Core/Services/PatchMutator/MutationNaming.h"
+#include "PatchFixturePaths.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
 
 namespace
 {
-    juce::File fixturesPatchesDir()
-    {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Patches");
-    }
-
     juce::File fixturesMastersDir()
     {
         return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Masters");
@@ -50,8 +47,11 @@ public:
         scan_sortOrder_patchFixtures();
         scan_uppercaseSyxExtension_countsValid();
         savePatchSysExFile_validRoundTrip();
+        savePatchSysExFile_bankExportSlotIgnoredInHeader();
+        savePatchSysExFile_bankExportStemWritesEditBufferHeader();
         savePatchSysExFile_writeFailureHandled();
         loadPatchSysExFile_validFixture();
+        loadPatchSysExFile_thirdPartyOpcode01StillLoadable();
         loadPatchSysExFile_invalid();
 
         exportMutatorHistory_emptyStore_fails();
@@ -118,7 +118,7 @@ private:
 
     void copyFixturePatchToDir(const juce::File& dir, const juce::String& fileName)
     {
-        const auto source = fixturesPatchesDir().getChildFile(fileName);
+        const auto source = PatchTestFixtures::resolvePatchFixtureFile(fileName);
         expect(source.existsAsFile(), fileName + " patch fixture should exist");
         expect(source.copyFileTo(dir.getChildFile(fileName)), "Patch fixture copy should succeed");
     }
@@ -223,11 +223,11 @@ private:
 
         const auto tempDir = createTempScanDir();
         copyFixturePatchToDir(tempDir, "Patch 71.syx");
-        expect(fixturesPatchesDir().getChildFile("Patch 71.syx")
+        expect(PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx")
                    .copyFileTo(tempDir.getChildFile("Z.syx")));
-        expect(fixturesPatchesDir().getChildFile("Patch 71.syx")
+        expect(PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx")
                    .copyFileTo(tempDir.getChildFile("A.syx")));
-        expect(fixturesPatchesDir().getChildFile("Patch 71.syx")
+        expect(PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx")
                    .copyFileTo(tempDir.getChildFile("M.syx")));
 
         const auto result = service_.scanFolder(tempDir);
@@ -282,7 +282,7 @@ private:
         beginTest("Uppercase .SYX extension is discovered");
 
         const auto tempDir = createTempScanDir();
-        expect(fixturesPatchesDir().getChildFile("Patch 71.syx")
+        expect(PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx")
                    .copyFileTo(tempDir.getChildFile("Patch 71.SYX")));
 
         const auto result = service_.scanFolder(tempDir);
@@ -293,6 +293,19 @@ private:
         expectEquals(result.sortedValidFileNames[0], juce::String("Patch 71.SYX"));
 
         tempDir.deleteRecursively();
+    }
+
+    static void expectEditBufferPatchHeader(juce::UnitTest& test, const juce::MemoryBlock& sysEx)
+    {
+        test.expectEquals(static_cast<int>(sysEx.getSize()),
+                          static_cast<int>(SysExConstants::kPatchToEditBufferMessageLength));
+        const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
+        test.expectEquals(static_cast<int>(data[0]), static_cast<int>(SysExConstants::kSysExStart));
+        test.expectEquals(static_cast<int>(data[1]), static_cast<int>(SysExConstants::kManufacturerIdOberheim));
+        test.expectEquals(static_cast<int>(data[2]), static_cast<int>(SysExConstants::kDeviceIdMatrix1000));
+        test.expectEquals(static_cast<int>(data[3]),
+                          static_cast<int>(SysExConstants::Opcode::kSinglePatchToEditBuffer));
+        test.expectEquals(static_cast<int>(data[4]), 0);
     }
 
     void savePatchSysExFile_validRoundTrip()
@@ -311,7 +324,79 @@ private:
         expect(target.existsAsFile());
         expectEquals(service_.scanFolder(tempDir).validCount, 1);
 
+        juce::MemoryBlock savedSysEx;
+        expect(target.loadFileAsData(savedSysEx));
+        expectEditBufferPatchHeader(*this, savedSysEx);
+
+        juce::uint8 loaded[SysExConstants::kPatchPackedDataSize] = {};
+        expect(service_.loadPatchSysExFile(target, loaded).success);
+        expect(std::memcmp(loaded,
+                           Core::InitDefaults::patchData(),
+                           SysExConstants::kPatchPackedDataSize) == 0);
+
         tempDir.deleteRecursively();
+    }
+
+    void savePatchSysExFile_bankExportStemWritesEditBufferHeader()
+    {
+        beginTest("savePatchSysExFile_bankExportStemWritesEditBufferHeader");
+
+        const auto tempDir = createTempScanDir();
+        const auto stem = Core::PatchFileNameSanitizer::bankExportFileStem(42, "TEST");
+        const auto target = tempDir.getChildFile(Core::PatchFileNameSanitizer::ensureSyxExtension(stem));
+
+        const auto result = service_.savePatchSysExFile(
+            target,
+            Core::InitDefaults::patchData(),
+            encoder_,
+            42);
+
+        expect(result.success);
+        expectEquals(target.getFileName(), juce::String("P42 - TEST.syx"));
+
+        juce::MemoryBlock savedSysEx;
+        expect(target.loadFileAsData(savedSysEx));
+        expectEditBufferPatchHeader(*this, savedSysEx);
+
+        tempDir.deleteRecursively();
+    }
+
+    void savePatchSysExFile_bankExportSlotIgnoredInHeader()
+    {
+        beginTest("savePatchSysExFile_bankExportSlotIgnoredInHeader");
+
+        const auto tempDir = createTempScanDir();
+        const auto target = tempDir.getChildFile("P42 - TEST.syx");
+
+        const auto result = service_.savePatchSysExFile(
+            target,
+            Core::InitDefaults::patchData(),
+            encoder_,
+            42);
+
+        expect(result.success);
+        juce::MemoryBlock savedSysEx;
+        expect(target.loadFileAsData(savedSysEx));
+        expectEditBufferPatchHeader(*this, savedSysEx);
+
+        tempDir.deleteRecursively();
+    }
+
+    void loadPatchSysExFile_thirdPartyOpcode01StillLoadable()
+    {
+        beginTest("loadPatchSysExFile_thirdPartyOpcode01StillLoadable");
+
+        const auto source = PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx");
+        expect(source.existsAsFile());
+
+        juce::MemoryBlock sysEx;
+        expect(source.loadFileAsData(sysEx));
+        const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
+        expectEquals(static_cast<int>(data[3]),
+                     static_cast<int>(SysExConstants::Opcode::kSinglePatchData));
+
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        expect(service_.loadPatchSysExFile(source, packed).success);
     }
 
     void savePatchSysExFile_writeFailureHandled()
@@ -335,7 +420,7 @@ private:
     {
         beginTest("loadPatchSysExFile_validFixture");
 
-        const auto source = fixturesPatchesDir().getChildFile("Patch 71.syx");
+        const auto source = PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx");
         expect(source.existsAsFile());
 
         juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
@@ -605,6 +690,10 @@ private:
         const auto exportResult = service_.exportMutatorHistory(tempDir, store, encoder_, "INITNAME");
         expect(exportResult.success);
         expectEquals(exportResult.filesWritten, 3);
+
+        juce::MemoryBlock initialSysEx;
+        expect(tempDir.getChildFile("Initial.syx").loadFileAsData(initialSysEx));
+        expectEditBufferPatchHeader(*this, initialSysEx);
 
         const auto rootScan = service_.scanFolder(tempDir);
         expect(rootScan.folderUsable);

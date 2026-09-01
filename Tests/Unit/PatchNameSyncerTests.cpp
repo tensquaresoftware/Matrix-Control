@@ -5,6 +5,7 @@
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/PatchModel.h"
 #include "Core/Models/PatchNameSyncer.h"
+#include "PatchFixturePaths.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace
@@ -38,11 +39,6 @@ namespace
         void getStateInformation(juce::MemoryBlock&) override {}
         void setStateInformation(const void*, int) override {}
     };
-
-    static juce::File fixturesPatchesDir()
-    {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Patches");
-    }
 }
 
 class PatchNameSyncerTests : public juce::UnitTest
@@ -125,7 +121,7 @@ private:
         SysExDecoder decoder(parser);
         juce::MemoryBlock raw;
 
-        const bool loaded = fixturesPatchesDir().getChildFile("Patch 71.syx").loadFileAsData(raw);
+        const bool loaded = PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx").loadFileAsData(raw);
         expect(loaded, "Patch 71 fixture should load");
         if (!loaded) return;
 

@@ -2,7 +2,10 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/MIDI/SysEx/SysExConstants.h"
+#include "Core/MIDI/SysEx/SysExEncoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
+#include "Core/Init/InitDefaults.h"
+#include "PatchFixturePaths.h"
 
 /**
  * Unit tests for SysExParser
@@ -18,6 +21,8 @@ public:
     void runTest() override
     {
         testValidPatchStructure();
+        testEditBufferPatchValidation();
+        testThirdPartyOpcode01PatchValidation();
         testMissingEndByte();
         testMissingStartByte();
         testWrongManufacturer();
@@ -45,6 +50,42 @@ private:
         SysExParser parser;
         expect(!parser.validateStructure(validPatch),
                "Incomplete message should fail structure validation");
+    }
+
+    void testEditBufferPatchValidation()
+    {
+        beginTest("Edit-buffer patch SysEx (0x0D) validates as patch");
+
+        SysExEncoder encoder;
+        const auto message = encoder.encodePatchToEditBufferSysEx(Core::InitDefaults::patchData());
+
+        SysExParser parser;
+        const auto result = parser.validateSysEx(message);
+        expect(result.isValid, "0x0D patch message should pass validation");
+        expect(result.messageType == SysExParser::MessageType::kPatch);
+
+        const auto* data = static_cast<const juce::uint8*>(message.getData());
+        expectEquals(static_cast<int>(data[3]),
+                     static_cast<int>(SysExConstants::Opcode::kSinglePatchToEditBuffer));
+        expectEquals(static_cast<int>(data[4]), 0);
+    }
+
+    void testThirdPartyOpcode01PatchValidation()
+    {
+        beginTest("Third-party patch SysEx (0x01) validates as patch");
+
+        const auto fixture = PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx");
+        juce::MemoryBlock message;
+        expect(fixture.loadFileAsData(message), "Patch 71 fixture should load");
+
+        SysExParser parser;
+        const auto result = parser.validateSysEx(message);
+        expect(result.isValid, "0x01 patch message should pass validation");
+        expect(result.messageType == SysExParser::MessageType::kPatch);
+
+        const auto* data = static_cast<const juce::uint8*>(message.getData());
+        expectEquals(static_cast<int>(data[3]),
+                     static_cast<int>(SysExConstants::Opcode::kSinglePatchData));
     }
 
     void testMissingEndByte()

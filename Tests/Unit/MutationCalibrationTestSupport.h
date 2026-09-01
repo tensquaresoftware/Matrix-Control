@@ -9,6 +9,7 @@
 #include "Core/Services/PatchMutator/MutationAlgorithm.h"
 #include "Core/Services/PatchMutator/MutationMatrixModPolicy.h"
 #include "Core/Services/PatchMutator/MutationPostApply.h"
+#include "PatchFixturePaths.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -174,12 +175,12 @@ namespace MutationCalibrationTestSupport
         return juce::File(MATRIX_TEST_FIXTURES_DIR);
     }
 
-    // Relative path under Tests/Fixtures (e.g. "Patches/ROM/BANK 2/P00 - OBXA-11.syx").
+    // Relative path under Tests/Fixtures (e.g. "Patches/Factory/BANK 2/P00 - OBXA-11.syx").
     inline bool loadPatchFromFixtureRelative(const juce::String& relativePath,
                                              Core::PatchModel& outModel)
     {
         juce::MemoryBlock raw;
-        if (! fixturesRoot().getChildFile(relativePath).loadFileAsData(raw))
+        if (! PatchTestFixtures::resolveFixtureFile(relativePath).loadFileAsData(raw))
             return false;
 
         SysExParser parser;
@@ -194,22 +195,22 @@ namespace MutationCalibrationTestSupport
 
     // Spec corpus: banks 2–9, two patches each (exact filenames).
     inline constexpr const char* kRomCorpusRelativePaths[] = {
-        "Patches/ROM/BANK 2/P00 - OBXA-11.syx",
-        "Patches/ROM/BANK 2/P29 - AMBIANCE.syx",
-        "Patches/ROM/BANK 3/P03 - HALO.syx",
-        "Patches/ROM/BANK 3/P99 - SYNCAGE.syx",
-        "Patches/ROM/BANK 4/P34 - CS-80.syx",
-        "Patches/ROM/BANK 4/P19 - BIGBRA$$.syx",
-        "Patches/ROM/BANK 5/P11 - SYNBASS.syx",
-        "Patches/ROM/BANK 5/P68 - OSC SYNC.syx",
-        "Patches/ROM/BANK 6/P10 - 1000STRG.syx",
-        "Patches/ROM/BANK 6/P79 - SOLEMN.syx",
-        "Patches/ROM/BANK 7/P04 - ARP-2600.syx",
-        "Patches/ROM/BANK 7/P73 - SLAP 2.syx",
-        "Patches/ROM/BANK 8/P03 - BANJO.syx",
-        "Patches/ROM/BANK 8/P73 - NOISE-DN.syx",
-        "Patches/ROM/BANK 9/P01 - MIKPIANO.syx",
-        "Patches/ROM/BANK 9/P11 - OB8 JUMP.syx",
+        "Patches/Factory/BANK 2/P00 - OBXA-11.syx",
+        "Patches/Factory/BANK 2/P29 - AMBIANCE.syx",
+        "Patches/Factory/BANK 3/P03 - HALO.syx",
+        "Patches/Factory/BANK 3/P99 - SYNCAGE.syx",
+        "Patches/Factory/BANK 4/P34 - CS-80.syx",
+        "Patches/Factory/BANK 4/P19 - BIGBRA$$.syx",
+        "Patches/Factory/BANK 5/P11 - SYNBASS.syx",
+        "Patches/Factory/BANK 5/P68 - OSC SYNC.syx",
+        "Patches/Factory/BANK 6/P10 - 1000STRG.syx",
+        "Patches/Factory/BANK 6/P79 - SOLEMN.syx",
+        "Patches/Factory/BANK 7/P04 - ARP-2600.syx",
+        "Patches/Factory/BANK 7/P73 - SLAP 2.syx",
+        "Patches/Factory/BANK 8/P03 - BANJO.syx",
+        "Patches/Factory/BANK 8/P73 - NOISE-DN.syx",
+        "Patches/Factory/BANK 9/P01 - MIKPIANO.syx",
+        "Patches/Factory/BANK 9/P11 - OB8 JUMP.syx",
     };
 
     inline Core::PatchModel makeTrapDeadAmplitude()

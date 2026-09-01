@@ -190,6 +190,7 @@ SysExParser::MessageType SysExParser::getMessageTypeFromOpcode(juce::uint8 opcod
     switch (opcode)
     {
         case SysExConstants::Opcode::kSinglePatchData:
+        case SysExConstants::Opcode::kSinglePatchToEditBuffer:
             return MessageType::kPatch;
         case SysExConstants::Opcode::kMasterParameterData:
             return MessageType::kMaster;

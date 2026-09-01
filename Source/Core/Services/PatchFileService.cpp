@@ -103,7 +103,8 @@ namespace Core
         if (! parent.isDirectory() || ! parent.hasWriteAccess())
             return makeSaveFailure("Folder not writable");
 
-        const auto encoded = encoder.encodePatchSysEx(static_cast<juce::uint8>(patchNumber), packedData);
+        (void) patchNumber;
+        const auto encoded = encoder.encodePatchToEditBufferSysEx(packedData);
         if (encoded.getSize() == 0)
             return makeSaveFailure("Encode failed");
 

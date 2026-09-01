@@ -1,5 +1,9 @@
 #include "PatchManagerActionHandlerTestSupport.h"
 
+#include "Core/MIDI/SysEx/SysExConstants.h"
+
+#include "PatchFixturePaths.h"
+
 using namespace PatchManagerActionHandlerTestSupport;
 
 class PatchManagerActionHandlerSaveTests : public juce::UnitTest
@@ -59,6 +63,11 @@ private:
         expect(savedFile.loadFileAsData(savedSysEx));
         expect(harness.decoder.validatePatchSysExMessage(savedSysEx));
 
+        const auto* data = static_cast<const juce::uint8*>(savedSysEx.getData());
+        expectEquals(static_cast<int>(data[3]),
+                     static_cast<int>(SysExConstants::Opcode::kSinglePatchToEditBuffer));
+        expectEquals(static_cast<int>(data[4]), 0);
+
         tempDir.deleteRecursively();
     }
 
@@ -92,6 +101,13 @@ private:
                == FooterMessages::formatSaveSuccess(target.getFileName()));
         expectEquals(static_cast<int>(harness.patchFileService.getLastScanResult().validCount), 1);
         expect(sizeBefore > 0);
+
+        juce::MemoryBlock savedSysEx;
+        expect(target.loadFileAsData(savedSysEx));
+        const auto* data = static_cast<const juce::uint8*>(savedSysEx.getData());
+        expectEquals(static_cast<int>(data[3]),
+                     static_cast<int>(SysExConstants::Opcode::kSinglePatchToEditBuffer));
+        expectEquals(static_cast<int>(data[4]), 0);
 
         tempDir.deleteRecursively();
     }

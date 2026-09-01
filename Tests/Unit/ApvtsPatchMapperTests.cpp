@@ -10,6 +10,7 @@
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExParser.h"
 #include "Core/Models/ApvtsPatchMapper.h"
+#include "PatchFixturePaths.h"
 #include "Core/Models/PatchModel.h"
 #include "Shared/Definitions/ApvtsTypes.h"
 #include "Shared/Definitions/Matrix1000Limits.h"
@@ -67,11 +68,6 @@ private:
     using IntDesc     = PluginDescriptors::IntParameterDescriptor;
     using ChoiceDesc  = PluginDescriptors::ChoiceParameterDescriptor;
 
-    static juce::File fixturesPatchesDir()
-    {
-        return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Patches");
-    }
-
     static juce::AudioProcessorValueTreeState::ParameterLayout makeIntChoiceLayout(
         const IntDesc& d1, const IntDesc& d2, const ChoiceDesc& c1)
     {
@@ -94,7 +90,7 @@ private:
         SysExDecoder decoder(parser);
         juce::MemoryBlock raw;
 
-        if (!fixturesPatchesDir().getChildFile("Patch 71.syx").loadFileAsData(raw))
+        if (!PatchTestFixtures::resolvePatchFixtureFile("Patch 71.syx").loadFileAsData(raw))
             return std::nullopt;
 
         PatchBuffer buf {};
