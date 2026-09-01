@@ -473,6 +473,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
+        Tests/Unit/PatchFileServiceMutatorExportTests.cpp
         Tests/Unit/PatchFileNameSanitizerTests.cpp
         Tests/Unit/PatchNameOverlayStoreTests.cpp
         Tests/Unit/PatchNameResolverTests.cpp

@@ -10,9 +10,8 @@
 #include "Core/Models/PatchModel.h"
 #include "Core/Services/PatchFileService.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
-#include "Core/Services/PatchMutator/MutationHistoryStore.h"
-#include "Core/Services/PatchMutator/MutationNaming.h"
 #include "PatchFixturePaths.h"
+#include "PatchFileServiceTestSupport.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
@@ -53,19 +52,6 @@ public:
         loadPatchSysExFile_validFixture();
         loadPatchSysExFile_thirdPartyOpcode01StillLoadable();
         loadPatchSysExFile_invalid();
-
-        exportMutatorHistory_emptyStore_fails();
-        exportMutatorHistory_writesInitialAndRoot();
-        exportMutatorHistory_writesRetries();
-        exportMutatorHistory_gapIndices();
-        exportMutatorHistory_nameBytesMatch();
-        exportMutatorHistory_initialAlsoStampedWithUserName();
-        exportMutatorHistory_nonWritableFolder_fails();
-        exportMutatorHistory_roundTripValidates();
-
-        exportSession_createsFolderWithLayout();
-        resolveKeepSessionFolder_indexesSuffix();
-        exportSession_overwriteClearsExisting();
     }
 
 private:
@@ -76,44 +62,7 @@ private:
 
     juce::File createTempScanDir()
     {
-        auto dir = juce::File::getSpecialLocation(juce::File::tempDirectory)
-                       .getNonexistentChildFile("MatrixControlPatchFileService", "", false);
-        expect(dir.createDirectory(), "Temp scan dir should be created");
-        return dir;
-    }
-
-    static Core::PatchModel makeDistinctBuffer(int seed)
-    {
-        Core::PatchModel model;
-        const auto marker = static_cast<juce::uint8>(seed & 0xFF);
-        std::memset(model.data(), marker, Core::PatchModel::kBufferSize);
-        model.data()[8] = marker;
-        return model;
-    }
-
-    static Core::PatchModel makeParentBuffer(int seed)
-    {
-        Core::PatchModel model;
-        const auto marker = static_cast<juce::uint8>((seed + 100) & 0xFF);
-        std::memset(model.data(), marker, Core::PatchModel::kBufferSize);
-        model.data()[9] = marker;
-        return model;
-    }
-
-    static Core::PatchModel namedResult(int rootIndex, int retryIndex, int seed)
-    {
-        auto model = makeDistinctBuffer(seed);
-        Core::MutationNaming::applyPatchName(model, rootIndex, retryIndex);
-        return model;
-    }
-
-    juce::String decodedPatchName(const juce::File& file)
-    {
-        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
-        expect(service_.loadPatchSysExFile(file, packed).success);
-        Core::PatchModel model;
-        model.loadFrom(packed);
-        return model.getName();
+        return PatchFileServiceTestSupport::createTempDir(*this, "MatrixControlPatchFileService");
     }
 
     void copyFixturePatchToDir(const juce::File& dir, const juce::String& fileName)
@@ -297,15 +246,7 @@ private:
 
     static void expectEditBufferPatchHeader(juce::UnitTest& test, const juce::MemoryBlock& sysEx)
     {
-        test.expectEquals(static_cast<int>(sysEx.getSize()),
-                          static_cast<int>(SysExConstants::kPatchToEditBufferMessageLength));
-        const auto* data = static_cast<const juce::uint8*>(sysEx.getData());
-        test.expectEquals(static_cast<int>(data[0]), static_cast<int>(SysExConstants::kSysExStart));
-        test.expectEquals(static_cast<int>(data[1]), static_cast<int>(SysExConstants::kManufacturerIdOberheim));
-        test.expectEquals(static_cast<int>(data[2]), static_cast<int>(SysExConstants::kDeviceIdMatrix1000));
-        test.expectEquals(static_cast<int>(data[3]),
-                          static_cast<int>(SysExConstants::Opcode::kSinglePatchToEditBuffer));
-        test.expectEquals(static_cast<int>(data[4]), 0);
+        PatchFileServiceTestSupport::expectEditBufferPatchHeader(test, sysEx);
     }
 
     void savePatchSysExFile_validRoundTrip()
@@ -453,259 +394,6 @@ private:
 
         expect(! result.success);
         expect(result.errorMessage.isNotEmpty());
-    }
-
-    void exportMutatorHistory_emptyStore_fails()
-    {
-        beginTest("exportMutatorHistory_emptyStore_fails");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
-
-        expect(! result.success);
-        expect(result.errorMessage.isNotEmpty());
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_writesInitialAndRoot()
-    {
-        beginTest("exportMutatorHistory_writesInitialAndRoot");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        auto initial = makeDistinctBuffer(301);
-        initial.setName("MY PATCH");
-        store.setInitialSnapshot(initial);
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 302),
-                                makeParentBuffer(302)));
-
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "MY PATCH");
-
-        expect(result.success);
-        expect(result.filesWritten >= 2);
-        expect(tempDir.getChildFile("Initial.syx").existsAsFile());
-        expect(tempDir.getChildFile("M00").isDirectory());
-        expect(tempDir.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_writesRetries()
-    {
-        beginTest("exportMutatorHistory_writesRetries");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 310),
-                                makeParentBuffer(310)));
-        expect(store.insertRetry(0, 0, namedResult(0, 0, 311), makeParentBuffer(311)));
-        expect(store.insertRetry(0, 1, namedResult(0, 1, 312), makeParentBuffer(312)));
-
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
-
-        expect(result.success);
-        expect(tempDir.getChildFile("M00").getChildFile("M00-R00.syx").existsAsFile());
-        expect(tempDir.getChildFile("M00").getChildFile("M00-R01.syx").existsAsFile());
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_gapIndices()
-    {
-        beginTest("exportMutatorHistory_gapIndices");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 320),
-                                makeParentBuffer(320)));
-        expect(store.insertRoot(5, namedResult(5, Core::MutationHistoryStore::kRootOnly, 325),
-                                makeParentBuffer(325)));
-        expect(store.insertRoot(99, namedResult(99, Core::MutationHistoryStore::kRootOnly, 399),
-                                makeParentBuffer(399)));
-
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
-
-        expect(result.success);
-        expect(tempDir.getChildFile("M00").isDirectory());
-        expect(tempDir.getChildFile("M05").isDirectory());
-        expect(tempDir.getChildFile("M99").isDirectory());
-        expect(! tempDir.getChildFile("M01").exists());
-        expect(! tempDir.getChildFile("M02").exists());
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_nameBytesMatch()
-    {
-        beginTest("exportMutatorHistory_nameBytesMatch");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        // Fixture buffers carry Mxx/Mxx-Ryy in bytes 0-7 (legacy naming), but export must
-        // stamp the live USER name over them — filenames/folders stay Mxx via format helpers.
-        expect(store.insertRoot(5, namedResult(5, Core::MutationHistoryStore::kRootOnly, 335),
-                                makeParentBuffer(335)));
-        expect(store.insertRetry(5, 2, namedResult(5, 2, 352), makeParentBuffer(352)));
-
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
-        expect(result.success);
-
-        expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05.syx")),
-                     juce::String("WARMPAD"));
-        expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05-R02.syx")),
-                     juce::String("WARMPAD"));
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_initialAlsoStampedWithUserName()
-    {
-        beginTest("exportMutatorHistory_initialAlsoStampedWithUserName");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        // Initial.syx is the same patch identity as the mutation branches — export stamps
-        // it with the current live name too, so a rename after mutating is reflected there.
-        auto initial = makeDistinctBuffer(340);
-        initial.setName("MY PATCH");
-        store.setInitialSnapshot(initial);
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 341),
-                                makeParentBuffer(341)));
-
-        const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "COLDPAD");
-        expect(result.success);
-
-        expectEquals(decodedPatchName(tempDir.getChildFile("Initial.syx")), juce::String("COLDPAD"));
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_nonWritableFolder_fails()
-    {
-        beginTest("exportMutatorHistory_nonWritableFolder_fails");
-
-        Core::MutationHistoryStore store;
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 350),
-                                makeParentBuffer(350)));
-
-        const auto missing = juce::File::getSpecialLocation(juce::File::tempDirectory)
-                                 .getChildFile("MatrixControlMissingExportFolder");
-
-        const auto result = service_.exportMutatorHistory(missing, store, encoder_, "WARMPAD");
-
-        expect(! result.success);
-        expect(result.errorMessage.isNotEmpty());
-    }
-
-    void exportSession_createsFolderWithLayout()
-    {
-        beginTest("exportSession_createsFolderWithLayout");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-        auto initial = makeDistinctBuffer(401);
-        initial.setName("MY PATCH");
-        store.setInitialSnapshot(initial);
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 402),
-                                makeParentBuffer(402)));
-
-        const auto sessionFolder = tempDir.getChildFile("OB-VOX @ B8-P25");
-        const Core::MutatorHistorySessionExportArgs args { sessionFolder, store, encoder_, false, "OB-VOX" };
-        const auto result = service_.exportMutatorHistorySession(args);
-
-        expect(result.success);
-        expect(sessionFolder.getChildFile("Initial.syx").existsAsFile());
-        expect(sessionFolder.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
-
-        tempDir.deleteRecursively();
-    }
-
-    void resolveKeepSessionFolder_indexesSuffix()
-    {
-        beginTest("resolveKeepSessionFolder_indexesSuffix");
-
-        const auto tempDir = createTempScanDir();
-        const juce::String basename = "OB-VOX @ B3-P38";
-
-        expectEquals(Core::PatchFileService::resolveKeepSessionFolder(tempDir, basename).getFileName(),
-                     basename);
-
-        expect(tempDir.getChildFile(basename).createDirectory());
-        expectEquals(Core::PatchFileService::resolveKeepSessionFolder(tempDir, basename).getFileName(),
-                     basename + "-2");
-
-        expect(tempDir.getChildFile(basename + "-2").createDirectory());
-        expectEquals(Core::PatchFileService::resolveKeepSessionFolder(tempDir, basename).getFileName(),
-                     basename + "-3");
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportSession_overwriteClearsExisting()
-    {
-        beginTest("exportSession_overwriteClearsExisting");
-
-        const auto tempDir = createTempScanDir();
-        const auto sessionFolder = tempDir.getChildFile("B0-P00");
-        expect(sessionFolder.createDirectory());
-        const auto stale = sessionFolder.getChildFile("stale.txt");
-        expect(stale.replaceWithText("stale"));
-
-        Core::MutationHistoryStore store;
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 410),
-                                makeParentBuffer(410)));
-
-        const Core::MutatorHistorySessionExportArgs args { sessionFolder, store, encoder_, true, "WARMPAD" };
-        const auto result = service_.exportMutatorHistorySession(args);
-
-        expect(result.success);
-        expect(! stale.existsAsFile());
-        expect(sessionFolder.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
-
-        tempDir.deleteRecursively();
-    }
-
-    void exportMutatorHistory_roundTripValidates()
-    {
-        beginTest("exportMutatorHistory_roundTripValidates");
-
-        const auto tempDir = createTempScanDir();
-        Core::MutationHistoryStore store;
-
-        auto initial = makeDistinctBuffer(360);
-        initial.setName("INITNAME");
-        store.setInitialSnapshot(initial);
-        expect(store.insertRoot(0, namedResult(0, Core::MutationHistoryStore::kRootOnly, 361),
-                                makeParentBuffer(361)));
-        expect(store.insertRetry(0, 0, namedResult(0, 0, 362), makeParentBuffer(362)));
-
-        const auto exportResult = service_.exportMutatorHistory(tempDir, store, encoder_, "INITNAME");
-        expect(exportResult.success);
-        expectEquals(exportResult.filesWritten, 3);
-
-        juce::MemoryBlock initialSysEx;
-        expect(tempDir.getChildFile("Initial.syx").loadFileAsData(initialSysEx));
-        expectEditBufferPatchHeader(*this, initialSysEx);
-
-        const auto rootScan = service_.scanFolder(tempDir);
-        expect(rootScan.folderUsable);
-        expectEquals(rootScan.validCount, 1);
-        expectEquals(rootScan.invalidCount, 0);
-
-        const auto m00Scan = service_.scanFolder(tempDir.getChildFile("M00"));
-        expect(m00Scan.folderUsable);
-        expectEquals(m00Scan.validCount, 2);
-        expectEquals(m00Scan.invalidCount, 0);
-
-        tempDir.deleteRecursively();
     }
 };
 
