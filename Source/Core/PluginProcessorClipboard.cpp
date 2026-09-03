@@ -241,11 +241,14 @@ void PluginProcessor::refreshPatchNameDisplayForSettingsMode()
     if (static_cast<bool>(apvts.state.getProperty(MutatorState::kCompareActive, false)))
         return;
 
-    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kComputerFile)
-        return;
-
     if (patchManagerActionHandler_ == nullptr)
         return;
+
+    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kComputerFile)
+    {
+        patchManagerActionHandler_->reapplyComputerPatchDisplayedName();
+        return;
+    }
 
     patchManagerActionHandler_->reapplyDisplayedPatchName();
 }

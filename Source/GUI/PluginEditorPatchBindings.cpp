@@ -52,10 +52,12 @@ void PluginEditor::setPatchFolderPickerBinding()
                                   false,
                                   safeThis.getComponent());
 
-        if (chooser.browseForDirectory())
-            return chooser.getResult();
+        if (! chooser.browseForDirectory())
+            return {};
 
-        return {};
+        // OPEN may auto-load and show ASK ONCE next — raise UI before that modal stack.
+        raiseUiBeforeModalDialog(safeThis.getComponent());
+        return chooser.getResult();
     });
 }
 

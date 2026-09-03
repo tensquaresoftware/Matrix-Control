@@ -53,6 +53,21 @@ void configureOrderedAlertButtons(juce::AlertWindow& alert,
         primary->grabKeyboardFocus();
 }
 
+void raiseUiBeforeModalDialog(juce::Component* associatedComponent)
+{
+    if (associatedComponent != nullptr)
+    {
+        if (auto* top = associatedComponent->getTopLevelComponent())
+            top->toFront(true);
+        else
+            associatedComponent->toFront(true);
+    }
+
+   #if JUCE_MAC
+    juce::Process::makeForegroundProcess();
+   #endif
+}
+
 /** Visual LTR: Cancel -> [middle] -> primary (rightmost = default).
     Semantic codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
 
@@ -65,6 +80,9 @@ int showOrderedConfirmAlert(const OrderedConfirmAlertOptions& options)
     jassert(options.primaryLabel.isNotEmpty());
 
     const bool hasMiddle = options.middleLabel.isNotEmpty();
+
+    // Native FileChooser can leave Matrix-Control behind; raise before the next modal.
+    raiseUiBeforeModalDialog(options.associatedComponent);
 
     if (usesMacOsNativeAlertButtonOrder())
     {

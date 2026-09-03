@@ -8,6 +8,10 @@
 - **Unused Settings display strings** — SKIN / UI SCALE (and related) remain in `PluginDisplayNames::Settings` but are not shown in the reorganized modal; cleanup with the next Settings surface pass.
 - **Settings GUI regression tests** — no automated coverage for section order, combo labels/IDs, or design width/height.
 
+## Deferred from: code review of spec-settings-modal-sections-and-naming.md (2026-09-03)
+
+- **Fixed Settings height vs plugin/standalone** — `kDesignHeight = 420` does not shrink when HARDWARE LATENCY is hidden in standalone; empty vertical space remains. Pre-existing layout debt; revisit with a content-driven height pass.
+
 ## Deferred from: code review of spec-patch-mutator-playable-calibration.md (2026-08-29)
 
 - **Incomplete calibration / anti-silence tests** — motion guarantee, Preserve destination invent, choice-step limits, Consonant/Dissonant set membership, active-DCO cardinality, escalated ENV floors and FM nudge are only partly covered; re-open in the tests review chunk.

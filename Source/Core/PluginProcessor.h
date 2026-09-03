@@ -136,7 +136,7 @@ public:
     // the previous name on an empty commit).
     void commitPatchNameRename(const juce::String& newName);
 
-    // Re-resolve displayed Patch Name after Patch Name Display Settings changes (device origin).
+    // Re-resolve displayed Patch Name after MATRIX-1000 / COMPUTER PATCHES display Settings change.
     void refreshPatchNameDisplayForSettingsMode();
 
     bool setMidiInputPort(const juce::String& deviceId);

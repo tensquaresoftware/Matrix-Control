@@ -33,6 +33,9 @@ namespace PluginEditorInternal
     // Semantic result codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
     int showOrderedConfirmAlert(const OrderedConfirmAlertOptions& options);
 
+    /** After a native FileChooser, raise the plugin UI so the next modal is not buried. */
+    void raiseUiBeforeModalDialog(juce::Component* associatedComponent);
+
     // ---- Mutator Delete confirm with an optional "Don't ask again" checkbox. ----
     struct MutatorDeleteConfirmResult
     {

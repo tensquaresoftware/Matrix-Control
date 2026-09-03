@@ -18,6 +18,7 @@ public:
         testLoad_askOnceCancelRestoresModel();
         testLoad_mismatch_preferInternalFooter();
         testLoad_mismatch_preferFilenameFooter();
+        testReapplyComputerDisplay_togglesSysexAndFileNames();
     }
 
 private:
@@ -326,6 +327,44 @@ private:
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatReconciliationNotice("OUTSIDE", true));
         expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "OUTSIDE");
+
+        tempDir.deleteRecursively();
+    }
+
+    void testReapplyComputerDisplay_togglesSysexAndFileNames()
+    {
+        beginTest("reapplyComputerDisplay_togglesSysexAndFileNames");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        Core::PatchModel exportModel;
+        exportModel.loadFrom(Core::InitDefaults::patchData());
+        exportModel.setName("INSIDE");
+        expect(harness.patchFileService.savePatchSysExFile(
+            tempDir.getChildFile("OUTSIDE.syx"), exportModel.data(), harness.sysExEncoder).success);
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath, tempDir.getFullPathName(), nullptr);
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, Policy::kDisplaySysexNames, nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile, 1, nullptr);
+        simulateSelectPatchFileDispatch(harness);
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("INSIDE"));
+
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, Policy::kDisplayFileNames, nullptr);
+        harness.handler.reapplyComputerPatchDisplayedName();
+        expectEquals(harness.model.getName(), juce::String("OUTSIDE"));
+
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, Policy::kDisplaySysexNames, nullptr);
+        harness.handler.reapplyComputerPatchDisplayedName();
+        expectEquals(harness.model.getName(), juce::String("INSIDE"));
 
         tempDir.deleteRecursively();
     }

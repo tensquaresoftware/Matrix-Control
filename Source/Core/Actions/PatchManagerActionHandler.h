@@ -97,6 +97,9 @@ namespace Core
         // placeholder on banked devices) using the current Patch Name Display Settings mode.
         void reapplyDisplayedPatchName();
 
+        // Re-apply COMPUTER PATCHES DISPLAY SYSEX / FILE NAMES to the loaded .syx without prompting.
+        void reapplyComputerPatchDisplayedName();
+
         // Persist a musical overlay for the current Internal bank/patch when the name is usable
         // and not an Oberheim BNK placeholder (inline rename / STORE paths).
         void rememberCurrentOverlayFromModel();
