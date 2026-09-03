@@ -14,6 +14,7 @@ public:
     {
         testUnsavedGate_saveAsFromDeviceKeepsNotStored();
         testUnsavedGate_saveAsAfterDeviceEditKeepsNotStored();
+        testUnsavedGate_cleanDeviceSaveAsDoesNotInventRamRisk();
         testUnsavedGate_tryPersistSaveOverwritesKnownSyx();
         testUnsavedGate_fileOriginWithoutPathResolvesSaveAs();
         testUnsavedGate_captureAfterSaveFromDeviceKeepsNotStored();
@@ -88,6 +89,41 @@ private:
 
         tempDir.deleteRecursively();
     }
+
+    void testUnsavedGate_cleanDeviceSaveAsDoesNotInventRamRisk()
+    {
+        beginTest("unsavedGate_cleanDeviceSaveAsDoesNotInventRamRisk");
+
+        // Clean ROM/device load (not INIT): Save As is an export copy only — do not mark
+        // not-STORED, or OPEN after export falsely prompts Unsaved Patch.
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 2, 0, false);
+        harness.useSuccessfulDeviceDump();
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
+        expect(! harness.handler.isPatchNotStoredInRam());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.pickSaveFileCallback = [&tempDir](juce::File, juce::String stem) {
+            return tempDir.getChildFile(stem + ".syx");
+        };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
+
+        expect(! harness.handler.isPatchNotStoredInRam());
+        expect(! harness.dirtyPatchTracker.syncApvtsAndIsDirty(
+            harness.mapper, harness.patchNameSyncer, harness.model));
+
+        tempDir.deleteRecursively();
+    }
+
     void testUnsavedGate_tryPersistSaveOverwritesKnownSyx()
     {
         beginTest("unsavedGate_tryPersistSaveOverwritesKnownSyx");

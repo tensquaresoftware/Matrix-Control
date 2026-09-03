@@ -153,9 +153,11 @@ namespace PluginDisplayNames
         {
             constexpr const char* kTitle = "Invalid patch file name";
             constexpr const char* kBody =
-                "Use 1 to 8 characters: A–Z, 0–9, space, hyphen (-), or underscore (_).\n\n"
-                "Lowercase letters are OK (saved as uppercase). "
-                "Empty names, accents, and other symbols are not allowed.";
+                "Patch file names must be 1 to 8 characters only "
+                "(A-Z, 0-9, space, hyphen -, or underscore _).\n\n"
+                "Lowercase is OK (saved as uppercase). "
+                "Longer names, accents, and other symbols are not allowed.\n\n"
+                "Example: RESO is OK; RESONANCE is too long.";
             constexpr const char* kOk = "OK";
         }
 

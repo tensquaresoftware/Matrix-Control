@@ -11,7 +11,7 @@ namespace Core
             input = input.substring(lastSep + 1);
         }
 
-        if (input.endsWithIgnoreCase(".syx"))
+        while (input.endsWithIgnoreCase(".syx"))
             input = input.upToLastOccurrenceOf(".", false, false);
 
         return input.trim();

@@ -334,14 +334,24 @@ namespace Core
             return;
         }
 
+        // Device / ROM / INIT: Save As is a disk copy only — keep the live Patch Name honest
+        // until the user Opens the .syx. Computer-file origin keeps the injected stem.
+        if (! editorPatchFromComputerFile_)
+            patchModel_->setName(previousName);
+
         completeSuccessfulSave(writeTarget);
     }
 
     void PatchManagerActionHandler::completeSuccessfulSave(const juce::File& savedFile)
     {
         const auto savedFileName = PatchManagerActionHandlerInternal::savedSyxFileName(savedFile);
-        // Device / INIT context: refresh clean snapshot but keep RAM risk until STORE (§0.5 / §4.5).
-        const bool retainRamRisk = ! editorPatchFromComputerFile_;
+        // Device / INIT: keep RAM risk only when it already applied (e.g. INIT) or the user had
+        // edits before this export. A clean ROM/device load + Save As must not invent at-risk
+        // state — otherwise OPEN after export falsely shows Unsaved Patch.
+        const bool hadUnsavedEdits = dirtyPatchTracker_ != nullptr
+            && dirtyPatchTracker_->isDirty(*patchModel_);
+        const bool retainRamRisk = ! editorPatchFromComputerFile_
+            && (patchNotStoredInRam_ || hadUnsavedEdits);
 
         patchNameSyncer_->bufferToApvts();
         captureCleanSnapshot();
