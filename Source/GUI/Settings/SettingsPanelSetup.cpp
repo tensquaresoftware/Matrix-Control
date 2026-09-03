@@ -27,18 +27,16 @@ std::unique_ptr<TSS::HorizontalSeparator> SettingsPanel::makeSeparator(TSS::ISki
 
 void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
 {
-    const int comboWidth = kContentWidth_ - kLabelWidth_ - kGap_;
-
     patchSectionLabel_ = makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kPatchSection);
     patchSectionSeparator_ = makeSeparator(skin);
     matrix1000PatchesLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kMatrix1000PatchesLabel);
-    matrix1000PatchesCombo_ = makeCombo(skin, comboWidth);
+    matrix1000PatchesCombo_ = makeCombo(skin, kComboWidth_);
     computerPatchesLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kComputerPatchesLabel);
-    computerPatchesCombo_ = makeCombo(skin, comboWidth);
+    computerPatchesCombo_ = makeCombo(skin, kComboWidth_);
     unsavedStateLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kUnsavedStateLabel);
-    unsavedStateCombo_ = makeCombo(skin, comboWidth);
+    unsavedStateCombo_ = makeCombo(skin, kComboWidth_);
 
     addAndMakeVisible(*patchSectionLabel_);
     addAndMakeVisible(*patchSectionSeparator_);
@@ -52,17 +50,14 @@ void SettingsPanel::setupPatchSection(TSS::ISkin& skin)
 
 void SettingsPanel::setupPatchMutatorSection(TSS::ISkin& skin)
 {
-    const int comboWidth = kContentWidth_ - kLabelWidth_ - kGap_;
-    const int placeholderWidth = comboWidth;
-
     patchMutatorSectionLabel_ =
         makeLabel(skin, kContentWidth_, PluginDisplayNames::Settings::kPatchMutatorSection);
     patchMutatorSectionSeparator_ = makeSeparator(skin);
     deleteWarningLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDeleteWarningLabel);
-    deleteWarningCombo_ = makeCombo(skin, comboWidth);
+    deleteWarningCombo_ = makeCombo(skin, kComboWidth_);
     defragHistoryLabel_ = makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kDefragHistoryLabel);
     defragHistoryPlaceholder_ =
-        makeLabel(skin, placeholderWidth, PluginDisplayNames::Settings::kComingSoon);
+        makeLabel(skin, kComboWidth_, PluginDisplayNames::Settings::kComingSoon);
 
     addAndMakeVisible(*patchMutatorSectionLabel_);
     addAndMakeVisible(*patchMutatorSectionSeparator_);
@@ -93,8 +88,8 @@ void SettingsPanel::setupMasterSection(TSS::ISkin& skin)
             {}});
     masterOperationsLabel_ =
         makeLabel(skin, kLabelWidth_, PluginDisplayNames::Settings::kMasterOperationsLabel);
-    masterOperationsPlaceholder_ = makeLabel(
-        skin, kContentWidth_ - kLabelWidth_ - kGap_, PluginDisplayNames::Settings::kComingSoon);
+    masterOperationsPlaceholder_ =
+        makeLabel(skin, kComboWidth_, PluginDisplayNames::Settings::kComingSoon);
 
     addAndMakeVisible(*masterSectionLabel_);
     addAndMakeVisible(*masterSectionSeparator_);

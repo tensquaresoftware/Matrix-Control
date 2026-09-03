@@ -51,11 +51,14 @@ void SettingsPanel::layoutLabeledControlRow(juce::Rectangle<int>& bounds,
                                             const RowLayoutMetrics& metrics,
                                             const LabeledControlRowArgs& args)
 {
+    // Match ParameterCell: label column, then control immediately at labelWidth (no gap).
     auto row = bounds.removeFromTop(metrics.controlHeight);
-    args.label->setBounds(row.removeFromLeft(metrics.labelWidth));
+    const int x = row.getX();
+    const int y = row.getY();
+
+    args.label->setBounds(x, y, metrics.labelWidth, metrics.controlHeight);
     args.label->setUiScale(uiScale_);
-    row.removeFromLeft(metrics.gap);
-    args.control->setBounds(row.removeFromLeft(args.controlWidth).withHeight(metrics.controlHeight));
+    args.control->setBounds(x + metrics.labelWidth, y, args.controlWidth, metrics.controlHeight);
     if (auto* slider = dynamic_cast<TSS::Slider*>(args.control))
         slider->setUiScale(uiScale_);
     else if (auto* combo = dynamic_cast<TSS::ComboBox*>(args.control))
@@ -69,10 +72,12 @@ void SettingsPanel::layoutPlaceholderRow(juce::Rectangle<int>& bounds,
                                          TSS::Label& placeholder)
 {
     auto row = bounds.removeFromTop(metrics.controlHeight);
-    label.setBounds(row.removeFromLeft(metrics.labelWidth));
+    const int x = row.getX();
+    const int y = row.getY();
+
+    label.setBounds(x, y, metrics.labelWidth, metrics.controlHeight);
     label.setUiScale(uiScale_);
-    row.removeFromLeft(metrics.gap);
-    placeholder.setBounds(row);
+    placeholder.setBounds(x + metrics.labelWidth, y, metrics.comboWidth, metrics.controlHeight);
     placeholder.setUiScale(uiScale_);
     bounds.removeFromTop(metrics.rowGap);
 }
@@ -143,12 +148,11 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
 {
     RowLayoutMetrics metrics;
     metrics.rowGap = juce::roundToInt(static_cast<float>(kRowGap_) * uiScale_);
-    metrics.gap = juce::roundToInt(static_cast<float>(kGap_) * uiScale_);
     metrics.labelWidth = juce::roundToInt(static_cast<float>(kLabelWidth_) * uiScale_);
     metrics.sliderWidth = juce::roundToInt(static_cast<float>(kSliderWidth_) * uiScale_);
     metrics.controlHeight = juce::roundToInt(static_cast<float>(kControlHeight_) * uiScale_);
     metrics.separatorHeight = juce::roundToInt(static_cast<float>(kSeparatorHeight_) * uiScale_);
-    metrics.comboWidth = bounds.getWidth() - metrics.labelWidth - metrics.gap;
+    metrics.comboWidth = juce::roundToInt(static_cast<float>(kComboWidth_) * uiScale_);
 
     layoutPatchSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);

@@ -17,8 +17,8 @@ namespace TSS
 class SettingsPanel : public juce::Component
 {
 public:
-    // Wide enough for MATRIX-1000 PATCHES + DISPLAY MUSICAL NAMES without clipping.
-    static constexpr int kDesignWidth = 400;
+    // Content = label column 120 + control column 140 (no gap); outer = content + padding 16*2.
+    static constexpr int kDesignWidth = 292;
     static constexpr int kDesignHeight = 420;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
@@ -50,7 +50,6 @@ private:
     struct RowLayoutMetrics
     {
         int rowGap = 0;
-        int gap = 0;
         int labelWidth = 0;
         int sliderWidth = 0;
         int controlHeight = 0;
@@ -91,14 +90,17 @@ private:
                               TSS::Label& placeholder);
 
     inline constexpr static int kPadding_ = 16;
-    inline constexpr static int kGap_ = 8;
     inline constexpr static int kRowGap_ = 12;
+    // Design gap from section title row to the separator stroke (not the separator component box).
     inline constexpr static int kSectionTitleGap_ = 4;
     inline constexpr static int kControlHeight_ = 20;
-    inline constexpr static int kSeparatorHeight_ = 8;
-    inline constexpr static int kLabelWidth_ = 160;
+    // Match HorizontalSeparator line thickness so the stroke sits at the top of the gap+line stack.
+    inline constexpr static int kSeparatorHeight_ = 1;
+    inline constexpr static int kLabelWidth_ = 120;
+    inline constexpr static int kComboWidth_ = 140;
     inline constexpr static int kSliderWidth_ = 72;
-    inline constexpr static int kContentWidth_ = kDesignWidth - kPadding_ * 2;
+    inline constexpr static int kContentWidth_ = kLabelWidth_ + kComboWidth_;
+    static_assert(kDesignWidth == kContentWidth_ + kPadding_ * 2);
 
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
