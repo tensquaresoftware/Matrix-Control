@@ -136,8 +136,11 @@ public:
     // the previous name on an empty commit).
     void commitPatchNameRename(const juce::String& newName);
 
-    // Re-resolve displayed Patch Name after MATRIX-1000 / COMPUTER PATCHES display Settings change.
+    // Re-resolve displayed Patch Name after MATRIX-1000 PATCHES display Settings change.
     void refreshPatchNameDisplayForSettingsMode();
+
+    // Re-apply COMPUTER PATCHES DISPLAY SYSEX / FILE NAMES for a loaded .syx.
+    void refreshComputerPatchNameDisplayForSettingsPolicy();
 
     bool setMidiInputPort(const juce::String& deviceId);
     bool setMidiOutputPort(const juce::String& deviceId);

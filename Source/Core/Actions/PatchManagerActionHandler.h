@@ -396,6 +396,10 @@ namespace Core
                                     const DeviceMemoryLimits& limits,
                                     PatchNameResolvePurpose purpose);
 
+        juce::String resolveDisplayedPatchNameSeed(int bank,
+                                                   int patch,
+                                                   const DeviceMemoryLimits& limits) const;
+
         BankTransferState bankTransfer_;
         std::uint64_t bankTransferGeneration_ = 0;
         PatchFolderPicker bankExportFolderPicker_;

@@ -142,28 +142,43 @@ namespace Core
         }));
     }
 
+    juce::String PatchManagerActionHandler::resolveDisplayedPatchNameSeed(int bank,
+                                                                         int patch,
+                                                                         const DeviceMemoryLimits& limits) const
+    {
+        if (hasLastDeviceDumpRawName_
+            && bank == lastDeviceDumpBank_
+            && patch == lastDeviceDumpPatch_)
+        {
+            return lastDeviceDumpRawName_;
+        }
+
+        if (limits.hasBankConcept())
+        {
+            // Spec live-toggle fallback when no raw dump is cached for this slot.
+            return PatchFileNameSanitizer::formatOberheimBankPlaceholderName(bank, patch);
+        }
+
+        return patchModel_ != nullptr ? patchModel_->getName() : juce::String();
+    }
+
     void PatchManagerActionHandler::reapplyDisplayedPatchName()
     {
         if (patchModel_ == nullptr || apvtsPatchMapper_ == nullptr)
             return;
 
-        if (pendingDeviceLoad_.has_value())
-            return;
-
-        if (! hasLastDeviceDumpRawName_)
+        if (pendingDeviceLoad_.has_value() || editorPatchFromComputerFile_)
             return;
 
         const auto limits = deviceMemoryLimits_();
         const int bank = getCurrentBank(limits);
         const int patch = getCurrentPatch(limits);
-
-        if (bank != lastDeviceDumpBank_ || patch != lastDeviceDumpPatch_)
-            return;
+        const auto seedName = resolveDisplayedPatchNameSeed(bank, patch, limits);
 
         const bool wasDirty = dirtyPatchTracker_ != nullptr
             && dirtyPatchTracker_->isDirty(*patchModel_);
 
-        patchModel_->setName(lastDeviceDumpRawName_);
+        patchModel_->setName(seedName);
         applyResolvedPatchName(*patchModel_,
                                PatchCoordinates { bank, patch },
                                limits,

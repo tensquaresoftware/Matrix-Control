@@ -121,7 +121,7 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         // DISPLAY SYSEX / FILE NAMES: refresh PATCH NAME for an already-loaded computer patch.
         // ASK ONCE PER LOAD is load-time only — do not prompt from Settings.
         if (selectedId == kDisplaySysexNames || selectedId == kDisplayFileNames)
-            pluginProcessor.refreshPatchNameDisplayForSettingsMode();
+            pluginProcessor.refreshComputerPatchNameDisplayForSettingsPolicy();
     };
 
     panel.getUnsavedStateCombo().onChange = [this, &panel]

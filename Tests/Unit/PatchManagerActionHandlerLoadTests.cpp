@@ -1,5 +1,8 @@
 #include "PatchManagerActionHandlerTestSupport.h"
 
+#include "Core/Services/Matrix1000FactoryPatchNames.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
+
 using namespace PatchManagerActionHandlerTestSupport;
 
 class PatchManagerActionHandlerLoadTests : public juce::UnitTest
@@ -19,6 +22,7 @@ public:
         testLoad_mismatch_preferInternalFooter();
         testLoad_mismatch_preferFilenameFooter();
         testReapplyComputerDisplay_togglesSysexAndFileNames();
+        testReapplyMatrixDisplay_noDumpCache_togglesRomFactoryAndBnk();
     }
 
 private:
@@ -367,6 +371,34 @@ private:
         expectEquals(harness.model.getName(), juce::String("INSIDE"));
 
         tempDir.deleteRecursively();
+    }
+
+    void testReapplyMatrixDisplay_noDumpCache_togglesRomFactoryAndBnk()
+    {
+        beginTest("reapplyMatrixDisplay_noDumpCache_togglesRomFactoryAndBnk");
+
+        constexpr int kRomBank = 2;
+        constexpr int kPatch = 5;
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, kRomBank, kPatch, false);
+
+        const auto factoryName = Core::Matrix1000FactoryPatchNames::nameFor(kRomBank, kPatch);
+        expect(factoryName.isNotEmpty());
+
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kMatrix1000PatchesNamesMode,
+            PluginIDs::Settings::Matrix1000PatchesNamesMode::kDisplayMusicalNames,
+            nullptr);
+        harness.handler.reapplyDisplayedPatchName();
+        expectEquals(harness.model.getName(), factoryName);
+
+        harness.proc.apvts.state.setProperty(
+            PluginIDs::Settings::kMatrix1000PatchesNamesMode,
+            PluginIDs::Settings::Matrix1000PatchesNamesMode::kDisplayHardwareNames,
+            nullptr);
+        harness.handler.reapplyDisplayedPatchName();
+        expectEquals(harness.model.getName(),
+                     Core::PatchFileNameSanitizer::formatOberheimBankPlaceholderName(kRomBank, kPatch));
     }
 };
 

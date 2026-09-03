@@ -244,13 +244,25 @@ void PluginProcessor::refreshPatchNameDisplayForSettingsMode()
     if (patchManagerActionHandler_ == nullptr)
         return;
 
-    if (patchLoadContext_.origin == Core::PatchLoadContext::Origin::kComputerFile)
-    {
-        patchManagerActionHandler_->reapplyComputerPatchDisplayedName();
-        return;
-    }
-
     patchManagerActionHandler_->reapplyDisplayedPatchName();
+}
+
+void PluginProcessor::refreshComputerPatchNameDisplayForSettingsPolicy()
+{
+    notifyNonParameterStateChanged();
+
+    namespace MutatorState = PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties;
+
+    if (static_cast<bool>(apvts.state.getProperty(MutatorState::kCompareActive, false)))
+        return;
+
+    if (patchManagerActionHandler_ == nullptr)
+        return;
+
+    if (patchLoadContext_.origin != Core::PatchLoadContext::Origin::kComputerFile)
+        return;
+
+    patchManagerActionHandler_->reapplyComputerPatchDisplayedName();
 }
 
 void PluginProcessor::commitPatchNameRename(const juce::String& newName)
