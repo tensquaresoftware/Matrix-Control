@@ -149,6 +149,16 @@ namespace PluginDisplayNames
             constexpr const char* kCancel   = "Cancel";
         }
 
+        namespace InvalidSaveAsPatchName
+        {
+            constexpr const char* kTitle = "Invalid patch file name";
+            constexpr const char* kBody =
+                "Use 1 to 8 characters: A–Z, 0–9, space, hyphen (-), or underscore (_).\n\n"
+                "Lowercase letters are OK (saved as uppercase). "
+                "Empty names, accents, and other symbols are not allowed.";
+            constexpr const char* kOk = "OK";
+        }
+
         namespace MasterInitConfirm
         {
             constexpr const char* kTitle = "RESET MASTER MODULE?";
@@ -1081,6 +1091,8 @@ namespace PluginDisplayNames
                 constexpr const char* kFolderNotFound = "Folder not found";
                 constexpr const char* kLoadSelectionStale = "Selection out of date";
                 constexpr const char* kPatchFileNotFound = "Patch file not found";
+                constexpr const char* kInvalidSaveStem =
+                    "Invalid patch file name (use A-Z, 0-9, space, -, _; max 8)";
             }
 
             namespace StandaloneWidgets

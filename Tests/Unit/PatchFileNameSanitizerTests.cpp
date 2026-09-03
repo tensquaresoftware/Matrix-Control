@@ -16,6 +16,8 @@ public:
         sanitizeFileStem_stripsPathAndExtension();
         sanitizeOsPathSegment_keepsSpacesStripsStar();
         sanitizeOsFileStem_fallbackWhenEmpty();
+        normalizeMatrixSaveStem_acceptsCaseOnlyFold();
+        normalizeMatrixSaveStem_refusesAccentsExoticAndOverlength();
         bankExportFileStem_padsSlotAndAppendsSanitizedName();
         bankExportFileStem_omitsNameWhenSanitizedEmpty();
         bankExportFileStem_clampsOutOfRangeSlots();
@@ -91,6 +93,42 @@ private:
                      juce::String(Core::PatchFileNameSanitizer::kEmptyNameFallback));
         expectEquals(Core::PatchFileNameSanitizer::sanitizeOsFileStem("WARM PAD.syx"),
                      juce::String("WARM PAD"));
+    }
+
+    void normalizeMatrixSaveStem_acceptsCaseOnlyFold()
+    {
+        beginTest("normalizeMatrixSaveStem_acceptsCaseOnlyFold");
+
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("test"),
+                     juce::String("TEST"));
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("Warm-Pad.syx"),
+                     juce::String("WARM-PAD"));
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("ABCDEFGH"),
+                     juce::String("ABCDEFGH"));
+        expect(Core::PatchFileNameSanitizer::isExactMatrixFileStem("ab_12"));
+        expect(Core::PatchFileNameSanitizer::isExactMatrixFileStem("A B"));
+    }
+
+    void normalizeMatrixSaveStem_refusesAccentsExoticAndOverlength()
+    {
+        beginTest("normalizeMatrixSaveStem_refusesAccentsExoticAndOverlength");
+
+        // "réso" as explicit UTF-8 (avoid source-charset / juce_String literal asserts).
+        const auto accented = juce::String::fromUTF8("r\xc3\xa9so");
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(accented),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("*'CANOPY"),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("TOOLONGNAME"),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("ABCDEFGHI"),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty("   "),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(""),
+                     juce::String());
+        expect(! Core::PatchFileNameSanitizer::isExactMatrixFileStem(accented));
+        expect(! Core::PatchFileNameSanitizer::isExactMatrixFileStem("*'CANOPY"));
     }
 
     void bankExportFileStem_padsSlotAndAppendsSanitizedName()

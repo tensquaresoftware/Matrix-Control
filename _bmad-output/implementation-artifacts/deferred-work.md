@@ -1,5 +1,15 @@
 # Deferred Work
 
+## Deferred from: code review of spec-computer-patches-save-as-naming.md (2026-09-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-save-as-naming.md`
+  summary: Case-sensitive volumes may leave an old-cased twin `.syx` beside the new uppercase write after SAVE/SAVE AS case fold.
+  evidence: writeTarget uses getSiblingFile(uppercase); original differently cased path is not deleted after success.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-save-as-naming.md`
+  summary: SAVE AS picker may skip a second overwrite confirm when the final uppercase sibling differs from the path the native dialog already confirmed.
+  evidence: dialog warns on chosen path; code returns siblingFile(normalized) which can be a different case-sensitive path.
+
 ## Deferred from: Settings modal reorg (2026-09-03)
 
 - **Release diagnostic logging toggle** — Settings no longer shows a LOGGING row (hidden until designed). Revisit later: optional user-facing Support/Diagnostic log (single on/off for MIDI + APVTS + future loggers), file location, size/rotation limits, and release performance cost before exposing in the Settings modal.

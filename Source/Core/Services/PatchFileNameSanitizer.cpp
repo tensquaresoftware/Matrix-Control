@@ -32,6 +32,27 @@ namespace Core
         return filtered;
     }
 
+    juce::String PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(juce::String input)
+    {
+        const auto stem = stripPathAndSyxExtension(std::move(input)).trim().toUpperCase();
+
+        if (stem.isEmpty() || stem.length() > kMaxNameLength)
+            return {};
+
+        for (const auto character : stem)
+        {
+            if (! isAllowedMatrixChar(character))
+                return {};
+        }
+
+        return stem;
+    }
+
+    bool PatchFileNameSanitizer::isExactMatrixFileStem(const juce::String& input)
+    {
+        return normalizeMatrixSaveStemOrEmpty(input).isNotEmpty();
+    }
+
     juce::String PatchFileNameSanitizer::sanitizeOsPathSegmentOrEmpty(juce::String input)
     {
         input = stripOsForbiddenChars(input.trim()).toUpperCase().trim();

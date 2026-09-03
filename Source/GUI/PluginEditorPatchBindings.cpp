@@ -6,6 +6,7 @@
 
 #include "Core/Services/MutatorDeleteWarningPolicy.h"
 #include "Core/Services/PatchFileNameReconciler.h"
+#include "Core/Services/PatchFileNameSanitizer.h"
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 #include "Shared/Definitions/PluginIDs.h"
@@ -289,17 +290,52 @@ void PluginEditor::setPatchSaveFilePickerBinding()
             if (safeThis == nullptr)
                 return {};
 
-            juce::FileChooser chooser("Save patch as",
-                                      suggestedFolder.getChildFile(suggestedStem + ".syx"),
-                                      "*.syx",
-                                      true,
-                                      false,
-                                      safeThis.getComponent());
+            namespace Dialog = PluginDisplayNames::Dialogs::InvalidSaveAsPatchName;
+            auto folder = suggestedFolder;
+            auto stemForDialog = suggestedStem;
 
-            if (chooser.browseForFileToSave(true))
-                return chooser.getResult();
+            for (;;)
+            {
+                if (safeThis == nullptr)
+                    return {};
 
-            return {};
+                juce::FileChooser chooser("Save patch as",
+                                          folder.getChildFile(stemForDialog + ".syx"),
+                                          "*.syx",
+                                          true,
+                                          false,
+                                          safeThis.getComponent());
+
+                if (! chooser.browseForFileToSave(true))
+                    return {};
+
+                if (safeThis == nullptr)
+                    return {};
+
+                const auto chosen = chooser.getResult();
+                const auto normalized = Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(
+                    chosen.getFileNameWithoutExtension());
+
+                if (normalized.isNotEmpty())
+                    return chosen.getSiblingFile(
+                        Core::PatchFileNameSanitizer::ensureSyxExtension(normalized));
+
+                raiseUiBeforeModalDialog(safeThis.getComponent());
+
+                juce::NativeMessageBox::show(juce::MessageBoxOptions()
+                                                .withIconType(juce::MessageBoxIconType::WarningIcon)
+                                                .withTitle(Dialog::kTitle)
+                                                .withMessage(Dialog::kBody)
+                                                .withButton(Dialog::kOk)
+                                                .withAssociatedComponent(safeThis.getComponent()));
+
+                if (safeThis == nullptr)
+                    return {};
+
+                raiseUiBeforeModalDialog(safeThis.getComponent());
+                folder = chosen.getParentDirectory();
+                stemForDialog = chosen.getFileNameWithoutExtension();
+            }
         });
 }
 

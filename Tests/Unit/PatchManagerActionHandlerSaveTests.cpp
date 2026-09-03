@@ -20,10 +20,25 @@ public:
         testSave_noSysEx();
         testSave_unusableFolderNoOp();
         testSaveAs_noSysEx();
-        testSave_preservesPatchEditName();
+        testSaveAs_injectsUppercaseStemIntoNameBytes();
+        testSave_injectsSanitizedStemIntoNameBytes();
+        testSaveAs_illegalStem_noWrite();
+        testSaveAs_suggestedStem_isMatrixSanitized();
+        testSave_illegalDiskStem_refusesWrite();
     }
 
 private:
+    static juce::String loadSavedPatchName(HandlerHarness& harness, const juce::File& file)
+    {
+        juce::uint8 packed[SysExConstants::kPatchPackedDataSize] = {};
+        if (! harness.patchFileService.loadPatchSysExFile(file, packed).success)
+            return {};
+
+        Core::PatchModel decoded;
+        decoded.loadFrom(packed);
+        return decoded.getName();
+    }
+
     void testSaveAs_writesAndRescans()
     {
         beginTest("saveAs_writesAndRescans");
@@ -95,19 +110,23 @@ private:
 
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchFile, juce::var());
 
-        expect(target.existsAsFile());
-        expect(target.getSize() > 0);
+        const auto written = tempDir.getChildFile("PATCH 71.syx");
+        expect(written.existsAsFile());
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
-               == FooterMessages::formatSaveSuccess(target.getFileName()));
+               == FooterMessages::formatSaveSuccess("PATCH 71.syx"));
         expectEquals(static_cast<int>(harness.patchFileService.getLastScanResult().validCount), 1);
         expect(sizeBefore > 0);
 
         juce::MemoryBlock savedSysEx;
-        expect(target.loadFileAsData(savedSysEx));
+        expect(written.loadFileAsData(savedSysEx));
         const auto* data = static_cast<const juce::uint8*>(savedSysEx.getData());
         expectEquals(static_cast<int>(data[3]),
                      static_cast<int>(SysExConstants::Opcode::kSinglePatchToEditBuffer));
         expectEquals(static_cast<int>(data[4]), 0);
+        expectEquals(harness.model.getName(), juce::String("PATCH 71"));
+        expectEquals(loadSavedPatchName(harness, written), juce::String("PATCH 71"));
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("PATCH 71"));
 
         tempDir.deleteRecursively();
     }
@@ -254,9 +273,9 @@ private:
         tempDir.deleteRecursively();
     }
 
-    void testSave_preservesPatchEditName()
+    void testSaveAs_injectsUppercaseStemIntoNameBytes()
     {
-        beginTest("save_preservesPatchEditName");
+        beginTest("saveAs_injectsUppercaseStemIntoNameBytes");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         const auto tempDir = createTempScanDir();
@@ -272,20 +291,171 @@ private:
         harness.proc.apvts.state.setProperty(PatchNameIds::kPatchName, "*'CANOPY", nullptr);
 
         harness.pickSaveFileCallback = [&tempDir](juce::File, juce::String) {
-            return tempDir.getChildFile("MY-PATCH.syx");
+            return tempDir.getChildFile("test.syx");
         };
 
         harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
 
-        expect(harness.model.getName() == "*'CANOPY");
-        expect(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString() == "*'CANOPY");
-
-        const auto savedFile = tempDir.getChildFile("MY-PATCH.syx");
+        const auto savedFile = tempDir.getChildFile("TEST.syx");
         expect(savedFile.existsAsFile());
-        juce::MemoryBlock savedSysEx;
-        expect(savedFile.loadFileAsData(savedSysEx));
-        expect(harness.decoder.validatePatchSysExMessage(savedSysEx));
-        expect(savedFile.getFileNameWithoutExtension() == "MY-PATCH");
+        expectEquals(harness.model.getName(), juce::String("TEST"));
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("TEST"));
+        expectEquals(loadSavedPatchName(harness, savedFile), juce::String("TEST"));
+        expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
+               == FooterMessages::formatSaveSuccess("TEST.syx"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testSave_injectsSanitizedStemIntoNameBytes()
+    {
+        beginTest("save_injectsSanitizedStemIntoNameBytes");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        const auto warmFile = tempDir.getChildFile("WARM.syx");
+        {
+            Core::PatchModel seed;
+            seed.setName("OLDNAME");
+            expect(harness.patchFileService.savePatchSysExFile(
+                       warmFile, seed.data(), harness.sysExEncoder)
+                       .success);
+        }
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.model.setName("*'CANOPY");
+        harness.proc.apvts.state.setProperty(PatchNameIds::kPatchName, "*'CANOPY", nullptr);
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchFile, juce::var());
+
+        expect(warmFile.existsAsFile());
+        expectEquals(harness.model.getName(), juce::String("WARM"));
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("WARM"));
+        expectEquals(loadSavedPatchName(harness, warmFile), juce::String("WARM"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testSaveAs_illegalStem_noWrite()
+    {
+        beginTest("saveAs_illegalStem_noWrite");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        harness.model.setName("KEEPNAME");
+        harness.proc.apvts.state.setProperty(PatchNameIds::kPatchName, "KEEPNAME", nullptr);
+
+        const auto accentedStem = juce::String::fromUTF8("r\xc3\xa9so");
+        harness.pickSaveFileCallback = [&tempDir, accentedStem](juce::File, juce::String) {
+            return tempDir.getChildFile(accentedStem + ".syx");
+        };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
+
+        expectEquals(tempDir.getNumberOfChildFiles(juce::File::findFiles), 0);
+        expectEquals(harness.model.getName(), juce::String("KEEPNAME"));
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("KEEPNAME"));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kInvalidSaveStem));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString(),
+                     juce::String("warning"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void testSaveAs_suggestedStem_isMatrixSanitized()
+    {
+        beginTest("saveAs_suggestedStem_isMatrixSanitized");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+
+        harness.model.setName("*'CANOPY");
+        harness.proc.apvts.state.setProperty(PatchNameIds::kPatchName, "*'CANOPY", nullptr);
+
+        juce::String suggestedStemSeen;
+        harness.pickSaveFileCallback = [&tempDir, &suggestedStemSeen](juce::File, juce::String stem) {
+            suggestedStemSeen = stem;
+            return tempDir.getChildFile("CANOPY.syx");
+        };
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchAs, juce::var());
+
+        expectEquals(suggestedStemSeen, juce::String("CANOPY"));
+        expect(tempDir.getChildFile("CANOPY.syx").existsAsFile());
+
+        tempDir.deleteRecursively();
+    }
+
+    void testSave_illegalDiskStem_refusesWrite()
+    {
+        beginTest("save_illegalDiskStem_refusesWrite");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        const auto accentedStem = juce::String::fromUTF8("r\xc3\xa9so");
+        const auto oddFile = tempDir.getChildFile(accentedStem + ".syx");
+        {
+            Core::PatchModel seed;
+            seed.setName("OLDNAME");
+            expect(harness.patchFileService.savePatchSysExFile(
+                       oddFile, seed.data(), harness.sysExEncoder)
+                       .success);
+        }
+
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StateProperties::kFolderPath,
+            tempDir.getFullPathName(),
+            nullptr);
+        harness.handler.rescanPersistedComputerPatchesFolder();
+        harness.proc.apvts.state.setProperty(
+            ComputerPatches::StandaloneWidgets::kSelectPatchFile,
+            1,
+            nullptr);
+
+        harness.model.setName("KEEPNAME");
+        harness.proc.apvts.state.setProperty(PatchNameIds::kPatchName, "KEEPNAME", nullptr);
+        const auto sizeBefore = oddFile.getSize();
+
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kSavePatchFile, juce::var());
+
+        expectEquals(oddFile.getSize(), sizeBefore);
+        expectEquals(harness.model.getName(), juce::String("KEEPNAME"));
+        expectEquals(harness.proc.apvts.state.getProperty(PatchNameIds::kPatchName).toString(),
+                     juce::String("KEEPNAME"));
+        expectEquals(harness.proc.apvts.state.getProperty("uiMessageText").toString(),
+                     juce::String(FooterMessages::kInvalidSaveStem));
 
         tempDir.deleteRecursively();
     }

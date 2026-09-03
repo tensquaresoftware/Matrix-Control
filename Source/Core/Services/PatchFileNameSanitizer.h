@@ -22,6 +22,14 @@ namespace Core
         // Falls back to kEmptyNameFallback when empty — suitable for .syx filenames.
         static juce::String sanitizeOsFileStem(juce::String input);
 
+        // Computer Patches SAVE AS validation: strip path/.syx, trim, uppercase — then accept
+        // only when every character is Matrix-legal and length is 1–8. Case-only differences OK;
+        // accents / exotic punctuation / overlength refuse (empty return — no silent rewrite).
+        static juce::String normalizeMatrixSaveStemOrEmpty(juce::String input);
+
+        // True when normalizeMatrixSaveStemOrEmpty would return a non-empty stem.
+        static bool isExactMatrixFileStem(const juce::String& input);
+
         static juce::String ensureSyxExtension(const juce::String& stem);
 
         // Bank Utility EXPORT filename stem: "Pxx - {Name}" (slot 0-99, name OS-sanitized from

@@ -306,19 +306,35 @@ namespace Core
         if (patchNameSyncer_ != nullptr)
             patchNameSyncer_->apvtsToBuffer();
 
-        const auto target = targetFile.withFileExtension(PatchFileService::kSyxExtension);
+        const auto targetWithExt = targetFile.withFileExtension(PatchFileService::kSyxExtension);
+        const auto rawStem = targetWithExt.getFileNameWithoutExtension();
+        const auto matrixStem = PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(rawStem);
+
+        // Refuse illegal stems at the write boundary (no silent sanitizeFileStem rewrite).
+        if (matrixStem.isEmpty())
+        {
+            publishSaveFailureFooter(FooterMessages::kInvalidSaveStem);
+            return;
+        }
+
+        const auto writeTarget =
+            targetWithExt.getSiblingFile(PatchFileNameSanitizer::ensureSyxExtension(matrixStem));
+        const auto previousName = patchModel_->getName();
+        patchModel_->setName(matrixStem);
+
         const auto result = patchFileService_->savePatchSysExFile(
-            target,
+            writeTarget,
             patchModel_->data(),
             *sysExEncoder_);
 
         if (! result.success)
         {
+            patchModel_->setName(previousName);
             publishSaveFailureFooter(result.errorMessage);
             return;
         }
 
-        completeSuccessfulSave(target);
+        completeSuccessfulSave(writeTarget);
     }
 
     void PatchManagerActionHandler::completeSuccessfulSave(const juce::File& savedFile)
@@ -404,7 +420,7 @@ namespace Core
             PluginIDs::PatchEditSection::PatchNameModule::kPatchName,
             juce::String()).toString();
 
-        return PatchFileNameSanitizer::sanitizeOsFileStem(raw);
+        return PatchFileNameSanitizer::sanitizeFileStem(raw);
     }
 
     void PatchManagerActionHandler::publishSaveSuccessFooter(const juce::String& fileName)
