@@ -42,7 +42,7 @@ namespace MutatorState = PatchManager::PatchMutatorModule::StateProperties;
 namespace ComputerPatches = PatchManager::ComputerPatchesModule;
 namespace PatchNameIds = PluginIDs::PatchEditSection::PatchNameModule;
 namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
-namespace Policy = PluginIDs::Settings::NameReconciliationPolicy;
+namespace Policy = PluginIDs::Settings::ComputerPatchesNamesPolicy;
 
 namespace PatchManagerActionHandlerTestSupport
 {

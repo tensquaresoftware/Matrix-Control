@@ -5,11 +5,11 @@
 
 namespace
 {
-    using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+    using namespace PluginIDs::Settings::UnsavedStatePolicy;
 
     struct CloseGateScenario
     {
-        int policyId = kWarnAlways;
+        int policyId = kAlwaysWarn;
         bool isDirty = false;
         bool notStoredInRam = false;
         Core::UnsavedEditConfirmChoice gateChoice = Core::UnsavedEditConfirmChoice::kCancel;

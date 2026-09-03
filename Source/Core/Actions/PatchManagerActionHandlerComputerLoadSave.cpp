@@ -179,8 +179,8 @@ namespace Core
     PatchNameReconciliationResult PatchManagerActionHandler::reconcileLoadedPatchName(const juce::File& file)
     {
         const auto policy = static_cast<int>(apvts_.state.getProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-            PluginIDs::Settings::NameReconciliationPolicy::kDefault));
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
+            PluginIDs::Settings::ComputerPatchesNamesPolicy::kDefault));
 
         return PatchFileNameReconciler::reconcile(
             *patchModel_,

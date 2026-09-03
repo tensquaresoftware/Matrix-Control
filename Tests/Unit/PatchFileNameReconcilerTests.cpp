@@ -5,7 +5,7 @@
 #include "Core/Services/PatchFileNameReconciler.h"
 #include "Shared/Definitions/PluginIDs.h"
 
-namespace Policy = PluginIDs::Settings::NameReconciliationPolicy;
+namespace Policy = PluginIDs::Settings::ComputerPatchesNamesPolicy;
 
 class PatchFileNameReconcilerTests : public juce::UnitTest
 {
@@ -34,7 +34,7 @@ private:
         const auto result = Core::PatchFileNameReconciler::reconcile(
             model,
             "BASS",
-            Policy::kPreferFilename,
+            Policy::kDisplayFileNames,
             nullptr);
 
         expect(! result.hadMismatch);
@@ -55,7 +55,7 @@ private:
         const auto result = Core::PatchFileNameReconciler::reconcile(
             model,
             "OUTSIDE",
-            Policy::kPreferInternal,
+            Policy::kDisplaySysexNames,
             nullptr);
 
         expect(result.hadMismatch);
@@ -75,7 +75,7 @@ private:
         const auto result = Core::PatchFileNameReconciler::reconcile(
             model,
             "OUTSIDE",
-            Policy::kPreferFilename,
+            Policy::kDisplayFileNames,
             nullptr);
 
         expect(result.hadMismatch);
@@ -139,7 +139,7 @@ private:
         const auto result = Core::PatchFileNameReconciler::reconcile(
             model,
             "BASS",
-            Policy::kPreferFilename,
+            Policy::kDisplayFileNames,
             nullptr);
 
         expect(! result.hadMismatch);

@@ -150,7 +150,7 @@ bool PatchNameDisplayPanel::isTrackedProperty(const juce::String& propertyName)
         || propertyName == MutatorState::kSelectedRetryIndex
         || propertyName == InternalPatches::kCurrentBankNumber
         || propertyName == InternalPatches::kCurrentPatchNumber
-        || propertyName == PluginIDs::Settings::kPatchNameDisplayMode;
+        || propertyName == PluginIDs::Settings::kMatrix1000PatchesNamesMode;
 }
 
 void PatchNameDisplayPanel::valueTreePropertyChanged(juce::ValueTree&,

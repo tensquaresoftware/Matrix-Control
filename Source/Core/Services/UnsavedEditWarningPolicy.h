@@ -30,7 +30,7 @@ namespace Core
         // Settings policy: warn when dirty and/or not yet STORED in RAM, unless never-warn.
         inline bool shouldPrompt(int policyId, bool isDirty, bool notStoredInRam = false) noexcept
         {
-            using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+            using namespace PluginIDs::Settings::UnsavedStatePolicy;
 
             if (policyId == kNeverWarn)
                 return false;

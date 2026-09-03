@@ -266,8 +266,8 @@ private:
             tempDir.getFullPathName(),
             nullptr);
         harness.proc.apvts.state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-            Policy::kPreferInternal,
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
+            Policy::kDisplaySysexNames,
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
 
@@ -281,7 +281,7 @@ private:
     void armAskOnceCancelAndSelectFirst(HandlerHarness& harness)
     {
         harness.proc.apvts.state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
             Policy::kAskOncePerLoad,
             nullptr);
         harness.patchLoadHookState->invoked = false;

@@ -151,10 +151,10 @@ bool PluginProcessor::confirmSessionCloseGateIfNeeded()
 
 bool PluginProcessor::confirmUnsavedEditGateIfNeeded()
 {
-    using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+    using namespace PluginIDs::Settings::UnsavedStatePolicy;
 
     const int policy = static_cast<int>(apvts.state.getProperty(
-        PluginIDs::Settings::kUnsavedEditWarningPolicy,
+        PluginIDs::Settings::kUnsavedStatePolicy,
         kDefault));
 
     if (dirtyPatchTracker_ == nullptr || patchModel_ == nullptr || apvtsPatchMapper_ == nullptr

@@ -333,10 +333,10 @@ private:
     void initializeHardwareLatencyProperty();
     void initializeInitTemplatesFolderProperty();
     void initializeComputerPatchesFolderProperty();
-    void initializeNameReconciliationPolicyProperty();
-    void initializeUnsavedEditWarningPolicyProperty();
-    void initializeMutatorDeleteWarningPolicyProperty();
-    void initializePatchNameDisplayModeProperty();
+    void initializeComputerPatchesNamesPolicyProperty();
+    void initializeUnsavedStatePolicyProperty();
+    void initializeDeleteWarningPolicyProperty();
+    void initializeMatrix1000PatchesNamesModeProperty();
     void applyHardwareLatencyToHost();
     void notifyNonParameterStateChanged();
     void scheduleDeferredMidiPortSyncForPluginHost();

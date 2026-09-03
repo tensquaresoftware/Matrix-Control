@@ -6,19 +6,19 @@ namespace Core
 {
     namespace PatchNameDisplay
     {
-        // Settings policy: Musical Names (default) vs Hardware Names for Patch Name UI.
+        // Settings: MATRIX-1000 PATCHES — DISPLAY MUSICAL NAMES (default) vs DISPLAY HARDWARE NAMES.
         inline bool isHardwareNames(int modeId) noexcept
         {
-            using namespace PluginIDs::Settings::PatchNameDisplayMode;
+            using namespace PluginIDs::Settings::Matrix1000PatchesNamesMode;
 
-            return modeId == kHardwareNames;
+            return modeId == kDisplayHardwareNames;
         }
 
         inline int normalize(int modeId) noexcept
         {
-            using namespace PluginIDs::Settings::PatchNameDisplayMode;
+            using namespace PluginIDs::Settings::Matrix1000PatchesNamesMode;
 
-            if (modeId == kMusicalNames || modeId == kHardwareNames)
+            if (modeId == kDisplayMusicalNames || modeId == kDisplayHardwareNames)
                 return modeId;
 
             return kDefault;

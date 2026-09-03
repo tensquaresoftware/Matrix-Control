@@ -17,8 +17,9 @@ namespace TSS
 class SettingsPanel : public juce::Component
 {
 public:
-    static constexpr int kDesignWidth = 300;
-    static constexpr int kDesignHeight = 390;
+    // Wide enough for MATRIX-1000 PATCHES + DISPLAY MUSICAL NAMES without clipping.
+    static constexpr int kDesignWidth = 400;
+    static constexpr int kDesignHeight = 420;
 
     SettingsPanel(TSS::ISkin& skin, bool isPluginMode);
     ~SettingsPanel() override = default;
@@ -31,10 +32,10 @@ public:
     void setPluginMode(bool isPluginMode);
 
     TSS::Slider& getHardwareLatencySlider() { return *hardwareLatencySlider_; }
-    TSS::ComboBox& getNameReconciliationPolicyCombo() { return *nameReconciliationPolicyCombo_; }
-    TSS::ComboBox& getUnsavedEditWarningPolicyCombo() { return *unsavedEditWarningPolicyCombo_; }
-    TSS::ComboBox& getMutatorDeleteWarningPolicyCombo() { return *mutatorDeleteWarningPolicyCombo_; }
-    TSS::ComboBox& getPatchNameDisplayModeCombo() { return *patchNameDisplayModeCombo_; }
+    TSS::ComboBox& getMatrix1000PatchesCombo() { return *matrix1000PatchesCombo_; }
+    TSS::ComboBox& getComputerPatchesCombo() { return *computerPatchesCombo_; }
+    TSS::ComboBox& getUnsavedStateCombo() { return *unsavedStateCombo_; }
+    TSS::ComboBox& getDeleteWarningCombo() { return *deleteWarningCombo_; }
 
 private:
     struct SectionHeaderLayoutArgs
@@ -64,11 +65,10 @@ private:
         int controlWidth = 0;
     };
 
-    void setupGeneralSection(TSS::ISkin& skin);
-    void setupPolicyControls(TSS::ISkin& skin);
-    void setupPlaceholderRows(TSS::ISkin& skin);
-    void setupMatrix1000Section(TSS::ISkin& skin);
-    void populatePolicyComboItems();
+    void setupPatchSection(TSS::ISkin& skin);
+    void setupPatchMutatorSection(TSS::ISkin& skin);
+    void setupMasterSection(TSS::ISkin& skin);
+    void populateComboItems();
     void applyComboPopupLooks(TSS::ISkin& skin);
     void applyChildLooks(TSS::ISkin& skin);
 
@@ -78,8 +78,9 @@ private:
 
     void updateModeSpecificVisibility();
     void layoutContent(juce::Rectangle<int> bounds);
-    void layoutGeneralSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
-    void layoutMatrix1000Section(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
+    void layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics);
     void layoutSectionHeader(juce::Rectangle<int>& bounds, const SectionHeaderLayoutArgs& args);
     void layoutLabeledControlRow(juce::Rectangle<int>& bounds,
                                  const RowLayoutMetrics& metrics,
@@ -95,7 +96,7 @@ private:
     inline constexpr static int kSectionTitleGap_ = 4;
     inline constexpr static int kControlHeight_ = 20;
     inline constexpr static int kSeparatorHeight_ = 8;
-    inline constexpr static int kLabelWidth_ = 128;
+    inline constexpr static int kLabelWidth_ = 160;
     inline constexpr static int kSliderWidth_ = 72;
     inline constexpr static int kContentWidth_ = kDesignWidth - kPadding_ * 2;
 
@@ -103,27 +104,28 @@ private:
     float uiScale_ = 1.0f;
     bool isPluginMode_ = false;
 
-    std::unique_ptr<TSS::Label> generalSectionLabel_;
-    std::unique_ptr<TSS::HorizontalSeparator> generalSectionSeparator_;
+    std::unique_ptr<TSS::Label> patchSectionLabel_;
+    std::unique_ptr<TSS::HorizontalSeparator> patchSectionSeparator_;
+    std::unique_ptr<TSS::Label> matrix1000PatchesLabel_;
+    std::unique_ptr<TSS::ComboBox> matrix1000PatchesCombo_;
+    std::unique_ptr<TSS::Label> computerPatchesLabel_;
+    std::unique_ptr<TSS::ComboBox> computerPatchesCombo_;
+    std::unique_ptr<TSS::Label> unsavedStateLabel_;
+    std::unique_ptr<TSS::ComboBox> unsavedStateCombo_;
+
+    std::unique_ptr<TSS::Label> patchMutatorSectionLabel_;
+    std::unique_ptr<TSS::HorizontalSeparator> patchMutatorSectionSeparator_;
+    std::unique_ptr<TSS::Label> deleteWarningLabel_;
+    std::unique_ptr<TSS::ComboBox> deleteWarningCombo_;
+    std::unique_ptr<TSS::Label> defragHistoryLabel_;
+    std::unique_ptr<TSS::Label> defragHistoryPlaceholder_;
+
+    std::unique_ptr<TSS::Label> masterSectionLabel_;
+    std::unique_ptr<TSS::HorizontalSeparator> masterSectionSeparator_;
     std::unique_ptr<TSS::Label> hardwareLatencyLabel_;
     std::unique_ptr<TSS::Slider> hardwareLatencySlider_;
-    std::unique_ptr<TSS::Label> masterOpsLabel_;
-    std::unique_ptr<TSS::Label> masterOpsPlaceholder_;
-    std::unique_ptr<TSS::Label> policiesLabel_;
-    std::unique_ptr<TSS::ComboBox> nameReconciliationPolicyCombo_;
-    std::unique_ptr<TSS::Label> unsavedEditWarningLabel_;
-    std::unique_ptr<TSS::ComboBox> unsavedEditWarningPolicyCombo_;
-    std::unique_ptr<TSS::Label> mutatorDeleteWarningLabel_;
-    std::unique_ptr<TSS::ComboBox> mutatorDeleteWarningPolicyCombo_;
-    std::unique_ptr<TSS::Label> defragLabel_;
-    std::unique_ptr<TSS::Label> defragPlaceholder_;
-    std::unique_ptr<TSS::Label> loggingLabel_;
-    std::unique_ptr<TSS::Label> loggingPlaceholder_;
-
-    std::unique_ptr<TSS::Label> matrix1000SectionLabel_;
-    std::unique_ptr<TSS::HorizontalSeparator> matrix1000SectionSeparator_;
-    std::unique_ptr<TSS::Label> patchNameDisplayLabel_;
-    std::unique_ptr<TSS::ComboBox> patchNameDisplayModeCombo_;
+    std::unique_ptr<TSS::Label> masterOperationsLabel_;
+    std::unique_ptr<TSS::Label> masterOperationsPlaceholder_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsPanel)
 };

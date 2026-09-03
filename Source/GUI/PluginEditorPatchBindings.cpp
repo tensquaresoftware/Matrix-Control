@@ -249,13 +249,13 @@ void PluginEditor::setMutatorDeleteConfirmGateBinding()
                 return false;
             }
 
-            using namespace PluginIDs::Settings::MutatorDeleteWarningPolicy;
+            using namespace PluginIDs::Settings::DeleteWarningPolicy;
 
             const int policyRaw = static_cast<int>(safeThis->pluginProcessor.getApvts().state.getProperty(
-                PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+                PluginIDs::Settings::kDeleteWarningPolicy,
                 kDefault));
             const int policy =
-                (policyRaw == kWarnAlways || policyRaw == kNeverWarn) ? policyRaw : kDefault;
+                (policyRaw == kAlwaysWarn || policyRaw == kNeverWarn) ? policyRaw : kDefault;
 
             if (! Core::MutatorDeleteWarning::shouldPrompt(policy))
                 return true;
@@ -265,12 +265,12 @@ void PluginEditor::setMutatorDeleteConfirmGateBinding()
             if (result.confirmed && result.dontAskAgain)
             {
                 safeThis->pluginProcessor.getApvts().state.setProperty(
-                    PluginIDs::Settings::kMutatorDeleteWarningPolicy,
+                    PluginIDs::Settings::kDeleteWarningPolicy,
                     kNeverWarn,
                     nullptr);
 
                 if (auto* settingsPanel = safeThis->getSettingsPanelIfOpen())
-                    settingsPanel->getMutatorDeleteWarningPolicyCombo().setSelectedId(
+                    settingsPanel->getDeleteWarningCombo().setSelectedId(
                         kNeverWarn, juce::dontSendNotification);
             }
 

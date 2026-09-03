@@ -228,7 +228,7 @@ private:
             tempDir.getFullPathName(),
             nullptr);
         harness.proc.apvts.state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
             Policy::kAskOncePerLoad,
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
@@ -273,8 +273,8 @@ private:
             tempDir.getFullPathName(),
             nullptr);
         harness.proc.apvts.state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-            Policy::kPreferInternal,
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
+            Policy::kDisplaySysexNames,
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
         harness.proc.apvts.state.setProperty(
@@ -312,8 +312,8 @@ private:
             tempDir.getFullPathName(),
             nullptr);
         harness.proc.apvts.state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-            Policy::kPreferFilename,
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
+            Policy::kDisplayFileNames,
             nullptr);
         harness.handler.rescanPersistedComputerPatchesFolder();
         harness.proc.apvts.state.setProperty(

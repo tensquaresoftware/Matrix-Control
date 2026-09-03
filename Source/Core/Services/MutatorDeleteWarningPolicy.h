@@ -9,7 +9,7 @@ namespace Core
         // Settings policy: prompt before Patch Mutator Delete unless the user chose never-warn.
         inline bool shouldPrompt(int policyId) noexcept
         {
-            using namespace PluginIDs::Settings::MutatorDeleteWarningPolicy;
+            using namespace PluginIDs::Settings::DeleteWarningPolicy;
 
             return policyId != kNeverWarn;
         }

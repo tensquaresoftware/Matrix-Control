@@ -8,55 +8,86 @@
 #include "GUI/Settings/SettingsPanel.h"
 #include "Shared/Definitions/PluginIDs.h"
 
+namespace
+{
+    int normalizeComputerPatchesNamesPolicy(int policyRaw)
+    {
+        using namespace PluginIDs::Settings::ComputerPatchesNamesPolicy;
+
+        if (policyRaw == kDisplaySysexNames || policyRaw == kDisplayFileNames
+            || policyRaw == kAskOncePerLoad)
+            return policyRaw;
+
+        return kDefault;
+    }
+
+    int normalizeUnsavedStatePolicy(int policyRaw)
+    {
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
+
+        if (policyRaw == kAlwaysWarn || policyRaw == kNeverWarn)
+            return policyRaw;
+
+        return kDefault;
+    }
+
+    int normalizeDeleteWarningPolicy(int policyRaw)
+    {
+        using namespace PluginIDs::Settings::DeleteWarningPolicy;
+
+        if (policyRaw == kAlwaysWarn || policyRaw == kNeverWarn)
+            return policyRaw;
+
+        return kDefault;
+    }
+
+    int readNormalizedProperty(juce::ValueTree& state,
+                               const char* propertyId,
+                               int defaultValue,
+                               const std::function<int(int)>& normalize)
+    {
+        const int raw = static_cast<int>(state.getProperty(propertyId, defaultValue));
+        const int normalized = normalize(raw);
+        if (normalized != raw)
+            state.setProperty(propertyId, normalized, nullptr);
+        return normalized;
+    }
+}
+
 void PluginEditor::restoreSettingsPanelFromState(SettingsPanel& panel)
 {
+    auto& state = pluginProcessor.getApvts().state;
+
     if (!pluginProcessor.isStandalone())
         panel.getHardwareLatencySlider().setValue(pluginProcessor.getHardwareLatencyMs(), juce::dontSendNotification);
 
-    const int policy = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-        PluginIDs::Settings::NameReconciliationPolicy::kDefault));
-    panel.getNameReconciliationPolicyCombo().setSelectedId(policy, juce::dontSendNotification);
+    panel.getMatrix1000PatchesCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kMatrix1000PatchesNamesMode,
+                               PluginIDs::Settings::Matrix1000PatchesNamesMode::kDefault,
+                               [](int raw) { return Core::PatchNameDisplay::normalize(raw); }),
+        juce::dontSendNotification);
 
-    const int unsavedPolicyRaw = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kUnsavedEditWarningPolicy,
-        PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault));
-    const int unsavedPolicy =
-        (unsavedPolicyRaw == PluginIDs::Settings::UnsavedEditWarningPolicy::kWarnAlways
-         || unsavedPolicyRaw == PluginIDs::Settings::UnsavedEditWarningPolicy::kNeverWarn)
-            ? unsavedPolicyRaw
-            : PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault;
-    panel.getUnsavedEditWarningPolicyCombo().setSelectedId(unsavedPolicy, juce::dontSendNotification);
+    panel.getComputerPatchesCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kComputerPatchesNamesPolicy,
+                               PluginIDs::Settings::ComputerPatchesNamesPolicy::kDefault,
+                               normalizeComputerPatchesNamesPolicy),
+        juce::dontSendNotification);
 
-    const int mutatorDeletePolicyRaw = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kMutatorDeleteWarningPolicy,
-        PluginIDs::Settings::MutatorDeleteWarningPolicy::kDefault));
-    const int mutatorDeletePolicy =
-        (mutatorDeletePolicyRaw == PluginIDs::Settings::MutatorDeleteWarningPolicy::kWarnAlways
-         || mutatorDeletePolicyRaw == PluginIDs::Settings::MutatorDeleteWarningPolicy::kNeverWarn)
-            ? mutatorDeletePolicyRaw
-            : PluginIDs::Settings::MutatorDeleteWarningPolicy::kDefault;
-    if (mutatorDeletePolicy != mutatorDeletePolicyRaw)
-    {
-        pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kMutatorDeleteWarningPolicy,
-            mutatorDeletePolicy,
-            nullptr);
-    }
-    panel.getMutatorDeleteWarningPolicyCombo().setSelectedId(mutatorDeletePolicy, juce::dontSendNotification);
+    panel.getUnsavedStateCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kUnsavedStatePolicy,
+                               PluginIDs::Settings::UnsavedStatePolicy::kDefault,
+                               normalizeUnsavedStatePolicy),
+        juce::dontSendNotification);
 
-    const int patchNameDisplayRaw = static_cast<int>(pluginProcessor.getApvts().state.getProperty(
-        PluginIDs::Settings::kPatchNameDisplayMode,
-        PluginIDs::Settings::PatchNameDisplayMode::kDefault));
-    const int patchNameDisplayMode = Core::PatchNameDisplay::normalize(patchNameDisplayRaw);
-    if (patchNameDisplayMode != patchNameDisplayRaw)
-    {
-        pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kPatchNameDisplayMode,
-            patchNameDisplayMode,
-            nullptr);
-    }
-    panel.getPatchNameDisplayModeCombo().setSelectedId(patchNameDisplayMode, juce::dontSendNotification);
+    panel.getDeleteWarningCombo().setSelectedId(
+        readNormalizedProperty(state,
+                               PluginIDs::Settings::kDeleteWarningPolicy,
+                               PluginIDs::Settings::DeleteWarningPolicy::kDefault,
+                               normalizeDeleteWarningPolicy),
+        juce::dontSendNotification);
 }
 
 void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
@@ -66,48 +97,45 @@ void PluginEditor::wireSettingsPanel(SettingsPanel& panel)
         pluginProcessor.setHardwareLatencyMs(static_cast<float>(panel.getHardwareLatencySlider().getValue()));
     };
 
-    panel.getNameReconciliationPolicyCombo().onChange = [this, &panel]
+    panel.getMatrix1000PatchesCombo().onChange = [this, &panel]
     {
-        pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-            panel.getNameReconciliationPolicyCombo().getSelectedId(),
-            nullptr);
-    };
-
-    panel.getUnsavedEditWarningPolicyCombo().onChange = [this, &panel]
-    {
-        pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kUnsavedEditWarningPolicy,
-            panel.getUnsavedEditWarningPolicyCombo().getSelectedId(),
-            nullptr);
-    };
-
-    panel.getMutatorDeleteWarningPolicyCombo().onChange = [this, &panel]
-    {
-        using namespace PluginIDs::Settings::MutatorDeleteWarningPolicy;
-
-        const int selectedId = panel.getMutatorDeleteWarningPolicyCombo().getSelectedId();
-        if (selectedId != kWarnAlways && selectedId != kNeverWarn)
+        using namespace PluginIDs::Settings::Matrix1000PatchesNamesMode;
+        const int selectedId = panel.getMatrix1000PatchesCombo().getSelectedId();
+        if (selectedId != kDisplayMusicalNames && selectedId != kDisplayHardwareNames)
             return;
-
         pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kMutatorDeleteWarningPolicy,
-            selectedId,
-            nullptr);
-    };
-
-    panel.getPatchNameDisplayModeCombo().onChange = [this, &panel]
-    {
-        using namespace PluginIDs::Settings::PatchNameDisplayMode;
-
-        const int selectedId = panel.getPatchNameDisplayModeCombo().getSelectedId();
-        if (selectedId != kMusicalNames && selectedId != kHardwareNames)
-            return;
-
-        pluginProcessor.getApvts().state.setProperty(
-            PluginIDs::Settings::kPatchNameDisplayMode,
-            selectedId,
-            nullptr);
+            PluginIDs::Settings::kMatrix1000PatchesNamesMode, selectedId, nullptr);
         pluginProcessor.refreshPatchNameDisplayForSettingsMode();
+    };
+
+    panel.getComputerPatchesCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::ComputerPatchesNamesPolicy;
+        const int selectedId = panel.getComputerPatchesCombo().getSelectedId();
+        if (selectedId != kDisplaySysexNames && selectedId != kDisplayFileNames
+            && selectedId != kAskOncePerLoad)
+            return;
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kComputerPatchesNamesPolicy, selectedId, nullptr);
+    };
+
+    panel.getUnsavedStateCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
+        const int selectedId = panel.getUnsavedStateCombo().getSelectedId();
+        if (selectedId != kAlwaysWarn && selectedId != kNeverWarn)
+            return;
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kUnsavedStatePolicy, selectedId, nullptr);
+    };
+
+    panel.getDeleteWarningCombo().onChange = [this, &panel]
+    {
+        using namespace PluginIDs::Settings::DeleteWarningPolicy;
+        const int selectedId = panel.getDeleteWarningCombo().getSelectedId();
+        if (selectedId != kAlwaysWarn && selectedId != kNeverWarn)
+            return;
+        pluginProcessor.getApvts().state.setProperty(
+            PluginIDs::Settings::kDeleteWarningPolicy, selectedId, nullptr);
     };
 }

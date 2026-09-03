@@ -17,42 +17,43 @@ namespace PluginIDs
         constexpr const char* kHardwareLatencyMs = "settingsHardwareLatencyMs";
         constexpr const char* kInitTemplatesFolderPath = "settingsInitTemplatesFolderPath";
         constexpr const char* kTestWidget = "settingsTestWidget";
-        constexpr const char* kComputerPatchesNameReconciliationPolicy =
+        // Persistence keys keep historical string values for session compatibility.
+        constexpr const char* kComputerPatchesNamesPolicy =
             "settingsComputerPatchesNameReconciliationPolicy";
-        constexpr const char* kUnsavedEditWarningPolicy =
+        constexpr const char* kUnsavedStatePolicy =
             "settingsUnsavedEditWarningPolicy";
-        constexpr const char* kMutatorDeleteWarningPolicy =
+        constexpr const char* kDeleteWarningPolicy =
             "settingsMutatorDeleteWarningPolicy";
-        constexpr const char* kPatchNameDisplayMode =
+        constexpr const char* kMatrix1000PatchesNamesMode =
             "settingsPatchNameDisplayMode";
 
-        namespace NameReconciliationPolicy
+        namespace ComputerPatchesNamesPolicy
         {
-            constexpr int kPreferInternal = 1;
-            constexpr int kPreferFilename = 2;
+            constexpr int kDisplaySysexNames = 1;
+            constexpr int kDisplayFileNames = 2;
             constexpr int kAskOncePerLoad = 3;
-            constexpr int kDefault = kPreferInternal;
+            constexpr int kDefault = kDisplaySysexNames;
         }
 
-        namespace UnsavedEditWarningPolicy
+        namespace UnsavedStatePolicy
         {
-            constexpr int kWarnAlways = 1;
+            constexpr int kAlwaysWarn = 1;
             constexpr int kNeverWarn = 2;
-            constexpr int kDefault = kWarnAlways;
+            constexpr int kDefault = kAlwaysWarn;
         }
 
-        namespace MutatorDeleteWarningPolicy
+        namespace DeleteWarningPolicy
         {
-            constexpr int kWarnAlways = 1;
+            constexpr int kAlwaysWarn = 1;
             constexpr int kNeverWarn = 2;
-            constexpr int kDefault = kWarnAlways;
+            constexpr int kDefault = kAlwaysWarn;
         }
 
-        namespace PatchNameDisplayMode
+        namespace Matrix1000PatchesNamesMode
         {
-            constexpr int kMusicalNames = 1;
-            constexpr int kHardwareNames = 2;
-            constexpr int kDefault = kMusicalNames;
+            constexpr int kDisplayMusicalNames = 1;
+            constexpr int kDisplayHardwareNames = 2;
+            constexpr int kDefault = kDisplayMusicalNames;
         }
 
         namespace SkinVariants

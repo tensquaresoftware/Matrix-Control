@@ -92,28 +92,26 @@ namespace PluginDisplayNames
         const juce::String kWindowTitle                = "SETTINGS";
         constexpr const char* kSkinLabel               = "SKIN :";
         constexpr const char* kUiScaleLabel            = "UI SCALE :";
-        constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY :";
+        constexpr const char* kHardwareLatencyLabel    = "HARDWARE LATENCY";
         constexpr const char* kAudioFromLabel          = "AUDIO FROM :";
         constexpr const char* kInputGainLabel          = "INPUT GAIN :";
-        constexpr const char* kGeneralSection          = "GENERAL";
-        constexpr const char* kMatrix1000Section       = "MATRIX-1000";
-        constexpr const char* kMasterOperationsSection = "MASTER OPERATIONS";
-        constexpr const char* kPoliciesSection         = "POLICIES";
-        constexpr const char* kDefragSection           = "DEFRAG";
-        constexpr const char* kLoggingSection          = "LOGGING";
+        constexpr const char* kPatchSection            = "PATCH";
+        constexpr const char* kPatchMutatorSection     = "PATCH MUTATOR";
+        constexpr const char* kMasterSection           = "MASTER";
+        constexpr const char* kMatrix1000PatchesLabel  = "MATRIX-1000 PATCHES";
+        constexpr const char* kComputerPatchesLabel    = "COMPUTER PATCHES";
+        constexpr const char* kUnsavedStateLabel       = "UNSAVED STATE";
+        constexpr const char* kDeleteWarningLabel      = "DELETE WARNING";
+        constexpr const char* kDefragHistoryLabel      = "DEFRAG HISTORY";
+        constexpr const char* kMasterOperationsLabel   = "MASTER OPERATIONS";
         constexpr const char* kComingSoon              = "Coming soon...";
-        constexpr const char* kNameReconciliationPreferInternal = "PREFER INTERNAL NAME";
-        constexpr const char* kNameReconciliationPreferFilename = "PREFER FILENAME";
-        constexpr const char* kNameReconciliationAskOnce        = "ASK ONCE PER LOAD";
-        constexpr const char* kUnsavedEditWarningLabel          = "UNSAVED :";
-        constexpr const char* kUnsavedEditWarnAlways           = "WARN ALWAYS";
-        constexpr const char* kUnsavedEditNeverWarn            = "NEVER WARN";
-        constexpr const char* kMutatorDeleteWarningLabel       = "MUTATOR DEL :";
-        constexpr const char* kMutatorDeleteWarnAlways         = "WARN ALWAYS";
-        constexpr const char* kMutatorDeleteNeverWarn          = "NEVER WARN";
-        constexpr const char* kPatchNameDisplayLabel           = "PATCH NAME DISPLAY :";
-        constexpr const char* kPatchNameDisplayMusicalNames    = "MUSICAL NAMES";
-        constexpr const char* kPatchNameDisplayHardwareNames   = "HARDWARE NAMES";
+        constexpr const char* kDisplaySysexNames       = "DISPLAY SYSEX NAMES";
+        constexpr const char* kDisplayFileNames        = "DISPLAY FILE NAMES";
+        constexpr const char* kAskOncePerLoad          = "ASK ONCE PER LOAD";
+        constexpr const char* kAlwaysWarn              = "ALWAYS WARN";
+        constexpr const char* kNeverWarn               = "NEVER WARN";
+        constexpr const char* kDisplayMusicalNames     = "DISPLAY MUSICAL NAMES";
+        constexpr const char* kDisplayHardwareNames    = "DISPLAY HARDWARE NAMES";
     }
 
     namespace Dialogs

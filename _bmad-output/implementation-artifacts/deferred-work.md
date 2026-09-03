@@ -1,5 +1,13 @@
 # Deferred Work
 
+## Deferred from: Settings modal reorg (2026-09-03)
+
+- **Release diagnostic logging toggle** — Settings no longer shows a LOGGING row (hidden until designed). Revisit later: optional user-facing Support/Diagnostic log (single on/off for MIDI + APVTS + future loggers), file location, size/rotation limits, and release performance cost before exposing in the Settings modal.
+- **Ask-once / footer vocabulary vs Settings** — Settings now says SYSEX / FILE NAMES; the ask-once dialog and Computer Patches load footer still say “Internal name” / “Filename”. Align product copy in a follow-up.
+- **Core policy header filenames** — `UnsavedEditWarningPolicy.h`, `MutatorDeleteWarningPolicy.h`, `PatchNameDisplayMode.h` still use older names while Settings IDs speak Unsaved State / Delete Warning / Matrix-1000 Patches Names. Rename files/namespaces when convenient.
+- **Unused Settings display strings** — SKIN / UI SCALE (and related) remain in `PluginDisplayNames::Settings` but are not shown in the reorganized modal; cleanup with the next Settings surface pass.
+- **Settings GUI regression tests** — no automated coverage for section order, combo labels/IDs, or design width/height.
+
 ## Deferred from: code review of spec-patch-mutator-playable-calibration.md (2026-08-29)
 
 - **Incomplete calibration / anti-silence tests** — motion guarantee, Preserve destination invent, choice-step limits, Consonant/Dissonant set membership, active-DCO cardinality, escalated ENV floors and FM nudge are only partly covered; re-open in the tests review chunk.

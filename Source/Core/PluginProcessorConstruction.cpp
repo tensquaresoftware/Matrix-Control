@@ -279,10 +279,10 @@ void PluginProcessor::finishConstructionSetup()
     initializeHardwareLatencyProperty();
     initializeInitTemplatesFolderProperty();
     initializeComputerPatchesFolderProperty();
-    initializeNameReconciliationPolicyProperty();
-    initializeUnsavedEditWarningPolicyProperty();
-    initializeMutatorDeleteWarningPolicyProperty();
-    initializePatchNameDisplayModeProperty();
+    initializeComputerPatchesNamesPolicyProperty();
+    initializeUnsavedStatePolicyProperty();
+    initializeDeleteWarningPolicyProperty();
+    initializeMatrix1000PatchesNamesModeProperty();
 
     initializePatchNameProperty();
     initializeClipboardPasteEnabledProperties();

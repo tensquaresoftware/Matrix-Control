@@ -224,8 +224,8 @@ bool PluginProcessor::canEditPatchName() const
 
     // Hardware Names + device memory on banked Matrix-1000: names are not durable via SysEx.
     const int displayMode = Core::PatchNameDisplay::normalize(static_cast<int>(
-        apvts.state.getProperty(PluginIDs::Settings::kPatchNameDisplayMode,
-                               PluginIDs::Settings::PatchNameDisplayMode::kDefault)));
+        apvts.state.getProperty(PluginIDs::Settings::kMatrix1000PatchesNamesMode,
+                               PluginIDs::Settings::Matrix1000PatchesNamesMode::kDefault)));
     if (Core::PatchNameDisplay::isHardwareNames(displayMode) && limits.hasBankConcept())
         return false;
 
@@ -319,46 +319,46 @@ void PluginProcessor::initializeComputerPatchesFolderProperty()
     }
 }
 
-void PluginProcessor::initializeNameReconciliationPolicyProperty()
+void PluginProcessor::initializeComputerPatchesNamesPolicyProperty()
 {
-    if (! apvts.state.hasProperty(PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy))
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kComputerPatchesNamesPolicy))
     {
         apvts.state.setProperty(
-            PluginIDs::Settings::kComputerPatchesNameReconciliationPolicy,
-            PluginIDs::Settings::NameReconciliationPolicy::kDefault,
+            PluginIDs::Settings::kComputerPatchesNamesPolicy,
+            PluginIDs::Settings::ComputerPatchesNamesPolicy::kDefault,
             nullptr);
     }
 }
 
-void PluginProcessor::initializeUnsavedEditWarningPolicyProperty()
+void PluginProcessor::initializeUnsavedStatePolicyProperty()
 {
-    if (! apvts.state.hasProperty(PluginIDs::Settings::kUnsavedEditWarningPolicy))
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kUnsavedStatePolicy))
     {
         apvts.state.setProperty(
-            PluginIDs::Settings::kUnsavedEditWarningPolicy,
-            PluginIDs::Settings::UnsavedEditWarningPolicy::kDefault,
+            PluginIDs::Settings::kUnsavedStatePolicy,
+            PluginIDs::Settings::UnsavedStatePolicy::kDefault,
             nullptr);
     }
 }
 
-void PluginProcessor::initializeMutatorDeleteWarningPolicyProperty()
+void PluginProcessor::initializeDeleteWarningPolicyProperty()
 {
-    if (! apvts.state.hasProperty(PluginIDs::Settings::kMutatorDeleteWarningPolicy))
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kDeleteWarningPolicy))
     {
         apvts.state.setProperty(
-            PluginIDs::Settings::kMutatorDeleteWarningPolicy,
-            PluginIDs::Settings::MutatorDeleteWarningPolicy::kDefault,
+            PluginIDs::Settings::kDeleteWarningPolicy,
+            PluginIDs::Settings::DeleteWarningPolicy::kDefault,
             nullptr);
     }
 }
 
-void PluginProcessor::initializePatchNameDisplayModeProperty()
+void PluginProcessor::initializeMatrix1000PatchesNamesModeProperty()
 {
-    if (! apvts.state.hasProperty(PluginIDs::Settings::kPatchNameDisplayMode))
+    if (! apvts.state.hasProperty(PluginIDs::Settings::kMatrix1000PatchesNamesMode))
     {
         apvts.state.setProperty(
-            PluginIDs::Settings::kPatchNameDisplayMode,
-            PluginIDs::Settings::PatchNameDisplayMode::kDefault,
+            PluginIDs::Settings::kMatrix1000PatchesNamesMode,
+            PluginIDs::Settings::Matrix1000PatchesNamesMode::kDefault,
             nullptr);
     }
 }

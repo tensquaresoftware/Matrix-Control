@@ -124,8 +124,8 @@ namespace Core
                 return PatchNameResolver::Mode::kMusical;
 
             const int modeId = PatchNameDisplay::normalize(static_cast<int>(
-                apvts_.state.getProperty(PluginIDs::Settings::kPatchNameDisplayMode,
-                                         PluginIDs::Settings::PatchNameDisplayMode::kDefault)));
+                apvts_.state.getProperty(PluginIDs::Settings::kMatrix1000PatchesNamesMode,
+                                         PluginIDs::Settings::Matrix1000PatchesNamesMode::kDefault)));
 
             return PatchNameDisplay::isHardwareNames(modeId) ? PatchNameResolver::Mode::kHardware
                                                              : PatchNameResolver::Mode::kMusical;

@@ -68,7 +68,7 @@ namespace Core
                                                                      int policy,
                                                                      const Picker& picker)
     {
-        using namespace PluginIDs::Settings::NameReconciliationPolicy;
+        using namespace PluginIDs::Settings::ComputerPatchesNamesPolicy;
 
         const auto internalSanitized = PatchFileNameSanitizer::sanitizeToMatrixName(model.getName());
         const auto fileSanitized = PatchFileNameSanitizer::sanitizeFileStem(fileStem);
@@ -76,7 +76,7 @@ namespace Core
         if (internalSanitized.equalsIgnoreCase(fileSanitized))
             return makeMatchResult(internalSanitized);
 
-        if (policy == kPreferFilename)
+        if (policy == kDisplayFileNames)
         {
             model.setName(fileSanitized);
             return makeMismatchResult(fileSanitized, true);
@@ -85,7 +85,7 @@ namespace Core
         if (policy == kAskOncePerLoad)
             return reconcileAskOnce(model, internalSanitized, fileSanitized, picker);
 
-        // Prefer-Internal: keep the decoded Matrix name bytes as-is (may include exotic factory
+        // DISPLAY SYSEX NAMES: keep the decoded Matrix name bytes as-is (may include exotic factory
         // characters). Do not re-filter through the Matrix filename charset.
         return makeMismatchResult(model.getName(), false);
     }

@@ -294,7 +294,7 @@ private:
     {
         beginTest("Unsaved warning policy — never warn skips prompt");
 
-        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
         expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, true));
     }
 
@@ -302,8 +302,8 @@ private:
     {
         beginTest("Unsaved warning policy — warn always when dirty");
 
-        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
-        expect(Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, true));
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
+        expect(Core::UnsavedEditWarning::shouldPrompt(kAlwaysWarn, true));
         expect(Core::UnsavedEditWarning::shouldPrompt(kDefault, true));
     }
 
@@ -311,18 +311,18 @@ private:
     {
         beginTest("Unsaved warning policy — clean never prompts");
 
-        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
-        expect(! Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false));
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kAlwaysWarn, false));
         expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, false));
-        expect(! Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false, false));
+        expect(! Core::UnsavedEditWarning::shouldPrompt(kAlwaysWarn, false, false));
     }
 
     void testUnsavedWarningPolicy_notStoredPromptsWhenClean()
     {
         beginTest("Unsaved warning policy — not stored prompts when clean");
 
-        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
-        expect(Core::UnsavedEditWarning::shouldPrompt(kWarnAlways, false, true));
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
+        expect(Core::UnsavedEditWarning::shouldPrompt(kAlwaysWarn, false, true));
         expect(Core::UnsavedEditWarning::shouldPrompt(kDefault, false, true));
     }
 
@@ -330,7 +330,7 @@ private:
     {
         beginTest("Unsaved warning policy — never warn skips not stored");
 
-        using namespace PluginIDs::Settings::UnsavedEditWarningPolicy;
+        using namespace PluginIDs::Settings::UnsavedStatePolicy;
         expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, false, true));
         expect(! Core::UnsavedEditWarning::shouldPrompt(kNeverWarn, true, true));
     }

@@ -11,11 +11,10 @@ SettingsPanel::SettingsPanel(TSS::ISkin& skin, bool isPluginMode)
 {
     setOpaque(true);
 
-    setupGeneralSection(skin);
-    setupPolicyControls(skin);
-    setupPlaceholderRows(skin);
-    setupMatrix1000Section(skin);
-    populatePolicyComboItems();
+    setupPatchSection(skin);
+    setupPatchMutatorSection(skin);
+    setupMasterSection(skin);
+    populateComboItems();
     applyComboPopupLooks(skin);
 
     setPluginMode(isPluginMode);
@@ -59,6 +58,8 @@ void SettingsPanel::layoutLabeledControlRow(juce::Rectangle<int>& bounds,
     args.control->setBounds(row.removeFromLeft(args.controlWidth).withHeight(metrics.controlHeight));
     if (auto* slider = dynamic_cast<TSS::Slider*>(args.control))
         slider->setUiScale(uiScale_);
+    else if (auto* combo = dynamic_cast<TSS::ComboBox*>(args.control))
+        combo->setUiScale(uiScale_);
     bounds.removeFromTop(metrics.rowGap);
 }
 
@@ -76,11 +77,52 @@ void SettingsPanel::layoutPlaceholderRow(juce::Rectangle<int>& bounds,
     bounds.removeFromTop(metrics.rowGap);
 }
 
-void SettingsPanel::layoutGeneralSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+void SettingsPanel::layoutPatchSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
 {
     layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ generalSectionLabel_.get(),
-                                                 generalSectionSeparator_.get(),
+                        SectionHeaderLayoutArgs{ patchSectionLabel_.get(),
+                                                 patchSectionSeparator_.get(),
+                                                 metrics.controlHeight,
+                                                 metrics.separatorHeight,
+                                                 metrics.rowGap });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ matrix1000PatchesLabel_.get(),
+                                                   matrix1000PatchesCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ computerPatchesLabel_.get(),
+                                                   computerPatchesCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ unsavedStateLabel_.get(),
+                                                   unsavedStateCombo_.get(),
+                                                   metrics.comboWidth });
+}
+
+void SettingsPanel::layoutPatchMutatorSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutSectionHeader(bounds,
+                        SectionHeaderLayoutArgs{ patchMutatorSectionLabel_.get(),
+                                                 patchMutatorSectionSeparator_.get(),
+                                                 metrics.controlHeight,
+                                                 metrics.separatorHeight,
+                                                 metrics.rowGap });
+    layoutLabeledControlRow(bounds,
+                            metrics,
+                            LabeledControlRowArgs{ deleteWarningLabel_.get(),
+                                                   deleteWarningCombo_.get(),
+                                                   metrics.comboWidth });
+    layoutPlaceholderRow(bounds, metrics, *defragHistoryLabel_, *defragHistoryPlaceholder_);
+}
+
+void SettingsPanel::layoutMasterSection(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
+{
+    layoutSectionHeader(bounds,
+                        SectionHeaderLayoutArgs{ masterSectionLabel_.get(),
+                                                 masterSectionSeparator_.get(),
                                                  metrics.controlHeight,
                                                  metrics.separatorHeight,
                                                  metrics.rowGap });
@@ -92,42 +134,9 @@ void SettingsPanel::layoutGeneralSection(juce::Rectangle<int>& bounds, const Row
                                 LabeledControlRowArgs{ hardwareLatencyLabel_.get(),
                                                        hardwareLatencySlider_.get(),
                                                        metrics.sliderWidth });
-        bounds.removeFromTop(metrics.rowGap);
     }
 
-    layoutPlaceholderRow(bounds, metrics, *masterOpsLabel_, *masterOpsPlaceholder_);
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ policiesLabel_.get(),
-                                                   nameReconciliationPolicyCombo_.get(),
-                                                   metrics.comboWidth });
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ unsavedEditWarningLabel_.get(),
-                                                   unsavedEditWarningPolicyCombo_.get(),
-                                                   metrics.comboWidth });
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ mutatorDeleteWarningLabel_.get(),
-                                                   mutatorDeleteWarningPolicyCombo_.get(),
-                                                   metrics.comboWidth });
-    layoutPlaceholderRow(bounds, metrics, *defragLabel_, *defragPlaceholder_);
-    layoutPlaceholderRow(bounds, metrics, *loggingLabel_, *loggingPlaceholder_);
-}
-
-void SettingsPanel::layoutMatrix1000Section(juce::Rectangle<int>& bounds, const RowLayoutMetrics& metrics)
-{
-    layoutSectionHeader(bounds,
-                        SectionHeaderLayoutArgs{ matrix1000SectionLabel_.get(),
-                                                 matrix1000SectionSeparator_.get(),
-                                                 metrics.controlHeight,
-                                                 metrics.separatorHeight,
-                                                 metrics.rowGap });
-    layoutLabeledControlRow(bounds,
-                            metrics,
-                            LabeledControlRowArgs{ patchNameDisplayLabel_.get(),
-                                                   patchNameDisplayModeCombo_.get(),
-                                                   metrics.comboWidth });
+    layoutPlaceholderRow(bounds, metrics, *masterOperationsLabel_, *masterOperationsPlaceholder_);
 }
 
 void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
@@ -141,9 +150,11 @@ void SettingsPanel::layoutContent(juce::Rectangle<int> bounds)
     metrics.separatorHeight = juce::roundToInt(static_cast<float>(kSeparatorHeight_) * uiScale_);
     metrics.comboWidth = bounds.getWidth() - metrics.labelWidth - metrics.gap;
 
-    layoutGeneralSection(bounds, metrics);
+    layoutPatchSection(bounds, metrics);
     bounds.removeFromTop(metrics.rowGap);
-    layoutMatrix1000Section(bounds, metrics);
+    layoutPatchMutatorSection(bounds, metrics);
+    bounds.removeFromTop(metrics.rowGap);
+    layoutMasterSection(bounds, metrics);
 }
 
 void SettingsPanel::setSkin(TSS::ISkin& skin)
