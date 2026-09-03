@@ -3,12 +3,10 @@
 ## Deferred from: code review of spec-computer-patches-save-as-naming.md (2026-09-04)
 
 - source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-save-as-naming.md`
-  summary: Case-sensitive volumes may leave an old-cased twin `.syx` beside the new uppercase write after SAVE/SAVE AS case fold.
-  evidence: writeTarget uses getSiblingFile(uppercase); original differently cased path is not deleted after success.
-
-- source_spec: `_bmad-output/implementation-artifacts/spec-computer-patches-save-as-naming.md`
   summary: SAVE AS picker may skip a second overwrite confirm when the final uppercase sibling differs from the path the native dialog already confirmed.
   evidence: dialog warns on chosen path; code returns siblingFile(normalized) which can be a different case-sensitive path.
+
+<!-- Resolved 2026-09-04: case-fold twin `.syx` removal via removeCaseFoldTwinSyxFiles after successful SAVE. -->
 
 ## Deferred from: Settings modal reorg (2026-09-03)
 

@@ -117,6 +117,8 @@ private:
 
         const auto written = tempDir.getChildFile("PATCH 71.syx");
         expect(written.existsAsFile());
+        // Case-sensitive volumes must not keep "Patch 71.syx" beside "PATCH 71.syx".
+        expectEquals(tempDir.getNumberOfChildFiles(juce::File::findFiles, "*.syx"), 1);
         expect(harness.proc.apvts.state.getProperty("uiMessageText").toString()
                == FooterMessages::formatSaveSuccess("PATCH 71.syx"));
         expectEquals(static_cast<int>(harness.patchFileService.getLastScanResult().validCount), 1);

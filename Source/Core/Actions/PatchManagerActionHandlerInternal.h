@@ -57,4 +57,26 @@ namespace PatchManagerActionHandlerInternal
             ? targetFile.getFileName()
             : targetFile.withFileExtension(Core::PatchFileService::kSyxExtension).getFileName();
     }
+
+    // After a Matrix case-fold write (e.g. Patch 71.syx → PATCH 71.syx), case-sensitive
+    // volumes can leave the old-cased twin beside the new file. Remove exact-name mismatches
+    // that equalIgnoreCase the kept name. On case-insensitive volumes the directory lists a
+    // single entry, so this is a no-op and cannot delete the file just written.
+    inline void removeCaseFoldTwinSyxFiles(const juce::File& keptSyxFile)
+    {
+        const auto parent = keptSyxFile.getParentDirectory();
+        if (! parent.isDirectory())
+            return;
+
+        const auto keptName = keptSyxFile.getFileName();
+        for (const auto& entry : juce::RangedDirectoryIterator(
+                 parent, false, "*" + juce::String(Core::PatchFileService::kSyxExtension),
+                 juce::File::findFiles))
+        {
+            const auto candidate = entry.getFile();
+            const auto name = candidate.getFileName();
+            if (name.equalsIgnoreCase(keptName) && name != keptName)
+                candidate.deleteFile();
+        }
+    }
 }

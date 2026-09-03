@@ -334,6 +334,9 @@ namespace Core
             return;
         }
 
+        using namespace PatchManagerActionHandlerInternal;
+        removeCaseFoldTwinSyxFiles(writeTarget);
+
         // Device / ROM / INIT: Save As is a disk copy only — keep the live Patch Name honest
         // until the user Opens the .syx. Computer-file origin keeps the injected stem.
         if (! editorPatchFromComputerFile_)
