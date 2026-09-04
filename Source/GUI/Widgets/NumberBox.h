@@ -20,7 +20,16 @@ namespace TSS
             kUnavailable
         };
 
-        explicit NumberBox(int width, int height, const NumberBoxLook& look, bool editable, int minValue, int maxValue);
+        struct Config
+        {
+            int width = 0;
+            int height = 20;
+            bool editable = false;
+            int minValue = 0;
+            int maxValue = 0;
+        };
+
+        explicit NumberBox(const NumberBoxLook& look, const Config& config);
         ~NumberBox() override = default;
 
         void setLook(const NumberBoxLook& look);

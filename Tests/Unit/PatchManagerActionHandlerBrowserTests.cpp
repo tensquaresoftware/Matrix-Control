@@ -26,6 +26,7 @@ public:
         testRescanPersistedFolderEmptyPathClearsStaleCache();
         testRescanPersistedFolderNoSysEx();
         testFolderPathSessionXmlRoundTrip();
+        testNavigationFocus_switchesBetweenComputerAndInternal();
     }
 
 private:
@@ -438,6 +439,39 @@ private:
             restored.apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
 
         expect(restored.apvts.state.getProperty(ComputerPatches::StateProperties::kFolderPath).toString() == path);
+    }
+
+    void testNavigationFocus_switchesBetweenComputerAndInternal()
+    {
+        beginTest("navigationFocus_switchesBetweenComputerAndInternal");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 1, 10, true);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kComputer);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 10);
+
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 11);
+
+        tempDir.deleteRecursively();
     }
 };
 

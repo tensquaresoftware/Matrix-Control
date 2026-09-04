@@ -9,20 +9,25 @@
 class TestNumberBoxes::NumberBoxScalePanel : public juce::Component
 {
 public:
-    NumberBoxScalePanel(float scale,
-                        const juce::String& scaleLabelText,
-                        const TSS::NumberBoxLook& numberBoxLook,
-                        const TSS::LabelLook& labelLook,
-                        const NumberBoxDimensions& dimensions)
-        : scale_(scale)
-        , dimensions_(dimensions)
-        , numberBoxLook_(numberBoxLook)
+    struct Setup
+    {
+        float scale = 1.0f;
+        juce::String scaleLabelText;
+        TSS::NumberBoxLook numberBoxLook {};
+        TSS::LabelLook labelLook {};
+        NumberBoxDimensions dimensions {};
+    };
+
+    explicit NumberBoxScalePanel(const Setup& setup)
+        : scale_(setup.scale)
+        , dimensions_(setup.dimensions)
+        , numberBoxLook_(setup.numberBoxLook)
     {
         scaleLabel_ = std::make_unique<TSS::Label>(
             TestScaleColumns::kScaleLabelColumnDesignWidth,
             TestScaleColumns::kScaleLabelHeight,
-            labelLook,
-            scaleLabelText);
+            setup.labelLook,
+            setup.scaleLabelText);
         addAndMakeVisible(*scaleLabel_);
 
         valueBox_ = createNumberBox(false, false, 42);
@@ -64,12 +69,13 @@ private:
     std::unique_ptr<TSS::NumberBox> createNumberBox(bool editable, bool focusHighlight, int value)
     {
         auto box = std::make_unique<TSS::NumberBox>(
-            dimensions_.patchNumberWidth,
-            dimensions_.height,
             numberBoxLook_,
-            editable,
-            0,
-            99);
+            TSS::NumberBox::Config {
+                .width = dimensions_.patchNumberWidth,
+                .height = dimensions_.height,
+                .editable = editable,
+                .minValue = 0,
+                .maxValue = 99 });
         box->setUiScale(scale_);
         box->setFocusHighlight(focusHighlight);
         box->setValue(value);
@@ -134,12 +140,12 @@ void TestNumberBoxes::rebuildPanels()
     columnPanels_.reserve(TestScaleColumns::kSpecs.size());
     for (const auto& spec : TestScaleColumns::kSpecs)
     {
-        auto panel = std::make_unique<NumberBoxScalePanel>(
-            spec.scale,
-            spec.label,
-            numberBoxLook,
-            labelLook,
-            dimensions_);
+        auto panel = std::make_unique<NumberBoxScalePanel>(NumberBoxScalePanel::Setup {
+            .scale = spec.scale,
+            .scaleLabelText = spec.label,
+            .numberBoxLook = numberBoxLook,
+            .labelLook = labelLook,
+            .dimensions = dimensions_ });
         addAndMakeVisible(*panel);
         columnPanels_.push_back(std::move(panel));
     }

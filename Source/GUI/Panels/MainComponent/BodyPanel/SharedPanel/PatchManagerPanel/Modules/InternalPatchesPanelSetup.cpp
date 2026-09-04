@@ -79,24 +79,26 @@ void InternalPatchesPanel::setupLoadNextPatchButton(TSS::ISkin& skin, WidgetFact
 void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
 {
     currentBankNumber = std::make_unique<TSS::NumberBox>(
-        dims_.numberBoxes.bankNumberWidth,
-        dims_.numberBoxes.height,
         TSS::numberBoxLookFromSkin(skin),
-        false,
-        Matrix1000Limits::kMinBankNumber,
-        Matrix1000Limits::kMaxBankNumber);
+        TSS::NumberBox::Config {
+            .width = dims_.numberBoxes.bankNumberWidth,
+            .height = dims_.numberBoxes.height,
+            .editable = false,
+            .minValue = Matrix1000Limits::kMinBankNumber,
+            .maxValue = Matrix1000Limits::kMaxBankNumber });
     addAndMakeVisible(*currentBankNumber);
 }
 
 void InternalPatchesPanel::setupCurrentPatchNumberBox(TSS::ISkin& skin)
 {
     currentPatchNumber = std::make_unique<TSS::NumberBox>(
-        dims_.numberBoxes.patchNumberWidth,
-        dims_.numberBoxes.height,
         TSS::numberBoxLookFromSkin(skin),
-        true,
-        Matrix1000Limits::kMinPatchNumber,
-        Matrix1000Limits::kMaxPatchNumber);
+        TSS::NumberBox::Config {
+            .width = dims_.numberBoxes.patchNumberWidth,
+            .height = dims_.numberBoxes.height,
+            .editable = true,
+            .minValue = Matrix1000Limits::kMinPatchNumber,
+            .maxValue = Matrix1000Limits::kMaxPatchNumber });
 
     // Push value to APVTS via property (same pattern as buttons)
     currentPatchNumber->setOnValueChanged([this](int newValue)

@@ -9,15 +9,15 @@
 
 namespace TSS
 {
-    NumberBox::NumberBox(int width, int height, const NumberBoxLook& look, bool editable, int minValue, int maxValue)
+    NumberBox::NumberBox(const NumberBoxLook& look, const Config& config)
         : look_(look)
-        , height_(height)
-        , minValue_(minValue)
-        , maxValue_(maxValue)
-        , editable_(editable)
+        , height_(config.height)
+        , minValue_(config.minValue)
+        , maxValue_(config.maxValue)
+        , editable_(config.editable)
     {
         setOpaque(true);
-        setSize(width, height_);
+        setSize(config.width, height_);
         updateValueText();
     }
 
