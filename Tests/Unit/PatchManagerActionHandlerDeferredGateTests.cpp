@@ -14,8 +14,8 @@ public:
         testUnsavedGate_continueEditBeforeDumpAbortsApply();
         testUnsavedGate_bootstrapCancelBeforeFirstCommit();
         testUnsavedGate_comboCancelUsesBaselineBeforeFirstCommit();
-        testUnsavedGate_bankDumpUnavailableRollsBackCoordsAndLock();
-        testUnsavedGate_numberBoxPriorSnapshotRestoresLock();
+        testUnsavedGate_bankDumpUnavailableRollsBackCoords();
+        testUnsavedGate_numberBoxPriorSnapshotRestoresUndefinedCoords();
         testUnsavedGate_computerLoadAbandonsPendingDeviceDump();
         testUnsavedGate_deferredHistoryDiscardSurvivesReconcileCancel();
         testUnsavedGate_openCancelAfterHistoryGateCancel();
@@ -158,9 +158,9 @@ private:
         tempDir.deleteRecursively();
     }
 
-    void testUnsavedGate_bankDumpUnavailableRollsBackCoordsAndLock()
+    void testUnsavedGate_bankDumpUnavailableRollsBackCoords()
     {
-        beginTest("unsavedGate_bankDumpUnavailableRollsBackCoordsAndLock");
+        beginTest("unsavedGate_bankDumpUnavailableRollsBackCoords");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 1, 10, false);
@@ -176,16 +176,20 @@ private:
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 10);
-        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kNone);
         expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));
         expect(! harness.patchLoadHookState->invoked);
         expect(harness.model.getName() == "BANKKEEP");
     }
 
-    void testUnsavedGate_numberBoxPriorSnapshotRestoresLock()
+    void testUnsavedGate_numberBoxPriorSnapshotRestoresUndefinedCoords()
     {
-        beginTest("unsavedGate_numberBoxPriorSnapshotRestoresLock");
+        beginTest("unsavedGate_numberBoxPriorSnapshotRestoresUndefinedCoords");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 1, 10, false);
@@ -195,18 +199,24 @@ private:
         harness.model.setName("NUMBKEEP");
         harness.patchNameSyncer.bufferToApvts();
 
-        // Simulate NumberBox: advance patch + lock, then load with a true pre-nav snapshot.
+        // Simulate NumberBox: advance patch + establish, then load with a true pre-nav snapshot.
         harness.proc.apvts.state.setProperty(InternalPatches::kCurrentPatchNumber, 11, nullptr);
-        harness.proc.apvts.state.setProperty(BankUtility::StateProperties::kBanksLocked, true, nullptr);
+        harness.proc.apvts.state.setProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished, true, nullptr);
         harness.dumpFakeState->available = false;
         harness.patchLoadHookState->invoked = false;
         harness.handler.loadCurrentPatchFromDevice(
             harness.limits,
-            Core::PatchManagerActionHandler::InternalCoordinatesSnapshot { 1, 10, 1, false });
+            Core::PatchManagerActionHandler::InternalCoordinatesSnapshot {
+                1, 10, 1, false, PatchManager::NavigationFocus::kNone });
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 10);
-        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kNone);
         expect(harness.dirtyPatchTracker.syncApvtsAndIsDirty(
             harness.mapper, harness.patchNameSyncer, harness.model));
         expect(! harness.patchLoadHookState->invoked);
@@ -218,7 +228,7 @@ private:
         beginTest("unsavedGate_computerLoadAbandonsPendingDeviceDump");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
-        initializePatchManagerState(harness.proc.apvts.state, 0, 4, false);
+        initializePatchManagerState(harness.proc.apvts.state, 0, 4, true);
         harness.mapper.apvtsToBuffer();
         harness.dirtyPatchTracker.captureSnapshot(harness.model);
 

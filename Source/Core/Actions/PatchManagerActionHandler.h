@@ -19,6 +19,7 @@
 #include "Core/Services/UnsavedEditWarningPolicy.h"
 #include "Core/Util/ComboboxPatchSendDebouncer.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
+#include "Shared/Definitions/PluginIDs.h"
 
 class MidiManager;
 class SysExEncoder;
@@ -75,7 +76,8 @@ namespace Core
             int bank = 0;
             int patch = 0;
             int selectedBank = 0;
-            bool banksLocked = false;
+            bool coordinatesEstablished = false;
+            int navigationFocus = PluginIDs::PatchManagerSection::NavigationFocus::kDefault;
         };
 
         PatchManagerActionHandler(Dependencies dependencies, ActionExecutionHooks hooks);
@@ -155,6 +157,7 @@ namespace Core
         void markPatchNotStoredInRam() noexcept { patchNotStoredInRam_ = true; }
         void revertComputerPatchesSelectionIfNeeded(int previousSelectedId);
         void rememberComputerPatchesSelection(int selectedId);
+        void clearComputerPatchesSelection();
         void seedCommittedComputerPatchesSelectionIfNeeded();
         void restoreComputerPatchesBrowser(const juce::String& folderPath, int selectedId);
         void abortComputerPatchesNavigation();
@@ -174,7 +177,17 @@ namespace Core
         void noteStableComputerPatchesSelection(int selectedId);
         bool isDeviceDumpAvailable() const;
         void requestDeviceDump(juce::uint8 patchNumber, ActionExecutionHooks::DeviceDumpCallback onResult);
-        void markBanksLockedInApvts();
+        bool arePatchCoordinatesEstablished() const;
+        void markPatchCoordinatesEstablished();
+        void setNavigationFocus(int focusOwner);
+        void clearComputerNavigationFocusIfOwned();
+        // First Internal Prev/Next on undefined coordinates lands on the lowest slot instead
+        // of stepping, because there is nothing to step from yet.
+        PatchCoordinates resolveInternalNavigationTarget(bool isNext,
+                                                         const DeviceMemoryLimits& limits) const;
+        // OPEN on undefined coordinates: claim bank/patch 0 as the .syx destination and send
+        // Set Bank only — the device patch must not be dumped into the editor.
+        void establishCoordinatesForComputerOpen(const DeviceMemoryLimits& limits);
         // Bank Utility EXPORT/IMPORT/COPY/PASTE orchestration (live MIDI dump/write, cancellable).
         using PackedPatchBuffer = std::array<juce::uint8, PatchModel::kBufferSize>;
 

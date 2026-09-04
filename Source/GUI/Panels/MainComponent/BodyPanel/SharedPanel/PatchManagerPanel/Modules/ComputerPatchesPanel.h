@@ -98,6 +98,8 @@ private:
     void setNavigationButtonsEnabled(bool enabled);
     void clearPatchFileSelectionProperty();
     void handleSelectPatchFileChanged();
+    // Red combo text while Computer Patches owns patch navigation.
+    void refreshNavigationFocusHighlight();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComputerPatchesPanel)
 };

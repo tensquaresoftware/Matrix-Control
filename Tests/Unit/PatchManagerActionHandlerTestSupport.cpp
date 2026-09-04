@@ -96,10 +96,15 @@ namespace PatchManagerActionHandlerTestSupport
         jassert(source.copyFileTo(destination));
     }
 
-    void initializePatchManagerState(juce::ValueTree& state, int bank, int patch, bool bankLocked)
+    void initializePatchManagerState(juce::ValueTree& state,
+                                     int bank,
+                                     int patch,
+                                     bool coordinatesEstablished)
     {
         state.setProperty(BankUtility::StateProperties::kSelectedBank, bank, nullptr);
-        state.setProperty(BankUtility::StateProperties::kBanksLocked, bankLocked, nullptr);
+        state.setProperty(PatchManager::StateProperties::kPatchCoordinatesEstablished,
+                          coordinatesEstablished,
+                          nullptr);
         state.setProperty(InternalPatches::kCurrentBankNumber, bank, nullptr);
         state.setProperty(InternalPatches::kCurrentPatchNumber, patch, nullptr);
     }
@@ -150,6 +155,7 @@ namespace PatchManagerActionHandlerTestSupport
                                                           Core::ActionExecutionHooks::DeviceDumpCallback onResult)
         {
             state->lastRequestedPatch = patchNumber;
+            ++state->requestCount;
             if (state->deferCallback)
             {
                 state->pendingCallback = std::move(onResult);

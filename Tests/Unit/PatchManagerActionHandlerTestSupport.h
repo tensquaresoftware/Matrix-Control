@@ -95,7 +95,12 @@ namespace PatchManagerActionHandlerTestSupport
     juce::File fixturesPatchesDir();
     juce::File createTempScanDir();
     void copyFixturePatchToDir(const juce::File& dir, const juce::String& fileName);
-    void initializePatchManagerState(juce::ValueTree& state, int bank, int patch, bool bankLocked = false);
+    // Most tests start from a synth whose slot is already known; pass false to exercise the
+    // "coordinates still undefined" startup path.
+    void initializePatchManagerState(juce::ValueTree& state,
+                                     int bank,
+                                     int patch,
+                                     bool coordinatesEstablished = true);
 
     struct HandlerHarness
     {
@@ -119,6 +124,7 @@ namespace PatchManagerActionHandlerTestSupport
             std::vector<juce::uint8> response;
             Core::ActionExecutionHooks::DeviceDumpCallback pendingCallback;
             juce::uint8 lastRequestedPatch = 0;
+            int requestCount = 0;
         };
 
         std::shared_ptr<PatchLoadHookState> patchLoadHookState;

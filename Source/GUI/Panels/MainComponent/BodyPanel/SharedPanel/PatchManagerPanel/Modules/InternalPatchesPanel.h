@@ -86,13 +86,15 @@ private:
     void applyChildLooks(TSS::ISkin& skin);
 
     void refreshDeviceLimits();
-    void refreshBankLockIndicator();
+    // Placeholder / gray-empty / focus-red state of the two coordinate boxes.
+    void refreshCoordinateDisplayStates();
     void syncNumberBoxesFromApvts();
     void applyPatchNumberRange(const Core::DeviceMemoryLimits& limits);
     void updatePasteStoreEnabled(const Core::DeviceMemoryLimits& limits, int currentBank);
     void wirePasteStoreButton(TSS::Button* button, const juce::Identifier& actionPropertyId, bool functionallyEnabled);
 
-    bool bankNumberVisible_ = true;
+    // Bank box keeps its slot on every device; on Matrix-6/6R it just shows gray and empty.
+    bool bankNumberAvailable_ = true;
     bool clipboardPasteEnabled_ = false;
     bool romPasteStoreBlocked_ = false;
 

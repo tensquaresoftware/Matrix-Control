@@ -107,7 +107,7 @@ namespace TSS
         
         // NumberBox colours
         kNumberBoxText,
-        kNumberBoxDot,
+        kNumberBoxTextFocus,
         kNumberBoxEditorBackground,
         kNumberBoxEditorSelectionBackground,
         kNumberBoxEditorText,

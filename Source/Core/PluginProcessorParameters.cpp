@@ -294,9 +294,12 @@ void PluginProcessor::applyAcceptedPatchNumberChange(const juce::String& paramet
     const int priorSelectedBank = static_cast<int>(apvts.state.getProperty(
         PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
         priorBank));
-    const bool priorBanksLocked = static_cast<bool>(apvts.state.getProperty(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+    const bool priorCoordinatesEstablished = static_cast<bool>(apvts.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
         false));
+    const int priorNavigationFocus = static_cast<int>(apvts.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+        PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
 
     lastKnownPatchNumber_ = clampedPatch;
     lastKnownPatchNumberInitialized_ = true;
@@ -306,14 +309,25 @@ void PluginProcessor::applyAcceptedPatchNumberChange(const juce::String& paramet
 
     sendPatchSelectionForAcceptedChange(clampedPatch);
 
+    // Typing a slot number is an explicit Internal choice, so it pins the coordinates too.
+    apvts.state.setProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
+        true,
+        nullptr);
+    apvts.state.setProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+        PluginIDs::PatchManagerSection::NavigationFocus::kInternal,
+        nullptr);
+
     // Mirror the synth's edit buffer into the editor (clears Mutator history via onPatchLoaded).
-    // Pass the full pre-navigation snapshot so a failed dump restores NumberBox + Banks Locked.
+    // Pass the full pre-navigation snapshot so a failed dump rolls the coordinates back.
     if (patchManagerActionHandler_ != nullptr)
     {
         patchManagerActionHandler_->loadCurrentPatchFromDevice(
             limits,
             Core::PatchManagerActionHandler::InternalCoordinatesSnapshot {
-                priorBank, priorPatchNumber, priorSelectedBank, priorBanksLocked });
+                priorBank, priorPatchNumber, priorSelectedBank,
+                priorCoordinatesEstablished, priorNavigationFocus });
     }
 }
 
@@ -331,15 +345,7 @@ void PluginProcessor::sendPatchSelectionForAcceptedChange(int clampedPatch)
     const int bankNumber = static_cast<int>(apvts.state.getProperty(
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
         limits.minBankNumber()));
-    const bool setBankSent = patchSelectionMidiSync_->syncSelection(bankNumber, clampedPatch, limits, false);
-
-    if (setBankSent && limits.hasBankConcept())
-    {
-        apvts.state.setProperty(
-            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
-            true,
-            nullptr);
-    }
+    patchSelectionMidiSync_->syncSelection(bankNumber, clampedPatch, limits, false);
 }
 
 void PluginProcessor::updateDevicePatchLoadContext()
@@ -409,6 +415,7 @@ void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
 {
     using namespace PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
     namespace BankState = PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
+    namespace PatchManagerState = PluginIDs::PatchManagerSection::StateProperties;
 
     const auto limits = getResolvedDeviceMemoryLimits();
     const int defaultBank = limits.hasBankConcept() ? limits.minBankNumber() : 0;
@@ -418,6 +425,13 @@ void PluginProcessor::resetInternalPatchCoordinatesToDefaults()
     apvts.state.setProperty(kCurrentBankNumber, defaultBank, nullptr);
     apvts.state.setProperty(kCurrentPatchNumber, defaultPatch, nullptr);
     apvts.state.setProperty(BankState::kSelectedBank, defaultBank, nullptr);
+
+    // The synth cannot be queried for its current slot, so these defaults are a guess: the UI
+    // must show them as undefined until the user pins a real slot.
+    apvts.state.setProperty(PatchManagerState::kPatchCoordinatesEstablished, false, nullptr);
+    apvts.state.setProperty(PatchManagerState::kNavigationFocus,
+                            PluginIDs::PatchManagerSection::NavigationFocus::kNone,
+                            nullptr);
     suppressPatchSelectionMidiSync_ = false;
 
     lastKnownPatchNumber_ = defaultPatch;

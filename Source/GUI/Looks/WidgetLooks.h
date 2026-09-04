@@ -143,7 +143,8 @@ namespace TSS
         juce::Colour borderOff{};
         juce::Colour borderOn{};
         juce::Colour text{};
-        juce::Colour dot{};
+        // Used instead of `text` while this box owns patch-navigation focus.
+        juce::Colour textFocus{};
         juce::Colour editorBackground{};
         juce::Colour editorText{};
         juce::Colour editorSelectionBackground{};

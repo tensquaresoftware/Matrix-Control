@@ -8,14 +8,16 @@ namespace TSS::SkinColours
     {
         namespace NumberBox
         {
+            // Normal readable value (same chart entry as button labels).
             inline constexpr ColourElement kText = {
                 "NumberBoxText",
-                ColourChart::kRed,
-                ColourChart::kRed,
+                ColourChart::kLightGrey2,
+                ColourChart::kLightGrey2,
             };
 
-            inline constexpr ColourElement kDot = {
-                "NumberBoxDot",
+            // Navigation focus: Internal Patches owns patch navigation — matches PATCH NAME red.
+            inline constexpr ColourElement kTextFocus = {
+                "NumberBoxTextFocus",
                 ColourChart::kRed,
                 ColourChart::kRed,
             };

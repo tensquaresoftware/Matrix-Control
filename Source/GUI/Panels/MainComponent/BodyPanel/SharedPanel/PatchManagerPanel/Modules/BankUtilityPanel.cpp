@@ -11,7 +11,6 @@
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Skins/SkinHelpers.h"
 #include "GUI/Looks/LookBuilders.h"
-#include "GUI/Skins/ColourChart.h"
 #include "GUI/Widgets/ModuleHeader.h"
 #include "GUI/Widgets/Button.h"
 #include "Shared/Definitions/PluginDescriptors.h"
@@ -116,7 +115,7 @@ BankUtilityPanel::BankUtilityPanel(TSS::ISkin& skin, const BankUtilityPanelDimen
     normalBankLook_ = TSS::buttonLookFromSkin(skin);
     apvts_.state.addListener(this);
     refreshDeviceGating();
-    refreshSelectedBankHighlight();
+    refreshCurrentBankMarker();
     refreshUtilityEnabled();
 
     setSize(dims_.width, dims_.height);
@@ -139,9 +138,10 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
         refreshDeviceGating();
     }
     else if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank
+             || propertyName == PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished
              || propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBankEnabled)
     {
-        refreshSelectedBankHighlight();
+        refreshCurrentBankMarker();
         refreshUtilityEnabled();
     }
 }
@@ -149,7 +149,7 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
 void BankUtilityPanel::valueTreeRedirected(juce::ValueTree&)
 {
     refreshDeviceGating();
-    refreshSelectedBankHighlight();
+    refreshCurrentBankMarker();
     refreshUtilityEnabled();
 }
 
@@ -179,7 +179,7 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
     if (grayed)
         giveAwayKeyboardFocus();
 
-    refreshSelectedBankHighlight();
+    refreshCurrentBankMarker();
     repaint();
 }
 
@@ -248,27 +248,48 @@ void BankUtilityPanel::refreshUtilityEnabled()
     refreshClipboardBlinkBindings();
 }
 
-void BankUtilityPanel::refreshSelectedBankHighlight()
+void BankUtilityPanel::refreshCurrentBankMarker()
 {
-    const int selected = static_cast<int>(apvts_.state.getProperty(
+    const int currentBank = static_cast<int>(apvts_.state.getProperty(
         PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
         0));
+    const bool coordinatesEstablished = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
+        false));
 
     for (auto& button : selectBankButtons_)
         setOptionalLook(button.get(), normalBankLook_);
 
-    if (!bankUtilityGrayed_ && selected >= 0 && selected < kBankCount)
-    {
-        if (auto* button = selectBankButtons_[static_cast<size_t>(selected)].get())
-        {
-            auto accentLook = normalBankLook_;
-            const auto selectedRed = juce::Colour(ColourChart::kRed);
-            accentLook.textOff = selectedRed;
-            accentLook.textHover = selectedRed;
-            accentLook.textClicked = selectedRed;
-            button->setLook(accentLook);
-        }
-    }
+    // No bank of work yet, so nothing is marked.
+    if (bankUtilityGrayed_ || ! coordinatesEstablished)
+        return;
+
+    if (currentBank < 0 || currentBank >= kBankCount)
+        return;
+
+    if (auto* button = selectBankButtons_[static_cast<size_t>(currentBank)].get())
+        button->setLook(makeCurrentBankMarkerLook());
+}
+
+TSS::ButtonLook BankUtilityPanel::makeCurrentBankMarkerLook() const
+{
+    // Same visual language as the footer DEVICE badge: filled block, dark label.
+    auto markerLook = normalBankLook_;
+
+    if (skin_ == nullptr)
+        return markerLook;
+
+    const auto badgeFill = skin_->getColour(TSS::SkinColourId::kFooterMessageInfo);
+    const auto badgeText = skin_->getColour(TSS::SkinColourId::kFooterPanelBackground);
+
+    markerLook.backgroundOff = badgeFill;
+    markerLook.backgroundHover = badgeFill;
+    markerLook.backgroundClicked = badgeFill;
+    markerLook.textOff = badgeText;
+    markerLook.textHover = badgeText;
+    markerLook.textClicked = badgeText;
+
+    return markerLook;
 }
 
 void BankUtilityPanel::layoutContentRows(float sf)
@@ -359,7 +380,7 @@ void BankUtilityPanel::setSkin(TSS::ISkin& skin)
         bankUtilityModuleHeader_->setLook(TSS::moduleHeaderLookFromSkin(skin));
 
     applyNormalLookToActionButtons();
-    refreshSelectedBankHighlight();
+    refreshCurrentBankMarker();
 
     if (copyFeedbackBinding_)
         copyFeedbackBinding_->refresh();

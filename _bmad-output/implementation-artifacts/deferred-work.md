@@ -1313,3 +1313,17 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-version-0-2-0-alpha-and-ci-green.md`
   summary: Standalone getApplicationVersion may show bare CMake version (0.2.0) while About shows PluginVersion with alpha suffix.
   evidence: Dual version surfaces pre-exist; About path was the story scope only.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-focus-and-bank-marker.md`
+  summary: No automated GUI checks for placeholder `-`/`--`, bank badge marker, or red focus colours (manual UAT only).
+  evidence: Verification Gap / Blind Hunter — Core tests assert APVTS only; NumberBox harness has no DisplayState assertions.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-focus-and-bank-marker.md`
+  summary: No unit test for PluginProcessor session/startup reset of established+focus, nor for NumberBox-accepted patch establish path.
+  evidence: Verification Gap — resetInternalPatchCoordinatesToDefaults and applyAcceptedPatchNumberChange lack Tests/ coverage.
+
+## Deferred from: code review of spec-patch-nav-focus-and-bank-marker.md (2026-09-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-focus-and-bank-marker.md`
+  summary: Matrix-6/6R gray-empty bank box and establish/OPEN-without-bank paths have no dedicated unit coverage; Verification lists manual UAT only.
+  evidence: Acceptance Auditor / Blind Hunter — new handler tests are Matrix-1000-only.
