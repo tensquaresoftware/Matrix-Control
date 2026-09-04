@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-09-04'
 status: 'done'
 baseline_commit: 'e67a7769f13bcacd07471c0979e40a8d3a03185f'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '{project-root}/_bmad-output/project-context.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-bank-utility-copy-paste.md'
@@ -148,3 +148,15 @@ Nav focus is a single owner (none/internal/computer). Bank marker is independent
 
 - Undefined first Next/Prev, bank select, focus switch, OPEN establish
   [`PatchManagerActionHandlerBasicTests.cpp:391`](../../Tests/Unit/PatchManagerActionHandlerBasicTests.cpp#L391)
+
+### Review Findings
+
+- [x] [Review][Patch] STORE must also set Internal nav focus when marking coordinates established [`Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp:485`] — decided 2026-09-04: option 1; applied
+- [x] [Review][Decision] Cancelled/failed first OPEN leaves Set Bank + destination APVTS under undefined UI — resolved 2026-09-04: keep current design (option 1); Set Bank before `.syx` accepted; UI stays undefined until commit
+- [x] [Review][Patch] Empty/unusable OPEN must not clear Internal nav focus [`Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp:57`] — applied
+- [x] [Review][Patch] Matrix-6/6R bank NumberBox empty but not grayed like other gated controls [`Source/GUI/Panels/.../InternalPatchesPanel.cpp:345`] — applied
+- [x] [Review][Patch] Empty-folder focus test never seeds a prior non-none focus [`Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp:177`] — applied
+- [x] [Review][Patch] No test that cancel/fail after OPEN-from-undefined leaves coordinates unestablished [`Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp`] — applied
+- [x] [Review][Defer] No automated GUI checks for placeholders / badge / red focus — deferred, pre-existing (already in deferred-work.md for this spec)
+- [x] [Review][Defer] No unit coverage for `resetInternalPatchCoordinatesToDefaults` / `applyAcceptedPatchNumberChange` — deferred, pre-existing (already in deferred-work.md for this spec)
+- [x] [Review][Defer] Matrix-6/6R establish/OPEN paths lack dedicated unit tests — deferred, pre-existing (manual UAT in Verification)

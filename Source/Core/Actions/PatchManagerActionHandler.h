@@ -180,6 +180,7 @@ namespace Core
         bool arePatchCoordinatesEstablished() const;
         void markPatchCoordinatesEstablished();
         void setNavigationFocus(int focusOwner);
+        void clearComputerNavigationFocusIfOwned();
         // First Internal Prev/Next on undefined coordinates lands on the lowest slot instead
         // of stepping, because there is nothing to step from yet.
         PatchCoordinates resolveInternalNavigationTarget(bool isNext,

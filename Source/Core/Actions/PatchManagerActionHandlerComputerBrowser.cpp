@@ -54,7 +54,7 @@ namespace Core
         if (! scan.folderUsable || scan.validCount < 1)
         {
             clearComputerPatchesSelection();
-            setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kNone);
+            clearComputerNavigationFocusIfOwned();
             return;
         }
 

@@ -1321,3 +1321,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-focus-and-bank-marker.md`
   summary: No unit test for PluginProcessor session/startup reset of established+focus, nor for NumberBox-accepted patch establish path.
   evidence: Verification Gap — resetInternalPatchCoordinatesToDefaults and applyAcceptedPatchNumberChange lack Tests/ coverage.
+
+## Deferred from: code review of spec-patch-nav-focus-and-bank-marker.md (2026-09-04)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-focus-and-bank-marker.md`
+  summary: Matrix-6/6R gray-empty bank box and establish/OPEN-without-bank paths have no dedicated unit coverage; Verification lists manual UAT only.
+  evidence: Acceptance Auditor / Blind Hunter — new handler tests are Matrix-1000-only.

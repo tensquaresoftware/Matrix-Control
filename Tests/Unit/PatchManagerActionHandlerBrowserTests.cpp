@@ -16,6 +16,9 @@ public:
         testOpenUndefinedCoordinates_establishesDestinationWithoutDeviceLoad();
         testOpenEstablishedCoordinates_keepsThem();
         testOpenEmptyFolder_leavesCoordinatesUndefined();
+        testOpenEmptyFolder_preservesInternalFocus();
+        testOpenEmptyFolder_clearsComputerFocus();
+        testOpenUndefined_cancelLeavesCoordinatesUnestablished();
         testOpenAlreadySelectedFirstReloads();
         testSessionLoadResetsBrowserWithoutRescan();
         testRescanPersistedFolderMissingPathWarningFooter();
@@ -185,6 +188,80 @@ private:
 
         harness.pickFolderCallback = [&tempDir]() { return tempDir; };
         fireOpenAndDispatchLoad(harness);
+
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kNone);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenEmptyFolder_preservesInternalFocus()
+    {
+        beginTest("open_emptyFolder_preservesInternalFocus");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 2, 10, true);
+        harness.proc.apvts.state.setProperty(
+            PatchManager::StateProperties::kNavigationFocus,
+            PatchManager::NavigationFocus::kInternal,
+            nullptr);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenEmptyFolder_clearsComputerFocus()
+    {
+        beginTest("open_emptyFolder_clearsComputerFocus");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 1, 5, true);
+        harness.proc.apvts.state.setProperty(
+            PatchManager::StateProperties::kNavigationFocus,
+            PatchManager::NavigationFocus::kComputer,
+            nullptr);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kNone);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenUndefined_cancelLeavesCoordinatesUnestablished()
+    {
+        beginTest("open_undefined_cancelLeavesCoordinatesUnestablished");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 0, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+
+        SelectPatchFileLoadDispatcher dispatcher(harness);
+        harness.gateState->allow = false;
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        harness.handler.handleAction(ComputerPatches::StandaloneWidgets::kOpenPatchFolder, juce::var());
 
         expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(
             PatchManager::StateProperties::kPatchCoordinatesEstablished)));

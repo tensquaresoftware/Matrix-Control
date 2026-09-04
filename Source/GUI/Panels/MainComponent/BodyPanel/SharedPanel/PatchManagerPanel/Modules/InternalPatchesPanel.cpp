@@ -5,6 +5,7 @@
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
+#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -345,6 +346,7 @@ void InternalPatchesPanel::refreshCoordinateDisplayStates()
         currentBankNumber->setDisplayState(bankNumberAvailable_ ? coordinateState
                                                                : DisplayState::kUnavailable);
         currentBankNumber->setEnabled(bankNumberAvailable_);
+        TSS::GrayedControlHelper::applyGrayedAppearance(*currentBankNumber, ! bankNumberAvailable_);
         currentBankNumber->setFocusHighlight(bankNumberAvailable_ && internalHasFocus);
     }
 

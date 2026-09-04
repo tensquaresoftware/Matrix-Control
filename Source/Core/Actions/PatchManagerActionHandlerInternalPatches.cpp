@@ -175,6 +175,16 @@ namespace Core
             nullptr);
     }
 
+    void PatchManagerActionHandler::clearComputerNavigationFocusIfOwned()
+    {
+        // An empty Computer pick is not Internal navigation — only drop Computer focus.
+        const int focus = static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+            PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
+        if (focus == PluginIDs::PatchManagerSection::NavigationFocus::kComputer)
+            setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kNone);
+    }
+
     PatchCoordinates PatchManagerActionHandler::resolveInternalNavigationTarget(
         bool isNext,
         const DeviceMemoryLimits& limits) const
@@ -483,6 +493,7 @@ namespace Core
 
         // STORE writes to a concrete slot, so the coordinates are no longer a guess.
         markPatchCoordinatesEstablished();
+        setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kInternal);
 
         apvtsPatchMapper_->apvtsToBuffer();
         if (patchNameSyncer_ != nullptr)

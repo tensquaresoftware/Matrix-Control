@@ -127,10 +127,18 @@ private:
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 1, 42, false);
 
+        harness.proc.apvts.state.setProperty(
+            PatchManager::StateProperties::kNavigationFocus,
+            PatchManager::NavigationFocus::kComputer,
+            nullptr);
+
         harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
 
         expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
             PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
         const auto queued = scanQueue(harness.queue);
         expect(queued.setBank);
         expectEquals(queued.setBankValue, 1);
