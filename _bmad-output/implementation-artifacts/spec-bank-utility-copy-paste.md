@@ -139,3 +139,16 @@ COPY blinks on click (before dump finishes); PASTE joins blink only when target 
 
 - Same-bank / cross-RAM eligibility and mode replace
   [`ClipboardBankServiceTests.cpp:1`](../../Tests/Unit/ClipboardBankServiceTests.cpp#L1)
+
+### Review Findings
+
+- [x] [Review][Decision] COPY unsaved-edit confirm before dump — resolved: keep export parity (`confirmPatchContextChange` after blink arm). No code change.
+- [x] [Review][Patch] Handler orchestration tests — dump→clipboard COPY, PASTE write/disarm + cancel, busy bank-select refuse (decision: add now)
+- [x] [Review][Patch] Guard `beginBankImportSnapshot` against stale settle timers [`PatchManagerActionHandlerBankImport.cpp:225`]
+- [x] [Review][Patch] Abort COPY/PASTE when progress UI hook is missing [`PatchManagerActionHandlerBankCopyPaste.cpp:68`]
+- [x] [Review][Patch] Publish busy footer on COPY/PASTE refuse [`PatchManagerActionHandlerBankCopyPaste.cpp:40`]
+- [x] [Review][Patch] Re-apply clipboard blink when Compare/lock disables utility buttons [`BankUtilityPanel.cpp:186`]
+- [x] [Review][Patch] Use accurate footer when bank paste prep fails [`PatchManagerActionHandlerBankCopyPaste.cpp:388`]
+- [x] [Review][Patch] Drive progress dialog layout from `PrepareForShowArgs::layout`, not title strings [`BankTransferProgressDialog.cpp:42`]
+- [x] [Review][Patch] Load paste name overlays once per transfer, not per slot [`PatchManagerActionHandlerBankImportWrite.cpp:83`]
+- [x] [Review][Patch] Clean leftover SELECT BANK width atom / unused paste-ROM footer / dead progress strings / dialog header indent [`DesignAtoms.h:104`]

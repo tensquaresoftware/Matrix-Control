@@ -190,11 +190,18 @@ void PluginEditor::configureBankTransferProgressShowAndUpdate(Core::BankTransfer
         int totalSteps,
         std::function<void()> onCancel)
     {
-        if (safeThis != nullptr)
-        {
-            safeThis->showBankTransferProgressDialog(
-                BankTransferProgressShowRequest { title, message, detail, totalSteps, std::move(onCancel) });
-        }
+        if (safeThis == nullptr)
+            return;
+
+        using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+        const auto layout = (title == juce::String(kExportTitle) || title == juce::String(kCopyTitle))
+            ? BankTransferProgressDialog::ContentLayout::SingleLane
+            : BankTransferProgressDialog::ContentLayout::DualLane;
+
+        safeThis->showBankTransferProgressDialog(
+            BankTransferProgressShowRequest {
+                title, message, detail, totalSteps, std::move(onCancel), layout });
     };
 
     presenter.update = [safeThis = juce::Component::SafePointer<PluginEditor>(this)](int completedSteps)

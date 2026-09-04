@@ -467,6 +467,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchModuleInitServiceTests.cpp
         Tests/Unit/PatchManagerActionHandlerTestSupport.cpp
         Tests/Unit/PatchManagerActionHandlerBasicTests.cpp
+        Tests/Unit/PatchManagerActionHandlerBankCopyPasteTests.cpp
         Tests/Unit/PatchManagerActionHandlerGateTests.cpp
         Tests/Unit/PatchManagerActionHandlerUnsavedChantier2Tests.cpp
         Tests/Unit/PatchManagerActionHandlerDeferredGateTests.cpp
@@ -642,6 +643,7 @@ if(MATRIX_BUILD_TESTS)
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_STANDALONE_APPLICATION=1
+        JUCE_MODAL_LOOPS_PERMITTED=1
         MATRIX_TEST_FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Tests/Fixtures"
         MATRIX_CONTROL_PROJECT_VERSION="${PROJECT_VERSION}"
         MATRIX_CONTROL_PRERELEASE_SUFFIX="${MATRIX_CONTROL_PRERELEASE_SUFFIX}"

@@ -200,6 +200,7 @@ void PluginEditor::showBankTransferProgressDialog(const BankTransferProgressShow
         .detail = request.detail,
         .totalSteps = request.totalSteps,
         .onCancelRequested = request.onCancelRequested,
+        .layout = request.layout,
     });
 
     const int baseWidth = layoutDimensions_.editor.width;

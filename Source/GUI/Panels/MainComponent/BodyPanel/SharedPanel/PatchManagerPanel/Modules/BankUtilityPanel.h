@@ -17,6 +17,11 @@ namespace TSS
     class ClipboardFeedbackButtonBinding;
 }
 
+namespace Core
+{
+    class DeviceMemoryLimits;
+}
+
 class WidgetFactory;
 
 class BankUtilityPanel : public juce::Component,
@@ -69,6 +74,9 @@ private:
     void refreshDeviceGating();
     void refreshSelectedBankHighlight();
     void refreshUtilityEnabled();
+    void refreshImportBankEnabled(bool rootLocked, const Core::DeviceMemoryLimits& limits);
+    void refreshPasteBankEnabled(bool rootLocked);
+    void refreshClipboardBlinkBindings();
     void setBankUtilityGrayed(bool grayed);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankUtilityPanel)

@@ -32,9 +32,6 @@ BankTransferProgressDialog::~BankTransferProgressDialog() = default;
 
 void BankTransferProgressDialog::prepareForShow(PrepareForShowArgs args)
 {
-    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
-    using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
-
     title_ = std::move(args.title);
     detail_ = std::move(args.detail);
     primaryMessage_ = std::move(args.message);
@@ -42,29 +39,57 @@ void BankTransferProgressDialog::prepareForShow(PrepareForShowArgs args)
     primaryCompletedSteps_ = 0;
     secondaryLaneActive_ = false;
     secondaryCompletedSteps_ = 0;
-
-    // Prefer explicit layout; fall back to title so existing call sites keep working.
     contentLayout_ = args.layout;
-    if (args.layout == ContentLayout::Import
-        && title_ == juce::String(kExportTitle))
-        contentLayout_ = ContentLayout::Export;
 
-    if (contentLayout_ == ContentLayout::Import)
-    {
-        // Fixed dual-lane height from the start; secondary stays grayed until activated.
-        secondaryMessage_ = juce::String(kImportingWritingMessage);
-        secondaryTotalSteps_ = primaryTotalSteps_;
-    }
-    else
-    {
-        secondaryMessage_.clear();
-        secondaryTotalSteps_ = 1;
-    }
+    applyOperationPresentationFromTitle();
 
     onCancelRequested_ = std::move(args.onCancelRequested);
     setCancelEnabled(static_cast<bool>(onCancelRequested_));
     resized();
     repaint();
+}
+
+void BankTransferProgressDialog::applyOperationPresentationFromTitle()
+{
+    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+    using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+    // Terminology and detail placement follow the title; lane count comes from PrepareForShowArgs::layout.
+    if (title_ == juce::String(kExportTitle))
+    {
+        headerLabel_ = juce::String(kDestinationFolderLabel);
+        detailBelowProgress_ = false;
+        detailInline_ = false;
+        secondaryMessage_.clear();
+        secondaryTotalSteps_ = 1;
+        return;
+    }
+
+    if (title_ == juce::String(kCopyTitle))
+    {
+        headerLabel_ = juce::String(kDestinationLabel);
+        detailBelowProgress_ = true;
+        detailInline_ = true;
+        secondaryMessage_.clear();
+        secondaryTotalSteps_ = 1;
+        return;
+    }
+
+    if (title_ == juce::String(kPasteTitle))
+    {
+        headerLabel_ = juce::String(kSourceLabel);
+        detailBelowProgress_ = false;
+        detailInline_ = true;
+        secondaryMessage_ = juce::String(kPastingWritingMessage);
+        secondaryTotalSteps_ = primaryTotalSteps_;
+        return;
+    }
+
+    headerLabel_ = juce::String(kSourceFolderLabel);
+    detailBelowProgress_ = true;
+    detailInline_ = false;
+    secondaryMessage_ = juce::String(kImportingWritingMessage);
+    secondaryTotalSteps_ = primaryTotalSteps_;
 }
 
 void BankTransferProgressDialog::beginSecondaryPhase(const juce::String& message, int totalSteps)
@@ -132,7 +157,7 @@ int BankTransferProgressDialog::getBorderThickness() const
 
 int BankTransferProgressDialog::getDesignContentHeight() const noexcept
 {
-    return contentLayout_ == ContentLayout::Import ? kDesignHeightDual : kDesignHeightSingle;
+    return contentLayout_ == ContentLayout::DualLane ? kDesignHeightDual : kDesignHeightSingle;
 }
 
 juce::Rectangle<int> BankTransferProgressDialog::getDialogBounds() const
@@ -172,32 +197,51 @@ void BankTransferProgressDialog::paintProgressBar(juce::Graphics& g,
                false);
 }
 
-juce::Rectangle<int> BankTransferProgressDialog::paintFolderHeader(juce::Graphics& g,
+juce::Rectangle<int> BankTransferProgressDialog::paintDetailHeader(juce::Graphics& g,
                                                                    juce::Rectangle<int> body,
                                                                    const juce::Font& bodyFont,
-                                                                   const juce::String& folderLabel) const
+                                                                   bool belowProgress) const
 {
     const float em = bodyFont.getHeight();
     const int gap1em = juce::roundToInt(em);
     const int lineHeight = juce::jmax(1, juce::roundToInt(em));
 
+    if (belowProgress)
+        body.removeFromTop(gap1em);
+
     g.setFont(bodyFont);
     g.setColour(skin_->getColour(SkinColourId::kDarkPanelText));
 
+    if (detailInline_)
     {
-        auto labelLine = body.removeFromTop(lineHeight);
-        g.drawText(folderLabel, labelLine, juce::Justification::centredLeft, false);
+        auto line = body.removeFromTop(lineHeight);
+        juce::String inlineText = headerLabel_;
+        if (detail_.isNotEmpty())
+            inlineText = headerLabel_.trimEnd() + " " + detail_;
+
+        const auto fitted = TSS::TextFitHelpers::fitWithAsciiEllipsis(
+            inlineText, bodyFont, static_cast<float>(line.getWidth()), true);
+        g.drawText(fitted, line, juce::Justification::centredLeft, false);
+    }
+    else
+    {
+        {
+            auto labelLine = body.removeFromTop(lineHeight);
+            g.drawText(headerLabel_, labelLine, juce::Justification::centredLeft, false);
+        }
+
+        if (detail_.isNotEmpty())
+        {
+            auto pathLine = body.removeFromTop(lineHeight);
+            const auto fittedPath = TSS::TextFitHelpers::fitWithAsciiEllipsis(
+                detail_, bodyFont, static_cast<float>(pathLine.getWidth()), true);
+            g.drawText(fittedPath, pathLine, juce::Justification::centredLeft, false);
+        }
     }
 
-    if (detail_.isNotEmpty())
-    {
-        auto pathLine = body.removeFromTop(lineHeight);
-        const auto fittedPath = TSS::TextFitHelpers::fitWithAsciiEllipsis(
-            detail_, bodyFont, static_cast<float>(pathLine.getWidth()), true);
-        g.drawText(fittedPath, pathLine, juce::Justification::centredLeft, false);
-    }
+    if (! belowProgress)
+        body.removeFromTop(gap1em);
 
-    body.removeFromTop(gap1em);
     return body;
 }
 
@@ -228,13 +272,13 @@ void BankTransferProgressDialog::paintPhaseLane(juce::Graphics& g, const PhaseLa
     paintProgressBar(g, progressBar, fraction, args.enabled);
 }
 
-void BankTransferProgressDialog::paintExportBody(juce::Graphics& g,
-                                                   juce::Rectangle<int> body,
-                                                   const juce::Font& bodyFont) const
+void BankTransferProgressDialog::paintSingleLaneBody(juce::Graphics& g,
+                                                     juce::Rectangle<int> body,
+                                                     const juce::Font& bodyFont) const
 {
-    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+    if (! detailBelowProgress_)
+        body = paintDetailHeader(g, body, bodyFont, false);
 
-    body = paintFolderHeader(g, body, bodyFont, juce::String(kDestinationFolderLabel));
     paintPhaseLane(g,
                    PhaseLanePaintArgs {
                        body,
@@ -243,15 +287,18 @@ void BankTransferProgressDialog::paintExportBody(juce::Graphics& g,
                        primaryCompletedSteps_,
                        primaryTotalSteps_,
                        true });
+
+    if (detailBelowProgress_)
+        paintDetailHeader(g, body, bodyFont, true);
 }
 
-void BankTransferProgressDialog::paintImportBody(juce::Graphics& g,
+void BankTransferProgressDialog::paintDualLaneBody(juce::Graphics& g,
                                                    juce::Rectangle<int> body,
                                                    const juce::Font& bodyFont) const
 {
-    using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+    if (! detailBelowProgress_)
+        body = paintDetailHeader(g, body, bodyFont, false);
 
-    body = paintFolderHeader(g, body, bodyFont, juce::String(kSourceFolderLabel));
     paintPhaseLane(g,
                    PhaseLanePaintArgs {
                        body,
@@ -270,6 +317,9 @@ void BankTransferProgressDialog::paintImportBody(juce::Graphics& g,
                        secondaryCompletedSteps_,
                        secondaryTotalSteps_,
                        secondaryLaneActive_ });
+
+    if (detailBelowProgress_)
+        paintDetailHeader(g, body, bodyFont, true);
 }
 
 void BankTransferProgressDialog::paint(juce::Graphics& g)
@@ -306,10 +356,10 @@ void BankTransferProgressDialog::paint(juce::Graphics& g)
     body = body.withTrimmedLeft(padX).withTrimmedRight(padX);
     body.removeFromBottom(bottomReserve);
 
-    if (contentLayout_ == ContentLayout::Export)
-        paintExportBody(g, body, bodyFont);
+    if (contentLayout_ == ContentLayout::SingleLane)
+        paintSingleLaneBody(g, body, bodyFont);
     else
-        paintImportBody(g, body, bodyFont);
+        paintDualLaneBody(g, body, bodyFont);
 }
 
 void BankTransferProgressDialog::resized()

@@ -37,7 +37,13 @@ namespace Core
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-        if (isBankTransferBusy() || clipboardService_ == nullptr)
+        if (isBankTransferBusy())
+        {
+            publishBankTransferFooter(kBankTransferBusyFooterMessage, "warning");
+            return false;
+        }
+
+        if (clipboardService_ == nullptr)
             return false;
 
         if (! limits.hasBankConcept())
@@ -65,12 +71,12 @@ namespace Core
         bankTransfer_.importPatches.reserve(static_cast<size_t>(ClipboardService::kBankSlotCount));
     }
 
-    void PatchManagerActionHandler::showBankCopyProgress(std::uint64_t generation, int bank)
+    bool PatchManagerActionHandler::showBankCopyProgress(std::uint64_t generation, int bank)
     {
         using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
 
         if (! bankTransferProgress_.show)
-            return;
+            return false;
 
         bankTransferProgress_.show(
             juce::String(kCopyTitle),
@@ -78,6 +84,7 @@ namespace Core
             juce::String(kClipboardLabel),
             bankTransfer_.totalSlots,
             [this, generation] { requestBankTransferCancel(generation); });
+        return true;
     }
 
     void PatchManagerActionHandler::beginBankCopyDumpLoop(std::uint64_t generation,
@@ -107,8 +114,29 @@ namespace Core
             });
     }
 
+    void PatchManagerActionHandler::restoreBankCopyFeedbackAfterConfirmCancel()
+    {
+        if (hooks_.clearBankCopyFeedbackPending)
+            hooks_.clearBankCopyFeedbackPending();
+
+        if (clipboardService_ != nullptr && clipboardService_->getMode() == ClipboardMode::Bank)
+        {
+            if (hooks_.armClipboardFeedback)
+                hooks_.armClipboardFeedback();
+        }
+        else if (hooks_.disarmClipboardFeedback)
+        {
+            hooks_.disarmClipboardFeedback();
+        }
+
+        if (hooks_.refreshClipboardMirrors)
+            hooks_.refreshClipboardMirrors();
+    }
+
     void PatchManagerActionHandler::handleBankCopy(const DeviceMemoryLimits& limits)
     {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
         if (! validateBankCopyPrerequisites(limits))
             return;
 
@@ -117,28 +145,19 @@ namespace Core
 
         if (! confirmPatchContextChange())
         {
-            if (hooks_.clearBankCopyFeedbackPending)
-                hooks_.clearBankCopyFeedbackPending();
-
-            if (clipboardService_ != nullptr && clipboardService_->getMode() == ClipboardMode::Bank)
-            {
-                if (hooks_.armClipboardFeedback)
-                    hooks_.armClipboardFeedback();
-            }
-            else if (hooks_.disarmClipboardFeedback)
-            {
-                hooks_.disarmClipboardFeedback();
-            }
-
-            if (hooks_.refreshClipboardMirrors)
-                hooks_.refreshClipboardMirrors();
+            restoreBankCopyFeedbackAfterConfirmCancel();
             return;
         }
 
         const int bank = getSelectedBankForTransfer(limits);
         initializeBankCopyState(limits, bank);
         const auto generation = bankTransfer_.generation;
-        showBankCopyProgress(generation, bank);
+        if (! showBankCopyProgress(generation, bank))
+        {
+            finishBankCopy(false, kCopyFailedFooterMessage, "warning");
+            return;
+        }
+
         beginBankCopyDumpLoop(generation, limits, bank);
     }
 
@@ -278,13 +297,25 @@ namespace Core
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-        if (isBankTransferBusy() || clipboardService_ == nullptr)
+        if (isBankTransferBusy())
+        {
+            publishBankTransferFooter(kBankTransferBusyFooterMessage, "warning");
+            return false;
+        }
+
+        if (clipboardService_ == nullptr)
             return false;
 
         if (! limits.hasBankConcept())
             return false;
 
-        if (! limits.isPasteStoreAllowed(targetBank) || ! clipboardService_->canPasteBank(targetBank))
+        if (! limits.isPasteStoreAllowed(targetBank))
+        {
+            publishBankTransferFooter(kPasteRomBlockedFooterMessage, "warning");
+            return false;
+        }
+
+        if (! clipboardService_->canPasteBank(targetBank))
             return false;
 
         if (! isDeviceDumpAvailable())
@@ -323,19 +354,20 @@ namespace Core
         return true;
     }
 
-    void PatchManagerActionHandler::showBankPasteProgress(std::uint64_t generation, int targetBank)
+    bool PatchManagerActionHandler::showBankPasteProgress(std::uint64_t generation, int targetBank)
     {
         using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
 
         if (! bankTransferProgress_.show)
-            return;
+            return false;
 
         bankTransferProgress_.show(
             juce::String(kPasteTitle),
-            formatPasteProgressMessage(targetBank),
+            formatPasteSafetyCopyMessage(targetBank),
             juce::String(kClipboardLabel),
             bankTransfer_.totalSlots,
             [this, generation] { requestBankTransferCancel(generation); });
+        return true;
     }
 
     void PatchManagerActionHandler::beginBankPasteWriteLoop(std::uint64_t generation,
@@ -387,12 +419,18 @@ namespace Core
 
         if (! prepareBankPastePatches(*sourceBank, targetBank, limits))
         {
-            publishBankTransferFooter(kDeviceUnavailableFooterMessage, "warning");
+            publishBankTransferFooter(kPasteClipboardFailedFooterMessage, "warning");
             return;
         }
 
         const auto generation = bankTransfer_.generation;
-        showBankPasteProgress(generation, targetBank);
+        if (! showBankPasteProgress(generation, targetBank))
+        {
+            bankTransfer_ = BankTransferState {};
+            publishBankTransferFooter(kPasteClipboardFailedFooterMessage, "warning");
+            return;
+        }
+
         beginBankPasteWriteLoop(generation, limits, targetBank);
     }
 

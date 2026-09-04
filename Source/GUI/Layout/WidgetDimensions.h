@@ -162,7 +162,6 @@ struct NumberBoxDimensions
 struct LabelDimensions
 {
     int modulationBusNumberWidth;
-    int patchManagerSelectBankWidth;
     int patchMutatorWidth;
     int height;
 };

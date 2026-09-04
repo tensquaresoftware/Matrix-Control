@@ -183,37 +183,31 @@ void BankUtilityPanel::setBankUtilityGrayed(bool grayed)
     repaint();
 }
 
-void BankUtilityPanel::refreshUtilityEnabled()
+void BankUtilityPanel::refreshImportBankEnabled(bool rootLocked, const Core::DeviceMemoryLimits& limits)
 {
-    MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown;
-    const bool rootLocked = isRootSectionLocked(apvts_, deviceType);
-    const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
+    if (importBankButton_ == nullptr)
+        return;
 
-    if (exportBankButton_)
-        exportBankButton_->setEnabled(! rootLocked);
-
-    if (copyBankButton_)
-        copyBankButton_->setEnabled(! rootLocked && ! bankUtilityGrayed_);
-
-    if (importBankButton_ != nullptr)
+    if (rootLocked)
     {
-        if (rootLocked)
-        {
-            importBankButton_->setEnabled(false);
-        }
-        else if (! limits.hasBankConcept())
-        {
-            importBankButton_->setEnabled(true);
-        }
-        else
-        {
-            const int selectedBank = static_cast<int>(apvts_.state.getProperty(
-                PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
-                0));
-            importBankButton_->setEnabled(! limits.isRomBank(selectedBank));
-        }
+        importBankButton_->setEnabled(false);
+        return;
     }
 
+    if (! limits.hasBankConcept())
+    {
+        importBankButton_->setEnabled(true);
+        return;
+    }
+
+    const int selectedBank = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+        0));
+    importBankButton_->setEnabled(! limits.isRomBank(selectedBank));
+}
+
+void BankUtilityPanel::refreshPasteBankEnabled(bool rootLocked)
+{
     if (pasteBankButton_ == nullptr)
         return;
 
@@ -227,6 +221,31 @@ void BankUtilityPanel::refreshUtilityEnabled()
         PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBankEnabled,
         false));
     pasteBankButton_->setEnabled(pasteEnabled);
+}
+
+void BankUtilityPanel::refreshClipboardBlinkBindings()
+{
+    if (copyFeedbackBinding_ != nullptr)
+        copyFeedbackBinding_->refresh();
+    if (pasteFeedbackBinding_ != nullptr)
+        pasteFeedbackBinding_->refresh();
+}
+
+void BankUtilityPanel::refreshUtilityEnabled()
+{
+    MatrixDeviceTypes::Type deviceType = MatrixDeviceTypes::Type::kUnknown;
+    const bool rootLocked = isRootSectionLocked(apvts_, deviceType);
+    const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
+
+    if (exportBankButton_)
+        exportBankButton_->setEnabled(! rootLocked);
+
+    if (copyBankButton_)
+        copyBankButton_->setEnabled(! rootLocked && ! bankUtilityGrayed_);
+
+    refreshImportBankEnabled(rootLocked, limits);
+    refreshPasteBankEnabled(rootLocked);
+    refreshClipboardBlinkBindings();
 }
 
 void BankUtilityPanel::refreshSelectedBankHighlight()

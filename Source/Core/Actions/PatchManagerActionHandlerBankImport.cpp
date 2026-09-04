@@ -224,6 +224,10 @@ namespace Core
 
     void PatchManagerActionHandler::beginBankImportSnapshot(std::uint64_t generation)
     {
+        // Stale settle timers must not clear a newer transfer's safety snapshot.
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
+            return;
+
         bankTransfer_.deviceSnapshot.clear();
         snapshotNextImportSlot(0, generation);
     }

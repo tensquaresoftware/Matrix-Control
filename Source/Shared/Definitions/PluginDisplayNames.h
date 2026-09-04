@@ -247,6 +247,8 @@ namespace PluginDisplayNames
             constexpr const char* kCancel      = "CANCEL";
             constexpr const char* kDestinationFolderLabel = "Destination folder :";
             constexpr const char* kSourceFolderLabel = "Source folder :";
+            constexpr const char* kDestinationLabel = "Destination :";
+            constexpr const char* kSourceLabel = "Source :";
             constexpr const char* kClipboardLabel = "Clipboard";
 
             inline juce::String formatExportProgressMessage(int bank)
@@ -261,12 +263,22 @@ namespace PluginDisplayNames
 
             inline juce::String formatCopyProgressMessage(int bank)
             {
-                return "Copying bank " + juce::String(bank) + " :";
+                return "Reading source bank " + juce::String(bank) + " into clipboard :";
             }
 
-            inline juce::String formatPasteProgressMessage(int bank)
+            inline juce::String formatPasteSafetyCopyMessage(int destinationBank)
             {
-                return "Pasting to bank " + juce::String(bank) + " :";
+                return "Saving safety copy of destination bank " + juce::String(destinationBank) + " :";
+            }
+
+            inline juce::String formatPasteWritingMessage(int destinationBank)
+            {
+                return "Writing clipboard into destination bank " + juce::String(destinationBank) + " :";
+            }
+
+            inline juce::String formatPasteRestoringMessage(int destinationBank)
+            {
+                return "Cancelling - restoring destination bank " + juce::String(destinationBank) + " :";
             }
         }
     }
@@ -1005,6 +1017,8 @@ namespace PluginDisplayNames
                 "Import is only available on Matrix-1000 RAM banks 0 and 1.";
             constexpr const char* kPasteRomBlockedFooterMessage =
                 "Paste is only available on Matrix-1000 RAM banks 0 and 1.";
+            constexpr const char* kPasteClipboardFailedFooterMessage =
+                "Bank paste failed - clipboard contents could not be read.";
             constexpr const char* kBankTransferBusyFooterMessage =
                 "Bank transfer in progress - wait for it to finish.";
             constexpr const char* kDeviceUnavailableFooterMessage =
@@ -1028,10 +1042,7 @@ namespace PluginDisplayNames
             constexpr const char* kImportingReadingMessage = "Reading bank safety copy from device :";
             constexpr const char* kImportingWritingMessage = "Writing patches to the device :";
             constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device :";
-            constexpr const char* kCopyingMessage = "Copying bank from device :";
-            constexpr const char* kPastingReadingMessage = "Reading bank safety copy from device :";
-            constexpr const char* kPastingWritingMessage = "Writing patches to the device :";
-            constexpr const char* kPastingRestoringMessage = "Cancelling - restoring device :";
+            constexpr const char* kPastingWritingMessage = "Writing clipboard into destination bank :";
 
             namespace StandaloneWidgets
             {

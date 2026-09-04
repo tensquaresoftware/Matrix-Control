@@ -227,7 +227,6 @@ namespace DimensionFactoryBuilders
             .moduleHeader = moduleHeader,
             .labels = {
                 .modulationBusNumberWidth = Atoms::Widths::Label::kModulationBusNumber,
-                .patchManagerSelectBankWidth = Atoms::Widths::Label::kPatchManagerSelectBank,
                 .patchMutatorWidth = Atoms::Widths::Label::kPatchMutator,
                 .height = Atoms::Heights::kLabel,
             },

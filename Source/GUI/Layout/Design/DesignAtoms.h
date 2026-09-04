@@ -101,7 +101,6 @@ namespace TSS::Design
             namespace Label
             {
                 inline constexpr int kModulationBusNumber = 8;
-                inline constexpr int kPatchManagerSelectBank = 68;
                 inline constexpr int kPatchMutator = 40;
             }
 

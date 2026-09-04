@@ -282,6 +282,7 @@ namespace Core
                                             const PackedPatchBuffer& writtenCurrentSlot);
         void schedulePostImportDeviceReload(const DeviceMemoryLimits& limits);
         void rememberOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed);
+        void rememberPasteOverlayForSlot(int destinationBank, int slot, const juce::uint8* packed);
         void restoreOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed);
 
         struct SelectedPatchFileResolution
@@ -381,16 +382,17 @@ namespace Core
         void handleBankExport(const DeviceMemoryLimits& limits);
         void handleBankImport(const DeviceMemoryLimits& limits);
         void handleBankCopy(const DeviceMemoryLimits& limits);
+        void restoreBankCopyFeedbackAfterConfirmCancel();
         void handleBankPaste(const DeviceMemoryLimits& limits);
         bool validateBankCopyPrerequisites(const DeviceMemoryLimits& limits);
         void initializeBankCopyState(const DeviceMemoryLimits& limits, int bank);
-        void showBankCopyProgress(std::uint64_t generation, int bank);
+        bool showBankCopyProgress(std::uint64_t generation, int bank);
         void beginBankCopyDumpLoop(std::uint64_t generation, const DeviceMemoryLimits& limits, int bank);
         void commitCopiedBankToClipboard();
         bool processCopyDumpSlot(int slot, std::uint64_t generation, std::vector<juce::uint8> dump);
         bool validateBankPastePrerequisites(const DeviceMemoryLimits& limits, int targetBank);
         bool prepareBankPastePatches(int sourceBank, int targetBank, const DeviceMemoryLimits& limits);
-        void showBankPasteProgress(std::uint64_t generation, int targetBank);
+        bool showBankPasteProgress(std::uint64_t generation, int targetBank);
         void beginBankPasteWriteLoop(std::uint64_t generation, const DeviceMemoryLimits& limits, int targetBank);
         void exportNextSlot(int slot, std::uint64_t generation);
         void finishBankExport(bool success, const juce::String& footerMessage, const juce::String& severity);
@@ -400,6 +402,7 @@ namespace Core
         void beginBankImportSnapshot(std::uint64_t generation);
         void snapshotNextImportSlot(int slot, std::uint64_t generation);
         void beginBankImportWrite(std::uint64_t generation);
+        void showImportFamilyWriteProgress();
         void writeNextImportSlot(int slot, std::uint64_t generation);
         juce::String bankImportFamilyCancelMessage() const;
         juce::String bankImportFamilyRestoreFailedMessage() const;

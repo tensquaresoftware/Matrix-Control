@@ -80,6 +80,8 @@ private:
 
         expect(Core::ActionPropertyRegistry::isActionProperty(PatchEdit::Dco1Module::StandaloneWidgets::kCopy));
         expect(Core::ActionPropertyRegistry::isActionProperty(BankUtility::kSelectBank3));
+        expect(Core::ActionPropertyRegistry::isActionProperty(BankUtility::kCopyBank));
+        expect(Core::ActionPropertyRegistry::isActionProperty(BankUtility::kPasteBank));
         expect(Core::ActionPropertyRegistry::isActionProperty(PatchMutator::kMutate));
     }
 
