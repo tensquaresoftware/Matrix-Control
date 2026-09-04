@@ -26,7 +26,7 @@ public:
         addAndMakeVisible(*scaleLabel_);
 
         valueBox_ = createNumberBox(false, false, 42);
-        editableDotBox_ = createNumberBox(true, true, 7);
+        editableFocusBox_ = createNumberBox(true, true, 7);
     }
 
     int getScaledColumnWidth() const
@@ -57,11 +57,11 @@ public:
 
         scaleLabel_->setBounds(0, 0, scaledColumnWidth, TestScaleColumns::kScaleLabelHeight);
         valueBox_->setBounds(0, firstBoxY, scaledBoxWidth, scaledBoxHeight);
-        editableDotBox_->setBounds(0, secondBoxY, scaledBoxWidth, scaledBoxHeight);
+        editableFocusBox_->setBounds(0, secondBoxY, scaledBoxWidth, scaledBoxHeight);
     }
 
 private:
-    std::unique_ptr<TSS::NumberBox> createNumberBox(bool editable, bool showDot, int value)
+    std::unique_ptr<TSS::NumberBox> createNumberBox(bool editable, bool focusHighlight, int value)
     {
         auto box = std::make_unique<TSS::NumberBox>(
             dimensions_.patchNumberWidth,
@@ -71,7 +71,7 @@ private:
             0,
             99);
         box->setUiScale(scale_);
-        box->setShowDot(showDot);
+        box->setFocusHighlight(focusHighlight);
         box->setValue(value);
         addAndMakeVisible(*box);
         return box;
@@ -82,7 +82,7 @@ private:
     TSS::NumberBoxLook numberBoxLook_ {};
     std::unique_ptr<TSS::Label> scaleLabel_;
     std::unique_ptr<TSS::NumberBox> valueBox_;
-    std::unique_ptr<TSS::NumberBox> editableDotBox_;
+    std::unique_ptr<TSS::NumberBox> editableFocusBox_;
 };
 
 TestNumberBoxes::TestNumberBoxes(TSS::ISkin& skin, const NumberBoxDimensions& dimensions)

@@ -1,9 +1,11 @@
 #include "NumberBox.h"
 
+#include <cstdlib>
 #include <memory>
 
 #include "GUI/Layout/ScaledDrawing.h"
 #include "GUI/Skins/ColourChart.h"
+#include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace TSS
 {
@@ -16,13 +18,12 @@ namespace TSS
     {
         setOpaque(true);
         setSize(width, height_);
-        updateTextWidthCache();
+        updateValueText();
     }
 
     void NumberBox::setLook(const NumberBoxLook& look)
     {
         look_ = look;
-        updateTextWidthCache();
         repaint();
     }
 
@@ -32,7 +33,6 @@ namespace TSS
             return;
 
         uiScale_ = uiScale;
-        updateTextWidthCache();
         repaint();
     }
 
@@ -41,6 +41,8 @@ namespace TSS
         minValue_ = minValue;
         maxValue_ = maxValue;
         setValue(currentValue_);
+        updateValueText();
+        repaint();
     }
 
     void NumberBox::setValue(int newValue)
@@ -50,7 +52,7 @@ namespace TSS
         if (currentValue_ != clampedValue)
         {
             currentValue_ = clampedValue;
-            updateTextWidthCache();
+            updateValueText();
             repaint();
             
             if (onValueChanged_)
@@ -63,13 +65,23 @@ namespace TSS
         onValueChanged_ = std::move(callback);
     }
 
-    void NumberBox::setShowDot(bool show)
+    void NumberBox::setDisplayState(DisplayState state)
     {
-        if (showDot_ != show)
-        {
-            showDot_ = show;
-            repaint();
-        }
+        if (displayState_ == state)
+            return;
+
+        displayState_ = state;
+        updateValueText();
+        repaint();
+    }
+
+    void NumberBox::setFocusHighlight(bool focused)
+    {
+        if (focusHighlight_ == focused)
+            return;
+
+        focusHighlight_ = focused;
+        repaint();
     }
 
     void NumberBox::paint(juce::Graphics& g)
@@ -88,17 +100,12 @@ namespace TSS
         g.setColour(getBorderColour());
         g.drawRect(bounds, borderThickness);
 
-        g.setColour(look_.text);
+        if (cachedValueText_.isEmpty())
+            return;
+
+        g.setColour(getTextColour());
         g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
         g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
-
-        if (showDot_)
-        {
-            const auto dotPosition = calculateDotPosition(bounds, cachedTextWidth_);
-            g.setColour(look_.dot);
-            const float dotRadius = kDotRadius_ * uiScale_;
-            g.fillEllipse(dotPosition.x, dotPosition.y, dotRadius * 2.0f, dotRadius * 2.0f);
-        }
     }
 
     void NumberBox::resized()
@@ -106,19 +113,41 @@ namespace TSS
         repaint();
     }
 
-    void NumberBox::updateTextWidthCache()
+    int NumberBox::digitCount() const
     {
-        cachedValueText_ = juce::String(currentValue_);
+        int digits = 1;
+        for (int remaining = std::abs(maxValue_) / 10; remaining > 0; remaining /= 10)
+            ++digits;
 
-        juce::GlyphArrangement glyphArrangement;
-        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * uiScale_);
-        glyphArrangement.addLineOfText(scaledFont, cachedValueText_, 0.0f, 0.0f);
-        cachedTextWidth_ = glyphArrangement.getBoundingBox(0, -1, true).getWidth();
+        return digits;
+    }
+
+    void NumberBox::updateValueText()
+    {
+        switch (displayState_)
+        {
+            case DisplayState::kUnavailable:
+                cachedValueText_.clear();
+                return;
+
+            case DisplayState::kUndefined:
+                cachedValueText_ = juce::String::repeatedString(
+                    juce::String::charToString(PluginDisplayNames::Widgets::NumberBox::kUndefinedValueDigit),
+                    digitCount());
+                return;
+
+            case DisplayState::kValue:
+            default:
+                cachedValueText_ = juce::String(currentValue_).paddedLeft('0', digitCount());
+                return;
+        }
     }
 
     void NumberBox::mouseDoubleClick(const juce::MouseEvent&)
     {
-        if (!editable_ || !isEnabled())
+        if (! editable_ || ! isEnabled()
+            || displayState_ == DisplayState::kUnavailable
+            || displayState_ == DisplayState::kUndefined)
             return;
 
         showEditor();
@@ -129,15 +158,11 @@ namespace TSS
         return isEnabled() ? look_.borderOn : look_.borderOff;
     }
 
-    juce::Point<float> NumberBox::calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const
+    juce::Colour NumberBox::getTextColour() const
     {
-        const auto scaledFont = look_.font.withHeight(look_.font.getHeight() * uiScale_);
-        const float textRight = bounds.getCentreX() + textWidth * 0.5f;
-        const float baselineY = bounds.getCentreY() + scaledFont.getHeight() * 0.5f - scaledFont.getDescent();
-
-        const float dotXOffset = kDotXOffset_ * uiScale_;
-        const float dotRadius = kDotRadius_ * uiScale_;
-        return { textRight + dotXOffset, baselineY - dotRadius };
+        // Red marks navigation focus only; an undefined coordinate stays neutral.
+        const bool useFocusColour = focusHighlight_ && displayState_ == DisplayState::kValue;
+        return useFocusColour ? look_.textFocus : look_.text;
     }
 
     void NumberBox::showEditor()

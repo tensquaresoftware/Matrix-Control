@@ -288,6 +288,15 @@ namespace PluginDisplayNames
         constexpr const char* kPercent = "%";
     }
 
+    namespace Widgets
+    {
+        namespace NumberBox
+        {
+            // Undefined coordinate: one glyph per digit of the box range ("-" / "--").
+            constexpr char kUndefinedValueDigit = '-';
+        }
+    }
+
     namespace ShortLabels
     {
         constexpr const char* kInit  = "I"; // Init buttons

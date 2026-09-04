@@ -26,9 +26,10 @@ namespace Core
         snapshot.selectedBank = static_cast<int>(apvts_.state.getProperty(
             PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
             snapshot.bank));
-        snapshot.banksLocked = static_cast<bool>(apvts_.state.getProperty(
-            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
-            false));
+        snapshot.coordinatesEstablished = arePatchCoordinatesEstablished();
+        snapshot.navigationFocus = static_cast<int>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+            PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
         return snapshot;
     }
 
@@ -42,9 +43,10 @@ namespace Core
             snapshot.selectedBank,
             nullptr);
         apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
-            snapshot.banksLocked,
+            PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
+            snapshot.coordinatesEstablished,
             nullptr);
+        setNavigationFocus(snapshot.navigationFocus);
     }
 
     void PatchManagerActionHandler::beginPendingDeviceLoad(const InternalCoordinatesSnapshot& priorCoordinates)

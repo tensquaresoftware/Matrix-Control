@@ -540,6 +540,26 @@ namespace PluginIDs
     {
         constexpr const char* kGroupId = "patchManagerSection";
 
+        namespace StateProperties
+        {
+            // False until the plugin knows which slot the synth sits on. The Matrix cannot be
+            // queried at launch, so bank select, the first Internal Prev/Next, or a successful
+            // OPEN is what establishes the coordinates.
+            constexpr const char* kPatchCoordinatesEstablished =
+                "patchManagerCoordinatesEstablished";
+            // Which browser last drove patch navigation — see NavigationFocus below.
+            constexpr const char* kNavigationFocus = "patchManagerNavigationFocus";
+        }
+
+        // Single owner of the navigation-focus highlight (red text).
+        namespace NavigationFocus
+        {
+            constexpr int kNone     = 0;
+            constexpr int kInternal = 1;
+            constexpr int kComputer = 2;
+            constexpr int kDefault  = kNone;
+        }
+
         namespace BankUtilityModule
         {
             constexpr const char* kGroupId = "bankUtilityModule";
@@ -547,7 +567,6 @@ namespace PluginIDs
             namespace StateProperties
             {
                 constexpr const char* kSelectedBank = "patchManagerSelectedBank";
-                constexpr const char* kBanksLocked = "patchManagerBanksLocked";
                 // Persisted last OS folder pickers (plugin state) — parent for EXPORT, source for IMPORT.
                 constexpr const char* kExportParentFolderPath = "bankUtilityExportParentFolderPath";
                 constexpr const char* kImportFolderPath = "bankUtilityImportFolderPath";

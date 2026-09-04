@@ -132,19 +132,58 @@ namespace Core
             pendingInternalNavBaseline_ = captureInternalCoordinates(limits);
 
         const bool isNext = propertyId == kLoadNextPatch;
-        const int direction = isNext ? 1 : -1;
 
-        PatchCoordinates current;
-        current.bank = getCurrentBank(limits);
-        current.patch = getCurrentPatch(limits);
-
-        applyPatchCoordinates(limits.advancePatch(current, direction), limits, false);
+        const auto target = resolveInternalNavigationTarget(isNext, limits);
+        applyPatchCoordinates(target, limits, false);
+        if (limits.hasBankConcept())
+        {
+            apvts_.state.setProperty(
+                PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+                target.bank,
+                nullptr);
+        }
+        markPatchCoordinatesEstablished();
+        setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kInternal);
 
         abandonPendingDeviceLoad();
         abandonPendingComputerSelectSettle();
 
         patchNavDebouncer_.schedule([this]() { settleInternalPatchNavigation(); });
         return true;
+    }
+
+    bool PatchManagerActionHandler::arePatchCoordinatesEstablished() const
+    {
+        return static_cast<bool>(apvts_.state.getProperty(
+            PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
+            false));
+    }
+
+    void PatchManagerActionHandler::markPatchCoordinatesEstablished()
+    {
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
+            true,
+            nullptr);
+    }
+
+    void PatchManagerActionHandler::setNavigationFocus(int focusOwner)
+    {
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+            focusOwner,
+            nullptr);
+    }
+
+    PatchCoordinates PatchManagerActionHandler::resolveInternalNavigationTarget(
+        bool isNext,
+        const DeviceMemoryLimits& limits) const
+    {
+        if (! arePatchCoordinatesEstablished())
+            return { limits.minBankNumber(), limits.minPatchNumber() };
+
+        const PatchCoordinates current { getCurrentBank(limits), getCurrentPatch(limits) };
+        return limits.advancePatch(current, isNext ? 1 : -1);
     }
 
     void PatchManagerActionHandler::abandonPendingInternalNavSettle()
@@ -272,12 +311,16 @@ namespace Core
         const auto priorCoordinates = captureInternalCoordinates(limits);
         const int clampedBank = juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), bankIndex);
         apvts_.state.setProperty(BankUtilityModule::StateProperties::kSelectedBank, clampedBank, nullptr);
-        apvts_.state.setProperty(InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber, clampedBank, nullptr);
+
+        // Picking a bank lands on its first slot.
+        const PatchCoordinates destination { clampedBank, limits.minPatchNumber() };
+        applyPatchCoordinates(destination, limits, false);
 
         if (patchSelectionMidiSync_ != nullptr)
-            patchSelectionMidiSync_->syncSelection(clampedBank, getCurrentPatch(limits), limits, true);
+            patchSelectionMidiSync_->syncSelection(destination.bank, destination.patch, limits, true);
 
-        markBanksLockedInApvts();
+        markPatchCoordinatesEstablished();
+        setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kInternal);
         beginPendingDeviceLoad(priorCoordinates);
         loadCurrentPatchFromDevice(limits);
         return true;
@@ -438,8 +481,8 @@ namespace Core
         if (patchSelectionMidiSync_ != nullptr)
             patchSelectionMidiSync_->syncSelection(currentBank, getCurrentPatch(limits), limits, true);
 
-        if (limits.hasBankConcept())
-            markBanksLockedInApvts();
+        // STORE writes to a concrete slot, so the coordinates are no longer a guess.
+        markPatchCoordinatesEstablished();
 
         apvtsPatchMapper_->apvtsToBuffer();
         if (patchNameSyncer_ != nullptr)

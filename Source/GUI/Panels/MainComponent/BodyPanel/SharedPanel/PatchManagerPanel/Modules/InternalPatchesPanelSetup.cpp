@@ -85,7 +85,6 @@ void InternalPatchesPanel::setupCurrentBankNumberBox(TSS::ISkin& skin)
         false,
         Matrix1000Limits::kMinBankNumber,
         Matrix1000Limits::kMaxBankNumber);
-    currentBankNumber->setShowDot(false);
     addAndMakeVisible(*currentBankNumber);
 }
 

@@ -8,6 +8,22 @@
 #include "Shared/Definitions/PluginIDs.h"
 #include "Shared/Definitions/MatrixDeviceTypes.h"
 
+namespace
+{
+    void seedPatchManagerStateDefaults(juce::ValueTree& state)
+    {
+        namespace PatchManager = PluginIDs::PatchManagerSection;
+
+        state.setProperty(PatchManager::BankUtilityModule::StateProperties::kSelectedBank,
+                          Matrix1000Limits::kMinBankNumber,
+                          nullptr);
+        state.setProperty(PatchManager::StateProperties::kPatchCoordinatesEstablished, false, nullptr);
+        state.setProperty(PatchManager::StateProperties::kNavigationFocus,
+                          PatchManager::NavigationFocus::kDefault,
+                          nullptr);
+    }
+}
+
 MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
                          Core::MidiOutboundQueue& outboundQueueRef,
                          Core::MidiActivityTracker& activityTrackerRef)
@@ -36,12 +52,7 @@ MidiManager::MidiManager(juce::AudioProcessorValueTreeState& apvtsRef,
                             MatrixDeviceTypes::toApvtsString(MatrixDeviceTypes::Type::kUnknown),
                             nullptr);
     apvts.state.setProperty("deviceVersion", juce::String(), nullptr);
-    apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
-                            Matrix1000Limits::kMinBankNumber,
-                            nullptr);
-    apvts.state.setProperty(PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
-                            false,
-                            nullptr);
+    seedPatchManagerStateDefaults(apvts.state);
     apvts.state.setProperty("lastError", juce::String(), nullptr);
     apvts.state.setProperty("errorType", juce::String(), nullptr);
     apvts.state.setProperty("lastPatchLoaded", juce::String(), nullptr);

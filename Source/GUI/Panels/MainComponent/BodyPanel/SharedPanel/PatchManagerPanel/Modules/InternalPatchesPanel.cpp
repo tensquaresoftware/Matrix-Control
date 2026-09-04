@@ -164,8 +164,11 @@ void InternalPatchesPanel::valueTreePropertyChanged(
         refreshDeviceLimits();
     }
 
-    if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked)
-        refreshBankLockIndicator();
+    if (propertyName == PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished
+        || propertyName == PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus)
+    {
+        refreshCoordinateDisplayStates();
+    }
 
     if (propertyName == PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive)
         refreshDeviceLimits();
@@ -197,11 +200,8 @@ void InternalPatchesPanel::layoutBrowserRow(float sf, int row2Y, int buttonH)
     placeOrSkipLeft(browserRow, loadNextPatchButton_.get(), navButtonW);
     browserRow.removeFromLeft(interGap);
 
-    if (bankNumberVisible_)
-    {
-        placeOrSkipLeft(browserRow, currentBankNumber.get(), bankNumberW);
-        browserRow.removeFromLeft(interGap);
-    }
+    placeOrSkipLeft(browserRow, currentBankNumber.get(), bankNumberW);
+    browserRow.removeFromLeft(interGap);
 
     if (currentPatchNumber)
         currentPatchNumber->setBounds(browserRow.removeFromLeft(patchNumberW));
@@ -222,7 +222,7 @@ void InternalPatchesPanel::layoutContentRows(float sf)
     if (memoryGroupLabel)
         memoryGroupLabel->setBounds(memoryGroupX, row1Y, m.memoryGroupW, m.groupLabelH);
 
-    // Row 2 — successive integer strips (fixed widths; bank NumberBox hide reflows patch left)
+    // Row 2 — successive integer strips (fixed widths; bank NumberBox always laid out)
     const int row2Y = row1Y + m.groupLabelH;
     layoutBrowserRow(sf, row2Y, m.buttonH);
 
@@ -311,9 +311,7 @@ void InternalPatchesPanel::refreshDeviceLimits()
         apvts_.state.getProperty(MatrixDeviceTypes::kApvtsPropertyName));
     const auto limits = Core::DeviceMemoryLimits::resolve(deviceType);
 
-    bankNumberVisible_ = limits.hasBankConcept();
-    if (currentBankNumber)
-        currentBankNumber->setVisible(bankNumberVisible_);
+    bankNumberAvailable_ = limits.hasBankConcept();
 
     applyPatchNumberRange(limits);
 
@@ -321,20 +319,40 @@ void InternalPatchesPanel::refreshDeviceLimits()
         PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCurrentBankNumber,
         Matrix1000Limits::kMinBankNumber));
     updatePasteStoreEnabled(limits, currentBank);
-    refreshBankLockIndicator();
+    refreshCoordinateDisplayStates();
 
     resized();
 }
 
-void InternalPatchesPanel::refreshBankLockIndicator()
+void InternalPatchesPanel::refreshCoordinateDisplayStates()
 {
-    if (currentBankNumber == nullptr)
-        return;
+    using DisplayState = TSS::NumberBox::DisplayState;
 
-    const bool banksLocked = static_cast<bool>(apvts_.state.getProperty(
-        PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
+    const bool coordinatesEstablished = static_cast<bool>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
         false));
-    currentBankNumber->setShowDot(bankNumberVisible_ && banksLocked);
+    const int navigationFocus = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+        PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
+    const bool internalHasFocus =
+        navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kInternal;
+
+    const auto coordinateState = coordinatesEstablished ? DisplayState::kValue : DisplayState::kUndefined;
+
+    if (currentBankNumber)
+    {
+        // Matrix-6/6R has no banks: keep the slot, show it gray and empty.
+        currentBankNumber->setDisplayState(bankNumberAvailable_ ? coordinateState
+                                                               : DisplayState::kUnavailable);
+        currentBankNumber->setEnabled(bankNumberAvailable_);
+        currentBankNumber->setFocusHighlight(bankNumberAvailable_ && internalHasFocus);
+    }
+
+    if (currentPatchNumber)
+    {
+        currentPatchNumber->setDisplayState(coordinateState);
+        currentPatchNumber->setFocusHighlight(internalHasFocus);
+    }
 }
 
 void InternalPatchesPanel::syncNumberBoxesFromApvts()

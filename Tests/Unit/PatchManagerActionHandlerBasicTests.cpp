@@ -28,9 +28,11 @@ public:
         testNavigationWithinBankNoSetBank();
         testAt99_fourNext_staysBank0();
         testAt99_next_wrapsToPatch0_sameBank();
-        testColdStart_setBank_setsLockIndicatorTrue();
+        testUndefinedCoordinates_firstNext_landsOnBank0Patch0();
+        testUndefinedCoordinates_firstPrev_landsOnBank0Patch0();
         testNavigationStaleSyncedBank_sendsSetBankOnFirstClick();
-        testBankSelectSetsBanksLockedTrue();
+        testBankSelectMarksCoordinatesEstablished();
+        testNavigationFocus_switchesBetweenComputerAndInternal();
     }
 
 private:
@@ -127,6 +129,8 @@ private:
 
         harness.handler.handleAction(InternalPatches::kStorePatch, juce::var());
 
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
         const auto queued = scanQueue(harness.queue);
         expect(queued.setBank);
         expectEquals(queued.setBankValue, 1);
@@ -318,7 +322,8 @@ private:
         harness.handler.handleAction(BankUtility::StandaloneWidgets::kSelectBank3, juce::var());
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
-        expect(!static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        expect(!static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
         expect(harness.queue.isEmpty());
     }
 
@@ -334,7 +339,11 @@ private:
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 6);
-        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
         const auto queued = scanQueue(harness.queue);
         expect(!queued.setBank);
     }
@@ -355,7 +364,8 @@ private:
 
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 3);
-        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
         const auto queued = scanQueue(harness.queue);
         expect(!queued.setBank);
     }
@@ -368,7 +378,7 @@ private:
         initializePatchManagerState(harness.proc.apvts.state,
                                     0,
                                     Matrix1000Limits::kMaxPatchNumber,
-                                    false);
+                                    true);
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
 
         fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
@@ -376,23 +386,55 @@ private:
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)),
                      Matrix1000Limits::kMinPatchNumber);
-        expect(!static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
         const auto queued = scanQueue(harness.queue);
         expect(!queued.setBank);
     }
 
-    void testColdStart_setBank_setsLockIndicatorTrue()
+    void testUndefinedCoordinates_firstNext_landsOnBank0Patch0()
     {
-        beginTest("coldStart_setBank_setsLockIndicatorTrue");
+        beginTest("undefinedCoordinates_firstNext_landsOnBank0Patch0");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 0, 0, false);
 
         fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
 
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 1);
-        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        // Nothing to step from yet, so the first Next claims the lowest slot instead of 0/01.
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)),
+                     Matrix1000Limits::kMinBankNumber);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)),
+                     Matrix1000Limits::kMinPatchNumber);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, 0);
+    }
+
+    void testUndefinedCoordinates_firstPrev_landsOnBank0Patch0()
+    {
+        beginTest("undefinedCoordinates_firstPrev_landsOnBank0Patch0");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 0, false);
+
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadPreviousPatch);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)),
+                     Matrix1000Limits::kMinBankNumber);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)),
+                     Matrix1000Limits::kMinPatchNumber);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         BankUtility::StateProperties::kSelectedBank)),
+                     Matrix1000Limits::kMinBankNumber);
         const auto queued = scanQueue(harness.queue);
         expect(queued.setBank);
         expectEquals(queued.setBankValue, 0);
@@ -403,7 +445,7 @@ private:
         beginTest("navigation_staleSyncedBank_sendsSetBankOnFirstClick");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
-        initializePatchManagerState(harness.proc.apvts.state, 9, 93, false);
+        initializePatchManagerState(harness.proc.apvts.state, 9, 93, true);
         harness.patchSelectionMidiSync.resetLastSyncedBank(0);
 
         fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
@@ -415,20 +457,60 @@ private:
         expectEquals(queued.setBankValue, 9);
     }
 
-    void testBankSelectSetsBanksLockedTrue()
+    void testBankSelectMarksCoordinatesEstablished()
     {
-        beginTest("bankSelect_setsBanksLockedTrue");
+        beginTest("bankSelect_marksCoordinatesEstablished");
 
         HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
         initializePatchManagerState(harness.proc.apvts.state, 0, 4, false);
 
         harness.handler.handleAction(BankUtility::StandaloneWidgets::kSelectBank3, juce::var());
 
-        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
         expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 3);
+        // Selecting a bank lands on its first slot, whatever the previous patch was.
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)),
+                     Matrix1000Limits::kMinPatchNumber);
         const auto queued = scanQueue(harness.queue);
         expect(queued.setBank);
         expectEquals(queued.setBankValue, 3);
+    }
+
+    void testNavigationFocus_switchesBetweenComputerAndInternal()
+    {
+        beginTest("navigationFocus_switchesBetweenComputerAndInternal");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 1, 10, true);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kComputer);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 10);
+
+        while (! harness.queue.isEmpty())
+            (void) harness.queue.dequeue();
+
+        fireInternalPatchNavigation(harness, InternalPatches::kLoadNextPatch);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kInternal);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 1);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 11);
+
+        tempDir.deleteRecursively();
     }
 };
 

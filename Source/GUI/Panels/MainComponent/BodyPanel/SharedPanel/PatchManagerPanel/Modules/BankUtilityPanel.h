@@ -72,7 +72,9 @@ private:
     void applyNormalLookToActionButtons();
 
     void refreshDeviceGating();
-    void refreshSelectedBankHighlight();
+    // Marks the bank STORE / bank COPY would write to, with a footer-style badge fill.
+    void refreshCurrentBankMarker();
+    TSS::ButtonLook makeCurrentBankMarkerLook() const;
     void refreshUtilityEnabled();
     void refreshImportBankEnabled(bool rootLocked, const Core::DeviceMemoryLimits& limits);
     void refreshPasteBankEnabled(bool rootLocked);

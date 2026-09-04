@@ -1,10 +1,31 @@
 #include "Core/Actions/PatchManagerActionHandler.h"
 
+#include "Core/MIDI/PatchSelectionMidiSync.h"
 #include "Core/Services/PatchFileService.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace Core
 {
+
+    void PatchManagerActionHandler::establishCoordinatesForComputerOpen(const DeviceMemoryLimits& limits)
+    {
+        if (arePatchCoordinatesEstablished())
+            return;
+
+        const PatchCoordinates destination { limits.minBankNumber(), limits.minPatchNumber() };
+        applyPatchCoordinates(destination, limits, false);
+
+        apvts_.state.setProperty(
+            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank,
+            destination.bank,
+            nullptr);
+
+        // Set Bank only: a Program Change here would pull device patch 00 into the edit buffer
+        // before the .syx is applied. Do not mark established yet — cancel / failed load must
+        // leave the UI in the undefined state until a .syx actually commits.
+        if (patchSelectionMidiSync_ != nullptr)
+            patchSelectionMidiSync_->sendSetBank(destination.bank, limits);
+    }
 
     void PatchManagerActionHandler::handleOpenPatchFolder(const DeviceMemoryLimits& limits)
     {
@@ -32,11 +53,8 @@ namespace Core
         const auto& scan = patchFileService_->getLastScanResult();
         if (! scan.folderUsable || scan.validCount < 1)
         {
-            apvts_.state.setProperty(
-                PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
-                0,
-                nullptr);
-            rememberComputerPatchesSelection(0);
+            clearComputerPatchesSelection();
+            setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kNone);
             return;
         }
 
@@ -44,6 +62,10 @@ namespace Core
             previousFolderPath,
             previousSelectedId
         };
+
+        // The folder holds usable patches, so this OPEN counts as the moment that pins the
+        // destination slot. Runs before the .syx apply so Set Bank precedes the dump.
+        establishCoordinatesForComputerOpen(limits);
 
         constexpr int kFirstPatchFileId = 1;
         const int beforeId = readComputerPatchesSelectedId();
@@ -56,13 +78,18 @@ namespace Core
             loadSelectedPatchFileImmediately(limits);
     }
 
-    void PatchManagerActionHandler::resetComputerPatchesBrowserAfterSessionLoad()
+    void PatchManagerActionHandler::clearComputerPatchesSelection()
     {
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSelectPatchFile,
             0,
             nullptr);
         rememberComputerPatchesSelection(0);
+    }
+
+    void PatchManagerActionHandler::resetComputerPatchesBrowserAfterSessionLoad()
+    {
+        clearComputerPatchesSelection();
         lastStableComputerPatchesSelectedId_ = 0;
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,

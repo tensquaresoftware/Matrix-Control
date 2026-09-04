@@ -13,6 +13,9 @@ public:
         testOpenCancelledDoesNotPersist();
         testOpenAutoSelectsAndLoadsFirst();
         testOpenEmptyFolderNoLoad();
+        testOpenUndefinedCoordinates_establishesDestinationWithoutDeviceLoad();
+        testOpenEstablishedCoordinates_keepsThem();
+        testOpenEmptyFolder_leavesCoordinatesUndefined();
         testOpenAlreadySelectedFirstReloads();
         testSessionLoadResetsBrowserWithoutRescan();
         testRescanPersistedFolderMissingPathWarningFooter();
@@ -109,6 +112,85 @@ private:
         expectEquals(harness.patchFileService.getLastScanResult().validCount, 0);
         expect(harness.queue.isEmpty());
         expect(! harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenUndefinedCoordinates_establishesDestinationWithoutDeviceLoad()
+    {
+        beginTest("open_undefinedCoordinates_establishesDestinationWithoutDeviceLoad");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 12, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)),
+                     Matrix1000Limits::kMinBankNumber);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)),
+                     Matrix1000Limits::kMinPatchNumber);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         BankUtility::StateProperties::kSelectedBank)),
+                     Matrix1000Limits::kMinBankNumber);
+        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kComputer);
+
+        const auto queued = scanQueue(harness.queue);
+        expect(queued.setBank);
+        expectEquals(queued.setBankValue, Matrix1000Limits::kMinBankNumber);
+        // Device patch 00 must not be pulled into the editor before the .syx is applied.
+        expectEquals(harness.dumpFakeState->requestCount, 0);
+        expect(harness.patchLoadHookState->invoked);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenEstablishedCoordinates_keepsThem()
+    {
+        beginTest("open_establishedCoordinates_keepsThem");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 2, 34, true);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+        copyFixturePatchToDir(tempDir, "Patch 5.syx");
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 2);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 34);
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kComputer);
+
+        tempDir.deleteRecursively();
+    }
+
+    void testOpenEmptyFolder_leavesCoordinatesUndefined()
+    {
+        beginTest("open_emptyFolder_leavesCoordinatesUndefined");
+
+        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
+        initializePatchManagerState(harness.proc.apvts.state, 0, 0, false);
+        const auto tempDir = createTempScanDir();
+        expect(tempDir.createDirectory());
+
+        harness.pickFolderCallback = [&tempDir]() { return tempDir; };
+        fireOpenAndDispatchLoad(harness);
+
+        expect(! static_cast<bool>(harness.proc.apvts.state.getProperty(
+            PatchManager::StateProperties::kPatchCoordinatesEstablished)));
+        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(
+                         PatchManager::StateProperties::kNavigationFocus)),
+                     PatchManager::NavigationFocus::kNone);
 
         tempDir.deleteRecursively();
     }

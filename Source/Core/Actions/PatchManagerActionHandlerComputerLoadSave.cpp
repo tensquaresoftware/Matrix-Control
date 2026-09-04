@@ -70,6 +70,8 @@ namespace Core
         noteComputerPatchOrigin(file);
 
         applyLoadedPatchToApvtsAndSynth(limits);
+        markPatchCoordinatesEstablished();
+        setNavigationFocus(PluginIDs::PatchManagerSection::NavigationFocus::kComputer);
         rememberComputerPatchesSelection(requestedId);
         apvts_.state.setProperty(
             PluginIDs::PatchManagerSection::ComputerPatchesModule::StateProperties::kSelectPatchCancelBaseline,

@@ -11,6 +11,15 @@ namespace TSS
     public:
         using ValueChangedCallback = std::function<void(int)>;
 
+        // What the box shows: a value, the "coordinates unknown" placeholder, or nothing at all
+        // for devices where this coordinate does not exist (Matrix-6/6R bank).
+        enum class DisplayState
+        {
+            kValue,
+            kUndefined,
+            kUnavailable
+        };
+
         explicit NumberBox(int width, int height, const NumberBoxLook& look, bool editable, int minValue, int maxValue);
         ~NumberBox() override = default;
 
@@ -24,8 +33,12 @@ namespace TSS
 
         void setOnValueChanged(ValueChangedCallback callback);
 
-        void setShowDot(bool show);
-        bool getShowDot() const { return showDot_; }
+        void setDisplayState(DisplayState state);
+        DisplayState getDisplayState() const { return displayState_; }
+
+        // Navigation focus highlight — red text, matching the PATCH NAME display.
+        void setFocusHighlight(bool focused);
+        bool hasFocusHighlight() const { return focusHighlight_; }
 
         void paint(juce::Graphics& g) override;
         void resized() override;
@@ -36,8 +49,6 @@ namespace TSS
     private:
         inline constexpr static int kDefaultHeight_ = 20;
         inline constexpr static int kBorderThickness_ = 2;
-        inline constexpr static float kDotRadius_ = 1.5f;
-        inline constexpr static float kDotXOffset_ = 3.0f;
         inline constexpr static float kEditorFontSizeIncrease_ = 4.0f;
 
         NumberBoxLook look_{};
@@ -46,18 +57,19 @@ namespace TSS
         int minValue_ = 0;
         int maxValue_ = 99;
         bool editable_ = false;
-        bool showDot_ = false;
+        DisplayState displayState_ = DisplayState::kValue;
+        bool focusHighlight_ = false;
         float uiScale_ = 1.0f;
         std::unique_ptr<juce::TextEditor> editor_;
         ValueChangedCallback onValueChanged_;
 
-        float cachedTextWidth_ = 0.0f;
         juce::String cachedValueText_;
 
-        void updateTextWidthCache();
+        void updateValueText();
+        int digitCount() const;
 
         juce::Colour getBorderColour() const;
-        juce::Point<float> calculateDotPosition(const juce::Rectangle<float>& bounds, float textWidth) const;
+        juce::Colour getTextColour() const;
 
         void showEditor();
         void hideEditor();

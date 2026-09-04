@@ -214,14 +214,6 @@ namespace Core
             return;
     }
 
-    void PatchManagerActionHandler::markBanksLockedInApvts()
-    {
-        apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
-            true,
-            nullptr);
-    }
-
     bool PatchManagerActionHandler::confirmPatchContextChange(bool includeUnsavedEditWarning)
     {
         return ! hooks_.confirmPatchContextChange
@@ -368,12 +360,8 @@ namespace Core
         if (! sendMidi)
             return;
 
-        bool setBankSent = false;
         if (patchSelectionMidiSync_ != nullptr)
-            setBankSent = patchSelectionMidiSync_->syncSelection(coordinates.bank, coordinates.patch, limits, false);
-
-        if (setBankSent)
-            markBanksLockedInApvts();
+            patchSelectionMidiSync_->syncSelection(coordinates.bank, coordinates.patch, limits, false);
     }
 
     int PatchManagerActionHandler::parseBankButtonIndex(const juce::String& propertyId) const

@@ -218,7 +218,7 @@ namespace TSS
         look.borderOff = skin.getColour(SkinColourId::kButtonBorderOff);
         look.borderOn = skin.getColour(SkinColourId::kButtonBorderOn);
         look.text = skin.getColour(SkinColourId::kNumberBoxText);
-        look.dot = skin.getColour(SkinColourId::kNumberBoxDot);
+        look.textFocus = skin.getColour(SkinColourId::kNumberBoxTextFocus);
         look.editorBackground = skin.getColour(SkinColourId::kNumberBoxEditorBackground);
         look.editorText = skin.getColour(SkinColourId::kNumberBoxEditorText);
         look.editorSelectionBackground = skin.getColour(SkinColourId::kNumberBoxEditorSelectionBackground);

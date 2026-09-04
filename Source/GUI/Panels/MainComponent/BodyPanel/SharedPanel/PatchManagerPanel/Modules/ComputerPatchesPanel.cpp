@@ -92,6 +92,7 @@ ComputerPatchesPanel::ComputerPatchesPanel(const Config& config)
 
     apvts_.state.addListener(this);
     refreshPatchFileComboBox();
+    refreshNavigationFocusHighlight();
 
     setSize(dims_.width, dims_.height);
 }
@@ -106,14 +107,45 @@ void ComputerPatchesPanel::valueTreePropertyChanged(juce::ValueTree&,
 {
     const auto name = property.toString();
     if (name == ComputerPatchesIds::StateProperties::kScanRevision)
+    {
         refreshPatchFileComboBox();
+        refreshNavigationFocusHighlight();
+    }
     else if (name == ComputerPatchesIds::StandaloneWidgets::kSelectPatchFile)
+    {
         syncSelectionFromApvts();
+    }
+    else if (name == PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus)
+    {
+        refreshNavigationFocusHighlight();
+    }
 }
 
 void ComputerPatchesPanel::valueTreeRedirected(juce::ValueTree&)
 {
     refreshPatchFileComboBox();
+    refreshNavigationFocusHighlight();
+}
+
+void ComputerPatchesPanel::refreshNavigationFocusHighlight()
+{
+    if (selectPatchFileComboBox_ == nullptr || skin_ == nullptr)
+        return;
+
+    const int navigationFocus = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+        PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
+
+    auto look = TSS::comboBoxLookFromSkin(*skin_);
+
+    if (navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kComputer)
+    {
+        const auto focusColour = skin_->getColour(TSS::SkinColourId::kNumberBoxTextFocus);
+        look.buttonLikeText = focusColour;
+        look.textEnabled = focusColour;
+    }
+
+    selectPatchFileComboBox_->setLook(look);
 }
 
 void ComputerPatchesPanel::refreshPatchFileComboBox()
@@ -306,8 +338,8 @@ void ComputerPatchesPanel::applyChildLooks(TSS::ISkin& skin)
 
     if (selectPatchFileComboBox_)
     {
-        selectPatchFileComboBox_->setLook(TSS::comboBoxLookFromSkin(skin));
         selectPatchFileComboBox_->setPopupMenuLook(TSS::popupMenuLookFromSkin(skin));
+        refreshNavigationFocusHighlight();
     }
 
     if (loadPreviousPatchFileButton_)
