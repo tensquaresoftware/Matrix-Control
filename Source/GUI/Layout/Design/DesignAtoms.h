@@ -50,10 +50,11 @@ namespace TSS::Design
                 inline constexpr int kCopy = 20;
                 inline constexpr int kPaste = 20;
 
-                inline constexpr int kPatchManagerBankSelect = 24;
-                inline constexpr int kPatchManagerUnlockBank = 68;
-                inline constexpr int kPatchManagerImportBank = 56;
-                inline constexpr int kPatchManagerExportBank = 56;
+                inline constexpr int kPatchManagerBankSelect = 28;
+                inline constexpr int kPatchManagerCopyBank = 44;
+                inline constexpr int kPatchManagerPasteBank = 44;
+                inline constexpr int kPatchManagerImportBank = 48;
+                inline constexpr int kPatchManagerExportBank = 48;
 
                 inline constexpr int kInternalPatchesInit = 36;
                 inline constexpr int kInternalPatchesCopy = 36;
@@ -100,7 +101,6 @@ namespace TSS::Design
             namespace Label
             {
                 inline constexpr int kModulationBusNumber = 8;
-                inline constexpr int kPatchManagerSelectBank = 68;
                 inline constexpr int kPatchMutator = 40;
             }
 

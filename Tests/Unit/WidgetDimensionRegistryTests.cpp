@@ -95,8 +95,14 @@ namespace
     };
 
     constexpr ExplicitButtonWidthCase kExplicitButtonWidthCases[] = {
-        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-          BW::kPatchManagerUnlockBank, "unlock bank" },
+        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kCopyBank,
+          BW::kPatchManagerCopyBank, "copy bank" },
+        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBank,
+          BW::kPatchManagerPasteBank, "paste bank" },
+        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank,
+          BW::kPatchManagerImportBank, "import bank" },
+        { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank,
+          BW::kPatchManagerExportBank, "export bank" },
         { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
           BW::kPatchManagerBankSelect, "select bank" },
         { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kInitPatch,

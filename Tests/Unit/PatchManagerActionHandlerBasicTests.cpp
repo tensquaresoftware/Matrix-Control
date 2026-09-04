@@ -28,12 +28,9 @@ public:
         testNavigationWithinBankNoSetBank();
         testAt99_fourNext_staysBank0();
         testAt99_next_wrapsToPatch0_sameBank();
-        testUnlock_doesNotChangeApvtsCoordinates();
         testColdStart_setBank_setsLockIndicatorTrue();
         testNavigationStaleSyncedBank_sendsSetBankOnFirstClick();
-        testUnlockBankSends0CHOnly();
         testBankSelectSetsBanksLockedTrue();
-        testUnlockBankMatrix6NoOp();
     }
 
 private:
@@ -384,21 +381,6 @@ private:
         expect(!queued.setBank);
     }
 
-    void testUnlock_doesNotChangeApvtsCoordinates()
-    {
-        beginTest("unlock_doesNotChangeApvtsCoordinates");
-
-        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
-        initializePatchManagerState(harness.proc.apvts.state, 2, 5, true);
-
-        harness.handler.handleAction(BankUtility::StandaloneWidgets::kUnlockBank, juce::var());
-
-        expect(!static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 2);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 5);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kSelectedBank)), 2);
-    }
-
     void testColdStart_setBank_setsLockIndicatorTrue()
     {
         beginTest("coldStart_setBank_setsLockIndicatorTrue");
@@ -433,21 +415,6 @@ private:
         expectEquals(queued.setBankValue, 9);
     }
 
-    void testUnlockBankSends0CHOnly()
-    {
-        beginTest("unlockBank_sends0CHOnly");
-
-        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix1000));
-        initializePatchManagerState(harness.proc.apvts.state, 7, 12, true);
-
-        harness.handler.handleAction(BankUtility::StandaloneWidgets::kUnlockBank, juce::var());
-
-        const auto queued = scanQueue(harness.queue);
-        expect(queued.unlockBank);
-        expect(!queued.setBank);
-        expect(!queued.patchData);
-    }
-
     void testBankSelectSetsBanksLockedTrue()
     {
         beginTest("bankSelect_setsBanksLockedTrue");
@@ -462,22 +429,6 @@ private:
         const auto queued = scanQueue(harness.queue);
         expect(queued.setBank);
         expectEquals(queued.setBankValue, 3);
-    }
-
-    void testUnlockBankMatrix6NoOp()
-    {
-        beginTest("unlockBank_matrix6_noOp");
-
-        HandlerHarness harness(Core::DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kMatrix6));
-        initializePatchManagerState(harness.proc.apvts.state, 0, 4, true);
-        harness.patchSelectionMidiSync.resetLastSyncedBank(0);
-
-        harness.handler.handleAction(BankUtility::StandaloneWidgets::kUnlockBank, juce::var());
-
-        expect(static_cast<bool>(harness.proc.apvts.state.getProperty(BankUtility::StateProperties::kBanksLocked)));
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentBankNumber)), 0);
-        expectEquals(static_cast<int>(harness.proc.apvts.state.getProperty(InternalPatches::kCurrentPatchNumber)), 4);
-        expect(harness.queue.isEmpty());
     }
 };
 

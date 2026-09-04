@@ -33,6 +33,13 @@ namespace Core
         std::function<void(juce::uint8 patchNumber, DeviceDumpCallback onResult)> requestDeviceDump;
         // Stops Copy/Paste blink feedback after a successful paste (clipboard content kept).
         std::function<void()> disarmClipboardFeedback;
+        // Bank Utility COPY: blink COPY immediately while the MIDI dump runs (clipboard unchanged).
+        std::function<void()> armBankCopyFeedbackPending;
+        std::function<void()> clearBankCopyFeedbackPending;
+        // Arms normal type-aware blink after clipboard content is ready.
+        std::function<void()> armClipboardFeedback;
+        // Refresh paste-enabled + blink mirrors (e.g. selected bank changed) without arming.
+        std::function<void()> refreshClipboardMirrors;
         // Clears editorial undo stack and refreshes DirtyPatchTracker snapshot (load/paste/mutate).
         std::function<void()> onEditorialCheckpoint;
         // Opens one editorial undo transaction before bulk APVTS writes (Init/Paste module).

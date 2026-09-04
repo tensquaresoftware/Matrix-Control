@@ -224,6 +224,10 @@ namespace Core
 
     void PatchManagerActionHandler::beginBankImportSnapshot(std::uint64_t generation)
     {
+        // Stale settle timers must not clear a newer transfer's safety snapshot.
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
+            return;
+
         bankTransfer_.deviceSnapshot.clear();
         snapshotNextImportSlot(0, generation);
     }
@@ -234,18 +238,24 @@ namespace Core
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
             return false;
 
         if (bankTransfer_.cancelRequested)
         {
-            finishBankImport(kImportCancelledFooterMessage, "warning");
+            const auto cancelMessage = bankTransfer_.kind == BankTransferState::Kind::kPaste
+                ? juce::String(kPasteCancelledFooterMessage)
+                : juce::String(kImportCancelledFooterMessage);
+            finishBankImport(cancelMessage, "warning");
             return false;
         }
 
         if (dump.size() != SysExConstants::kPatchPackedDataSize)
         {
-            finishBankImport(kSnapshotFailedFooterMessage, "warning");
+            const auto snapshotFailed = bankTransfer_.kind == BankTransferState::Kind::kPaste
+                ? juce::String(kPasteSnapshotFailedFooterMessage)
+                : juce::String(kSnapshotFailedFooterMessage);
+            finishBankImport(snapshotFailed, "warning");
             return false;
         }
 
@@ -263,12 +273,15 @@ namespace Core
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
             return;
 
         if (bankTransfer_.cancelRequested)
         {
-            finishBankImport(kImportCancelledFooterMessage, "warning");
+            const auto cancelMessage = bankTransfer_.kind == BankTransferState::Kind::kPaste
+                ? juce::String(kPasteCancelledFooterMessage)
+                : juce::String(kImportCancelledFooterMessage);
+            finishBankImport(cancelMessage, "warning");
             return;
         }
 

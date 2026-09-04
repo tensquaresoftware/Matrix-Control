@@ -42,19 +42,26 @@ namespace
     }
 }
 
-ClipboardPasteEnabledState resolvePasteEnabled(const ClipboardService& clipboard)
+ClipboardPasteEnabledState resolvePasteEnabled(const ClipboardPasteEnabledResolveArgs& args)
 {
     ClipboardPasteEnabledState state;
-    state.dco1 = clipboard.canPasteModule(PatchModuleKind::Dco1);
-    state.dco2 = clipboard.canPasteModule(PatchModuleKind::Dco2);
-    state.env1 = clipboard.canPasteModule(PatchModuleKind::Env1);
-    state.env2 = clipboard.canPasteModule(PatchModuleKind::Env2);
-    state.env3 = clipboard.canPasteModule(PatchModuleKind::Env3);
-    state.lfo1 = clipboard.canPasteModule(PatchModuleKind::Lfo1);
-    state.lfo2 = clipboard.canPasteModule(PatchModuleKind::Lfo2);
-    state.internalPatches = clipboard.canPasteFullPatch();
-    state.matrixModulation = clipboard.canPasteMatrixModulation();
+    state.dco1 = args.clipboard.canPasteModule(PatchModuleKind::Dco1);
+    state.dco2 = args.clipboard.canPasteModule(PatchModuleKind::Dco2);
+    state.env1 = args.clipboard.canPasteModule(PatchModuleKind::Env1);
+    state.env2 = args.clipboard.canPasteModule(PatchModuleKind::Env2);
+    state.env3 = args.clipboard.canPasteModule(PatchModuleKind::Env3);
+    state.lfo1 = args.clipboard.canPasteModule(PatchModuleKind::Lfo1);
+    state.lfo2 = args.clipboard.canPasteModule(PatchModuleKind::Lfo2);
+    state.internalPatches = args.clipboard.canPasteFullPatch();
+    state.matrixModulation = args.clipboard.canPasteMatrixModulation();
+    state.bankUtility = args.selectedBankPasteAllowed
+        && args.clipboard.canPasteBank(args.selectedBank);
     return state;
+}
+
+ClipboardPasteEnabledState resolvePasteEnabled(const ClipboardService& clipboard)
+{
+    return resolvePasteEnabled(ClipboardPasteEnabledResolveArgs { clipboard, -1, false });
 }
 
 std::optional<PatchModuleKind> patchModuleKindFromWidgetId(const juce::String& widgetId)

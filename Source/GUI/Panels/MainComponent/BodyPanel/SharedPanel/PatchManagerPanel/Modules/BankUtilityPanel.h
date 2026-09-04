@@ -13,8 +13,13 @@ namespace TSS
 {
     class ISkin;
     class ModuleHeader;
-    class Label;
     class Button;
+    class ClipboardFeedbackButtonBinding;
+}
+
+namespace Core
+{
+    class DeviceMemoryLimits;
 }
 
 class WidgetFactory;
@@ -49,17 +54,18 @@ private:
     TSS::ButtonLook normalBankLook_;
 
     std::unique_ptr<TSS::ModuleHeader> bankUtilityModuleHeader_;
-    std::unique_ptr<TSS::Label> bankSelectorLabel_;
-    std::unique_ptr<TSS::Button> unlockBankButton_;
     std::array<std::unique_ptr<TSS::Button>, kBankCount> selectBankButtons_;
-    std::unique_ptr<TSS::Button> importBankButton_;
+    std::unique_ptr<TSS::Button> copyBankButton_;
+    std::unique_ptr<TSS::Button> pasteBankButton_;
     std::unique_ptr<TSS::Button> exportBankButton_;
+    std::unique_ptr<TSS::Button> importBankButton_;
+    std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> copyFeedbackBinding_;
+    std::unique_ptr<TSS::ClipboardFeedbackButtonBinding> pasteFeedbackBinding_;
 
     void setupModuleHeader(TSS::ISkin& skin, WidgetFactory& widgetFactory, const juce::String& moduleId);
-    void setupBankSelectorLabel(TSS::ISkin& skin);
     void setupSelectBankButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupImportExportButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
-    void setupUnlockBankButton(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupUtilityButtons(TSS::ISkin& skin, WidgetFactory& widgetFactory);
+    void setupClipboardFeedbackBindings();
 
     void layoutContentRows(float sf);
     void applyChildUiScales(float sf);
@@ -67,7 +73,10 @@ private:
 
     void refreshDeviceGating();
     void refreshSelectedBankHighlight();
-    void refreshImportExportEnabled();
+    void refreshUtilityEnabled();
+    void refreshImportBankEnabled(bool rootLocked, const Core::DeviceMemoryLimits& limits);
+    void refreshPasteBankEnabled(bool rootLocked);
+    void refreshClipboardBlinkBindings();
     void setBankUtilityGrayed(bool grayed);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BankUtilityPanel)

@@ -8,6 +8,7 @@
 
 #include "Core/PluginProcessor.h"
 #include "MainComponent.h"
+#include "GUI/Dialogs/BankTransferProgressDialog.h"
 #include "GUI/Layout/PanelDimensions.h"
 #include "Skins/Skin.h"
 #include "Core/MIDI/Queue/RealtimeQueuePressureMonitor.h"
@@ -22,7 +23,6 @@ class SettingsPanel;
 class SettingsWindow;
 class AboutWindow;
 class MasterInitConfirmDialog;
-class BankTransferProgressDialog;
 
 class PluginEditor : public juce::AudioProcessorEditor,
                      private juce::KeyListener,
@@ -79,7 +79,7 @@ private:
         juce::ValueTree state_;
     };
 
-    // Bank Utility EXPORT/IMPORT progress modal request (see BankTransferProgressPresenter).
+    // Bank Utility EXPORT/IMPORT/COPY/PASTE progress modal request (see BankTransferProgressPresenter).
     struct BankTransferProgressShowRequest
     {
         juce::String title;
@@ -87,6 +87,7 @@ private:
         juce::String detail;
         int totalSteps = 0;
         std::function<void()> onCancelRequested;
+        BankTransferProgressDialog::ContentLayout layout = BankTransferProgressDialog::ContentLayout::DualLane;
     };
 
     // ---- Construction phases (see PluginEditor.cpp ctor for call order) ----
@@ -114,6 +115,7 @@ private:
     void setBankImportFolderPickerBinding();
     void setBankImportConfirmGateBinding();
     void setBankExportOverwriteConfirmGateBinding();
+    void setBankPasteConfirmGateBinding();
     void wireBankTransferProgressPresenter();
     void configureBankTransferProgressShowAndUpdate(Core::BankTransferProgressPresenter& presenter);
     void configureBankTransferProgressMessaging(Core::BankTransferProgressPresenter& presenter);

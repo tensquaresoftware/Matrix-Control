@@ -15,7 +15,8 @@ namespace DimensionFactoryBuilders
             .pasteWidth = BW::kPaste,
             .height = Atoms::Heights::kButton,
             .patchManagerBankSelectWidth = BW::kPatchManagerBankSelect,
-            .patchManagerUnlockBankWidth = BW::kPatchManagerUnlockBank,
+            .patchManagerCopyBankWidth = BW::kPatchManagerCopyBank,
+            .patchManagerPasteBankWidth = BW::kPatchManagerPasteBank,
             .patchManagerImportBankWidth = BW::kPatchManagerImportBank,
             .patchManagerExportBankWidth = BW::kPatchManagerExportBank,
             .internalPatchesInitWidth = BW::kInternalPatchesInit,
@@ -160,14 +161,9 @@ namespace DimensionFactoryBuilders
             .width = width,
             .height = height,
             .moduleHeader = moduleHeader,
-            .bankSelectorLabel = {
-                .modulationBusNumberWidth = Atoms::Widths::Label::kModulationBusNumber,
-                .patchManagerSelectBankWidth = Atoms::Widths::Label::kPatchManagerSelectBank,
-                .patchMutatorWidth = Atoms::Widths::Label::kPatchMutator,
-                .height = Atoms::Heights::kLabel,
-            },
             .buttons = buttons,
             .layout = buildPatchManagerModuleLayout(),
+            .selectorToUtilityGap = Recipes::BankUtilityModule::kSelectorToUtilityGap,
         };
     }
 
@@ -231,7 +227,6 @@ namespace DimensionFactoryBuilders
             .moduleHeader = moduleHeader,
             .labels = {
                 .modulationBusNumberWidth = Atoms::Widths::Label::kModulationBusNumber,
-                .patchManagerSelectBankWidth = Atoms::Widths::Label::kPatchManagerSelectBank,
                 .patchMutatorWidth = Atoms::Widths::Label::kPatchMutator,
                 .height = Atoms::Heights::kLabel,
             },

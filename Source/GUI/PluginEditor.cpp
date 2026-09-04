@@ -62,6 +62,7 @@ PluginEditor::~PluginEditor()
     pluginProcessor.setBankImportFolderPicker({});
     pluginProcessor.setBankImportConfirmGate({});
     pluginProcessor.setBankExportOverwriteConfirmGate({});
+    pluginProcessor.setBankPasteConfirmGate({});
     pluginProcessor.setBankTransferProgressPresenter({});
 
     pluginProcessor.getApvts().state.removeListener(this);

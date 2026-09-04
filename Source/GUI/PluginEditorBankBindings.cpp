@@ -17,6 +17,7 @@ void PluginEditor::wireBankTransferBindings()
     setBankImportFolderPickerBinding();
     setBankImportConfirmGateBinding();
     setBankExportOverwriteConfirmGateBinding();
+    setBankPasteConfirmGateBinding();
     wireBankTransferProgressPresenter();
 }
 
@@ -150,6 +151,28 @@ void PluginEditor::setBankExportOverwriteConfirmGateBinding()
         });
 }
 
+void PluginEditor::setBankPasteConfirmGateBinding()
+{
+    pluginProcessor.setBankPasteConfirmGate(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](int sourceBank, int targetBank) -> bool
+        {
+            if (! isMessageThread() || safeThis == nullptr)
+                return false;
+
+            namespace Dialog = PluginDisplayNames::Dialogs::BankPasteConfirm;
+
+            return showOrderedConfirmAlert({
+                       juce::MessageBoxIconType::WarningIcon,
+                       Dialog::kTitle,
+                       Dialog::formatBody(sourceBank, targetBank),
+                       Dialog::kCancel,
+                       Dialog::kContinue,
+                       safeThis.getComponent()
+                   })
+                   == 1;
+        });
+}
+
 void PluginEditor::wireBankTransferProgressPresenter()
 {
     Core::BankTransferProgressPresenter presenter;
@@ -167,11 +190,18 @@ void PluginEditor::configureBankTransferProgressShowAndUpdate(Core::BankTransfer
         int totalSteps,
         std::function<void()> onCancel)
     {
-        if (safeThis != nullptr)
-        {
-            safeThis->showBankTransferProgressDialog(
-                BankTransferProgressShowRequest { title, message, detail, totalSteps, std::move(onCancel) });
-        }
+        if (safeThis == nullptr)
+            return;
+
+        using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+        const auto layout = (title == juce::String(kExportTitle) || title == juce::String(kCopyTitle))
+            ? BankTransferProgressDialog::ContentLayout::SingleLane
+            : BankTransferProgressDialog::ContentLayout::DualLane;
+
+        safeThis->showBankTransferProgressDialog(
+            BankTransferProgressShowRequest {
+                title, message, detail, totalSteps, std::move(onCancel), layout });
     };
 
     presenter.update = [safeThis = juce::Component::SafePointer<PluginEditor>(this)](int completedSteps)

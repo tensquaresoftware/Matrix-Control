@@ -232,9 +232,11 @@ public:
     void setBankImportFolderPicker(PatchFolderPicker picker);
 
     using BankImportConfirmGate = std::function<bool()>;
+    using BankPasteConfirmGate = std::function<bool(int sourceBank, int targetBank)>;
 
     void setBankImportConfirmGate(BankImportConfirmGate gate);
     void setBankExportOverwriteConfirmGate(BankImportConfirmGate gate);
+    void setBankPasteConfirmGate(BankPasteConfirmGate gate);
     void setBankTransferProgressPresenter(Core::BankTransferProgressPresenter presenter);
 
     Core::PatchFileService& getPatchFileService() noexcept { return *patchFileService_; }
@@ -404,8 +406,11 @@ private:
     void initializeClipboardFeedbackProperties();
     void refreshClipboardFeedbackProperties();
     void armClipboardFeedbackSession();
+    void armBankCopyFeedbackPending();
+    void clearBankCopyFeedbackPending();
     void disarmClipboardFeedbackSession();
     void notifyClipboardCrossPatchReadyFromPatchLoad();
+    int getSelectedBankForClipboardTargets() const;
     void initializeMutatorRecipeState();
     void stripEphemeralMutatorStateForPersistence(juce::ValueTree& state);
     void resetEphemeralMutatorStateAfterSessionLoad();
@@ -451,6 +456,7 @@ private:
     std::unique_ptr<Core::ClipboardService> clipboardService_;
     bool clipboardFeedbackActive_ = false;
     bool clipboardFeedbackCrossPatchReady_ = false;
+    bool clipboardFeedbackBankCopyPending_ = false;
     Core::PatchLoadContext clipboardFeedbackOriginContext_;
 
     std::unique_ptr<Core::DirtyPatchTracker> dirtyPatchTracker_;

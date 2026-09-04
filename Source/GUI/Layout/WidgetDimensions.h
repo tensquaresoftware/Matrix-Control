@@ -11,7 +11,8 @@ struct ButtonDimensions
     int height;
 
     int patchManagerBankSelectWidth;
-    int patchManagerUnlockBankWidth;
+    int patchManagerCopyBankWidth;
+    int patchManagerPasteBankWidth;
     int patchManagerImportBankWidth;
     int patchManagerExportBankWidth;
 
@@ -161,7 +162,6 @@ struct NumberBoxDimensions
 struct LabelDimensions
 {
     int modulationBusNumberWidth;
-    int patchManagerSelectBankWidth;
     int patchMutatorWidth;
     int height;
 };

@@ -135,42 +135,36 @@ namespace PatchManagerActionHandlerTestSupport
 
     Core::ActionExecutionHooks HandlerHarness::makeHooks()
     {
-        return Core::ActionExecutionHooks{
-            [this](bool suppress) { suppressMatrixModSysEx = suppress; },
-            nullptr,
-            [this](bool suppress) { suppressPatchSysEx = suppress; },
-            nullptr,
-            nullptr,
-            [state = patchLoadHookState]() { state->invoked = true; },
-            nullptr,
-            [state = gateState](bool includeUnsavedEditWarning)
-            {
-                ++state->calls;
-                state->lastIncludeUnsavedEditWarning = includeUnsavedEditWarning;
-                return state->allow;
-            },
-            [state = dumpFakeState]() { return state->available; },
-            [state = dumpFakeState](juce::uint8 patchNumber,
-                                    Core::ActionExecutionHooks::DeviceDumpCallback onResult)
-            {
-                state->lastRequestedPatch = patchNumber;
-                if (state->deferCallback)
-                {
-                    state->pendingCallback = std::move(onResult);
-                    return;
-                }
-
-                if (onResult)
-                    onResult(state->response);
-            },
-            nullptr,
-            [this]()
-            {
-                proc.undoManager.clearUndoHistory();
-                handler.syncDirtySnapshotFromApvts();
-            },
-            nullptr
+        Core::ActionExecutionHooks hooks;
+        hooks.setSuppressMatrixModSysEx = [this](bool suppress) { suppressMatrixModSysEx = suppress; };
+        hooks.setSuppressPatchSysEx = [this](bool suppress) { suppressPatchSysEx = suppress; };
+        hooks.onPatchLoaded = [state = patchLoadHookState]() { state->invoked = true; };
+        hooks.confirmPatchContextChange = [state = gateState](bool includeUnsavedEditWarning)
+        {
+            ++state->calls;
+            state->lastIncludeUnsavedEditWarning = includeUnsavedEditWarning;
+            return state->allow;
         };
+        hooks.isDeviceDumpAvailable = [state = dumpFakeState]() { return state->available; };
+        hooks.requestDeviceDump = [state = dumpFakeState](juce::uint8 patchNumber,
+                                                          Core::ActionExecutionHooks::DeviceDumpCallback onResult)
+        {
+            state->lastRequestedPatch = patchNumber;
+            if (state->deferCallback)
+            {
+                state->pendingCallback = std::move(onResult);
+                return;
+            }
+
+            if (onResult)
+                onResult(state->response);
+        };
+        hooks.onEditorialCheckpoint = [this]()
+        {
+            proc.undoManager.clearUndoHistory();
+            handler.syncDirtySnapshotFromApvts();
+        };
+        return hooks;
     }
 
     void HandlerHarness::applyInitialHarnessState()

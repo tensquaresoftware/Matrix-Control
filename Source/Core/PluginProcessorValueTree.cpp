@@ -130,6 +130,12 @@ void PluginProcessor::valueTreePropertyChanged(juce::ValueTree& treeWhosePropert
     handleBankNumberChange(parameterId);
     handlePatchNumberChange(parameterId);
 
+    if (parameterId == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank)
+    {
+        refreshClipboardPasteEnabledProperties();
+        refreshClipboardFeedbackProperties();
+    }
+
     if (Core::ActionPropertyRegistry::isActionProperty(parameterId))
         actionDispatcher_->onActionPropertyChanged(parameterId, newValue);
 

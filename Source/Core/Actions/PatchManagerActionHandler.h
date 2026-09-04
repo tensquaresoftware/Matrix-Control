@@ -47,6 +47,7 @@ namespace Core
         // an ordered Cancel/Continue confirm gate for IMPORT. See BankTransferProgressPresenter.h
         // for the progress-modal presenter type shared with PluginProcessor.
         using BankImportConfirmGate = std::function<bool()>;
+        using BankPasteConfirmGate = std::function<bool(int sourceBank, int targetBank)>;
 
         struct Dependencies
         {
@@ -86,6 +87,7 @@ namespace Core
         void setBankImportFolderPicker(PatchFolderPicker picker);
         void setBankImportConfirmGate(BankImportConfirmGate gate);
         void setBankExportOverwriteConfirmGate(BankImportConfirmGate gate);
+        void setBankPasteConfirmGate(BankPasteConfirmGate gate);
         void setBankTransferProgressPresenter(BankTransferProgressPresenter presenter);
 
         void rescanPersistedComputerPatchesFolder();
@@ -172,9 +174,8 @@ namespace Core
         void noteStableComputerPatchesSelection(int selectedId);
         bool isDeviceDumpAvailable() const;
         void requestDeviceDump(juce::uint8 patchNumber, ActionExecutionHooks::DeviceDumpCallback onResult);
-        void handleUnlockBank(const DeviceMemoryLimits& limits);
         void markBanksLockedInApvts();
-        // Bank Utility EXPORT/IMPORT orchestration (live MIDI dump/write, cancellable).
+        // Bank Utility EXPORT/IMPORT/COPY/PASTE orchestration (live MIDI dump/write, cancellable).
         using PackedPatchBuffer = std::array<juce::uint8, PatchModel::kBufferSize>;
 
         void handleInternalPatchInit();
@@ -200,7 +201,6 @@ namespace Core
         bool tryHandleInitPasteStoreActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleComputerFileActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleBankTransferActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
-        bool tryHandleUnlockBankAction(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         void publishPasteNothingFooter();
         void publishPasteFailedFooter(const juce::String& sourceLabel, const juce::String& targetLabel);
         void publishPasteSuccessFooter(const juce::String& sourceLabel, const juce::String& targetLabel);
@@ -282,6 +282,7 @@ namespace Core
                                             const PackedPatchBuffer& writtenCurrentSlot);
         void schedulePostImportDeviceReload(const DeviceMemoryLimits& limits);
         void rememberOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed);
+        void rememberPasteOverlayForSlot(int destinationBank, int slot, const juce::uint8* packed);
         void restoreOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed);
 
         struct SelectedPatchFileResolution
@@ -342,7 +343,9 @@ namespace Core
             {
                 kNone,
                 kExport,
-                kImport
+                kImport,
+                kCopy,
+                kPaste
             };
 
             Kind kind = Kind::kNone;
@@ -352,6 +355,7 @@ namespace Core
             int completedSlots = 0;
             DeviceMemoryLimits limits { DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kUnknown) };
             int bank = 0;
+            int pasteSourceBank = -1;
             bool hasBankConcept = false;
 
             // EXPORT-only.
@@ -360,7 +364,7 @@ namespace Core
             juce::StringArray filesCreatedThisRun; // only paths that did not exist before this run
             bool createdTargetFolderThisRun = false;
 
-            // IMPORT-only.
+            // IMPORT / PASTE / COPY dump buffer.
             int importFoundCount = 0;
             int importValidCount = 0;
             int importWrittenCount = 0;
@@ -371,19 +375,54 @@ namespace Core
             juce::String pendingFooterSeverity;
         };
 
+        static bool isImportFamilyKind(BankTransferState::Kind kind) noexcept;
+        static bool isExportFamilyKind(BankTransferState::Kind kind) noexcept;
         bool isBankTransferBusy() const noexcept;
         int getSelectedBankForTransfer(const DeviceMemoryLimits& limits) const;
         void handleBankExport(const DeviceMemoryLimits& limits);
         void handleBankImport(const DeviceMemoryLimits& limits);
+        void handleBankCopy(const DeviceMemoryLimits& limits);
+        void restoreBankCopyFeedbackAfterConfirmCancel();
+        void handleBankPaste(const DeviceMemoryLimits& limits);
+        bool validateBankCopyPrerequisites(const DeviceMemoryLimits& limits);
+        void initializeBankCopyState(const DeviceMemoryLimits& limits, int bank);
+        bool showBankCopyProgress(std::uint64_t generation, int bank);
+        void beginBankCopyDumpLoop(std::uint64_t generation, const DeviceMemoryLimits& limits, int bank);
+        void commitCopiedBankToClipboard();
+        bool processCopyDumpSlot(int slot, std::uint64_t generation, std::vector<juce::uint8> dump);
+        bool validateBankPastePrerequisites(const DeviceMemoryLimits& limits, int targetBank);
+        bool prepareBankPastePatches(int sourceBank, int targetBank, const DeviceMemoryLimits& limits);
+        bool showBankPasteProgress(std::uint64_t generation, int targetBank);
+        void beginBankPasteWriteLoop(std::uint64_t generation, const DeviceMemoryLimits& limits, int targetBank);
         void exportNextSlot(int slot, std::uint64_t generation);
         void finishBankExport(bool success, const juce::String& footerMessage, const juce::String& severity);
+        void copyNextSlot(int slot, std::uint64_t generation);
+        void refreshBankCopyFeedbackAfterFinish(bool success);
+        void finishBankCopy(bool success, const juce::String& footerMessage, const juce::String& severity);
         void beginBankImportSnapshot(std::uint64_t generation);
         void snapshotNextImportSlot(int slot, std::uint64_t generation);
         void beginBankImportWrite(std::uint64_t generation);
+        void showImportFamilyWriteProgress();
         void writeNextImportSlot(int slot, std::uint64_t generation);
+        juce::String bankImportFamilyCancelMessage() const;
+        juce::String bankImportFamilyRestoreFailedMessage() const;
+        juce::String bankImportFamilyRestoringProgressMessage() const;
+        void showBankImportRestoreProgress();
+        void finishImportFamilyWriteSuccess();
         void beginBankImportRestore(std::uint64_t generation, const juce::String& footerMessage, const juce::String& severity);
         void restoreNextSnapshotSlot(int slot, std::uint64_t generation);
         void finishBankImport(const juce::String& footerMessage, const juce::String& severity);
+        struct BankImportFinishContext
+        {
+            DeviceMemoryLimits limits { DeviceMemoryLimits::resolve(MatrixDeviceTypes::Type::kUnknown) };
+            int importedBank = 0;
+            int currentPatch = 0;
+            bool importSucceeded = false;
+            bool wasPaste = false;
+            bool deviceMayHaveChanged = false;
+            std::optional<PackedPatchBuffer> writtenCurrentSlot;
+        };
+        void applyBankImportFinishSideEffects(const BankImportFinishContext& context);
         void requestBankTransferCancel(std::uint64_t generation);
         void publishBankTransferFooter(const juce::String& message, const juce::String& severity);
         int bankTransferWriteDelayMs() const;
@@ -406,6 +445,7 @@ namespace Core
         PatchFolderPicker bankImportFolderPicker_;
         BankImportConfirmGate bankImportConfirmGate_;
         BankImportConfirmGate bankExportOverwriteConfirmGate_;
+        BankPasteConfirmGate bankPasteConfirmGate_;
         BankTransferProgressPresenter bankTransferProgress_;
         PatchNameOverlayStore patchNameOverlay_;
         bool patchNameOverlayLoaded_ = false;

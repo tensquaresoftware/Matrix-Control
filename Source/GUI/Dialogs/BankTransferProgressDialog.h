@@ -9,17 +9,17 @@ namespace TSS
     class ISkin;
 }
 
-// Blocking modal overlay for Bank Utility EXPORT/IMPORT.
-// Export uses a destination-folder + single progress lane layout.
-// Import always shows both lanes at fixed height: primary (safety snapshot) active first,
-// secondary (write/restore) grayed until beginSecondaryPhase activates it.
+// Blocking modal overlay for Bank Utility EXPORT / IMPORT / COPY / PASTE.
+// Export and COPY use a single progress lane; Import and PASTE use dual lanes.
+// Detail placement: EXPORT / PASTE keep detail above progress; COPY / IMPORT put
+// detail below progress so top-to-bottom reading matches the transfer flow.
 class BankTransferProgressDialog : public juce::Component
 {
 public:
     enum class ContentLayout
     {
-        Export,
-        Import
+        SingleLane, // EXPORT / COPY
+        DualLane    // IMPORT / PASTE
     };
 
     static constexpr int kDesignWidth = 420;
@@ -39,12 +39,12 @@ public:
         juce::String detail;
         int totalSteps = 1;
         std::function<void()> onCancelRequested;
-        ContentLayout layout = ContentLayout::Import;
+        ContentLayout layout = ContentLayout::DualLane;
     };
 
     void prepareForShow(PrepareForShowArgs args);
 
-    // Activates the secondary lane (import write / restore) and starts its progress at 0.
+    // Activates the secondary lane (import/paste write / restore) and starts its progress at 0.
     void beginSecondaryPhase(const juce::String& message, int totalSteps);
 
     // Updates the active lane (primary until secondary is active, then secondary).
@@ -68,12 +68,12 @@ private:
                           juce::Rectangle<int> bounds,
                           float fraction,
                           bool enabled) const;
-    // Shared folder block: label, path, then 1em before the next section.
-    // Caller supplies a body that already starts 1em below the title (no extra top gap here).
-    juce::Rectangle<int> paintFolderHeader(juce::Graphics& g,
+    // Shared detail block: folder ops keep label + path on two lines; COPY/PASTE use one line.
+    // When above progress: trailing 1em gap. When below: leading 1em gap.
+    juce::Rectangle<int> paintDetailHeader(juce::Graphics& g,
                                            juce::Rectangle<int> body,
                                            const juce::Font& bodyFont,
-                                           const juce::String& folderLabel) const;
+                                           bool belowProgress) const;
     struct PhaseLanePaintArgs
     {
         juce::Rectangle<int>& body;
@@ -85,13 +85,20 @@ private:
     };
 
     void paintPhaseLane(juce::Graphics& g, const PhaseLanePaintArgs& args) const;
-    void paintExportBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
-    void paintImportBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
+    void paintSingleLaneBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
+    void paintDualLaneBody(juce::Graphics& g, juce::Rectangle<int> body, const juce::Font& bodyFont) const;
+    void applyOperationPresentationFromTitle();
 
     std::function<void()> onCancelRequested_;
     TSS::ISkin* skin_;
-    ContentLayout contentLayout_ = ContentLayout::Import;
+    ContentLayout contentLayout_ = ContentLayout::DualLane;
+    // COPY / IMPORT: progress first, then detail (read then destination/source).
+    // EXPORT / PASTE: detail first, then progress (matches their flow).
+    bool detailBelowProgress_ = false;
+    // COPY / PASTE: "Source : Clipboard" on one line. EXPORT / IMPORT: label then path.
+    bool detailInline_ = false;
     juce::String title_;
+    juce::String headerLabel_;
     juce::String detail_;
 
     juce::String primaryMessage_;

@@ -212,22 +212,6 @@ namespace Core
 
         if (tryHandleBankTransferActions(propertyId, limits))
             return;
-
-        tryHandleUnlockBankAction(propertyId, limits);
-    }
-
-    void PatchManagerActionHandler::handleUnlockBank(const DeviceMemoryLimits& limits)
-    {
-        if (! limits.hasBankConcept())
-            return;
-
-        if (patchSelectionMidiSync_ != nullptr)
-            patchSelectionMidiSync_->sendUnlockBank(limits);
-
-        apvts_.state.setProperty(
-            PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kBanksLocked,
-            false,
-            nullptr);
     }
 
     void PatchManagerActionHandler::markBanksLockedInApvts()
@@ -471,16 +455,23 @@ namespace Core
         if (midiManager_ != nullptr)
             midiManager_->cancelPendingSysExRequest();
 
-        if (bankTransfer_.kind == BankTransferState::Kind::kExport)
+        if (bankTransfer_.kind == BankTransferState::Kind::kExport
+            || bankTransfer_.kind == BankTransferState::Kind::kCopy)
         {
-            finishBankExport(false, kExportCancelledFooterMessage, "warning");
+            if (bankTransfer_.kind == BankTransferState::Kind::kCopy)
+                finishBankCopy(false, kCopyCancelledFooterMessage, "warning");
+            else
+                finishBankExport(false, kExportCancelledFooterMessage, "warning");
             return;
         }
 
         if (bankTransfer_.importWrittenCount > 0)
             return;
 
-        finishBankImport(kImportCancelledFooterMessage, "warning");
+        const auto cancelMessage = bankTransfer_.kind == BankTransferState::Kind::kPaste
+            ? juce::String(kPasteCancelledFooterMessage)
+            : juce::String(kImportCancelledFooterMessage);
+        finishBankImport(cancelMessage, "warning");
     }
 
     int PatchManagerActionHandler::getSelectedBankForTransfer(const DeviceMemoryLimits& limits) const

@@ -5,6 +5,7 @@
 #include "Core/MIDI/Queue/MidiRequestTiming.h"
 #include "Core/Models/ApvtsPatchMapper.h"
 #include "Core/Models/PatchModel.h"
+#include "Core/Services/Matrix1000FactoryPatchNames.h"
 #include "Core/Services/PatchFileNameSanitizer.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
@@ -13,36 +14,50 @@ namespace BankFooterMessages = PluginDisplayNames::PatchManagerSection::BankUtil
 namespace Core
 {
 
-    void PatchManagerActionHandler::beginBankImportWrite(std::uint64_t generation)
+    void PatchManagerActionHandler::showImportFamilyWriteProgress()
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
         using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
 
-        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+        const auto writingMessage = bankTransfer_.kind == BankTransferState::Kind::kPaste
+            ? formatPasteWritingMessage(bankTransfer_.bank)
+            : juce::String(kImportingWritingMessage);
+
+        if (bankTransferProgress_.beginSecondaryPhase)
+        {
+            bankTransferProgress_.beginSecondaryPhase(writingMessage, bankTransfer_.importValidCount);
+            return;
+        }
+
+        if (bankTransferProgress_.setMessage)
+            bankTransferProgress_.setMessage(writingMessage);
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(0);
+    }
+
+    void PatchManagerActionHandler::beginBankImportWrite(std::uint64_t generation)
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
             return;
 
         if (bankTransfer_.cancelRequested)
         {
-            finishBankImport(kImportCancelledFooterMessage, "warning");
+            finishBankImport(bankImportFamilyCancelMessage(), "warning");
             return;
         }
 
         bankTransfer_.completedSlots = 0;
         bankTransfer_.importWrittenCount = 0;
 
-        if (bankTransferProgress_.beginSecondaryPhase)
+        if (bankTransfer_.kind == BankTransferState::Kind::kPaste
+            && ! bankTransfer_.limits.isRomBank(bankTransfer_.pasteSourceBank))
         {
-            bankTransferProgress_.beginSecondaryPhase(
-                juce::String(kImportingWritingMessage),
-                bankTransfer_.importValidCount);
-        }
-        else if (bankTransferProgress_.setMessage)
-        {
-            bankTransferProgress_.setMessage(juce::String(kImportingWritingMessage));
-            if (bankTransferProgress_.update)
-                bankTransferProgress_.update(0);
+            loadPatchNameOverlayFromApvts();
         }
 
+        showImportFamilyWriteProgress();
         writeNextImportSlot(0, generation);
     }
 
@@ -52,6 +67,33 @@ namespace Core
         imported.loadFrom(packed);
         imported.normalizeNameEncoding();
         rememberOverlayName(bank, slot, imported.getName());
+    }
+
+    void PatchManagerActionHandler::rememberPasteOverlayForSlot(int destinationBank,
+                                                                int slot,
+                                                                const juce::uint8* packed)
+    {
+        const int sourceBank = bankTransfer_.pasteSourceBank;
+        if (bankTransfer_.limits.isRomBank(sourceBank))
+        {
+            const auto factoryName = Matrix1000FactoryPatchNames::nameFor(sourceBank, slot);
+            if (factoryName.isNotEmpty())
+            {
+                rememberOverlayName(destinationBank, slot, factoryName);
+                return;
+            }
+        }
+        else
+        {
+            const auto sourceOverlay = patchNameOverlay_.lookup(sourceBank, slot);
+            if (sourceOverlay.isNotEmpty())
+            {
+                rememberOverlayName(destinationBank, slot, sourceOverlay);
+                return;
+            }
+        }
+
+        rememberOverlayFromPackedSlot(destinationBank, slot, packed);
     }
 
     void PatchManagerActionHandler::restoreOverlayFromPackedSlot(int bank, int slot, const juce::uint8* packed)
@@ -72,16 +114,81 @@ namespace Core
         persistPatchNameOverlayToApvts();
     }
 
+    juce::String PatchManagerActionHandler::bankImportFamilyCancelMessage() const
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        return bankTransfer_.kind == BankTransferState::Kind::kPaste
+            ? juce::String(kPasteCancelledFooterMessage)
+            : juce::String(kImportCancelledFooterMessage);
+    }
+
+    juce::String PatchManagerActionHandler::bankImportFamilyRestoreFailedMessage() const
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+
+        return bankTransfer_.kind == BankTransferState::Kind::kPaste
+            ? juce::String(kPasteRestoreFailedFooterMessage)
+            : juce::String(kImportRestoreFailedFooterMessage);
+    }
+
+    juce::String PatchManagerActionHandler::bankImportFamilyRestoringProgressMessage() const
+    {
+        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
+        using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
+
+        return bankTransfer_.kind == BankTransferState::Kind::kPaste
+            ? formatPasteRestoringMessage(bankTransfer_.bank)
+            : juce::String(kImportingRestoringMessage);
+    }
+
+    void PatchManagerActionHandler::showBankImportRestoreProgress()
+    {
+        const auto restoringMessage = bankImportFamilyRestoringProgressMessage();
+        const int totalSteps = juce::jmax(1, static_cast<int>(bankTransfer_.deviceSnapshot.size()));
+
+        if (bankTransferProgress_.beginSecondaryPhase)
+        {
+            bankTransferProgress_.beginSecondaryPhase(restoringMessage, totalSteps);
+            return;
+        }
+
+        if (bankTransferProgress_.setMessage)
+            bankTransferProgress_.setMessage(restoringMessage);
+        if (bankTransferProgress_.update)
+            bankTransferProgress_.update(0);
+    }
+
+    void PatchManagerActionHandler::finishImportFamilyWriteSuccess()
+    {
+        if (bankTransfer_.kind == BankTransferState::Kind::kPaste)
+        {
+            finishBankImport(
+                BankFooterMessages::formatPasteSuccess(
+                    bankTransfer_.pasteSourceBank,
+                    bankTransfer_.bank),
+                "info");
+            return;
+        }
+
+        finishBankImport(
+            BankFooterMessages::formatImportSuccess(
+                bankTransfer_.importFoundCount,
+                bankTransfer_.importValidCount,
+                bankTransfer_.importWrittenCount),
+            "info");
+    }
+
     void PatchManagerActionHandler::writeNextImportSlot(int slot, std::uint64_t generation)
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
             return;
 
         if (bankTransfer_.cancelRequested)
         {
-            beginBankImportRestore(generation, kImportCancelledFooterMessage, "warning");
+            beginBankImportRestore(generation, bankImportFamilyCancelMessage(), "warning");
             return;
         }
 
@@ -93,18 +200,16 @@ namespace Core
 
         if (slot >= bankTransfer_.importValidCount)
         {
-            finishBankImport(
-                BankFooterMessages::formatImportSuccess(
-                    bankTransfer_.importFoundCount,
-                    bankTransfer_.importValidCount,
-                    bankTransfer_.importWrittenCount),
-                "info");
+            finishImportFamilyWriteSuccess();
             return;
         }
 
         const auto* packed = bankTransfer_.importPatches[static_cast<size_t>(slot)].data();
         midiManager_->sendPatch(static_cast<juce::uint8>(slot), packed);
-        rememberOverlayFromPackedSlot(bankTransfer_.bank, slot, packed);
+        if (bankTransfer_.kind == BankTransferState::Kind::kPaste)
+            rememberPasteOverlayForSlot(bankTransfer_.bank, slot, packed);
+        else
+            rememberOverlayFromPackedSlot(bankTransfer_.bank, slot, packed);
 
         ++bankTransfer_.importWrittenCount;
         bankTransfer_.completedSlots = slot + 1;
@@ -124,10 +229,7 @@ namespace Core
                                                            const juce::String& footerMessage,
                                                            const juce::String& severity)
     {
-        using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
-        using namespace PluginDisplayNames::Dialogs::BankTransferProgress;
-
-        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
             return;
 
         if (bankTransfer_.deviceSnapshot.empty())
@@ -138,7 +240,7 @@ namespace Core
 
         if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
         {
-            finishBankImport(kImportRestoreFailedFooterMessage, "warning");
+            finishBankImport(bankImportFamilyRestoreFailedMessage(), "warning");
             return;
         }
 
@@ -150,20 +252,7 @@ namespace Core
         if (bankTransferProgress_.setCancelEnabled)
             bankTransferProgress_.setCancelEnabled(false);
 
-        if (bankTransferProgress_.beginSecondaryPhase)
-        {
-            bankTransferProgress_.beginSecondaryPhase(
-                juce::String(kImportingRestoringMessage),
-                juce::jmax(1, static_cast<int>(bankTransfer_.deviceSnapshot.size())));
-        }
-        else
-        {
-            if (bankTransferProgress_.setMessage)
-                bankTransferProgress_.setMessage(juce::String(kImportingRestoringMessage));
-            if (bankTransferProgress_.update)
-                bankTransferProgress_.update(0);
-        }
-
+        showBankImportRestoreProgress();
         restoreNextSnapshotSlot(0, generation);
     }
 
@@ -171,7 +260,7 @@ namespace Core
     {
         using namespace PluginDisplayNames::PatchManagerSection::BankUtilityModule;
 
-        if (bankTransfer_.kind != BankTransferState::Kind::kImport || bankTransfer_.generation != generation)
+        if (! isImportFamilyKind(bankTransfer_.kind) || bankTransfer_.generation != generation)
             return;
 
         if (slot >= static_cast<int>(bankTransfer_.deviceSnapshot.size()))
@@ -182,7 +271,7 @@ namespace Core
 
         if (midiManager_ == nullptr || ! midiManager_->isEditorOutboundAllowed())
         {
-            finishBankImport(kImportRestoreFailedFooterMessage, "warning");
+            finishBankImport(bankImportFamilyRestoreFailedMessage(), "warning");
             return;
         }
 
@@ -261,32 +350,44 @@ namespace Core
         return bankTransfer_.importPatches[static_cast<size_t>(currentPatch)];
     }
 
+    void PatchManagerActionHandler::applyBankImportFinishSideEffects(const BankImportFinishContext& context)
+    {
+        if (context.wasPaste && context.importSucceeded && hooks_.disarmClipboardFeedback)
+            hooks_.disarmClipboardFeedback();
+        if (hooks_.refreshClipboardMirrors)
+            hooks_.refreshClipboardMirrors();
+        if (context.writtenCurrentSlot.has_value())
+        {
+            applyWrittenImportSlotToEditor(context.limits,
+                                           context.importedBank,
+                                           context.currentPatch,
+                                           *context.writtenCurrentSlot);
+        }
+        if (context.deviceMayHaveChanged && isDeviceDumpAvailable())
+            schedulePostImportDeviceReload(context.limits);
+    }
+
     void PatchManagerActionHandler::finishBankImport(const juce::String& footerMessage,
                                                      const juce::String& severity)
     {
         if (bankTransferProgress_.hide)
             bankTransferProgress_.hide();
 
-        const auto limits = bankTransfer_.limits;
-        const int importedBank = bankTransfer_.bank;
-        const int currentPatch = getCurrentPatch(limits);
-        const bool importSucceeded = severity == "info";
-        const bool deviceMayHaveChanged = importSucceeded
+        BankImportFinishContext context;
+        context.limits = bankTransfer_.limits;
+        context.importedBank = bankTransfer_.bank;
+        context.currentPatch = getCurrentPatch(context.limits);
+        context.importSucceeded = severity == "info";
+        context.wasPaste = bankTransfer_.kind == BankTransferState::Kind::kPaste;
+        context.deviceMayHaveChanged = context.importSucceeded
             || bankTransfer_.isRestoring
             || bankTransfer_.importWrittenCount > 0;
-
-        const auto writtenCurrentSlot = takeWrittenCurrentImportSlot(importSucceeded, currentPatch);
+        context.writtenCurrentSlot = takeWrittenCurrentImportSlot(
+            context.importSucceeded, context.currentPatch);
 
         bankTransfer_ = BankTransferState {};
         publishBankTransferFooter(footerMessage, severity);
-
-        if (writtenCurrentSlot.has_value())
-            applyWrittenImportSlotToEditor(limits, importedBank, currentPatch, *writtenCurrentSlot);
-
-        if (! deviceMayHaveChanged || ! isDeviceDumpAvailable())
-            return;
-
-        schedulePostImportDeviceReload(limits);
+        applyBankImportFinishSideEffects(context);
     }
 
 } // namespace Core

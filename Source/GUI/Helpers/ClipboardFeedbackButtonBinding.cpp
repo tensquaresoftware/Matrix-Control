@@ -34,6 +34,7 @@ void ClipboardFeedbackButtonBinding::valueTreePropertyChanged(juce::ValueTree&,
         || name == PluginIDs::ClipboardFeedback::kCopyLit
         || name == rolePropertyId_
         || name.endsWith("PasteEnabled")
+        || name.endsWith("PasteBankEnabled")
         || name == PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatchEnabled)
     {
         apply();

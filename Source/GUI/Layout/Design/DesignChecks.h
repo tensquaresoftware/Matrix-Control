@@ -60,6 +60,15 @@ namespace TSS::Design
         "Matrix mod section header action column (D-095)");
 
     static_assert(Recipes::BankUtilityModule::kHeight == 76, "Bank utility module height");
+    static_assert(Recipes::BankUtilityModule::kSelectorWidth == 156, "Bank utility selector width");
+    static_assert(Recipes::BankUtilityModule::kUtilityWidth == 96, "Bank utility utility width");
+    static_assert(Recipes::BankUtilityModule::kSelectorToUtilityGap == 16, "Bank utility selector-utility gap");
+    static_assert(Recipes::BankUtilityModule::kContentWidth == 268, "Bank utility content width");
+    static_assert(Atoms::Widths::Button::kPatchManagerBankSelect == 28, "Bank select button width");
+    static_assert(Atoms::Widths::Button::kPatchManagerCopyBank == 44, "Bank COPY button width");
+    static_assert(Atoms::Widths::Button::kPatchManagerPasteBank == 44, "Bank PASTE button width");
+    static_assert(Atoms::Widths::Button::kPatchManagerImportBank == 48, "Bank IMPORT button width");
+    static_assert(Atoms::Widths::Button::kPatchManagerExportBank == 48, "Bank EXPORT button width");
     static_assert(Recipes::InternalPatchesModule::kHeight == 76, "Internal patches module height");
     static_assert(Recipes::ComputerPatchesModule::kHeight == 76, "Computer patches module height");
     static_assert(Recipes::PatchMutatorModule::kHeight == 100, "Patch mutator module height");

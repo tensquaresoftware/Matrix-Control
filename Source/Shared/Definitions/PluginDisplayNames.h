@@ -212,6 +212,20 @@ namespace PluginDisplayNames
             constexpr const char* kContinue = "Continue";
         }
 
+        namespace BankPasteConfirm
+        {
+            constexpr const char* kTitle = "Paste bank?";
+            constexpr const char* kCancel   = "Cancel";
+            constexpr const char* kContinue = "Continue";
+
+            inline juce::String formatBody(int sourceBank, int targetBank)
+            {
+                return "This overwrites all 100 patches in bank " + juce::String(targetBank)
+                    + " with the copied bank " + juce::String(sourceBank) + ".\n\n"
+                    + "Continue to paste, or Cancel to keep the device unchanged.";
+            }
+        }
+
         namespace BankExportOverwriteConfirm
         {
             constexpr const char* kTitle = "Replace export folder?";
@@ -228,9 +242,14 @@ namespace PluginDisplayNames
         {
             constexpr const char* kExportTitle = "EXPORTING BANK TO DISK";
             constexpr const char* kImportTitle = "IMPORTING BANK";
+            constexpr const char* kCopyTitle   = "COPYING BANK";
+            constexpr const char* kPasteTitle  = "PASTING BANK";
             constexpr const char* kCancel      = "CANCEL";
             constexpr const char* kDestinationFolderLabel = "Destination folder :";
             constexpr const char* kSourceFolderLabel = "Source folder :";
+            constexpr const char* kDestinationLabel = "Destination :";
+            constexpr const char* kSourceLabel = "Source :";
+            constexpr const char* kClipboardLabel = "Clipboard";
 
             inline juce::String formatExportProgressMessage(int bank)
             {
@@ -240,6 +259,26 @@ namespace PluginDisplayNames
             inline juce::String formatExportProgressMessageNoBank()
             {
                 return "Exporting patches :";
+            }
+
+            inline juce::String formatCopyProgressMessage(int bank)
+            {
+                return "Reading source bank " + juce::String(bank) + " into clipboard :";
+            }
+
+            inline juce::String formatPasteSafetyCopyMessage(int destinationBank)
+            {
+                return "Saving safety copy of destination bank " + juce::String(destinationBank) + " :";
+            }
+
+            inline juce::String formatPasteWritingMessage(int destinationBank)
+            {
+                return "Writing clipboard into destination bank " + juce::String(destinationBank) + " :";
+            }
+
+            inline juce::String formatPasteRestoringMessage(int destinationBank)
+            {
+                return "Cancelling - restoring destination bank " + juce::String(destinationBank) + " :";
             }
         }
     }
@@ -973,29 +1012,40 @@ namespace PluginDisplayNames
         namespace BankUtilityModule
         {
             constexpr const char* kName = "BANK UTILITY";
-            constexpr const char* kUnlockBankFooterMessage =
-                "Synth bank lock released - use front panel for 3-digit entry; plugin bank/patch unchanged.";
             constexpr const char* kMatrix6ExportFolderName = "PATCHES";
             constexpr const char* kImportRomBlockedFooterMessage =
                 "Import is only available on Matrix-1000 RAM banks 0 and 1.";
+            constexpr const char* kPasteRomBlockedFooterMessage =
+                "Paste is only available on Matrix-1000 RAM banks 0 and 1.";
+            constexpr const char* kPasteClipboardFailedFooterMessage =
+                "Bank paste failed - clipboard contents could not be read.";
+            constexpr const char* kBankTransferBusyFooterMessage =
+                "Bank transfer in progress - wait for it to finish.";
             constexpr const char* kDeviceUnavailableFooterMessage =
                 "Bank transfer requires a connected, supported Matrix device.";
             constexpr const char* kSnapshotFailedFooterMessage =
                 "Could not read the current bank from the device - import aborted, nothing was written.";
+            constexpr const char* kPasteSnapshotFailedFooterMessage =
+                "Could not read the current bank from the device - paste aborted, nothing was written.";
             constexpr const char* kExportCancelledFooterMessage = "Export cancelled - no files kept for this run.";
             constexpr const char* kImportCancelledFooterMessage = "Import cancelled - device restored to its prior state.";
+            constexpr const char* kCopyCancelledFooterMessage = "Bank copy cancelled - clipboard unchanged.";
+            constexpr const char* kCopyFailedFooterMessage =
+                "Bank copy failed - clipboard unchanged. Check the connection and try again.";
+            constexpr const char* kPasteCancelledFooterMessage = "Paste cancelled - device restored to its prior state.";
             constexpr const char* kFolderNotWritableFooterMessage = "Could not create or write to the export folder.";
             constexpr const char* kImportRestoreFailedFooterMessage =
                 "Import cancelled - the device could not be fully restored. Check the connection and try again.";
+            constexpr const char* kPasteRestoreFailedFooterMessage =
+                "Paste cancelled - the device could not be fully restored. Check the connection and try again.";
             constexpr const char* kExportingMessage = "Exporting bank to disk...";
             constexpr const char* kImportingReadingMessage = "Reading bank safety copy from device :";
             constexpr const char* kImportingWritingMessage = "Writing patches to the device :";
             constexpr const char* kImportingRestoringMessage = "Cancelling - restoring device :";
+            constexpr const char* kPastingWritingMessage = "Writing clipboard into destination bank :";
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kBankSelector = "SELECT BANK";
-                constexpr const char* kUnlockBank   = "UNLOCK";
                 constexpr const char* kSelectBank0  = "0";
                 constexpr const char* kSelectBank1  = "1";
                 constexpr const char* kSelectBank2  = "2";
@@ -1006,6 +1056,8 @@ namespace PluginDisplayNames
                 constexpr const char* kSelectBank7  = "7";
                 constexpr const char* kSelectBank8  = "8";
                 constexpr const char* kSelectBank9  = "9";
+                constexpr const char* kCopyBank     = "COPY";
+                constexpr const char* kPasteBank    = "PASTE";
                 constexpr const char* kImportBank   = "IMPORT";
                 constexpr const char* kExportBank   = "EXPORT";
             }
@@ -1034,6 +1086,17 @@ namespace PluginDisplayNames
                 inline juce::String formatImportNoValidFiles(int found)
                 {
                     return "No valid .syx files to import (found " + juce::String(found) + ")";
+                }
+
+                inline juce::String formatCopySuccess(int bank)
+                {
+                    return "Bank " + juce::String(bank) + " copied to clipboard.";
+                }
+
+                inline juce::String formatPasteSuccess(int sourceBank, int targetBank)
+                {
+                    return "Bank " + juce::String(sourceBank) + " pasted to bank "
+                        + juce::String(targetBank) + ".";
                 }
             }
         }

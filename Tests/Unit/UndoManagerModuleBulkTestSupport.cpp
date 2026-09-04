@@ -116,20 +116,13 @@ juce::String resolveParameterIdFromTree(juce::ValueTree& tree, const juce::Ident
 Core::ActionExecutionHooks makeBulkUndoHooks(ModuleBulkUndoHarnessBase& harness,
                                              juce::UndoManager& undoManager)
 {
-    return Core::ActionExecutionHooks{
-        nullptr,
-        nullptr,
-        [&harness](bool suppress) { harness.suppressPatchSysEx = suppress; },
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        [&undoManager](const juce::String& name) { undoManager.beginNewTransaction(name); }};
+    Core::ActionExecutionHooks hooks;
+    hooks.setSuppressPatchSysEx = [&harness](bool suppress) { harness.suppressPatchSysEx = suppress; };
+    hooks.beginEditorialTransaction = [&undoManager](const juce::String& name)
+    {
+        undoManager.beginNewTransaction(name);
+    };
+    return hooks;
 }
 
 } // namespace

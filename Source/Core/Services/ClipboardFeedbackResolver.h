@@ -18,6 +18,7 @@ namespace Core
         bool lfo2Copy = false;
         bool matrixModulationCopy = false;
         bool internalPatchesCopy = false;
+        bool bankUtilityCopy = false;
 
         bool dco1Paste = false;
         bool dco2Paste = false;
@@ -28,10 +29,23 @@ namespace Core
         bool lfo2Paste = false;
         bool matrixModulationPaste = false;
         bool internalPatchesPaste = false;
+        bool bankUtilityPaste = false;
+    };
+
+    struct ClipboardFeedbackResolveArgs
+    {
+        const ClipboardService& clipboard;
+        bool sessionActive = false;
+        bool crossPatchReady = false;
+        // COPY blink starts on click before the MIDI dump finishes (clipboard unchanged).
+        bool bankCopyPending = false;
+        int selectedBank = -1;
+        bool selectedBankPasteAllowed = false;
     };
 
     // Session flags are owned by PluginProcessor: active arms blink; crossPatchReady
     // unlocks Matrix/FullPatch paste-target blink after a later patch load.
+    ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardFeedbackResolveArgs& args) noexcept;
     ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardService& clipboard,
                                                          bool sessionActive,
                                                          bool crossPatchReady) noexcept;
