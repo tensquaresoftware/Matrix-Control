@@ -35,6 +35,9 @@ private:
         const auto suffix = juce::String(MATRIX_CONTROL_PRERELEASE_SUFFIX).unquoted();
         if (suffix.isNotEmpty())
             expect(version.endsWith("-" + suffix), "Version string should include prerelease suffix");
+
+        // Pin the display string so a forgotten CMake version bump fails the suite.
+        expectEquals(version, juce::String("0.2.0-alpha"));
     }
 
     void testReleaseDateStringFormat()

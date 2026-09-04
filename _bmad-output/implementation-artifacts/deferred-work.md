@@ -1305,3 +1305,11 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-playability-unit-tests.md`
   summary: Oracle skips VCA2 floor when any live MM→VCA2 exists, without checking opener amount adequacy.
   evidence: Edge hunter on checkAmplitudePath / matrixModDrivesVca2Volume; production openers usually repair this, but oracle gap remains.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-version-0-2-0-alpha-and-ci-green.md`
+  summary: User manual still declares Version-Produit 0.1.2-alpha after product SSOT moved to 0.2.0-alpha.
+  evidence: Documentation/User/manuel-utilisateur.md front matter not in this story's Always; docs drift surfaced in review.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-version-0-2-0-alpha-and-ci-green.md`
+  summary: Standalone getApplicationVersion may show bare CMake version (0.2.0) while About shows PluginVersion with alpha suffix.
+  evidence: Dual version surfaces pre-exist; About path was the story scope only.
