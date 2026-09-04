@@ -557,7 +557,6 @@ namespace PluginIDs
 
             namespace StandaloneWidgets
             {
-                constexpr const char* kUnlockBank  = "bankUtilityUnlockBank";
                 constexpr const char* kSelectBank0 = "bankUtilitySelectBank0";
                 constexpr const char* kSelectBank1 = "bankUtilitySelectBank1";
                 constexpr const char* kSelectBank2 = "bankUtilitySelectBank2";
@@ -568,6 +567,9 @@ namespace PluginIDs
                 constexpr const char* kSelectBank7 = "bankUtilitySelectBank7";
                 constexpr const char* kSelectBank8 = "bankUtilitySelectBank8";
                 constexpr const char* kSelectBank9 = "bankUtilitySelectBank9";
+                constexpr const char* kCopyBank    = "bankUtilityCopyBank";
+                constexpr const char* kPasteBank   = "bankUtilityPasteBank";
+                constexpr const char* kPasteBankEnabled = "bankUtilityPasteBankEnabled";
                 constexpr const char* kImportBank  = "bankUtilityImportBank";
                 constexpr const char* kExportBank  = "bankUtilityExportBank";
             }
@@ -702,6 +704,7 @@ namespace PluginIDs
         constexpr const char* kLfo2Copy = "lfo2CopyFeedback";
         constexpr const char* kMatrixModulationCopy = "matrixModulationCopyFeedback";
         constexpr const char* kInternalPatchesCopy  = "internalPatchesCopyFeedback";
+        constexpr const char* kBankUtilityCopy      = "bankUtilityCopyFeedback";
 
         constexpr const char* kDco1Paste = "dco1PasteFeedback";
         constexpr const char* kDco2Paste = "dco2PasteFeedback";
@@ -712,5 +715,6 @@ namespace PluginIDs
         constexpr const char* kLfo2Paste = "lfo2PasteFeedback";
         constexpr const char* kMatrixModulationPaste = "matrixModulationPasteFeedback";
         constexpr const char* kInternalPatchesPaste  = "internalPatchesPasteFeedback";
+        constexpr const char* kBankUtilityPaste      = "bankUtilityPasteFeedback";
     }
 }

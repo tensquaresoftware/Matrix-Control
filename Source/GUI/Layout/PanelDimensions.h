@@ -117,9 +117,9 @@ struct BankUtilityPanelDimensions
     int width;
     int height;
     ModuleHeaderDimensions moduleHeader;
-    LabelDimensions bankSelectorLabel;
     ButtonDimensions buttons;
     PatchManagerModuleLayoutDimensions layout;
+    int selectorToUtilityGap;
 };
 
 struct InternalPatchesPanelDimensions

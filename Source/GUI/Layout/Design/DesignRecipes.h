@@ -75,8 +75,17 @@ namespace TSS::Design
         namespace BankUtilityModule
         {
             inline constexpr int kContentRowCount = 2;
+            inline constexpr int kBankButtonsPerRow = 5;
             inline constexpr int kHeight = Atoms::Heights::kModuleHeader + kContentRowCount * PatchManagerModule::kContentRowHeight
                 + (kContentRowCount - 1) * PatchManagerModule::kInterControlGap;
+            // Selector 5×28 + 4×gap4 = 156; Utility COPY/PASTE 44 + gap4 + EXPORT/IMPORT 48 = 96.
+            inline constexpr int kSelectorWidth = kBankButtonsPerRow * Atoms::Widths::Button::kPatchManagerBankSelect
+                + (kBankButtonsPerRow - 1) * PatchManagerModule::kInterControlGap;
+            inline constexpr int kUtilityWidth = Atoms::Widths::Button::kPatchManagerCopyBank
+                + PatchManagerModule::kInterControlGap
+                + Atoms::Widths::Button::kPatchManagerExportBank;
+            inline constexpr int kSelectorToUtilityGap = Spacing::kMedium * 2;
+            inline constexpr int kContentWidth = kSelectorWidth + kSelectorToUtilityGap + kUtilityWidth;
         }
 
         namespace InternalPatchesModule

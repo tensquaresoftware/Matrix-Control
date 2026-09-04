@@ -40,12 +40,21 @@ juce::String ClipboardService::getFullPatchSourceLabel() const
     return fullPatchSourceLabel_;
 }
 
+std::optional<int> ClipboardService::getBankSource() const noexcept
+{
+    if (mode_ != ClipboardMode::Bank || bankSource_ < 0)
+        return std::nullopt;
+
+    return bankSource_;
+}
+
 void ClipboardService::copyModule(PatchModuleKind source, const PatchModel& model, bool envelopeShapeOnly)
 {
     mode_ = ClipboardMode::Module;
     sourceModuleKind_ = source;
     envelopeShapeOnly_ = envelopeShapeOnly && isEnvelopeModule(source);
     fullPatchSourceLabel_.clear();
+    clearBankSnapshot();
     moduleSnapshot_.intValues.clear();
     moduleSnapshot_.choiceIndices.clear();
 
@@ -71,6 +80,7 @@ void ClipboardService::copyFullPatch(const PatchModel& model, const juce::String
     mode_ = ClipboardMode::FullPatch;
     envelopeShapeOnly_ = false;
     fullPatchSourceLabel_ = sourceLabel;
+    clearBankSnapshot();
     std::memcpy(fullPatchSnapshot_.data(), model.data(), fullPatchSnapshot_.size());
 }
 
@@ -79,12 +89,34 @@ void ClipboardService::copyMatrixModulation(const PatchModel& model)
     mode_ = ClipboardMode::MatrixModulation;
     envelopeShapeOnly_ = false;
     fullPatchSourceLabel_.clear();
+    clearBankSnapshot();
 
     const auto offset = PackedFieldCodec::safeOffset(
         static_cast<int>(kMatrixModSnapshotOffset),
         PatchModel::kBufferSize);
 
     std::memcpy(matrixModSnapshot_.data(), model.data() + offset, kMatrixModSnapshotSize);
+}
+
+void ClipboardService::copyBank(const BankPatchArray& patches, int sourceBank)
+{
+    mode_ = ClipboardMode::Bank;
+    envelopeShapeOnly_ = false;
+    fullPatchSourceLabel_.clear();
+    moduleSnapshot_.intValues.clear();
+    moduleSnapshot_.choiceIndices.clear();
+    fullPatchSnapshot_.fill(0);
+    matrixModSnapshot_.fill(0);
+    bankSnapshot_ = patches;
+    bankSource_ = sourceBank;
+}
+
+void ClipboardService::clearBankSnapshot() noexcept
+{
+    for (auto& slot : bankSnapshot_)
+        slot.fill(0);
+
+    bankSource_ = -1;
 }
 
 void ClipboardService::clear() noexcept
@@ -97,6 +129,7 @@ void ClipboardService::clear() noexcept
     moduleSnapshot_.choiceIndices.clear();
     fullPatchSnapshot_.fill(0);
     matrixModSnapshot_.fill(0);
+    clearBankSnapshot();
 }
 
 bool ClipboardService::canPasteModule(PatchModuleKind target) const noexcept
@@ -115,6 +148,14 @@ bool ClipboardService::canPasteFullPatch() const noexcept
 bool ClipboardService::canPasteMatrixModulation() const noexcept
 {
     return mode_ == ClipboardMode::MatrixModulation;
+}
+
+bool ClipboardService::canPasteBank(int targetBank) const noexcept
+{
+    if (mode_ != ClipboardMode::Bank || bankSource_ < 0)
+        return false;
+
+    return targetBank != bankSource_;
 }
 
 bool ClipboardService::pasteModule(PatchModuleKind target, PatchModel& model)
@@ -153,6 +194,15 @@ bool ClipboardService::pasteMatrixModulation(PatchModel& model)
         PatchModel::kBufferSize);
 
     std::memcpy(model.data() + offset, matrixModSnapshot_.data(), kMatrixModSnapshotSize);
+    return true;
+}
+
+bool ClipboardService::pasteBank(BankPatchArray& outPatches) const
+{
+    if (mode_ != ClipboardMode::Bank || bankSource_ < 0)
+        return false;
+
+    outPatches = bankSnapshot_;
     return true;
 }
 

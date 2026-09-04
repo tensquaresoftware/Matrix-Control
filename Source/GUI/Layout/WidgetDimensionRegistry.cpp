@@ -15,8 +15,10 @@ namespace
     };
 
     constexpr ExactButtonWidthEntry kExactStandaloneButtonWidths[] = {
-        { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-          BW::kPatchManagerUnlockBank },
+        { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kCopyBank,
+          BW::kPatchManagerCopyBank },
+        { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBank,
+          BW::kPatchManagerPasteBank },
         { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank,
           BW::kPatchManagerImportBank },
         { PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank,

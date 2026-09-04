@@ -63,7 +63,6 @@ namespace Core
             { PluginIDs::MatrixModulationSection::ModulationBus::StandaloneWidgets::kBus9Init, ActionHandlerKind::Module },
 
             // BankUtilityModule
-            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank1, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank2, ActionHandlerKind::PatchManager },
@@ -74,6 +73,8 @@ namespace Core
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank7, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank8, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kCopyBank, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBank, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kImportBank, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kExportBank, ActionHandlerKind::PatchManager },
 

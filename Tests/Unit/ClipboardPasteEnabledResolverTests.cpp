@@ -21,6 +21,8 @@ public:
         testMatrixModCopyDisablesModuleAndInternalEnablesMatrixMod();
         testModeSwitchFullPatchThenDco1CopyUpdatesMirrors();
         testPatchModuleKindFromWidgetId();
+        testBankClipboardPasteEligibility();
+        testModuleCopyClearsBankPaste();
     }
 
 private:
@@ -46,6 +48,7 @@ private:
         expectAllModulePasteDisabled(state);
         expect(!state.internalPatches, "internal paste disabled");
         expect(!state.matrixModulation, "matrix mod paste disabled");
+        expect(!state.bankUtility, "bank paste disabled");
     }
 
     void testModuleCopyDco1EnablesDcoTargets()
@@ -146,6 +149,51 @@ private:
         expect(env2Paste.has_value() && *env2Paste == Core::PatchModuleKind::Env2, "env2 paste maps");
 
         expect(!Core::patchModuleKindFromWidgetId("internalPatchesCopy").has_value(), "non-module id rejected");
+    }
+
+    void testBankClipboardPasteEligibility()
+    {
+        beginTest("bankClipboard_sameRomCross_pasteEnabledMirror");
+
+        Core::ClipboardService::BankPatchArray patches {};
+        Core::ClipboardService clipboard;
+        clipboard.copyBank(patches, 0);
+
+        const auto sameBank = Core::resolvePasteEnabled(Core::ClipboardPasteEnabledResolveArgs {
+            clipboard, 0, true
+        });
+        expect(! sameBank.bankUtility, "same-bank paste disabled");
+
+        const auto otherRam = Core::resolvePasteEnabled(Core::ClipboardPasteEnabledResolveArgs {
+            clipboard, 1, true
+        });
+        expect(otherRam.bankUtility, "cross-RAM paste enabled");
+
+        const auto rom = Core::resolvePasteEnabled(Core::ClipboardPasteEnabledResolveArgs {
+            clipboard, 5, false
+        });
+        expect(! rom.bankUtility, "ROM paste disabled");
+    }
+
+    void testModuleCopyClearsBankPaste()
+    {
+        beginTest("moduleCopy_afterBank_disablesBankPaste");
+
+        Core::ClipboardService::BankPatchArray patches {};
+        Core::ClipboardService clipboard;
+        clipboard.copyBank(patches, 0);
+        expect(Core::resolvePasteEnabled(Core::ClipboardPasteEnabledResolveArgs {
+            clipboard, 1, true
+        }).bankUtility);
+
+        Core::PatchModel model;
+        clipboard.copyModule(Core::PatchModuleKind::Dco1, model);
+
+        const auto state = Core::resolvePasteEnabled(Core::ClipboardPasteEnabledResolveArgs {
+            clipboard, 1, true
+        });
+        expect(! state.bankUtility, "module copy clears bank paste");
+        expect(state.dco1, "module paste remains");
     }
 };
 

@@ -203,6 +203,7 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
     Source/Core/Actions/PatchManagerActionHandlerBankImport.cpp
     Source/Core/Actions/PatchManagerActionHandlerBankImportWrite.cpp
+    Source/Core/Actions/PatchManagerActionHandlerBankCopyPaste.cpp
     Source/Core/Actions/MutatorActionHandler.cpp
     Source/Core/Factories/ApvtsValidator.cpp
     Source/Core/Factories/ApvtsLayoutBuilder.cpp
@@ -310,6 +311,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Panels/MainComponent/BodyPanel/PatchEditPanel/PatchEditTopModulesPanel/Modules/VcfVcaPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/PatchManagerPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanel.cpp
+    Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/BankUtilityPanelSetup.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/ComputerPatchesPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanel.cpp
     Source/GUI/Panels/MainComponent/BodyPanel/SharedPanel/PatchManagerPanel/Modules/InternalPatchesPanelSetup.cpp
@@ -411,6 +413,7 @@ if(MATRIX_BUILD_TESTS)
     target_sources(Matrix-Control_Tests PRIVATE
         Tests/TestMain.cpp
         Tests/Unit/ClipboardServiceTests.cpp
+        Tests/Unit/ClipboardBankServiceTests.cpp
         Tests/Unit/ClipboardFeedbackResolverTests.cpp
         Tests/Unit/DirtyPatchTrackerTests.cpp
         Tests/Unit/PluginProcessorCloseGateTests.cpp
@@ -581,6 +584,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/PatchManagerActionHandlerBankExport.cpp
         Source/Core/Actions/PatchManagerActionHandlerBankImport.cpp
         Source/Core/Actions/PatchManagerActionHandlerBankImportWrite.cpp
+        Source/Core/Actions/PatchManagerActionHandlerBankCopyPaste.cpp
         Source/Core/Actions/MutatorActionHandler.cpp
         Source/Core/Models/PatchNameSyncer.cpp
         Source/Core/Models/PackedFieldCodec.cpp

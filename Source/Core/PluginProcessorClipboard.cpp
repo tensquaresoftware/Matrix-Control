@@ -21,6 +21,7 @@ void PluginProcessor::initializeClipboardPasteEnabledProperties()
     namespace PatchEdit = PluginIDs::PatchEditSection;
     namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
     namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+    namespace BankUtility = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
 
     const char* pasteEnabledIds[] = {
         PatchEdit::Dco1Module::StandaloneWidgets::kPasteEnabled,
@@ -31,7 +32,8 @@ void PluginProcessor::initializeClipboardPasteEnabledProperties()
         PatchEdit::Lfo1Module::StandaloneWidgets::kPasteEnabled,
         PatchEdit::Lfo2Module::StandaloneWidgets::kPasteEnabled,
         InternalPatches::kPastePatchEnabled,
-        MatrixMod::kMatrixModulationPasteEnabled
+        MatrixMod::kMatrixModulationPasteEnabled,
+        BankUtility::kPasteBankEnabled
     };
 
     for (const auto* propertyId : pasteEnabledIds)
@@ -39,6 +41,19 @@ void PluginProcessor::initializeClipboardPasteEnabledProperties()
         if (!apvts.state.hasProperty(propertyId))
             apvts.state.setProperty(propertyId, false, nullptr);
     }
+}
+
+int PluginProcessor::getSelectedBankForClipboardTargets() const
+{
+    namespace BankState = PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties;
+
+    const auto limits = getResolvedDeviceMemoryLimits();
+    if (! limits.hasBankConcept())
+        return -1;
+
+    const int selected = static_cast<int>(apvts.state.getProperty(
+        BankState::kSelectedBank, limits.minBankNumber()));
+    return juce::jlimit(limits.minBankNumber(), limits.maxBankNumber(), selected);
 }
 
 void PluginProcessor::refreshClipboardPasteEnabledProperties()
@@ -49,8 +64,16 @@ void PluginProcessor::refreshClipboardPasteEnabledProperties()
     namespace PatchEdit = PluginIDs::PatchEditSection;
     namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
     namespace MatrixMod = PluginIDs::MatrixModulationSection::StandaloneWidgets;
+    namespace BankUtility = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
 
-    const auto state = Core::resolvePasteEnabled(*clipboardService_);
+    const int selectedBank = getSelectedBankForClipboardTargets();
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const bool selectedBankPasteAllowed = selectedBank >= 0
+        && limits.isPasteStoreAllowed(selectedBank);
+
+    const auto state = Core::resolvePasteEnabled(Core::ClipboardPasteEnabledResolveArgs {
+        *clipboardService_, selectedBank, selectedBankPasteAllowed
+    });
 
     apvts.state.setProperty(PatchEdit::Dco1Module::StandaloneWidgets::kPasteEnabled, state.dco1, nullptr);
     apvts.state.setProperty(PatchEdit::Dco2Module::StandaloneWidgets::kPasteEnabled, state.dco2, nullptr);
@@ -61,6 +84,7 @@ void PluginProcessor::refreshClipboardPasteEnabledProperties()
     apvts.state.setProperty(PatchEdit::Lfo2Module::StandaloneWidgets::kPasteEnabled, state.lfo2, nullptr);
     apvts.state.setProperty(InternalPatches::kPastePatchEnabled, state.internalPatches, nullptr);
     apvts.state.setProperty(MatrixMod::kMatrixModulationPasteEnabled, state.matrixModulation, nullptr);
+    apvts.state.setProperty(BankUtility::kPasteBankEnabled, state.bankUtility, nullptr);
 }
 
 void PluginProcessor::initializeClipboardFeedbackProperties()
@@ -79,6 +103,7 @@ void PluginProcessor::initializeClipboardFeedbackProperties()
         Feedback::kLfo2Copy,
         Feedback::kMatrixModulationCopy,
         Feedback::kInternalPatchesCopy,
+        Feedback::kBankUtilityCopy,
         Feedback::kDco1Paste,
         Feedback::kDco2Paste,
         Feedback::kEnv1Paste,
@@ -87,7 +112,8 @@ void PluginProcessor::initializeClipboardFeedbackProperties()
         Feedback::kLfo1Paste,
         Feedback::kLfo2Paste,
         Feedback::kMatrixModulationPaste,
-        Feedback::kInternalPatchesPaste
+        Feedback::kInternalPatchesPaste,
+        Feedback::kBankUtilityPaste
     };
 
     for (const auto* propertyId : feedbackIds)
@@ -107,9 +133,19 @@ void PluginProcessor::refreshClipboardFeedbackProperties()
 
     namespace Feedback = PluginIDs::ClipboardFeedback;
 
-    const auto state = Core::resolveClipboardFeedback(*clipboardService_,
-                                                      clipboardFeedbackActive_,
-                                                      clipboardFeedbackCrossPatchReady_);
+    const int selectedBank = getSelectedBankForClipboardTargets();
+    const auto limits = getResolvedDeviceMemoryLimits();
+    const bool selectedBankPasteAllowed = selectedBank >= 0
+        && limits.isPasteStoreAllowed(selectedBank);
+
+    const auto state = Core::resolveClipboardFeedback(Core::ClipboardFeedbackResolveArgs {
+        *clipboardService_,
+        clipboardFeedbackActive_,
+        clipboardFeedbackCrossPatchReady_,
+        clipboardFeedbackBankCopyPending_,
+        selectedBank,
+        selectedBankPasteAllowed
+    });
 
     apvts.state.setProperty(Feedback::kActive, state.active, nullptr);
     apvts.state.setProperty(Feedback::kDco1Copy, state.dco1Copy, nullptr);
@@ -121,6 +157,7 @@ void PluginProcessor::refreshClipboardFeedbackProperties()
     apvts.state.setProperty(Feedback::kLfo2Copy, state.lfo2Copy, nullptr);
     apvts.state.setProperty(Feedback::kMatrixModulationCopy, state.matrixModulationCopy, nullptr);
     apvts.state.setProperty(Feedback::kInternalPatchesCopy, state.internalPatchesCopy, nullptr);
+    apvts.state.setProperty(Feedback::kBankUtilityCopy, state.bankUtilityCopy, nullptr);
     apvts.state.setProperty(Feedback::kDco1Paste, state.dco1Paste, nullptr);
     apvts.state.setProperty(Feedback::kDco2Paste, state.dco2Paste, nullptr);
     apvts.state.setProperty(Feedback::kEnv1Paste, state.env1Paste, nullptr);
@@ -130,21 +167,39 @@ void PluginProcessor::refreshClipboardFeedbackProperties()
     apvts.state.setProperty(Feedback::kLfo2Paste, state.lfo2Paste, nullptr);
     apvts.state.setProperty(Feedback::kMatrixModulationPaste, state.matrixModulationPaste, nullptr);
     apvts.state.setProperty(Feedback::kInternalPatchesPaste, state.internalPatchesPaste, nullptr);
+    apvts.state.setProperty(Feedback::kBankUtilityPaste, state.bankUtilityPaste, nullptr);
 }
 
 void PluginProcessor::armClipboardFeedbackSession()
 {
     clipboardFeedbackActive_ = true;
     clipboardFeedbackCrossPatchReady_ = false;
+    clipboardFeedbackBankCopyPending_ = false;
     clipboardFeedbackOriginContext_ = patchLoadContext_;
     apvts.state.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, true, nullptr);
     refreshClipboardFeedbackProperties();
+}
+
+void PluginProcessor::armBankCopyFeedbackPending()
+{
+    clipboardFeedbackActive_ = true;
+    clipboardFeedbackCrossPatchReady_ = false;
+    clipboardFeedbackBankCopyPending_ = true;
+    clipboardFeedbackOriginContext_ = patchLoadContext_;
+    apvts.state.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, true, nullptr);
+    refreshClipboardFeedbackProperties();
+}
+
+void PluginProcessor::clearBankCopyFeedbackPending()
+{
+    clipboardFeedbackBankCopyPending_ = false;
 }
 
 void PluginProcessor::disarmClipboardFeedbackSession()
 {
     clipboardFeedbackActive_ = false;
     clipboardFeedbackCrossPatchReady_ = false;
+    clipboardFeedbackBankCopyPending_ = false;
     apvts.state.setProperty(PluginIDs::ClipboardFeedback::kCopyLit, true, nullptr);
     refreshClipboardFeedbackProperties();
 }

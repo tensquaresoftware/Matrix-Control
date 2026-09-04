@@ -99,20 +99,19 @@ private:
                           &matrixModDispatcher,
                           nullptr
                       },
-                      Core::ActionExecutionHooks{
-                          [this](bool suppress) { suppressMatrixModSysEx = suppress; },
-                          nullptr,
-                          [this](bool suppress) { suppressPatchSysEx = suppress; },
-                          nullptr,
-                          nullptr,
-                          {},
-                          nullptr,
-                          nullptr,
-                          nullptr,
-                          nullptr,
-                          nullptr,
-                          nullptr,
-                          nullptr })
+                      [&]()
+                      {
+                          Core::ActionExecutionHooks hooks;
+                          hooks.setSuppressMatrixModSysEx = [this](bool suppress)
+                          {
+                              suppressMatrixModSysEx = suppress;
+                          };
+                          hooks.setSuppressPatchSysEx = [this](bool suppress)
+                          {
+                              suppressPatchSysEx = suppress;
+                          };
+                          return hooks;
+                      }())
         {
         }
     };

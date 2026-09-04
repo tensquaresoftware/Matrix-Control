@@ -114,6 +114,7 @@ private:
     void setBankImportFolderPickerBinding();
     void setBankImportConfirmGateBinding();
     void setBankExportOverwriteConfirmGateBinding();
+    void setBankPasteConfirmGateBinding();
     void wireBankTransferProgressPresenter();
     void configureBankTransferProgressShowAndUpdate(Core::BankTransferProgressPresenter& presenter);
     void configureBankTransferProgressMessaging(Core::BankTransferProgressPresenter& presenter);

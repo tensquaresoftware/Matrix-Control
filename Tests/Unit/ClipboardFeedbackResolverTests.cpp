@@ -22,6 +22,8 @@ public:
         testMatrixCrossPatchUnlocksPaste();
         testFullPatchCrossPatchUnlocksPaste();
         testLfo1CopyBlinksLfo2PasteOnly();
+        testBankPendingCopyOnly();
+        testBankCopyAlternatePasteWhenCompatible();
     }
 
 private:
@@ -145,6 +147,46 @@ private:
         expect(!state.lfo1Paste);
         expect(state.lfo2Paste);
         expect(!state.dco1Paste);
+    }
+
+    void testBankPendingCopyOnly()
+    {
+        beginTest("bank copy pending — COPY blink only");
+
+        Core::ClipboardService clipboard;
+        const auto state = Core::resolveClipboardFeedback(Core::ClipboardFeedbackResolveArgs {
+            clipboard, true, false, true, 1, true
+        });
+        expect(state.active);
+        expect(state.bankUtilityCopy);
+        expect(! state.bankUtilityPaste);
+    }
+
+    void testBankCopyAlternatePasteWhenCompatible()
+    {
+        beginTest("bank copy — PASTE blink when other RAM selected");
+
+        Core::ClipboardService::BankPatchArray patches {};
+        Core::ClipboardService clipboard;
+        clipboard.copyBank(patches, 0);
+
+        const auto sameBank = Core::resolveClipboardFeedback(Core::ClipboardFeedbackResolveArgs {
+            clipboard, true, false, false, 0, true
+        });
+        expect(sameBank.bankUtilityCopy);
+        expect(! sameBank.bankUtilityPaste);
+
+        const auto otherRam = Core::resolveClipboardFeedback(Core::ClipboardFeedbackResolveArgs {
+            clipboard, true, false, false, 1, true
+        });
+        expect(otherRam.bankUtilityCopy);
+        expect(otherRam.bankUtilityPaste);
+
+        const auto rom = Core::resolveClipboardFeedback(Core::ClipboardFeedbackResolveArgs {
+            clipboard, true, false, false, 5, false
+        });
+        expect(rom.bankUtilityCopy);
+        expect(! rom.bankUtilityPaste);
     }
 };
 

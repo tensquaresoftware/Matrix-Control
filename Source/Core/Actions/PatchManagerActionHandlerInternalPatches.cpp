@@ -105,19 +105,19 @@ namespace Core
             return true;
         }
 
+        if (propertyId == kCopyBank)
+        {
+            handleBankCopy(limits);
+            return true;
+        }
+
+        if (propertyId == kPasteBank)
+        {
+            handleBankPaste(limits);
+            return true;
+        }
+
         return false;
-    }
-
-    bool PatchManagerActionHandler::tryHandleUnlockBankAction(const juce::String& propertyId,
-                                                              const DeviceMemoryLimits& limits)
-    {
-        using namespace PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
-
-        if (propertyId != kUnlockBank)
-            return false;
-
-        handleUnlockBank(limits);
-        return true;
     }
 
     bool PatchManagerActionHandler::tryHandleInternalPatchNavigation(const juce::String& propertyId,
@@ -248,8 +248,7 @@ namespace Core
 
         if (! limits.hasBankConcept())
         {
-            if (parseBankButtonIndex(propertyId) >= 0
-                || propertyId == BankUtilityModule::StandaloneWidgets::kUnlockBank)
+            if (parseBankButtonIndex(propertyId) >= 0)
                 return true;
 
             return false;
@@ -258,6 +257,14 @@ namespace Core
         const int bankIndex = parseBankButtonIndex(propertyId);
         if (bankIndex < 0)
             return false;
+
+        if (isBankTransferBusy())
+        {
+            publishBankTransferFooter(
+                PluginDisplayNames::PatchManagerSection::BankUtilityModule::kBankTransferBusyFooterMessage,
+                "warning");
+            return true;
+        }
 
         if (! confirmPatchContextChange())
             return true;

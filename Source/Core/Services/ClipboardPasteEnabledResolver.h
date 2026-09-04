@@ -20,8 +20,18 @@ namespace Core
         bool lfo2 = false;
         bool internalPatches = false;
         bool matrixModulation = false;
+        bool bankUtility = false;
     };
 
+    struct ClipboardPasteEnabledResolveArgs
+    {
+        const ClipboardService& clipboard;
+        int selectedBank = -1;
+        bool selectedBankPasteAllowed = false;
+    };
+
+    ClipboardPasteEnabledState resolvePasteEnabled(const ClipboardPasteEnabledResolveArgs& args);
+    // Backward-compatible overload for module / full-patch / matrix tests.
     ClipboardPasteEnabledState resolvePasteEnabled(const ClipboardService& clipboard);
     std::optional<PatchModuleKind> patchModuleKindFromWidgetId(const juce::String& widgetId);
 

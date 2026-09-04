@@ -80,39 +80,73 @@ namespace
         state.internalPatchesCopy = true;
         state.internalPatchesPaste = crossPatchReady && clipboard.canPasteFullPatch();
     }
+
+    void applyBankModeFeedback(ClipboardFeedbackBlinkState& state,
+                               const ClipboardService& clipboard,
+                               int selectedBank,
+                               bool selectedBankPasteAllowed) noexcept
+    {
+        state.bankUtilityCopy = true;
+        state.bankUtilityPaste = selectedBankPasteAllowed
+            && clipboard.canPasteBank(selectedBank);
+    }
 }
 
-ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardService& clipboard,
-                                                     bool sessionActive,
-                                                     bool crossPatchReady) noexcept
+ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardFeedbackResolveArgs& args) noexcept
 {
     ClipboardFeedbackBlinkState state;
 
-    if (! sessionActive || ! clipboard.hasContent())
+    if (! args.sessionActive)
+        return state;
+
+    if (args.bankCopyPending)
+    {
+        state.active = true;
+        state.bankUtilityCopy = true;
+        return state;
+    }
+
+    if (! args.clipboard.hasContent())
         return state;
 
     state.active = true;
 
-    switch (clipboard.getMode())
+    switch (args.clipboard.getMode())
     {
         case ClipboardMode::Empty:
             state.active = false;
             break;
 
         case ClipboardMode::Module:
-            applyModuleModeFeedback(state, clipboard);
+            applyModuleModeFeedback(state, args.clipboard);
             break;
 
         case ClipboardMode::MatrixModulation:
-            applyMatrixModeFeedback(state, clipboard, crossPatchReady);
+            applyMatrixModeFeedback(state, args.clipboard, args.crossPatchReady);
             break;
 
         case ClipboardMode::FullPatch:
-            applyFullPatchModeFeedback(state, clipboard, crossPatchReady);
+            applyFullPatchModeFeedback(state, args.clipboard, args.crossPatchReady);
+            break;
+
+        case ClipboardMode::Bank:
+            applyBankModeFeedback(state,
+                                  args.clipboard,
+                                  args.selectedBank,
+                                  args.selectedBankPasteAllowed);
             break;
     }
 
     return state;
+}
+
+ClipboardFeedbackBlinkState resolveClipboardFeedback(const ClipboardService& clipboard,
+                                                     bool sessionActive,
+                                                     bool crossPatchReady) noexcept
+{
+    return resolveClipboardFeedback(ClipboardFeedbackResolveArgs {
+        clipboard, sessionActive, crossPatchReady, false, -1, false
+    });
 }
 
 } // namespace Core

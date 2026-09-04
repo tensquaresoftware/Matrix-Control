@@ -124,6 +124,10 @@ void PluginProcessor::createActionSubsystem()
         {},
         {},
         {},
+        {},
+        {},
+        {},
+        {},
         [this]() { establishEditorialCheckpoint(); },
         [this](const juce::String& name) { beginEditorialTransaction(name); }};
 
@@ -163,6 +167,14 @@ void PluginProcessor::createPatchMutatorEngine(Core::ActionExecutionHooks& hooks
     };
 
     hooks.disarmClipboardFeedback = [this]() { disarmClipboardFeedbackSession(); };
+    hooks.armBankCopyFeedbackPending = [this]() { armBankCopyFeedbackPending(); };
+    hooks.clearBankCopyFeedbackPending = [this]() { clearBankCopyFeedbackPending(); };
+    hooks.armClipboardFeedback = [this]() { armClipboardFeedbackSession(); };
+    hooks.refreshClipboardMirrors = [this]()
+    {
+        refreshClipboardPasteEnabledProperties();
+        refreshClipboardFeedbackProperties();
+    };
 
     hooks.confirmPatchContextChange = [this](bool includeUnsavedEditWarning) {
         return confirmPatchContextChangeGate(includeUnsavedEditWarning);

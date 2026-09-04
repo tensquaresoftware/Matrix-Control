@@ -17,6 +17,7 @@ void PluginEditor::wireBankTransferBindings()
     setBankImportFolderPickerBinding();
     setBankImportConfirmGateBinding();
     setBankExportOverwriteConfirmGateBinding();
+    setBankPasteConfirmGateBinding();
     wireBankTransferProgressPresenter();
 }
 
@@ -142,6 +143,28 @@ void PluginEditor::setBankExportOverwriteConfirmGateBinding()
                        juce::MessageBoxIconType::WarningIcon,
                        Dialog::kTitle,
                        Dialog::kBody,
+                       Dialog::kCancel,
+                       Dialog::kContinue,
+                       safeThis.getComponent()
+                   })
+                   == 1;
+        });
+}
+
+void PluginEditor::setBankPasteConfirmGateBinding()
+{
+    pluginProcessor.setBankPasteConfirmGate(
+        [safeThis = juce::Component::SafePointer<PluginEditor>(this)](int sourceBank, int targetBank) -> bool
+        {
+            if (! isMessageThread() || safeThis == nullptr)
+                return false;
+
+            namespace Dialog = PluginDisplayNames::Dialogs::BankPasteConfirm;
+
+            return showOrderedConfirmAlert({
+                       juce::MessageBoxIconType::WarningIcon,
+                       Dialog::kTitle,
+                       Dialog::formatBody(sourceBank, targetBank),
                        Dialog::kCancel,
                        Dialog::kContinue,
                        safeThis.getComponent()

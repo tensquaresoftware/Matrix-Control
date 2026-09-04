@@ -18,12 +18,6 @@ namespace PluginDescriptors
     // Standalone Widgets ----------------------------------------------------------------------------------------------
     const std::vector<StandaloneWidgetDescriptor> PatchManagerSection::BankUtilityModule::kStandaloneWidgets = {
         {
-            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kUnlockBank,
-            .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
-            .widgetType = StandaloneWidgetType::kButton,
-        },
-        {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank0,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
@@ -80,6 +74,18 @@ namespace PluginDescriptors
         {
             .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9,
             .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kSelectBank9,
+            .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kCopyBank,
+            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kCopyBank,
+            .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
+            .widgetType = StandaloneWidgetType::kButton,
+        },
+        {
+            .widgetId = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBank,
+            .displayName = PluginDisplayNames::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBank,
             .parentGroupId = PluginIDs::PatchManagerSection::BankUtilityModule::kGroupId,
             .widgetType = StandaloneWidgetType::kButton,
         },

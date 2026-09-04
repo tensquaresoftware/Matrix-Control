@@ -91,6 +91,14 @@ namespace
             }
             case ClipboardMode::MatrixModulation:
                 return ClipboardMsg::kMatrixModulationName;
+            case ClipboardMode::Bank:
+            {
+                const auto source = clipboard.getBankSource();
+                if (! source.has_value())
+                    return {};
+
+                return "Bank " + juce::String(*source);
+            }
         }
 
         return {};
