@@ -9,10 +9,14 @@ namespace PatchTestFixtures
         return juce::File(MATRIX_TEST_FIXTURES_DIR).getChildFile("Patches");
     }
 
-    // Resolves user patch fixtures under Patches/User/ (after Short List flatten).
+    // Resolves unit-test reference patches under Patches/UnitTests/, then legacy User/ and root.
     inline juce::File resolvePatchFixtureFile(const juce::String& fileName)
     {
         const auto root = patchFixturesRoot();
+        const auto unitTestsFile = root.getChildFile("UnitTests").getChildFile(fileName);
+        if (unitTestsFile.existsAsFile())
+            return unitTestsFile;
+
         const auto userFile = root.getChildFile("User").getChildFile(fileName);
         if (userFile.existsAsFile())
             return userFile;
@@ -21,7 +25,7 @@ namespace PatchTestFixtures
         if (legacy.existsAsFile())
             return legacy;
 
-        return userFile;
+        return unitTestsFile;
     }
 
     // Resolves a path under Tests/Fixtures/, preferring Factory/ over deleted ROM/ copies.
