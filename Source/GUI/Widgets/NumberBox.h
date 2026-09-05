@@ -58,7 +58,6 @@ namespace TSS
     private:
         inline constexpr static int kDefaultHeight_ = 20;
         inline constexpr static int kBorderThickness_ = 2;
-        inline constexpr static float kEditorFontSizeIncrease_ = 4.0f;
 
         NumberBoxLook look_{};
         int height_ {kDefaultHeight_};
@@ -79,6 +78,12 @@ namespace TSS
 
         juce::Colour getBorderColour() const;
         juce::Colour getTextColour() const;
+        juce::Font scaledDisplayFont() const;
+
+        float borderStrokeThickness() const;
+        int editorBorderInset() const;
+        void layoutEditor();
+        void applyEditorAppearance();
 
         void showEditor();
         void hideEditor();

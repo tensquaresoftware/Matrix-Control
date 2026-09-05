@@ -1333,3 +1333,25 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-flat-export.md`
   summary: Direct `exportMutatorHistory` (non-session) does not clear leftover nested `Mxx/` or old `Initial.syx` when writing into a non-empty folder.
   evidence: Edge Case Hunter — GUI export uses session Overwrite/Keep which clears or creates fresh; leftover pollution only hits the direct API / unclean folder path.
+
+## Deferred from: one-shot NumberBox edit border and font (2026-09-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-border-and-font.md`
+  summary: External setValue / setDisplayState / setFocusHighlight while the TextEditor is open can desync the field or leave focus colour intent unused.
+  evidence: Pre-existing editor lifecycle; Blind Hunter — not introduced by the edit border/font change.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-border-and-font.md`
+  summary: Editor seeds unpadded currentValue_ while idle display uses zero-padded cachedValueText_.
+  evidence: Pre-existing showEditor text path; more noticeable now that font size matches display.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-border-and-font.md`
+  summary: TestNumberBoxes has no double-click edit, border-over-editor, or font-parity coverage.
+  evidence: Blind Hunter — harness only shows static scale/focus samples.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-border-and-font.md`
+  summary: System display scale change mid-edit (e.g. window moved between monitors) does not re-layout the editor until resize/scale API.
+  evidence: Blind Hunter edge case; paint snaps stroke independently of editor bounds.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-border-and-font.md`
+  summary: TextEditor caret and remaining colour IDs are unset; default caret may clash with NumberBox chrome.
+  evidence: Pre-existing showEditor colour setup; transparent outlines unchanged.

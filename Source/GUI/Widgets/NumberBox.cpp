@@ -24,6 +24,7 @@ namespace TSS
     void NumberBox::setLook(const NumberBoxLook& look)
     {
         look_ = look;
+        applyEditorAppearance();
         repaint();
     }
 
@@ -33,6 +34,8 @@ namespace TSS
             return;
 
         uiScale_ = uiScale;
+        applyEditorAppearance();
+        layoutEditor();
         repaint();
     }
 
@@ -87,29 +90,25 @@ namespace TSS
     void NumberBox::paint(juce::Graphics& g)
     {
         const auto bounds = getLocalBounds().toFloat();
-        const float systemDisplayScale = ScaledDrawing::systemDisplayScaleForComponent(*this);
-        const float borderThickness = ScaledDrawing::snappedStrokeThicknessFromDesign(
-            static_cast<float>(kBorderThickness_),
-            uiScale_,
-            systemDisplayScale,
-            ScaledDrawing::StrokeSnapPolicy::kRound);
 
-        g.setColour(look_.background);
+        // Match editor fill under the stroke so any inset gap uses the same colour as the field.
+        g.setColour(editor_ != nullptr ? look_.editorBackground : look_.background);
         g.fillRect(bounds);
 
         g.setColour(getBorderColour());
-        g.drawRect(bounds, borderThickness);
+        g.drawRect(bounds, borderStrokeThickness());
 
-        if (cachedValueText_.isEmpty())
+        if (editor_ != nullptr || cachedValueText_.isEmpty())
             return;
 
         g.setColour(getTextColour());
-        g.setFont(look_.font.withHeight(look_.font.getHeight() * uiScale_));
+        g.setFont(scaledDisplayFont());
         g.drawText(cachedValueText_, bounds, juce::Justification::centred, false);
     }
 
     void NumberBox::resized()
     {
+        layoutEditor();
         repaint();
     }
 
@@ -165,26 +164,60 @@ namespace TSS
         return useFocusColour ? look_.textFocus : look_.text;
     }
 
-    void NumberBox::showEditor()
+    juce::Font NumberBox::scaledDisplayFont() const
     {
-        if (editor_ != nullptr)
+        return look_.font.withHeight(look_.font.getHeight() * uiScale_);
+    }
+
+    float NumberBox::borderStrokeThickness() const
+    {
+        return ScaledDrawing::snappedStrokeThicknessFromDesign(
+            static_cast<float>(kBorderThickness_),
+            uiScale_,
+            ScaledDrawing::systemDisplayScaleForComponent(*this),
+            ScaledDrawing::StrokeSnapPolicy::kRound);
+    }
+
+    int NumberBox::editorBorderInset() const
+    {
+        return juce::jmax(1, juce::roundToInt(borderStrokeThickness()));
+    }
+
+    void NumberBox::layoutEditor()
+    {
+        if (editor_ == nullptr)
             return;
 
-        const auto editorFont = look_.font.withHeight(look_.font.getHeight() + kEditorFontSizeIncrease_);
+        editor_->setBounds(getLocalBounds().reduced(editorBorderInset()));
+    }
 
-        editor_ = std::make_unique<juce::TextEditor>();
-        editor_->setBounds(getLocalBounds());
-        editor_->setText(juce::String(currentValue_), false);
+    void NumberBox::applyEditorAppearance()
+    {
+        if (editor_ == nullptr)
+            return;
+
+        const auto editorFont = scaledDisplayFont();
         editor_->setFont(editorFont);
-        editor_->setJustification(juce::Justification::centred);
-
+        editor_->applyFontToAllText(editorFont);
         editor_->setColour(juce::TextEditor::backgroundColourId, look_.editorBackground);
         editor_->setColour(juce::TextEditor::textColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::highlightColourId, look_.editorSelectionBackground);
         editor_->setColour(juce::TextEditor::highlightedTextColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::outlineColourId, juce::Colour(ColourChart::kTransparent));
         editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour(ColourChart::kTransparent));
-        
+    }
+
+    void NumberBox::showEditor()
+    {
+        if (editor_ != nullptr)
+            return;
+
+        editor_ = std::make_unique<juce::TextEditor>();
+        layoutEditor();
+        editor_->setText(juce::String(currentValue_), false);
+        editor_->setJustification(juce::Justification::centred);
+        applyEditorAppearance();
+
         editor_->setBorder(juce::BorderSize<int>(0));
         editor_->setIndents(0, 0);
         editor_->setInputRestrictions(0, "0123456789");
@@ -196,7 +229,6 @@ namespace TSS
         addAndMakeVisible(*editor_);
         editor_->grabKeyboardFocus();
         editor_->selectAll();
-        editor_->applyFontToAllText(editorFont);
     }
 
     void NumberBox::hideEditor()
