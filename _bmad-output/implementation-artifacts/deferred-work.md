@@ -1385,3 +1385,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gui-lock-dimming-film-holes.md`
   summary: No automated tests for MainComponent film attach, Header/Footer/COMPARE hole assembly, LockDimmingFilm::hitTest/paint wiring, or binder click-block cutover — only LockDimmingFilmPolicyTests (pure helpers).
   evidence: Verification Gap review (2026-09-05 second pass) — omitting attach or breaking component hitTest still leaves policy unit tests green.
+
+## Deferred from: review of spec-bank-export-dot-filename-display.md (2026-09-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-bank-export-dot-filename-display.md`
+  summary: Sibling done-specs / deferred notes may still document Bank Utility export as `Pxx - {Name}` after the separator changed to `Pxx. {Name}`.
+  evidence: Blind Hunter — `spec-bank-utility-import-export.md` and an orphan-file deferred entry still use the hyphen form. Factory fixtures were renamed to `Pxx.` (`353488f5`; Ask First resolved keep in code review 2026-09-05).
+
+## Deferred from: code review of spec-bank-export-dot-filename-display.md (2026-09-05)
+
+- No IMPORT backfill unit test for new `Pxx.` stems — parse SSOT covered; Bank Import only shares the parser.
+- Hand-edited empty-after-dot stems (`P76.` / `P76. `) fall back to raw stem in `stemForFilenameReconcile` — export never emits these; empty-vs-nonmatch API ambiguity.
+- Manual hardware smoke (EXPORT → Finder → OPEN FILE NAMES / combo / SYSEX NAMES) — scheduled next week; not a code-review blocker.

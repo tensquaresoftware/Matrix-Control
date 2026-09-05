@@ -32,12 +32,12 @@ namespace Core
 
         static juce::String ensureSyxExtension(const juce::String& stem);
 
-        // Bank Utility EXPORT filename stem: "Pxx - {Name}" (slot 0-99, name OS-sanitized from
-        // the payload's name bytes), or "Pxx" when the sanitized name is empty.
+        // Bank Utility EXPORT filename stem: "Pxx. {Name}" (slot 0-99, name OS-sanitized from
+        // the payload's name bytes), or "Pxx" when the sanitized name is empty (never "Pxx." / "Pxx. ").
         static juce::String bankExportFileStem(int slot0to99, juce::String patchNameFromBytes);
 
-        // Returns the name segment of a Bank Utility export stem ("P10 - NYLON 12" -> "NYLON 12"),
-        // or empty when the stem is slot-only ("P10").
+        // Returns the name segment of a Bank Utility export stem ("P10. NYLON 12" -> "NYLON 12"),
+        // or empty when the stem is slot-only ("P10") or does not match "Pxx." (+ optional spaces).
         static juce::String nameFromBankExportStem(juce::String stem);
 
         // Oberheim ROM placeholder names embedded in factory dumps (e.g. "BNK4: 05").
