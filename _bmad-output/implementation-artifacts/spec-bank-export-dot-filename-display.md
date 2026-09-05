@@ -4,7 +4,7 @@ type: 'bugfix'
 created: '2026-09-05'
 status: 'done'
 baseline_commit: 'ee6e33e989496454bfc69cd63cb8776cf14687b2'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '{project-root}/_bmad-output/project-context.md'
 ---
@@ -27,7 +27,8 @@ context:
 - IMPORT slots follow sorted file order (not `Pxx` as slot index); stem parse remains name-backfill only for empty/`BNK…` payloads.
 - English only; unit tests updated for the new format.
 
-**Ask First:** OPEN combo truncation; footer 8-char load warnings; dual-format compatibility; renaming `Tests/Fixtures/Patches/` historical `Pxx -` paths.
+**Ask First:** OPEN combo truncation; footer 8-char load warnings; dual-format compatibility.
+**Resolved (review 2026-09-05):** renaming `Tests/Fixtures/Patches/Factory/` historical `Pxx -` → `Pxx.` kept (`353488f5` + MutationCalibration paths).
 
 **Never:**
 - Legacy `Pxx -` / `Pxx-Name` code; IMPORT-by-`Pxx`-number; Finder policing beyond known-prefix strip.
@@ -62,7 +63,7 @@ context:
 - `PatchFileNameReconciler.cpp` — keep policy; strip at call site (do not change global `sanitizeFileStem`)
 - `ComputerPatchesPanel.cpp` — OPEN full stems (~L199–202); **read-only**
 - `Tests/Unit/PatchFileNameSanitizerTests.cpp` + `PatchFileServiceTests.cpp` — update expectations/cases
-- `MutationCalibrationTestSupport.h` + `Tests/Fixtures/Patches/**` — leave historical `P00 -` paths
+- `MutationCalibrationTestSupport.h` + `Tests/Fixtures/Patches/Factory/**` — corpus aligned to `Pxx.` (`353488f5`; Ask First resolved keep)
 
 ## Tasks & Acceptance
 
@@ -80,6 +81,8 @@ context:
 - Given sanitizer/export unit tests, when run, then they pass with no `Pxx -` assertions.
 
 ## Spec Change Log
+
+- 2026-09-05 code review: Ask First fixture rename resolved **keep** (`353488f5`); Review Findings patches applied (stronger reapply test + artistic-inner load test).
 
 ## Design Notes
 
@@ -119,3 +122,12 @@ Examples: `P03. WARM PAD.syx` → `WARM PAD`; `P05. P99 - DJ.syx` → `P99 - DJ`
 
 - Sanitizer emit/parse matrix cases.
   [`PatchFileNameSanitizerTests.cpp:134`](../../Tests/Unit/PatchFileNameSanitizerTests.cpp#L134)
+
+### Review Findings
+
+- [x] [Review][Decision] Keep or revert Factory fixture rename to `Pxx.` — **resolved: keep** (`353488f5`). Ask First for fixture rename answered yes; Code Map / deferred notes updated to match corpus on `Pxx.`
+- [x] [Review][Patch] Strengthen reapply FILE NAMES test so SysEx name ≠ stripped filename (proves strip path) [Tests/Unit/PatchManagerActionHandlerBankExportFilenameTests.cpp:104]
+- [x] [Review][Patch] Add FILE NAMES load handler coverage for bank-export stem with artistic inner name (`P05. P99 - DJ`) [Tests/Unit/PatchManagerActionHandlerBankExportFilenameTests.cpp]
+- [x] [Review][Defer] No IMPORT backfill unit test for new `Pxx.` stems — deferred, coverage residual (parse SSOT covered; Bank Import path unchanged except shared parser)
+- [x] [Review][Defer] Hand-edited empty-after-dot stems (`P76.` / `P76. `) fall back to raw stem in `stemForFilenameReconcile` — deferred, pre-existing API empty-vs-nonmatch ambiguity; export never emits these
+- [x] [Review][Defer] Manual hardware smoke (EXPORT → Finder → OPEN FILE NAMES / combo / SYSEX NAMES) — deferred, scheduled next week per review preamble
