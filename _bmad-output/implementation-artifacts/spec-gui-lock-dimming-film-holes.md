@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-09-05'
 status: 'done'
 baseline_commit: '932f53fcafb5ec9b0f2a6066acf8358c95352b6b'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/8-3-ui-lock-without-synth.md'
   - '{project-root}/_bmad-output/project-context.md'
@@ -24,12 +24,12 @@ context:
 - Film covers full MainComponent bounds when active; paints dimming (not parent `setAlpha` as the primary mechanism); blocks clicks outside holes; passes clicks inside holes.
 - Hole sets: **device lock** (and existing equivalents: unsupported Matrix member, MIDI unresponsive) → Header + Footer only. **Compare + device OK** → Header + Footer + COMPARE button rect. Holes track layout (resize / UI scale).
 - Preserve `Core::isSectionLocked` composition and footer device/Compare messages (exact-string clear rules from 8-3).
-- One named film intensity constant (working default **0.3f**; historical binder alpha was 0.5f — different mechanism, calibrate visually via the constant only). Keep `GrayedControlHelper` local gray separate.
+- One named film intensity constant (working default **0.75f**; historical binder alpha was 0.5f — different mechanism, calibrate visually via the constant only). Keep `GrayedControlHelper` local gray separate.
 - PluginEditor modals / FileChoosers stay above the film (film inside MainComponent; editor overlays remain siblings of MainComponent).
 - English-only source; no Core→GUI; commits only on request.
 
 **Ask First:**
-- Shipping a default intensity other than 0.3f without visual check.
+- Shipping a default intensity other than 0.75f without visual check.
 - Dimming Header/Footer regions (future hole sets — out of this ship unless needed).
 
 **Never:**
@@ -54,8 +54,8 @@ context:
 
 ## Code Map
 
-- `Source/GUI/MainComponent.{h,cpp}` — owns `LockDimmingFilm` (ctor + idempotent `attachLockDimmingFilm`); `resized`/`setUiScale` refresh hole geometry; APVTS listener drives mode.
-- `Source/GUI/Helpers/LockDimmingFilm.{h,cpp}` — paint + `hitTest` via `lockDimmingFilmBlocksPoint`; intensity `kFilmIntensity = 0.3f`.
+- `Source/GUI/MainComponent.{h,cpp}` — owns `LockDimmingFilm` (idempotent `attachLockDimmingFilm` from `PluginEditor::createUiShell`); `resized`/`setUiScale` refresh hole geometry; APVTS listener drives mode.
+- `Source/GUI/Helpers/LockDimmingFilm.{h,cpp}` — paint + `hitTest` via `lockDimmingFilmBlocksPoint`; intensity `kFilmIntensity = 0.75f`.
 - `Source/GUI/Helpers/LockDimmingFilmPolicy.h` — pure mode/hole/hit helpers (`resolveLockDimmingFilmMode`, device lock wins over Compare).
 - `Source/GUI/Helpers/CompareLockBinder.{h,cpp}` — footer sync + focus steal only (no section `setAlpha` / mouse intercepts).
 - Binder sites (footer/focus only): `BodyPanel.cpp`, `SharedPanel.cpp`, `PatchManagerPanel.cpp` (Mutator `lockOnCompare=false`).
@@ -71,7 +71,7 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] Add reusable GUI dimming-film component (paint + hole hit-test + intensity constant default 0.3f) under `Source/GUI/` — uniform overlay mechanism.
+- [x] Add reusable GUI dimming-film component (paint + hole hit-test + intensity constant default 0.75f) under `Source/GUI/` — uniform overlay mechanism.
 - [x] Wire film on `MainComponent` (APVTS-driven visibility / hole policy; refresh holes on resize/UI scale; Header/Footer/COMPARE sources) — shell ownership + layout tracking.
 - [x] Expose COMPARE button bounds from Patch Mutator (minimal accessor) — hole geometry.
 - [x] Migrate `CompareLockBinder`: remove section `setAlpha` / section mouse-intercept dimming; keep footer sync; avoid binder fights / double dimming; delete dead `kLockedAlpha` if unused — clean cutover.
@@ -87,6 +87,14 @@ context:
 - Given lock transitions, when footer device/Compare messages apply, then 8-3 behavior is preserved.
 - Given PluginEditor modal or FileChooser, when shown over a locked UI, then it remains usable above the film.
 
+### Review Findings
+
+- [x] [Review][Decision] Ship film intensity 0.75f vs frozen default 0.3f — resolved: keep 0.75f; patch updates frozen Always / Design Notes / Code Map / tasks to match (daylight recalibration still allowed via the constant).
+- [x] [Review][Patch] Align spec intensity default to 0.75f [spec-gui-lock-dimming-film-holes.md] — renegotiated: frozen/working default, Ask First, Code Map, Design Notes, and execution task now say 0.75f.
+- [x] [Review][Patch] Fix stale attachLockDimmingFilm constructor claim [Source/GUI/MainComponent.h:45] — comment now points at PluginEditor::createUiShell.
+- [x] [Review][Patch] Avoid stealing keyboard focus from holes on every film refresh [Source/GUI/MainComponent.cpp:240] — `giveAwayKeyboardFocus` only when the film transitions from off to on.
+- [x] [Review][Defer] Shell film attach / hole assembly / component hitTest lack automated coverage beyond policy helpers [Tests/Unit/LockDimmingFilmPolicyTests.cpp] — deferred, pre-existing verification gap (policy tests satisfy execution AC; GUI wiring stays manual-smoke)
+
 ## Design Notes
 
 **Film hit model:** opaque to mouse outside holes (`hitTest` false inside hole rects so events reach components below). Prefer painting a semi-transparent fill with geometric holes over `setAlpha` on columns.
@@ -95,7 +103,7 @@ context:
 
 **Extensibility:** hole list/geometry is data the shell refreshes — future Header/Footer partial dim = different hole set, same film.
 
-**Default intensity:** use **0.3f** (recent visual WIP). Former binder `0.5f` is not pixel-equivalent to an overlay; ship 0.3f and calibrate with the constant.
+**Default intensity:** use **0.75f** (smoke-validated; daylight recalibration still via the constant only). Former binder `0.5f` is not pixel-equivalent to an overlay.
 
 ## Verification
 

@@ -233,11 +233,17 @@ void MainComponent::refreshLockDimmingFilm()
     auto holes = buildLockDimmingFilmHoles(includeCompareHole);
     const bool missingCompareHole = includeCompareHole && holes.size() < 3u;
 
+    const bool becomingActive = ! lockDimmingFilm_->isVisible();
+
     lockDimmingFilm_->setBounds(getLocalBounds());
     lockDimmingFilm_->setHoles(std::move(holes));
     lockDimmingFilm_->setVisible(true);
     lockDimmingFilm_->toFront(false);
-    bodyPanel.giveAwayKeyboardFocus();
+
+    // Steal focus only when the film turns on — not on every resize/scale refresh,
+    // which would yank keyboard focus off the COMPARE hole.
+    if (becomingActive)
+        bodyPanel.giveAwayKeyboardFocus();
 
     // Mutator may finish laying out COMPARE after the lock property callback.
     if (missingCompareHole && ! compareHoleRetryPending_)

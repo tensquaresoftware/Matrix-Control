@@ -1381,3 +1381,7 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-gui-lock-dimming-film-holes.md`
   summary: COMPARE hole may drift if Mutator re-layouts the button without a MainComponent resize or lock-property APVTS change (only a one-shot async retry covers empty bounds).
   evidence: Edge/Blind review — hole refresh is driven by shell resized + lock APVTS props, not Mutator-local layout callbacks.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gui-lock-dimming-film-holes.md`
+  summary: No automated tests for MainComponent film attach, Header/Footer/COMPARE hole assembly, LockDimmingFilm::hitTest/paint wiring, or binder click-block cutover — only LockDimmingFilmPolicyTests (pure helpers).
+  evidence: Verification Gap review (2026-09-05 second pass) — omitting attach or breaking component hitTest still leaves policy unit tests green.

@@ -13,7 +13,7 @@ namespace TSS
     class LockDimmingFilm : public juce::Component
     {
     public:
-        static constexpr float kFilmIntensity = 0.3f;
+        static constexpr float kFilmIntensity = 0.75f;
 
         LockDimmingFilm();
         ~LockDimmingFilm() override = default;

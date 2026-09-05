@@ -42,7 +42,7 @@ public:
     void setSkin(TSS::Skin& skin);
     void setUiScale(float uiScale);
 
-    /** Idempotent — also invoked from the constructor so the film cannot be skipped. */
+    /** Idempotent — call once from PluginEditor::createUiShell so the film is attached. */
     void attachLockDimmingFilm(juce::AudioProcessorValueTreeState& apvts);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
