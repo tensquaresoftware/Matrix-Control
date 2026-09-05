@@ -27,6 +27,22 @@ namespace
             mm->runDispatchLoopUntil(milliseconds);
     }
 
+    // Timer::callAfterDelay settle can lag on loaded CI runners; poll until committed or timeout.
+    bool waitUntilBankClipboardCommitted(Core::ClipboardService& clipboard, int settleMs)
+    {
+        const auto deadlineMs = juce::Time::getMillisecondCounter()
+                                + static_cast<juce::uint32>(settleMs + 2000);
+        while (juce::Time::getMillisecondCounter() < deadlineMs)
+        {
+            if (clipboard.getMode() == Core::ClipboardMode::Bank && clipboard.getBankSource().has_value())
+                return true;
+
+            pumpMessageLoop(10);
+        }
+
+        return clipboard.getMode() == Core::ClipboardMode::Bank && clipboard.getBankSource().has_value();
+    }
+
     Core::ClipboardService::BankPatchArray makeBankPatches(juce::uint8 marker)
     {
         Core::ClipboardService::BankPatchArray patches {};
@@ -66,11 +82,13 @@ private:
 
         const int settleMs = Core::MidiRequestTiming::deviceSettleMs(
             harness.midiManager.getRequiredSysExDelayMs());
-        pumpMessageLoop(settleMs + 50);
+        expect(waitUntilBankClipboardCommitted(harness.clipboard, settleMs));
 
         expect(harness.clipboard.getMode() == Core::ClipboardMode::Bank);
-        expect(harness.clipboard.getBankSource().has_value());
-        expectEquals(*harness.clipboard.getBankSource(), 2);
+        const auto bankSource = harness.clipboard.getBankSource();
+        expect(bankSource.has_value());
+        if (bankSource.has_value())
+            expectEquals(*bankSource, 2);
         expect(harness.proc.apvts.state.getProperty("uiMessageSeverity").toString() == "info");
     }
 
