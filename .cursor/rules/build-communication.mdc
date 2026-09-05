@@ -5,11 +5,11 @@ alwaysApply: true
 
 # Build — communication with Guillaume
 
-During any **build** session (`bmad-build`, the deprecated alias `bmad-quick-dev`, or an explicit “build / fix / implement this” run that follows that workflow):
+During any **build** session (`bmad-build`, or an explicit “build / fix / implement this” run that follows that workflow):
 
 ## Amorce « Contexte de la Story »
 
-SSOT (mandatory for create-story / dev-story / build / code-review): `.cursor/rules/bmad-story-context-amorce.mdc`.
+SSOT (mandatory for build / code-review): `.cursor/rules/bmad-story-context-amorce.mdc`.
 
 On first activation of this Build run, the first user-facing content must be `## Contexte de la Story` + one plain-French sentence, then the rest of the workflow. Do not repeat on later turns.
 

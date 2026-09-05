@@ -10,6 +10,7 @@ activation_steps_prepend = [
 ]
 
 persistent_facts = [
+  "file:{project-root}/_bmad-output/project-context.md",
   "file:{project-root}/_bmad/custom/clarity-bar-fr.md",
   "file:{project-root}/.cursor/rules/bmad-clarity-bar.mdc",
   "file:{project-root}/_bmad/custom/build-presentation-fr.md",

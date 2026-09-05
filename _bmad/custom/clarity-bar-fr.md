@@ -3,9 +3,7 @@
 Ce document est la **référence unique** pour le chat avec Guillaume pendant :
 
 - `bmad-code-review`
-- `bmad-build` (y compris la revue interne et le bilan ; alias déprécié `bmad-quick-dev`)
-- `bmad-create-story`
-- `bmad-dev-story`
+- `bmad-build` (y compris la revue interne et le bilan)
 
 Il prime sur le style des sous-agents, des étapes internes et de tout jargon d’ingénierie.
 

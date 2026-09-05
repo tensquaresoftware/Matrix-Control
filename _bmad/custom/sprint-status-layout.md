@@ -33,7 +33,7 @@ development_status:
 
 ## Preservation
 
-When updating an existing file (sprint-planning refresh, create-story, dev-story, code-review, build):
+When updating an existing file (sprint-planning refresh, code-review, build):
 
 - Keep all comment lines, blank lines, STATUS DEFINITIONS, WORKFLOW NOTES, and `action_items`.
 - Never downgrade story statuses.

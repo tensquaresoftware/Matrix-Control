@@ -13,7 +13,7 @@
 [core]
 project_name = "Matrix-Control"
 document_output_language = "English"
-output_folder = "_bmad-output"
+output_folder = "{project-root}/_bmad-output"
 
 [modules.bmm]
 planning_artifacts = "{project-root}/_bmad-output/planning-artifacts"

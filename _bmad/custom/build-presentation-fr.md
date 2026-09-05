@@ -1,6 +1,6 @@
 # Build — contrat de présentation (Matrix-Control)
 
-Ce document s’applique à **toute** sortie utilisateur de `bmad-build` (et de l’alias déprécié `bmad-quick-dev`) : clarification, plan, implémentation, **revue interne**, présentation finale.
+Ce document s’applique à **toute** sortie utilisateur de `bmad-build` : clarification, plan, implémentation, **revue interne**, présentation finale.
 Il prime sur le style télégraphique des étapes internes et des sous-agents.
 
 **Barème partagé (obligatoire) :** charger et appliquer `clarity-bar-fr.md` en premier. Rien ici n’assouplit ce barème.

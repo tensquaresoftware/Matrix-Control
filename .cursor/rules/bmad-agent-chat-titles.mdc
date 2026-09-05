@@ -5,7 +5,7 @@ alwaysApply: true
 
 # BMad — titres des conversations Agents
 
-When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-create-story`, `/bmad-dev-story`, `/bmad-code-review`, `/bmad-build`, `/bmad-correct-course`, etc.), consider renaming the current chat — **only under the gate below**.
+When Guillaume starts a conversation with a **BMad skill** (attached skill or slash command such as `/bmad-build`, `/bmad-code-review`, `/bmad-correct-course`, etc.), consider renaming the current chat — **only under the gate below**.
 
 Use the MCP tool `rename_chat` on server `cursor-app-control`. **Only this API persists the title** — direct database edits to the sidebar cache are overwritten when the conversation is opened (Cursor reloads the title from the conversation checkpoint).
 
@@ -47,7 +47,7 @@ When renaming is allowed, do it as the **first tool call**, before other work.
 
 ## After rename — story-command amorce
 
-For `bmad-create-story`, `bmad-dev-story`, `bmad-build` (and deprecated alias `bmad-quick-dev`), and `bmad-code-review`, follow `.cursor/rules/bmad-story-context-amorce.mdc` for the first user-facing content (`Contexte de la Story`).
+For `bmad-build` and `bmad-code-review`, follow `.cursor/rules/bmad-story-context-amorce.mdc` for the first user-facing content (`Contexte de la Story`).
 
 ---
 
@@ -61,17 +61,13 @@ These commands keep a compact ID-only title when a story ID is present:
 
 | Skill / command | Title |
 |---|---|
-| `bmad-create-story` | `BMad — Create Story {Story ID}` |
-| `bmad-dev-story` | `BMad — Dev Story {Story ID}` |
 | `bmad-code-review` | `BMad — Code Review {Story ID}` |
-| `bmad-build` (alias `bmad-quick-dev`) | `BMad — Build {Story ID}` |
+| `bmad-build` | `BMad — Build {Story ID}` |
 
-Omit `{Story ID}` only when none can be inferred. For `bmad-build` / `bmad-quick-dev` without a story ID, fall through to format B.
+Omit `{Story ID}` only when none can be inferred. For `bmad-build` without a story ID, fall through to format B.
 
 Examples:
 
-- `/bmad-create-story 4-5` → `BMad — Create Story 4-5`
-- `/bmad-dev-story 4-4` → `BMad — Dev Story 4-4`
 - `/bmad-code-review 4-4` → `BMad — Code Review 4-4`
 - `/bmad-build 8-4` → `BMad — Build 8-4`
 - `/bmad-build` + story `8-4` in the message → `BMad — Build 8-4`
@@ -91,7 +87,7 @@ Examples:
 
 - `/bmad-build` + disabled controls look (no story ID) → `BMad — Build : Look contrôles inactifs`
 - `/bmad-correct-course` + bank unlock simplify → `BMad — Correct Course : Unlock banque`
-- `/bmad-sprint-status` → `BMad — Sprint Status` (no topic needed)
+- `/bmad-sprint-planning` → `BMad — Sprint Planning` (no topic needed)
 
 ---
 
@@ -99,35 +95,23 @@ Examples:
 
 | Skill / command prefix | Label |
 |---|---|
-| `bmad-create-story` | Create Story |
-| `bmad-dev-story` | Dev Story |
 | `bmad-code-review` | Code Review |
 | `bmad-correct-course` | Correct Course |
 | `bmad-sprint-planning` | Sprint Planning |
-| `bmad-sprint-status` | Sprint Status |
 | `bmad-build` | Build |
-| `bmad-quick-dev` | Build |
 | `bmad-build-auto` | Build Auto |
-| `bmad-check-implementation-readiness` | Implementation Readiness |
-| `bmad-create-architecture` | Create Architecture |
 | `bmad-create-epics-and-stories` | Create Epics |
 | `bmad-prd` | PRD |
 | `bmad-spec` | Spec |
 | `bmad-retrospective` | Retrospective |
 | `bmad-help` | Help |
-| `bmad-checkpoint-preview` | Checkpoint |
-| `bmad-investigate` | Investigate |
+| `bmad-walkthrough` | Walkthrough |
 | `bmad-review` | Review |
-| `bmad-review-adversarial-general` | Adversarial Review |
-| `bmad-review-edge-case-hunter` | Edge Case Review |
 | `bmad-party-mode` | Party Mode |
 | `bmad-brainstorming` | Brainstorming |
 | `bmad-ux` | UX |
 | `bmad-deep-recon` | Deep Recon |
-| `bmad-technical-research` | Technical Research |
 | `bmad-project-context` | Project Context |
-| `bmad-generate-project-context` | Project Context |
-| `bmad-document-project` | Document Project |
 | Other `bmad-*` skill | Title-case the skill slug after `bmad-`, words separated by spaces |
 
 ---
@@ -153,7 +137,7 @@ Parse from the user message (slash command or attached skill context):
 
 - Epic-story: `4-5`, `7-3b`, `2-9b`, `8-4`
 - Utility stories: `U-0`, `U-11`
-- Accept `/bmad-create-story 4-5`, `/bmad-build 8-4`, `/bmad-create story 4-5`, or `story 4-5` / `US 8-4` in plain text
+- Accept `/bmad-build 8-4`, or `story 4-5` / `US 8-4` in plain text
 
 ---
 
