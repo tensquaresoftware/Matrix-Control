@@ -84,6 +84,7 @@ namespace TSS
         void paint(juce::Graphics& g) override;
         void resized() override;
         void mouseEnter(const juce::MouseEvent& event) override;
+        void mouseMove(const juce::MouseEvent& event) override;
         void mouseExit(const juce::MouseEvent& event) override;
         void mouseDown(const juce::MouseEvent& event) override;
 
@@ -96,8 +97,11 @@ namespace TSS
 
         int getTitleBandWidthDesign() const;
         juce::Rectangle<float> getTitlePaintBounds() const;
+        juce::Rectangle<float> getTitleInteractionBounds() const;
         bool isPointInTitleBand(juce::Point<float> localPoint) const;
         bool isTitleClickEnabled() const { return static_cast<bool>(titleClickHandler_); }
+        void syncTitleHoverFromPosition(juce::Point<float> localPoint);
+        void clearTitleHover();
 
         void createInitButton(const WithActionsSpec& spec);
         void createCopyPasteButtons(const WithActionsSpec& spec);

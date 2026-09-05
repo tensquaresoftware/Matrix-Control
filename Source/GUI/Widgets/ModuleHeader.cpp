@@ -8,7 +8,6 @@
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Widgets/Button.h"
-#include "GUI/Widgets/ModuleHeaderTitleColour.h"
 #include "Shared/Definitions/PluginIDs.h"
 
 namespace TSS
@@ -196,61 +195,6 @@ namespace TSS
         repaint();
     }
 
-    void ModuleHeader::setTitleClickHandler(std::function<void()> handler)
-    {
-        titleClickHandler_ = std::move(handler);
-
-        if (! isTitleClickEnabled())
-        {
-            titleHovered_ = false;
-            setMouseCursor(juce::MouseCursor::NormalCursor);
-        }
-
-        repaint();
-    }
-
-    juce::Colour ModuleHeader::resolveTitleTextColour() const
-    {
-        return resolveModuleHeaderTitleTextColour(isTitleClickEnabled(), titleHovered_, look_.text, look_.textFocus);
-    }
-
-    bool ModuleHeader::isPointInTitleBand(juce::Point<float> localPoint) const
-    {
-        return getTitlePaintBounds().contains(localPoint);
-    }
-
-    void ModuleHeader::mouseEnter(const juce::MouseEvent& event)
-    {
-        if (! isTitleClickEnabled() || ! isPointInTitleBand(event.position))
-            return;
-
-        titleHovered_ = true;
-        setMouseCursor(juce::MouseCursor::PointingHandCursor);
-        repaint();
-    }
-
-    void ModuleHeader::mouseExit(const juce::MouseEvent&)
-    {
-        if (! titleHovered_ && getMouseCursor() == juce::MouseCursor::NormalCursor)
-            return;
-
-        titleHovered_ = false;
-        setMouseCursor(juce::MouseCursor::NormalCursor);
-        repaint();
-    }
-
-    void ModuleHeader::mouseDown(const juce::MouseEvent& event)
-    {
-        if (! event.mods.isLeftButtonDown())
-            return;
-
-        if (! isTitleClickEnabled() || ! isPointInTitleBand(event.position))
-            return;
-
-        if (titleClickHandler_)
-            titleClickHandler_();
-    }
-
     void ModuleHeader::paint(juce::Graphics& g)
     {
         if (text_.isEmpty())
@@ -263,6 +207,9 @@ namespace TSS
 
     void ModuleHeader::resized()
     {
+        if (isTitleClickEnabled())
+            toFront(false);
+
         if (presentation_ == Presentation::TitleWithActions)
         {
             if (buttonSet_ == ButtonSet::InitCopyPaste)

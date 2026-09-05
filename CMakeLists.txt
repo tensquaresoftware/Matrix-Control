@@ -344,6 +344,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Widgets/ModulationBusCell.cpp
     Source/GUI/Widgets/ModulationBusHeader.cpp
     Source/GUI/Widgets/ModuleHeader.cpp
+    Source/GUI/Widgets/ModuleHeaderTitleClick.cpp
     Source/GUI/Widgets/MultiColumnPopupMenu.cpp
     Source/GUI/Widgets/NumberBox.cpp
     Source/GUI/Widgets/ParameterCell.cpp
