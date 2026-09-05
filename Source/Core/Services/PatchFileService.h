@@ -114,6 +114,7 @@ namespace Core
                                    juce::StringArray& validNames,
                                    int& validCount,
                                    int& invalidCount) const;
+        static void sortOpenListFileNames(juce::StringArray& validNames);
         PatchFolderScanResult scanReadableFolder(const juce::File& folder) const;
         PatchFolderScanResult makeUnusableFolderResult(const juce::File& folder) const;
         PatchFolderScanResult makeScanResult(const juce::File& folder,

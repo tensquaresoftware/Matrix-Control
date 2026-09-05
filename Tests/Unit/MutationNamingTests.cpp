@@ -20,6 +20,8 @@ public:
         formatPatchName_retry();
         formatPatchName_maxBoundary();
         formatExportStem_matchesPatchName();
+        parseExportFileName_initialRootRetry();
+        compareOpenListFileNames_mutatorOrder();
         buildHistorySubmenuDisplayLabels_sentinelOnly_empty();
         buildHistorySubmenuDisplayLabels_withRetries();
         buildHistorySubmenuDisplay_skipsInvalidTokens_keepsParallelIndices();
@@ -94,6 +96,39 @@ private:
 
         expectEquals(Core::MutationNaming::formatExportStem(5, 2),
                      Core::MutationNaming::formatPatchName(5, 2));
+    }
+
+    void parseExportFileName_initialRootRetry()
+    {
+        beginTest("parseExportFileName_initialRootRetry");
+
+        const auto initial = Core::MutationNaming::parseExportFileName("INITIAL.syx");
+        expect(initial.kind == Core::MutatorExportFileKey::Kind::kInitial);
+
+        const auto root = Core::MutationNaming::parseExportFileName("M01.syx");
+        expect(root.kind == Core::MutatorExportFileKey::Kind::kRoot);
+        expectEquals(root.rootIndex, 1);
+
+        const auto retry = Core::MutationNaming::parseExportFileName("M01-R08.syx");
+        expect(retry.kind == Core::MutatorExportFileKey::Kind::kRetry);
+        expectEquals(retry.rootIndex, 1);
+        expectEquals(retry.retryIndex, 8);
+
+        expect(Core::MutationNaming::parseExportFileName("M1.syx").kind
+               == Core::MutatorExportFileKey::Kind::kNone);
+        expect(Core::MutationNaming::parseExportFileName("WARMPAD.syx").kind
+               == Core::MutatorExportFileKey::Kind::kNone);
+    }
+
+    void compareOpenListFileNames_mutatorOrder()
+    {
+        beginTest("compareOpenListFileNames_mutatorOrder");
+
+        expect(Core::MutationNaming::compareOpenListFileNames("INITIAL.syx", "M00.syx") < 0);
+        expect(Core::MutationNaming::compareOpenListFileNames("M01.syx", "M01-R00.syx") < 0);
+        expect(Core::MutationNaming::compareOpenListFileNames("M01-R00.syx", "M01-R01.syx") < 0);
+        expect(Core::MutationNaming::compareOpenListFileNames("M01-R08.syx", "M02.syx") < 0);
+        expect(Core::MutationNaming::compareOpenListFileNames("A.syx", "M00.syx") < 0);
     }
 
     void buildHistorySubmenuDisplayLabels_sentinelOnly_empty()

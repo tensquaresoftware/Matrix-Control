@@ -379,7 +379,7 @@ Deux emplacements distincts :
 
 | Bouton | Rôle |
 |--------|------|
-| `OPEN` | Choisir / ouvrir le dossier de patches sur le disque |
+| `OPEN` | Choisir / ouvrir le dossier de patches sur le disque (liste triée : `INITIAL`, chaque `Mxx` puis ses `Mxx-Ryy`, sinon alphabétique) |
 | `SAVE AS` | Enregistrer le patch courant sous un nouveau nom `.syx` |
 | `SAVE` | Enregistrer dans le fichier déjà associé |
 

@@ -2,11 +2,23 @@
 
 #include "Core/MIDI/SysEx/SysExDecoder.h"
 #include "Core/MIDI/SysEx/SysExEncoder.h"
+#include "Core/Services/PatchMutator/MutationNaming.h"
 #include "Shared/Definitions/PluginDisplayNames.h"
 
 namespace Core
 {
     namespace FooterMessages = PluginDisplayNames::PatchManagerSection::ComputerPatchesModule::FooterMessages;
+
+    namespace
+    {
+        struct OpenListFileNameComparator
+        {
+            static int compareElements(const juce::String& first, const juce::String& second)
+            {
+                return MutationNaming::compareOpenListFileNames(first, second);
+            }
+        };
+    }
 
     PatchFileService::PatchFileService(SysExDecoder& decoder) noexcept
         : decoder_(decoder)
@@ -208,9 +220,24 @@ namespace Core
         counts.syxFileCount = syxFiles.size();
 
         collectSyxScanResults(syxFiles, validNames, counts.validCount, counts.invalidCount);
-        validNames.sort(false);
+        sortOpenListFileNames(validNames);
 
         return makeScanResult(folder, std::move(validNames), counts);
+    }
+
+    void PatchFileService::sortOpenListFileNames(juce::StringArray& validNames)
+    {
+        juce::Array<juce::String> ordered;
+
+        for (const auto& name : validNames)
+            ordered.add(name);
+
+        OpenListFileNameComparator comparator;
+        ordered.sort(comparator);
+        validNames.clearQuick();
+
+        for (const auto& name : ordered)
+            validNames.add(name);
     }
 
     bool PatchFileService::validateFileContents(const juce::File& file) const

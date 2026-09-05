@@ -30,7 +30,8 @@ namespace Core
     PatchFileExportResult PatchFileService::writeInitialSnapshot(const juce::File& folder,
                                                                  const MutatorExportWriteArgs& args)
     {
-        const auto initialFile = folder.getChildFile("INITIAL.syx");
+        const auto initialFile = folder.getChildFile(
+            juce::String(MutationNaming::kInitialExportStem) + PatchFileService::kSyxExtension);
         return writeExportPatchFile(initialFile, args.store.getInitialSnapshot().data(), args);
     }
 

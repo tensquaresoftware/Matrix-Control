@@ -42,6 +42,7 @@ public:
         scan_emptyFolder();
         scan_nonexistentFolder();
         scan_sortOrder();
+        scan_sortOrder_mutatorExportNames();
         scan_readFailure_countsInvalid();
         scan_sortOrder_patchFixtures();
         scan_uppercaseSyxExtension_countsValid();
@@ -186,6 +187,37 @@ private:
         expectEquals(result.sortedValidFileNames[1], juce::String("M.syx"));
         expectEquals(result.sortedValidFileNames[2], juce::String("Patch 71.syx"));
         expectEquals(result.sortedValidFileNames[3], juce::String("Z.syx"));
+
+        tempDir.deleteRecursively();
+    }
+
+    void scan_sortOrder_mutatorExportNames()
+    {
+        beginTest("Mutator export filenames sort root before retries");
+
+        const auto tempDir = createTempScanDir();
+        const auto model = PatchFileServiceTestSupport::makeDistinctBuffer(71);
+        const juce::StringArray names {
+            "M01-R00.syx",
+            "M02.syx",
+            "INITIAL.syx",
+            "M01.syx",
+            "M01-R01.syx",
+            "M00.syx"
+        };
+
+        for (const auto& name : names)
+            expect(service_.savePatchSysExFile(tempDir.getChildFile(name), model.data(), encoder_).success);
+
+        const auto result = service_.scanFolder(tempDir);
+
+        expectEquals(result.sortedValidFileNames.size(), 6);
+        expectEquals(result.sortedValidFileNames[0], juce::String("INITIAL.syx"));
+        expectEquals(result.sortedValidFileNames[1], juce::String("M00.syx"));
+        expectEquals(result.sortedValidFileNames[2], juce::String("M01.syx"));
+        expectEquals(result.sortedValidFileNames[3], juce::String("M01-R00.syx"));
+        expectEquals(result.sortedValidFileNames[4], juce::String("M01-R01.syx"));
+        expectEquals(result.sortedValidFileNames[5], juce::String("M02.syx"));
 
         tempDir.deleteRecursively();
     }
