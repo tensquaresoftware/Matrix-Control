@@ -1,6 +1,7 @@
 #include <juce_core/juce_core.h>
 
 #include "Core/Audio/DeviceAudioInputPreference.h"
+#include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterEditGate.h"
 
 class DeviceAudioInputPreferenceTests : public juce::UnitTest
@@ -60,6 +61,44 @@ public:
         expect(! Core::isMasterEditAllowed(true, MatrixDeviceTypes::Type::kMatrix6R));
         expect(! Core::isMasterEditAllowed(true, MatrixDeviceTypes::Type::kUnknown));
         expect(! Core::isMasterEditAllowed(false, MatrixDeviceTypes::Type::kMatrix6));
+
+        beginTest("hide content for unlocked Matrix-6/6R");
+        expect(Core::shouldHideMasterEditContent(
+            false, true, MatrixDeviceTypes::Type::kMatrix6));
+        expect(Core::shouldHideMasterEditContent(
+            false, true, MatrixDeviceTypes::Type::kMatrix6R));
+
+        beginTest("do not hide unless unlocked Matrix-6/6R");
+        expect(! Core::shouldHideMasterEditContent(
+            false, true, MatrixDeviceTypes::Type::kMatrix1000));
+        expect(! Core::shouldHideMasterEditContent(
+            false, true, MatrixDeviceTypes::Type::kUnknown));
+        expect(! Core::shouldHideMasterEditContent(
+            false, false, MatrixDeviceTypes::Type::kMatrix6));
+
+        beginTest("do not hide when no synth");
+        expectRootLockedNoHide(false, MatrixDeviceTypes::Type::kUnknown, false, false);
+
+        beginTest("do not hide when unknown detected");
+        expectRootLockedNoHide(true, MatrixDeviceTypes::Type::kUnknown, false, false);
+
+        beginTest("do not hide when unresponsive");
+        expectRootLockedNoHide(true, MatrixDeviceTypes::Type::kMatrix6, false, true);
+
+        beginTest("do not hide when Compare active");
+        expectRootLockedNoHide(true, MatrixDeviceTypes::Type::kMatrix6, true, false);
+    }
+
+private:
+    void expectRootLockedNoHide(bool deviceDetected,
+                                MatrixDeviceTypes::Type deviceType,
+                                bool compareActive,
+                                bool unresponsive)
+    {
+        const bool rootLocked = Core::isSectionLocked(
+            deviceDetected, deviceType, compareActive, unresponsive);
+        expect(rootLocked);
+        expect(! Core::shouldHideMasterEditContent(rootLocked, deviceDetected, deviceType));
     }
 };
 

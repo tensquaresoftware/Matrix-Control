@@ -1355,3 +1355,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-numberbox-edit-border-and-font.md`
   summary: TextEditor caret and remaining colour IDs are unset; default caret may clash with NumberBox chrome.
   evidence: Pre-existing showEditor colour setup; transparent outlines unchanged.
+
+## Deferred from: review of spec-master-edit-hide-matrix-6.md (2026-09-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-hide-matrix-6.md`
+  summary: PRD/epic FR-46 still describes MASTER EDIT as grayed on Matrix-6/6R while the UI now hides the column content.
+  evidence: Spec Ask First blocked PRD wording updates; product docs and shipped UX will drift until a dedicated copy pass.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-hide-matrix-6.md`
+  summary: MasterEditGate hide-predicate tests live in DeviceAudioInputPreferenceTests.cpp rather than a dedicated Core test file.
+  evidence: Blind Hunter — mixed suites; functional coverage exists, file split is cleanup only.

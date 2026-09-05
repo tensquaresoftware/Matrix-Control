@@ -10,4 +10,14 @@ namespace Core
     {
         return deviceDetected && deviceType == MatrixDeviceTypes::Type::kMatrix1000;
     }
+
+    /** Hide MASTER EDIT column content on Matrix-6/6R when the section is unlocked (FR-46 UI). */
+    inline bool shouldHideMasterEditContent(bool rootLocked,
+                                            bool deviceDetected,
+                                            MatrixDeviceTypes::Type deviceType) noexcept
+    {
+        const bool isMatrix6Family = deviceType == MatrixDeviceTypes::Type::kMatrix6
+                                  || deviceType == MatrixDeviceTypes::Type::kMatrix6R;
+        return ! rootLocked && deviceDetected && isMatrix6Family;
+    }
 }

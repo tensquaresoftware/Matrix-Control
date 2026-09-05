@@ -7,7 +7,6 @@
 #include "Core/MIDI/EditorOutboundGate.h"
 #include "Core/MIDI/MasterEditGate.h"
 #include "Core/Services/DeviceTypeRegistry.h"
-#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Looks/LookBuilders.h"
 #include "GUI/Skins/ISkin.h"
@@ -20,21 +19,6 @@
 #include "Shared/Definitions/PluginHelpers.h"
 #include "Shared/Definitions/PluginIDs.h"
 #include "GUI/Factories/WidgetFactory.h"
-
-namespace
-{
-    void setSubtreeKeyboardInteractionEnabled(juce::Component& root, bool enabled)
-    {
-        root.setWantsKeyboardFocus(enabled);
-        root.setMouseClickGrabsKeyboardFocus(enabled);
-
-        for (int i = 0; i < root.getNumChildComponents(); ++i)
-        {
-            if (auto* child = root.getChildComponent(i))
-                setSubtreeKeyboardInteractionEnabled(*child, enabled);
-        }
-    }
-}
 
 MasterEditPanel::MasterEditPanel(TSS::ISkin& skin, const MasterEditPanelDimensions& dims, WidgetFactory& widgetFactory, juce::AudioProcessorValueTreeState& apvts)
     : dims_(dims)
@@ -119,38 +103,33 @@ void MasterEditPanel::refreshDeviceGating()
         PluginIDs::PatchManagerSection::PatchMutatorModule::StateProperties::kCompareActive,
         false));
 
-    // Root Compare/device lock already dims the panel — skip child gray to avoid ~0.25 alpha.
+    // Root Compare/device lock owns dimming — skip hide so children stay under that lock.
     const bool rootLocked = Core::isSectionLocked(
         deviceDetected, deviceType, compareActive, deviceMidiUnresponsive);
-    const bool shouldGray = ! rootLocked
-        && deviceDetected
-        && ! Core::isMasterEditAllowed(deviceDetected, deviceType);
-    setMasterEditGrayed(shouldGray);
+    const bool shouldHide = Core::shouldHideMasterEditContent(
+        rootLocked, deviceDetected, deviceType);
+    applyMasterEditContentVisibility(shouldHide);
 }
 
-void MasterEditPanel::applyGrayedToChild(juce::Component* child, bool grayed)
+void MasterEditPanel::applyMasterEditContentVisibility(bool hidden)
 {
-    if (child == nullptr)
-        return;
+    const bool stateChanged = hidden != masterEditContentHidden_;
+    masterEditContentHidden_ = hidden;
 
-    TSS::GrayedControlHelper::applyGrayedAppearance(*child, grayed);
-    child->setInterceptsMouseClicks(! grayed, ! grayed);
-    setSubtreeKeyboardInteractionEnabled(*child, ! grayed);
-}
-
-void MasterEditPanel::setMasterEditGrayed(bool grayed)
-{
-    masterEditGrayed_ = grayed;
-
-    applyGrayedToChild(sectionHeader_.get(), grayed);
-    applyGrayedToChild(midiPanel_.get(), grayed);
-    applyGrayedToChild(vibratoPanel_.get(), grayed);
-    applyGrayedToChild(miscPanel_.get(), grayed);
-
-    if (grayed)
+    if (hidden && stateChanged)
+    {
+        juce::PopupMenu::dismissAllActiveMenus();
         giveAwayKeyboardFocus();
+    }
 
-    repaint();
+    const bool contentVisible = ! hidden;
+    sectionHeader_->setVisible(contentVisible);
+    midiPanel_->setVisible(contentVisible);
+    vibratoPanel_->setVisible(contentVisible);
+    miscPanel_->setVisible(contentVisible);
+
+    if (stateChanged)
+        repaint();
 }
 
 void MasterEditPanel::paint(juce::Graphics& g)
@@ -193,8 +172,7 @@ void MasterEditPanel::setSkin(TSS::ISkin& skin)
         vibratoPanel_.get(),
         miscPanel_.get());
 
-    if (masterEditGrayed_)
-        setMasterEditGrayed(true);
+    applyMasterEditContentVisibility(masterEditContentHidden_);
 
     repaint();
 }

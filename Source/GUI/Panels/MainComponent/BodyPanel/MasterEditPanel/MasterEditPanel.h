@@ -46,7 +46,7 @@ private:
     TSS::ISkin* skin_;
     float uiScale_ = 1.0f;
     juce::AudioProcessorValueTreeState& apvts_;
-    bool masterEditGrayed_ = false;
+    bool masterEditContentHidden_ = false;
 
     std::unique_ptr<TSS::SectionHeader> sectionHeader_;
     std::unique_ptr<MidiPanel> midiPanel_;
@@ -54,8 +54,7 @@ private:
     std::unique_ptr<MiscPanel> miscPanel_;
 
     void refreshDeviceGating();
-    void setMasterEditGrayed(bool grayed);
-    void applyGrayedToChild(juce::Component* child, bool grayed);
+    void applyMasterEditContentVisibility(bool hidden);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MasterEditPanel)
 };
