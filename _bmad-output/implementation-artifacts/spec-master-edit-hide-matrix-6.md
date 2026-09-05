@@ -65,7 +65,7 @@ context: []
 - [x] `Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.h` -- Repurpose FR-46 child state from grayed to content-hidden; drop unused gray-only helpers.
 - [x] `Source/GUI/Panels/MainComponent/BodyPanel/MasterEditPanel/MasterEditPanel.cpp` -- Hide/show the four children per gate; keep shell paint; give away focus when hiding; restore on hot-swap / `setSkin`.
 - [x] `Source/Core/MIDI/MasterEditGate.h` + `Tests/Unit/DeviceAudioInputPreferenceTests.cpp` -- Pure `shouldHideMasterEditContent` + unit coverage for I/O matrix decision rows (GUI smoke remains manual).
-- [ ] Manual smoke -- Matrix-6 hide, Matrix-1000 show, hot-swap both directions in Standalone.
+- [x] Manual smoke -- Matrix-6 hide, Matrix-1000 show, hot-swap both directions in Standalone.
 
 **Acceptance Criteria:**
 - Given detected Matrix-6/6R with section unlocked, when device gating refreshes, then MASTER EDIT shows only the Body-coloured shell — no header, modules, or semi-transparent controls.
