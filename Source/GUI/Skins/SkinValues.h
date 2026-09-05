@@ -106,6 +106,8 @@ namespace TSS
         kPopupMenuScrollbarButtonLike,
         
         // NumberBox colours
+        kNumberBoxBackground,
+        kNumberBoxBackgroundDisabled,
         kNumberBoxText,
         kNumberBoxTextFocus,
         kNumberBoxEditorBackground,

@@ -5,7 +5,6 @@
 #include "Core/Services/DeviceMemoryLimits.h"
 #include "Core/Services/DeviceTypeRegistry.h"
 #include "GUI/Helpers/ClipboardFeedbackButtonBinding.h"
-#include "GUI/Helpers/GrayedControlHelper.h"
 #include "GUI/Layout/ScaledLayout.h"
 #include "GUI/Skins/ISkin.h"
 #include "GUI/Looks/LookBuilders.h"
@@ -342,11 +341,11 @@ void InternalPatchesPanel::refreshCoordinateDisplayStates()
 
     if (currentBankNumber)
     {
-        // Matrix-6/6R has no banks: keep the slot, show it gray and empty.
+        // Matrix-6/6R has no banks: empty disabled slot (disabled fill from NumberBox skin).
         currentBankNumber->setDisplayState(bankNumberAvailable_ ? coordinateState
                                                                : DisplayState::kUnavailable);
         currentBankNumber->setEnabled(bankNumberAvailable_);
-        TSS::GrayedControlHelper::applyGrayedAppearance(*currentBankNumber, ! bankNumberAvailable_);
+        currentBankNumber->setAlpha(1.0f); // solid skin fill — never stack alpha gray
         currentBankNumber->setFocusHighlight(bankNumberAvailable_ && internalHasFocus);
     }
 

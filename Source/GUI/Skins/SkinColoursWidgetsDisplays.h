@@ -8,6 +8,20 @@ namespace TSS::SkinColours
     {
         namespace NumberBox
         {
+            // Enabled fill — black (was borrowed from ButtonBackgroundOn at LookBuilder time).
+            inline constexpr ColourElement kBackground = {
+                "NumberBoxBackground",
+                ColourChart::kBlack,
+                ColourChart::kBlack,
+            };
+
+            // Same Grey1 as Button / ButtonLike disabled fill (solid, no alpha overlay).
+            inline constexpr ColourElement kBackgroundDisabled = {
+                "NumberBoxBackgroundDisabled",
+                ColourChart::kDarkGrey1,
+                ColourChart::kDarkGrey1,
+            };
+
             // Normal readable value (same chart entry as button labels).
             inline constexpr ColourElement kText = {
                 "NumberBoxText",

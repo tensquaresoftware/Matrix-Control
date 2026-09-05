@@ -52,6 +52,7 @@ namespace TSS
         void paint(juce::Graphics& g) override;
         void resized() override;
         void mouseDoubleClick(const juce::MouseEvent& e) override;
+        void enablementChanged() override;
 
         int getHeight() const { return height_; }
 

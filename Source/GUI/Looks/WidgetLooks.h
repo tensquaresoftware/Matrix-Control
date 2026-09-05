@@ -140,6 +140,7 @@ namespace TSS
     struct NumberBoxLook
     {
         juce::Colour background{};
+        juce::Colour backgroundDisabled{};
         juce::Colour borderOff{};
         juce::Colour borderOn{};
         juce::Colour text{};

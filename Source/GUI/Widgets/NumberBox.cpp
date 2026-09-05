@@ -153,7 +153,10 @@ namespace TSS
         const auto bounds = getLocalBounds().toFloat();
 
         // Edit fill uses focus red so any inset gap matches the TextEditor.
-        g.setColour(editor_ != nullptr ? look_.textFocus : look_.background);
+        const auto fill = editor_ != nullptr
+                              ? look_.textFocus
+                              : (isEnabled() ? look_.background : look_.backgroundDisabled);
+        g.setColour(fill);
         g.fillRect(bounds);
 
         g.setColour(getBorderColour());
@@ -170,6 +173,14 @@ namespace TSS
     void NumberBox::resized()
     {
         layoutEditor();
+        repaint();
+    }
+
+    void NumberBox::enablementChanged()
+    {
+        if (! isEnabled() && editor_ != nullptr)
+            hideEditor();
+
         repaint();
     }
 

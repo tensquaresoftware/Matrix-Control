@@ -478,6 +478,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
         Tests/Unit/PatchManagerActionHandlerHeaderClickTests.cpp
         Tests/Unit/ModuleHeaderTitleColourTests.cpp
+        Tests/Unit/NumberBoxDisabledBackgroundColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp

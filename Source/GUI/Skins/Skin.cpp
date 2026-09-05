@@ -315,6 +315,8 @@ namespace TSS
     {
         using namespace SkinColours;
         
+        colours_[SkinColourId::kNumberBoxBackground] = juce::Colour(accessColour(Widgets::NumberBox::kBackground));
+        colours_[SkinColourId::kNumberBoxBackgroundDisabled] = juce::Colour(accessColour(Widgets::NumberBox::kBackgroundDisabled));
         colours_[SkinColourId::kNumberBoxText] = juce::Colour(accessColour(Widgets::NumberBox::kText));
         colours_[SkinColourId::kNumberBoxTextFocus] = juce::Colour(accessColour(Widgets::NumberBox::kTextFocus));
         colours_[SkinColourId::kNumberBoxEditorBackground] = juce::Colour(accessColour(Widgets::NumberBox::kEditorBackground));

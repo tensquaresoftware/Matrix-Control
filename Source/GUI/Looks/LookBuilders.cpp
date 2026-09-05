@@ -214,7 +214,8 @@ namespace TSS
     NumberBoxLook numberBoxLookFromSkin(const ISkin& skin)
     {
         NumberBoxLook look;
-        look.background = skin.getColour(SkinColourId::kButtonBackgroundOn);
+        look.background = skin.getColour(SkinColourId::kNumberBoxBackground);
+        look.backgroundDisabled = skin.getColour(SkinColourId::kNumberBoxBackgroundDisabled);
         look.borderOff = skin.getColour(SkinColourId::kButtonBorderOff);
         look.borderOn = skin.getColour(SkinColourId::kButtonBorderOn);
         look.text = skin.getColour(SkinColourId::kNumberBoxText);
