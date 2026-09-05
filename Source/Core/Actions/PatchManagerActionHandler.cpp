@@ -201,6 +201,9 @@ namespace Core
         if (tryHandleComputerPatchFileNavigation(propertyId, limits))
             return;
 
+        if (tryHandleModuleHeaderClicks(propertyId, limits))
+            return;
+
         if (tryHandleBankButtonSelection(propertyId, limits))
             return;
 

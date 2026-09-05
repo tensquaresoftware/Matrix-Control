@@ -85,6 +85,7 @@ namespace Core
             { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kCopyPatch, ActionHandlerKind::Module },
             { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kPastePatch, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kStorePatch, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kHeaderClick, ActionHandlerKind::PatchManager },
 
             // ComputerPatchesModule — stubs until Story 7.3 / Epic 4
             { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kLoadPreviousPatchFile, ActionHandlerKind::PatchManager },
@@ -93,6 +94,7 @@ namespace Core
             { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kOpenPatchFolder, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchAs, ActionHandlerKind::PatchManager },
             { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kSavePatchFile, ActionHandlerKind::PatchManager },
+            { PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets::kHeaderClick, ActionHandlerKind::PatchManager },
 
             // PatchMutatorModule — event buttons only (Amount/Random/History/enables are state or parameters)
             { PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets::kMutate, ActionHandlerKind::Mutator },

@@ -76,8 +76,16 @@ namespace TSS
         void setText(const juce::String& text);
         juce::String getText() const { return text_; }
 
+        // Opt-in title click + hover focus-red. Default off (WithActionsSpec stays inert).
+        void setTitleClickHandler(std::function<void()> handler);
+
+        juce::Colour resolveTitleTextColour() const;
+
         void paint(juce::Graphics& g) override;
         void resized() override;
+        void mouseEnter(const juce::MouseEvent& event) override;
+        void mouseExit(const juce::MouseEvent& event) override;
+        void mouseDown(const juce::MouseEvent& event) override;
 
     private:
         enum class Presentation
@@ -88,6 +96,8 @@ namespace TSS
 
         int getTitleBandWidthDesign() const;
         juce::Rectangle<float> getTitlePaintBounds() const;
+        bool isPointInTitleBand(juce::Point<float> localPoint) const;
+        bool isTitleClickEnabled() const { return static_cast<bool>(titleClickHandler_); }
 
         void createInitButton(const WithActionsSpec& spec);
         void createCopyPasteButtons(const WithActionsSpec& spec);
@@ -111,6 +121,8 @@ namespace TSS
         juce::String text_;
         ColourVariant colourVariant_ = ColourVariant::Blue;
         float uiScale_ = 1.0f;
+        std::function<void()> titleClickHandler_;
+        bool titleHovered_ = false;
 
         juce::AudioProcessorValueTreeState* apvts_ = nullptr;
         bool requireInitConfirmation_ = false;

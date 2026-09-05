@@ -611,6 +611,7 @@ namespace PluginIDs
                 constexpr const char* kPastePatch         = "internalPatchesPaste";
                 constexpr const char* kPastePatchEnabled  = "internalPatchesPasteEnabled";
                 constexpr const char* kStorePatch         = "internalPatchesStore";
+                constexpr const char* kHeaderClick        = "internalPatchesHeaderClick";
             }
         }
 
@@ -637,6 +638,7 @@ namespace PluginIDs
                 constexpr const char* kOpenPatchFolder       = "computerPatchesOpenFolder";
                 constexpr const char* kSavePatchAs           = "computerPatchesSaveAs";
                 constexpr const char* kSavePatchFile         = "computerPatchesSave";
+                constexpr const char* kHeaderClick           = "computerPatchesHeaderClick";
             }
         }
 

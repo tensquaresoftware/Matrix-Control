@@ -7,6 +7,8 @@
 
 namespace PatchEdit = PluginIDs::PatchEditSection;
 namespace BankUtility = PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets;
+namespace InternalPatches = PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets;
+namespace ComputerPatches = PluginIDs::PatchManagerSection::ComputerPatchesModule::StandaloneWidgets;
 namespace PatchMutator = PluginIDs::PatchManagerSection::PatchMutatorModule::StandaloneWidgets;
 
 class RecordingActionHandler : public Core::IActionHandler
@@ -68,6 +70,7 @@ public:
         testPasteEnabledIsNotActionProperty();
         testDispatcherRoutesModuleCopy();
         testDispatcherRoutesPatchManagerBankSelect();
+        testDispatcherRoutesPatchManagerHeaderClicks();
         testDispatcherRoutesMutatorMutate();
         testDispatcherIgnoresUnregisteredId();
         testTimestampValuePassesThrough();
@@ -82,6 +85,8 @@ private:
         expect(Core::ActionPropertyRegistry::isActionProperty(BankUtility::kSelectBank3));
         expect(Core::ActionPropertyRegistry::isActionProperty(BankUtility::kCopyBank));
         expect(Core::ActionPropertyRegistry::isActionProperty(BankUtility::kPasteBank));
+        expect(Core::ActionPropertyRegistry::isActionProperty(InternalPatches::kHeaderClick));
+        expect(Core::ActionPropertyRegistry::isActionProperty(ComputerPatches::kHeaderClick));
         expect(Core::ActionPropertyRegistry::isActionProperty(PatchMutator::kMutate));
     }
 
@@ -119,6 +124,26 @@ private:
         expectEquals(harness.patchManagerHandler().callCount(), 1);
         expectEquals(harness.mutatorHandler().callCount(), 0);
         expect(harness.patchManagerHandler().lastPropertyId() == BankUtility::kSelectBank3);
+    }
+
+    void testDispatcherRoutesPatchManagerHeaderClicks()
+    {
+        beginTest("Dispatcher routes Internal/Computer header-click actions to PatchManagerActionHandler");
+
+        TestableActionDispatcher harness;
+        harness.dispatcher().onActionPropertyChanged(InternalPatches::kHeaderClick, juce::int64(11));
+
+        expectEquals(harness.moduleHandler().callCount(), 0);
+        expectEquals(harness.patchManagerHandler().callCount(), 1);
+        expectEquals(harness.mutatorHandler().callCount(), 0);
+        expect(harness.patchManagerHandler().lastPropertyId() == InternalPatches::kHeaderClick);
+
+        harness.dispatcher().onActionPropertyChanged(ComputerPatches::kHeaderClick, juce::int64(22));
+
+        expectEquals(harness.moduleHandler().callCount(), 0);
+        expectEquals(harness.patchManagerHandler().callCount(), 2);
+        expectEquals(harness.mutatorHandler().callCount(), 0);
+        expect(harness.patchManagerHandler().lastPropertyId() == ComputerPatches::kHeaderClick);
     }
 
     void testDispatcherRoutesMutatorMutate()

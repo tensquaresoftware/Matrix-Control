@@ -162,6 +162,8 @@ namespace TSS
     struct ModuleHeaderLook
     {
         juce::Colour text{};
+        // Opt-in title-hover colour (NumberBox / Computer combo focus-red token).
+        juce::Colour textFocus{};
         juce::Colour lineBlue{};
         juce::Colour lineOrange{};
         juce::Font font{juce::FontOptions{}};

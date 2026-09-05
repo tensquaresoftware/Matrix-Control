@@ -392,6 +392,10 @@ void ComputerPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& wi
         TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(moduleId),
         dims_.moduleHeader);
+    moduleHeader_->setTitleClickHandler([this]
+    {
+        dispatchTimestampAction(apvts_, ComputerPatchesIds::StandaloneWidgets::kHeaderClick);
+    });
     addAndMakeVisible(*moduleHeader_);
 }
 

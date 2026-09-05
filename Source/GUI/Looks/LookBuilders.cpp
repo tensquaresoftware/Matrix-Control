@@ -240,6 +240,7 @@ namespace TSS
     {
         ModuleHeaderLook look;
         look.text = skin.getColour(SkinColourId::kModuleHeaderText);
+        look.textFocus = skin.getColour(SkinColourId::kNumberBoxTextFocus);
         look.lineBlue = skin.getColour(SkinColourId::kModuleHeaderLineBlue);
         look.lineOrange = skin.getColour(SkinColourId::kModuleHeaderLineOrange);
         look.font = resolvedTypographyFont(skin, TypographyStyleId::kModuleHeader);

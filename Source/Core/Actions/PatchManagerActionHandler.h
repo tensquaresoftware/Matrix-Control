@@ -210,6 +210,7 @@ namespace Core
         bool tryHandleInternalPatchNavigation(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleComputerPatchFileNavigation(const juce::String& propertyId,
                                                   const DeviceMemoryLimits& limits);
+        bool tryHandleModuleHeaderClicks(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleBankButtonSelection(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleInitPasteStoreActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);
         bool tryHandleComputerFileActions(const juce::String& propertyId, const DeviceMemoryLimits& limits);

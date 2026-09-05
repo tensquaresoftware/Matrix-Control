@@ -197,6 +197,7 @@ set(PLUGIN_SOURCES
     Source/Core/Actions/PatchManagerActionHandler.cpp
     Source/Core/Actions/PatchManagerActionHandlerSnapshot.cpp
     Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
+    Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
     Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
     Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp
@@ -474,6 +475,8 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/PatchManagerActionHandlerBrowserTests.cpp
         Tests/Unit/PatchManagerActionHandlerSaveTests.cpp
         Tests/Unit/PatchManagerActionHandlerLoadTests.cpp
+        Tests/Unit/PatchManagerActionHandlerHeaderClickTests.cpp
+        Tests/Unit/ModuleHeaderTitleColourTests.cpp
         Tests/Unit/PatchManagerActionHandlerComputerNavigationTests.cpp
         Tests/Unit/PatchManagerActionHandlerNavDebounceTests.cpp
         Tests/Unit/PatchFileServiceTests.cpp
@@ -579,6 +582,7 @@ if(MATRIX_BUILD_TESTS)
         Source/Core/Actions/PatchManagerActionHandler.cpp
         Source/Core/Actions/PatchManagerActionHandlerSnapshot.cpp
         Source/Core/Actions/PatchManagerActionHandlerInternalPatches.cpp
+        Source/Core/Actions/PatchManagerActionHandlerHeaderClick.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerBrowser.cpp
         Source/Core/Actions/PatchManagerActionHandlerComputerLoadSave.cpp
         Source/Core/Actions/PatchManagerActionHandlerDeviceLoad.cpp

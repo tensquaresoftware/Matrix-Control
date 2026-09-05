@@ -47,6 +47,12 @@ void InternalPatchesPanel::setupModuleHeader(TSS::ISkin& skin, WidgetFactory& wi
         TSS::ModuleHeader::ColourVariant::Blue,
         widgetFactory.getGroupDisplayName(moduleId),
         dims_.moduleHeader);
+    moduleHeader->setTitleClickHandler([this]
+    {
+        dispatchTimestampAction(
+            apvts_,
+            PluginIDs::PatchManagerSection::InternalPatchesModule::StandaloneWidgets::kHeaderClick);
+    });
     addAndMakeVisible(*moduleHeader);
 }
 
