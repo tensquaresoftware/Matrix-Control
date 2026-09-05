@@ -9,10 +9,11 @@
 
 namespace TSS
 {
-    // Composes FR-2 device lock with Mutator Compare lock on a set of section containers.
-    // Interactive children are enabled only when a supported device is detected and
-    // !(compareActive && lockOnCompare). Unknown Matrix-family members stay locked.
-    // Use lockOnCompare=false for Patch Mutator (COMPARE must stay live while Compare is active).
+    // Composes FR-2 device lock with Mutator Compare lock for footer sync and focus steal.
+    // Visual/hit dimming is owned by MainComponent's LockDimmingFilm — binders must not
+    // setAlpha or setInterceptsMouseClicks on sections (avoids double dimming / fights).
+    // Use lockOnCompare=false for Patch Mutator (COMPARE stays live while Compare is active;
+    // film hole policy decides whether COMPARE is uncovered).
     class CompareLockBinder : public juce::ValueTree::Listener
     {
     public:

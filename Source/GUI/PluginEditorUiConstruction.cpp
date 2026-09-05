@@ -34,6 +34,7 @@ void PluginEditor::createUiShell()
     mainComponent_ = std::make_unique<MainComponent>(
         *skin_, layoutDimensions_, *widgetFactory_, pluginProcessor.getApvts(), pluginProcessor.getPatchFileService());
     addAndMakeVisible(*mainComponent_);
+    mainComponent_->attachLockDimmingFilm(pluginProcessor.getApvts());
 
     mainComponent_->setBusReorderHandler(
         [this](int fromBus, int toBus)

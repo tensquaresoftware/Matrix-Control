@@ -1371,3 +1371,13 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-plugin-modals-always-on-top.md`
   summary: No automated regression check that raise-before/after runs around FileChoosers and Mutator Delete; z-order stays manual-smoke only.
   evidence: Verification Gap review — dropping a raise would still leave build/lint/unit tests green; project GUI modality is validated manually.
+
+## Deferred from: code review of spec-gui-lock-dimming-film-holes.md (2026-09-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gui-lock-dimming-film-holes.md`
+  summary: Film does not continuously trap keyboard focus; Tab may still reach body controls under the dimming film after the initial giveAwayKeyboardFocus.
+  evidence: Edge/Blind review — binders steal focus only on lock transitions; Mutator lockOnCompare=false; no ongoing focus filter for film-covered regions.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-gui-lock-dimming-film-holes.md`
+  summary: COMPARE hole may drift if Mutator re-layouts the button without a MainComponent resize or lock-property APVTS change (only a one-shot async retry covers empty bounds).
+  evidence: Edge/Blind review — hole refresh is driven by shell resized + lock APVTS props, not Mutator-local layout callbacks.

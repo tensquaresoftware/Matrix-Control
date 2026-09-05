@@ -13,20 +13,12 @@ namespace
     namespace FooterCopy = PluginDisplayNames::FooterPanel;
     namespace CompareMessages = PluginDisplayNames::PatchManagerSection::PatchMutatorModule::Messages;
 
-    constexpr float kLockedAlpha = 0.5f;
     const juce::Identifier kDeviceDetectedId("deviceDetected");
     const juce::Identifier kDeviceTypeId(MatrixDeviceTypes::kApvtsPropertyName);
     const juce::Identifier kDeviceMidiUnresponsiveId(Core::kDeviceMidiUnresponsiveProperty);
 
-    void applySectionLock(juce::Component& component, bool locked)
+    void applySectionFocusSteal(juce::Component& component, bool locked)
     {
-        // JUCE 8 getComponentAt() always descends into children when the parent hit-tests true.
-        // setInterceptsMouseClicks(true, false) therefore only dims visually if paired with alpha —
-        // it does NOT block child interaction. Use (false, false) so hitTest fails on the whole
-        // subtree and clicks fall through to the parent (non-interactive while locked).
-        component.setInterceptsMouseClicks(! locked, ! locked);
-        component.setAlpha(locked ? kLockedAlpha : 1.0f);
-
         if (locked)
             component.giveAwayKeyboardFocus();
     }
@@ -130,7 +122,7 @@ namespace TSS
         for (auto& safeComponent : locked_)
         {
             if (auto* component = safeComponent.getComponent())
-                applySectionLock(*component, locked);
+                applySectionFocusSteal(*component, locked);
         }
 
         syncDeviceLockFooter(deviceDetected, deviceType, compareActive, deviceMidiUnresponsive);
