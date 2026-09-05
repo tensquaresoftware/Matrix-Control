@@ -55,6 +55,15 @@ private:
         return model.getName();
     }
 
+    bool folderContainsExactSyxName(const juce::File& folder, const juce::String& exactFileName)
+    {
+        for (const auto& child : folder.findChildFiles(juce::File::findFiles, false, "*.syx"))
+            if (child.getFileName() == exactFileName)
+                return true;
+
+        return false;
+    }
+
     void exportMutatorHistory_emptyStore_fails()
     {
         beginTest("exportMutatorHistory_emptyStore_fails");
@@ -89,9 +98,10 @@ private:
 
         expect(result.success);
         expect(result.filesWritten >= 2);
-        expect(tempDir.getChildFile("Initial.syx").existsAsFile());
-        expect(tempDir.getChildFile("M00").isDirectory());
-        expect(tempDir.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
+        expect(tempDir.getChildFile("INITIAL.syx").existsAsFile());
+        expect(folderContainsExactSyxName(tempDir, "INITIAL.syx"));
+        expect(tempDir.getChildFile("M00.syx").existsAsFile());
+        expect(! tempDir.getChildFile("M00").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -117,8 +127,10 @@ private:
         const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
 
         expect(result.success);
-        expect(tempDir.getChildFile("M00").getChildFile("M00-R00.syx").existsAsFile());
-        expect(tempDir.getChildFile("M00").getChildFile("M00-R01.syx").existsAsFile());
+        expect(tempDir.getChildFile("M00.syx").existsAsFile());
+        expect(tempDir.getChildFile("M00-R00.syx").existsAsFile());
+        expect(tempDir.getChildFile("M00-R01.syx").existsAsFile());
+        expect(! tempDir.getChildFile("M00").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -146,11 +158,14 @@ private:
         const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
 
         expect(result.success);
-        expect(tempDir.getChildFile("M00").isDirectory());
-        expect(tempDir.getChildFile("M05").isDirectory());
-        expect(tempDir.getChildFile("M99").isDirectory());
-        expect(! tempDir.getChildFile("M01").exists());
-        expect(! tempDir.getChildFile("M02").exists());
+        expect(tempDir.getChildFile("M00.syx").existsAsFile());
+        expect(tempDir.getChildFile("M05.syx").existsAsFile());
+        expect(tempDir.getChildFile("M99.syx").existsAsFile());
+        expect(! tempDir.getChildFile("M01.syx").existsAsFile());
+        expect(! tempDir.getChildFile("M02.syx").existsAsFile());
+        expect(! tempDir.getChildFile("M00").isDirectory());
+        expect(! tempDir.getChildFile("M05").isDirectory());
+        expect(! tempDir.getChildFile("M99").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -173,9 +188,9 @@ private:
         const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "WARMPAD");
         expect(result.success);
 
-        expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05.syx")),
+        expectEquals(decodedPatchName(tempDir.getChildFile("M05.syx")),
                      juce::String("WARMPAD"));
-        expectEquals(decodedPatchName(tempDir.getChildFile("M05").getChildFile("M05-R02.syx")),
+        expectEquals(decodedPatchName(tempDir.getChildFile("M05-R02.syx")),
                      juce::String("WARMPAD"));
 
         tempDir.deleteRecursively();
@@ -199,7 +214,7 @@ private:
         const auto result = service_.exportMutatorHistory(tempDir, store, encoder_, "COLDPAD");
         expect(result.success);
 
-        expectEquals(decodedPatchName(tempDir.getChildFile("Initial.syx")), juce::String("COLDPAD"));
+        expectEquals(decodedPatchName(tempDir.getChildFile("INITIAL.syx")), juce::String("COLDPAD"));
 
         tempDir.deleteRecursively();
     }
@@ -242,8 +257,10 @@ private:
         const auto result = service_.exportMutatorHistorySession(args);
 
         expect(result.success);
-        expect(sessionFolder.getChildFile("Initial.syx").existsAsFile());
-        expect(sessionFolder.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
+        expect(sessionFolder.getChildFile("INITIAL.syx").existsAsFile());
+        expect(folderContainsExactSyxName(sessionFolder, "INITIAL.syx"));
+        expect(sessionFolder.getChildFile("M00.syx").existsAsFile());
+        expect(! sessionFolder.getChildFile("M00").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -278,6 +295,10 @@ private:
         expect(sessionFolder.createDirectory());
         const auto stale = sessionFolder.getChildFile("stale.txt");
         expect(stale.replaceWithText("stale"));
+        expect(sessionFolder.getChildFile("Initial.syx").replaceWithText("legacy-initial"));
+        const auto legacyRootDir = sessionFolder.getChildFile("M00");
+        expect(legacyRootDir.createDirectory());
+        expect(legacyRootDir.getChildFile("M00.syx").replaceWithText("legacy-nested"));
 
         Core::MutationHistoryStore store;
         expect(store.insertRoot(0,
@@ -290,7 +311,10 @@ private:
 
         expect(result.success);
         expect(! stale.existsAsFile());
-        expect(sessionFolder.getChildFile("M00").getChildFile("M00.syx").existsAsFile());
+        expect(sessionFolder.getChildFile("M00.syx").existsAsFile());
+        expect(folderContainsExactSyxName(sessionFolder, "M00.syx"));
+        expect(! sessionFolder.getChildFile("M00").isDirectory());
+        expect(! folderContainsExactSyxName(sessionFolder, "Initial.syx"));
 
         tempDir.deleteRecursively();
     }
@@ -318,18 +342,13 @@ private:
         expectEquals(exportResult.filesWritten, 3);
 
         juce::MemoryBlock initialSysEx;
-        expect(tempDir.getChildFile("Initial.syx").loadFileAsData(initialSysEx));
+        expect(tempDir.getChildFile("INITIAL.syx").loadFileAsData(initialSysEx));
         PatchFileServiceTestSupport::expectEditBufferPatchHeader(*this, initialSysEx);
 
         const auto rootScan = service_.scanFolder(tempDir);
         expect(rootScan.folderUsable);
-        expectEquals(rootScan.validCount, 1);
+        expectEquals(rootScan.validCount, 3);
         expectEquals(rootScan.invalidCount, 0);
-
-        const auto m00Scan = service_.scanFolder(tempDir.getChildFile("M00"));
-        expect(m00Scan.folderUsable);
-        expectEquals(m00Scan.validCount, 2);
-        expectEquals(m00Scan.invalidCount, 0);
 
         tempDir.deleteRecursively();
     }

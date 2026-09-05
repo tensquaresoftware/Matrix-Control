@@ -102,7 +102,8 @@ private:
         expect(result.success);
         expect(! result.exportCollisionModalRequested);
         expect(tempDir.getChildFile("OB-VOX @ B8-P25").isDirectory());
-        expect(tempDir.getChildFile("OB-VOX @ B8-P25").getChildFile("M00").isDirectory());
+        expect(tempDir.getChildFile("OB-VOX @ B8-P25").getChildFile("M00.syx").existsAsFile());
+        expect(! tempDir.getChildFile("OB-VOX @ B8-P25").getChildFile("M00").isDirectory());
 
         tempDir.deleteRecursively();
     }
@@ -166,7 +167,6 @@ private:
         expect(harness.engine.exportHistory(tempDir).success);
 
         const auto exportedFile = tempDir.getChildFile("WARMPAD @ B8-P25")
-                                       .getChildFile("M00")
                                        .getChildFile("M00.syx");
         expect(exportedFile.existsAsFile());
 

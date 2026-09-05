@@ -30,7 +30,7 @@ namespace Core
     PatchFileExportResult PatchFileService::writeInitialSnapshot(const juce::File& folder,
                                                                  const MutatorExportWriteArgs& args)
     {
-        const auto initialFile = folder.getChildFile("Initial.syx");
+        const auto initialFile = folder.getChildFile("INITIAL.syx");
         return writeExportPatchFile(initialFile, args.store.getInitialSnapshot().data(), args);
     }
 
@@ -60,7 +60,7 @@ namespace Core
         return result;
     }
 
-    PatchFileExportResult PatchFileService::writeRootEntry(const juce::File& rootDir,
+    PatchFileExportResult PatchFileService::writeRootEntry(const juce::File& folder,
                                                            int rootIndex,
                                                            const MutatorExportWriteArgs& args)
     {
@@ -70,7 +70,7 @@ namespace Core
         if (const auto rootEntry = args.store.getEntry(rootIndex, MutationHistoryStore::kRootOnly))
         {
             const auto rootLabel = MutationNaming::formatRootLabel(rootIndex);
-            const auto rootFile = rootDir.getChildFile(
+            const auto rootFile = folder.getChildFile(
                 PatchFileNameSanitizer::ensureSyxExtension(rootLabel));
             return writeExportPatchFile(rootFile, rootEntry->result.data(), args);
         }
@@ -78,7 +78,7 @@ namespace Core
         return result;
     }
 
-    PatchFileExportResult PatchFileService::writeRetryEntries(const juce::File& rootDir,
+    PatchFileExportResult PatchFileService::writeRetryEntries(const juce::File& folder,
                                                               int rootIndex,
                                                               const MutatorExportWriteArgs& args)
     {
@@ -90,7 +90,7 @@ namespace Core
             if (const auto retryEntry = args.store.getEntry(rootIndex, retryIndex))
             {
                 const auto stem = MutationNaming::formatExportStem(rootIndex, retryIndex);
-                const auto retryFile = rootDir.getChildFile(
+                const auto retryFile = folder.getChildFile(
                     PatchFileNameSanitizer::ensureSyxExtension(stem));
                 const auto write = writeExportPatchFile(retryFile, retryEntry->result.data(), args);
 
@@ -104,26 +104,19 @@ namespace Core
         return result;
     }
 
-    PatchFileExportResult PatchFileService::writeRootFolder(const juce::File& folder,
-                                                            int rootIndex,
-                                                            const MutatorExportWriteArgs& args)
+    PatchFileExportResult PatchFileService::writeRootAndRetries(const juce::File& folder,
+                                                                int rootIndex,
+                                                                const MutatorExportWriteArgs& args)
     {
         PatchFileExportResult result;
-        const auto rootDir = folder.getChildFile(MutationNaming::formatRootLabel(rootIndex));
 
-        if (! rootDir.createDirectory())
-        {
-            result.errorMessage = "Folder not writable";
-            return result;
-        }
-
-        const auto rootWrite = writeRootEntry(rootDir, rootIndex, args);
+        const auto rootWrite = writeRootEntry(folder, rootIndex, args);
         if (! rootWrite.success)
             return rootWrite;
 
         result.filesWritten += rootWrite.filesWritten;
 
-        const auto retryWrite = writeRetryEntries(rootDir, rootIndex, args);
+        const auto retryWrite = writeRetryEntries(folder, rootIndex, args);
         if (! retryWrite.success)
             return retryWrite;
 
@@ -132,14 +125,14 @@ namespace Core
         return result;
     }
 
-    PatchFileExportResult PatchFileService::writeAllRootFolders(const juce::File& folder,
-                                                                const MutatorExportWriteArgs& args)
+    PatchFileExportResult PatchFileService::writeAllRoots(const juce::File& folder,
+                                                          const MutatorExportWriteArgs& args)
     {
         PatchFileExportResult result;
 
         for (const auto rootIndex : args.store.getSortedRootIndices())
         {
-            const auto rootWrite = writeRootFolder(folder, rootIndex, args);
+            const auto rootWrite = writeRootAndRetries(folder, rootIndex, args);
 
             if (! rootWrite.success)
                 return rootWrite;
@@ -165,7 +158,7 @@ namespace Core
             result.filesWritten += initialWrite.filesWritten;
         }
 
-        const auto rootsWrite = writeAllRootFolders(folder, args);
+        const auto rootsWrite = writeAllRoots(folder, args);
         if (! rootsWrite.success)
             return rootsWrite;
 

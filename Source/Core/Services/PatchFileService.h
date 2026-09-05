@@ -81,13 +81,14 @@ namespace Core
                                                int patchNumber = 0);
         PatchFileLoadResult loadPatchSysExFile(const juce::File& file, juce::uint8* packedOut);
         // userPatchName is the live SSOT musical name (model + APVTS), stamped onto bytes
-        // 0-7 of every exported .syx before encoding. Filenames/folder stems stay Mxx/Mxx-Ryy
-        // via MutationNaming's format helpers, independent of the packed buffer's name bytes.
+        // 0-7 of every exported .syx before encoding. Filenames stay flat INITIAL.syx /
+        // Mxx.syx / Mxx-Ryy.syx via MutationNaming's format helpers, independent of the
+        // packed buffer's name bytes.
         PatchFileExportResult exportMutatorHistory(const juce::File& folder,
                                                    const MutationHistoryStore& store,
                                                    SysExEncoder& encoder,
                                                    const juce::String& userPatchName);
-        // Hybrid session-folder export: writes the FR-33 layout inside sessionFolder.
+        // Session-folder export: writes the flat mutator layout inside sessionFolder.
         // When clearExisting is true the folder contents are removed first (Overwrite);
         // otherwise the folder must be created fresh.
         PatchFileExportResult exportMutatorHistorySession(const MutatorHistorySessionExportArgs& args);
@@ -126,17 +127,17 @@ namespace Core
         PatchFileExportResult writeExportPatchFile(const juce::File& file,
                                                    const juce::uint8* packedData,
                                                    const MutatorExportWriteArgs& args);
-        PatchFileExportResult writeRootEntry(const juce::File& rootDir,
+        PatchFileExportResult writeRootEntry(const juce::File& folder,
                                              int rootIndex,
                                              const MutatorExportWriteArgs& args);
-        PatchFileExportResult writeRetryEntries(const juce::File& rootDir,
+        PatchFileExportResult writeRetryEntries(const juce::File& folder,
                                                 int rootIndex,
                                                 const MutatorExportWriteArgs& args);
-        PatchFileExportResult writeRootFolder(const juce::File& folder,
-                                              int rootIndex,
-                                              const MutatorExportWriteArgs& args);
-        PatchFileExportResult writeAllRootFolders(const juce::File& folder,
+        PatchFileExportResult writeRootAndRetries(const juce::File& folder,
+                                                  int rootIndex,
                                                   const MutatorExportWriteArgs& args);
+        PatchFileExportResult writeAllRoots(const juce::File& folder,
+                                            const MutatorExportWriteArgs& args);
         PatchFileExportResult writeHistoryLayout(const juce::File& folder,
                                                  const MutatorExportWriteArgs& args);
 

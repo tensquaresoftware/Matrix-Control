@@ -436,7 +436,7 @@ Le Mutator ne modifie pas le nom « officiel » du patch ; l’historique peut t
 | `C` (Compare) | Compare avec le patch de départ ; **verrouille** le reste de l’édition tant que Compare demeure actif (un message en bas de fenêtre le rappelle) |
 | `D` | Supprime l’entrée sélectionnée |
 | `F` | Vide l’historique |
-| `E` | Exporte la session (dossier avec `Initial.syx` et sous-dossiers en `.syx`) |
+| `E` | Exporte la session en liste plate (`INITIAL.syx`, `M00.syx`, `M00-R00.syx`, …) — à rouvrir via Computer Patches → Open sur ce dossier |
 
 L’historique ne survit pas à la fermeture du projet ou de l’application.
 

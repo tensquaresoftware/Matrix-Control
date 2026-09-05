@@ -1327,3 +1327,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-patch-nav-focus-and-bank-marker.md`
   summary: Matrix-6/6R gray-empty bank box and establish/OPEN-without-bank paths have no dedicated unit coverage; Verification lists manual UAT only.
   evidence: Acceptance Auditor / Blind Hunter — new handler tests are Matrix-1000-only.
+
+## Deferred from: review of spec-patch-mutator-flat-export.md (2026-09-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-patch-mutator-flat-export.md`
+  summary: Direct `exportMutatorHistory` (non-session) does not clear leftover nested `Mxx/` or old `Initial.syx` when writing into a non-empty folder.
+  evidence: Edge Case Hunter — GUI export uses session Overwrite/Keep which clears or creates fresh; leftover pollution only hits the direct API / unclean folder path.
