@@ -1397,3 +1397,15 @@ Original review bullets below remain for history; status for U-10-owned residual
 - No IMPORT backfill unit test for new `Pxx.` stems — parse SSOT covered; Bank Import only shares the parser.
 - Hand-edited empty-after-dot stems (`P76.` / `P76. `) fall back to raw stem in `stemForFilenameReconcile` — export never emits these; empty-vs-nonmatch API ambiguity.
 - Manual hardware smoke (EXPORT → Finder → OPEN FILE NAMES / combo / SYSEX NAMES) — scheduled next week; not a code-review blocker.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-version-0-3-0-alpha.md`
+  summary: User manual still declares Version-Produit 0.1.2-alpha after product SSOT moved to 0.3.0-alpha.
+  evidence: Documentation/User/manuel-utilisateur.md front matter out of bump scope; prior 0.2.0 deferred entry remains and this bump widens the drift.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-version-0-3-0-alpha.md`
+  summary: CONTRIBUTING.md still uses v0.2.0-alpha as the worked alpha release example.
+  evidence: Blind Hunter on version bump; example-only, not required for About/PluginVersion SSOT.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-version-0-3-0-alpha.md`
+  summary: Tracked empty CHANGELOG.md has no 0.3.0-alpha / Unreleased stub after the product version bump.
+  evidence: Blind Hunter; changelog hygiene not in Intent; empty file pre-existed.

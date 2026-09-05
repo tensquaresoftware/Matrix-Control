@@ -37,7 +37,7 @@ private:
             expect(version.endsWith("-" + suffix), "Version string should include prerelease suffix");
 
         // Pin the display string so a forgotten CMake version bump fails the suite.
-        expectEquals(version, juce::String("0.2.0-alpha"));
+        expectEquals(version, juce::String("0.3.0-alpha"));
     }
 
     void testReleaseDateStringFormat()
