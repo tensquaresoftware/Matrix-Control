@@ -1,5 +1,6 @@
 #include "NumberBox.h"
 
+#include <cmath>
 #include <cstdlib>
 #include <memory>
 
@@ -9,6 +10,66 @@
 
 namespace TSS
 {
+    namespace
+    {
+        // Digits-only field: no mouse/keyboard text selection during edit.
+        class NumberBoxEditField final : public juce::TextEditor
+        {
+        public:
+            NumberBoxEditField()
+            {
+                setSelectAllWhenFocused(false);
+                setPopupMenuEnabled(false);
+                setCaretVisible(true);
+            }
+
+            void mouseDown(const juce::MouseEvent& e) override
+            {
+                juce::TextEditor::mouseDown(e);
+                clearSelectionKeepCaret();
+            }
+
+            void mouseDrag(const juce::MouseEvent&) override
+            {
+                clearSelectionKeepCaret();
+            }
+
+            void mouseDoubleClick(const juce::MouseEvent&) override {}
+
+            bool keyPressed(const juce::KeyPress& key) override
+            {
+                if (key.getModifiers().isShiftDown()
+                    && (key.isKeyCode(juce::KeyPress::leftKey)
+                        || key.isKeyCode(juce::KeyPress::rightKey)
+                        || key.isKeyCode(juce::KeyPress::homeKey)
+                        || key.isKeyCode(juce::KeyPress::endKey)
+                        || key.isKeyCode(juce::KeyPress::upKey)
+                        || key.isKeyCode(juce::KeyPress::downKey)))
+                {
+                    const juce::KeyPress withoutShift(
+                        key.getKeyCode(),
+                        key.getModifiers().withoutFlags(juce::ModifierKeys::shiftModifier),
+                        key.getTextCharacter());
+                    const bool handled = juce::TextEditor::keyPressed(withoutShift);
+                    clearSelectionKeepCaret();
+                    return handled;
+                }
+
+                const bool handled = juce::TextEditor::keyPressed(key);
+                clearSelectionKeepCaret();
+                return handled;
+            }
+
+        private:
+            void clearSelectionKeepCaret()
+            {
+                const int caret = getCaretPosition();
+                setHighlightedRegion({});
+                setCaretPosition(caret);
+            }
+        };
+    }
+
     NumberBox::NumberBox(const NumberBoxLook& look, const Config& config)
         : look_(look)
         , height_(config.height)
@@ -51,18 +112,18 @@ namespace TSS
     void NumberBox::setValue(int newValue)
     {
         const int clampedValue = juce::jlimit(minValue_, maxValue_, newValue);
-        
+
         if (currentValue_ != clampedValue)
         {
             currentValue_ = clampedValue;
             updateValueText();
             repaint();
-            
+
             if (onValueChanged_)
                 onValueChanged_(clampedValue);
         }
     }
-    
+
     void NumberBox::setOnValueChanged(ValueChangedCallback callback)
     {
         onValueChanged_ = std::move(callback);
@@ -91,8 +152,8 @@ namespace TSS
     {
         const auto bounds = getLocalBounds().toFloat();
 
-        // Match editor fill under the stroke so any inset gap uses the same colour as the field.
-        g.setColour(editor_ != nullptr ? look_.editorBackground : look_.background);
+        // Edit fill uses focus red so any inset gap matches the TextEditor.
+        g.setColour(editor_ != nullptr ? look_.textFocus : look_.background);
         g.fillRect(bounds);
 
         g.setColour(getBorderColour());
@@ -169,6 +230,11 @@ namespace TSS
         return look_.font.withHeight(look_.font.getHeight() * uiScale_);
     }
 
+    juce::Font NumberBox::scaledEditFont() const
+    {
+        return scaledDisplayFont().boldened();
+    }
+
     float NumberBox::borderStrokeThickness() const
     {
         return ScaledDrawing::snappedStrokeThicknessFromDesign(
@@ -180,7 +246,8 @@ namespace TSS
 
     int NumberBox::editorBorderInset() const
     {
-        return juce::jmax(1, juce::roundToInt(borderStrokeThickness()));
+        // Ceil so a fractional stroke (e.g. UI Scale 125%) is never covered by the editor.
+        return juce::jmax(1, static_cast<int>(std::ceil(static_cast<double>(borderStrokeThickness()))));
     }
 
     void NumberBox::layoutEditor()
@@ -196,15 +263,17 @@ namespace TSS
         if (editor_ == nullptr)
             return;
 
-        const auto editorFont = scaledDisplayFont();
+        const auto editorFont = scaledEditFont();
+
         editor_->setFont(editorFont);
         editor_->applyFontToAllText(editorFont);
-        editor_->setColour(juce::TextEditor::backgroundColourId, look_.editorBackground);
+        editor_->setColour(juce::TextEditor::backgroundColourId, look_.textFocus);
         editor_->setColour(juce::TextEditor::textColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::highlightColourId, look_.editorSelectionBackground);
         editor_->setColour(juce::TextEditor::highlightedTextColourId, look_.editorText);
         editor_->setColour(juce::TextEditor::outlineColourId, juce::Colour(ColourChart::kTransparent));
         editor_->setColour(juce::TextEditor::focusedOutlineColourId, juce::Colour(ColourChart::kTransparent));
+        editor_->setColour(juce::CaretComponent::caretColourId, look_.editorText);
     }
 
     void NumberBox::showEditor()
@@ -212,15 +281,16 @@ namespace TSS
         if (editor_ != nullptr)
             return;
 
-        editor_ = std::make_unique<juce::TextEditor>();
+        editor_ = std::make_unique<NumberBoxEditField>();
         layoutEditor();
-        editor_->setText(juce::String(currentValue_), false);
+        // Empty field: user retypes the full value; Escape / focus-lost keeps currentValue_.
+        editor_->setText({}, false);
         editor_->setJustification(juce::Justification::centred);
         applyEditorAppearance();
 
         editor_->setBorder(juce::BorderSize<int>(0));
         editor_->setIndents(0, 0);
-        editor_->setInputRestrictions(0, "0123456789");
+        editor_->setInputRestrictions(digitCount(), "0123456789");
 
         editor_->onReturnKey = [this] { handleEditorReturn(); };
         editor_->onEscapeKey = [this] { hideEditor(); };
@@ -228,7 +298,6 @@ namespace TSS
 
         addAndMakeVisible(*editor_);
         editor_->grabKeyboardFocus();
-        editor_->selectAll();
     }
 
     void NumberBox::hideEditor()
@@ -247,13 +316,13 @@ namespace TSS
             return;
 
         const auto text = editor_->getText();
-        
+
         if (text.isEmpty())
         {
             hideEditor();
             return;
         }
-        
+
         const int rawValue = text.getIntValue();
         const int clampedValue = juce::jlimit(minValue_, maxValue_, rawValue);
 

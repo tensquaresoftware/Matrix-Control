@@ -11,9 +11,9 @@ baseline_commit: '242b28934e8f1ad538786d47a340c17d58125850'
 
 ## Intent
 
-**Problem:** Double-clicking an editable NumberBox (e.g. CurrentPatchNumber in INTERNAL PATCHES) hid the border and enlarged the font during typing, so edit mode looked unlike the idle control.
+**Problem:** Double-clicking an editable NumberBox hid or thinned the border at some UI scales, enlarged the font, and showed a white selection block — edit mode did not match the idle control.
 
-**Approach:** Keep the parent-drawn border visible around an inset TextEditor, and use the same scaled font height for display and edit across all NumberBoxes.
+**Approach:** Keep the parent-drawn border (ceil inset so fractional strokes stay uncovered). On edit: fill with navigation focus red, clear the field for full retype, disable text selection, white bold digits and white caret; Escape / focus-lost restores the previous value.
 
 ## Suggested Review Order
 

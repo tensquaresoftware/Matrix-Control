@@ -79,6 +79,7 @@ namespace TSS
         juce::Colour getBorderColour() const;
         juce::Colour getTextColour() const;
         juce::Font scaledDisplayFont() const;
+        juce::Font scaledEditFont() const;
 
         float borderStrokeThickness() const;
         int editorBorderInset() const;

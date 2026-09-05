@@ -22,22 +22,24 @@ namespace TSS::SkinColours
                 ColourChart::kRed,
             };
 
+            // Same focus red as kTextFocus — edit mode fills the box with this colour.
             inline constexpr ColourElement kEditorBackground = {
                 "NumberBoxEditorBackground",
                 ColourChart::kRed,
                 ColourChart::kRed,
             };
 
+            // Selection chrome is disabled in NumberBox; keep transparent if a range slips through.
             inline constexpr ColourElement kEditorSelectionBackground = {
                 "NumberBoxEditorSelectionBackground",
-                ColourChart::kWhite,
-                ColourChart::kWhite,
+                ColourChart::kTransparent,
+                ColourChart::kTransparent,
             };
 
             inline constexpr ColourElement kEditorText = {
                 "NumberBoxEditorText",
-                ColourChart::kBlack,
-                ColourChart::kBlack,
+                ColourChart::kWhite,
+                ColourChart::kWhite,
             };
         }
 
