@@ -139,9 +139,14 @@ void BankUtilityPanel::valueTreePropertyChanged(juce::ValueTree&,
     }
     else if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StateProperties::kSelectedBank
              || propertyName == PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished
-             || propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBankEnabled)
+             || propertyName == PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus)
     {
         refreshCurrentBankMarker();
+        if (propertyName != PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus)
+            refreshUtilityEnabled();
+    }
+    else if (propertyName == PluginIDs::PatchManagerSection::BankUtilityModule::StandaloneWidgets::kPasteBankEnabled)
+    {
         refreshUtilityEnabled();
     }
 }
@@ -256,12 +261,18 @@ void BankUtilityPanel::refreshCurrentBankMarker()
     const bool coordinatesEstablished = static_cast<bool>(apvts_.state.getProperty(
         PluginIDs::PatchManagerSection::StateProperties::kPatchCoordinatesEstablished,
         false));
+    const int navigationFocus = static_cast<int>(apvts_.state.getProperty(
+        PluginIDs::PatchManagerSection::StateProperties::kNavigationFocus,
+        PluginIDs::PatchManagerSection::NavigationFocus::kDefault));
+    const bool internalHasFocus =
+        navigationFocus == PluginIDs::PatchManagerSection::NavigationFocus::kInternal;
 
     for (auto& button : selectBankButtons_)
         setOptionalLook(button.get(), normalBankLook_);
 
-    // No bank of work yet, so nothing is marked.
-    if (bankUtilityGrayed_ || ! coordinatesEstablished)
+    // Mark only while Internal owns navigation focus and a bank of work exists.
+    // When Computer (or none) owns focus, CurrentBankNumber still shows the bank.
+    if (bankUtilityGrayed_ || ! coordinatesEstablished || ! internalHasFocus)
         return;
 
     if (currentBank < 0 || currentBank >= kBankCount)
@@ -273,21 +284,19 @@ void BankUtilityPanel::refreshCurrentBankMarker()
 
 TSS::ButtonLook BankUtilityPanel::makeCurrentBankMarkerLook() const
 {
-    // Same visual language as the footer DEVICE badge: filled block, dark label.
+    // Red text matches Internal NumberBoxes / PATCH NAME navigation focus.
     auto markerLook = normalBankLook_;
 
     if (skin_ == nullptr)
         return markerLook;
 
-    const auto badgeFill = skin_->getColour(TSS::SkinColourId::kFooterMessageInfo);
-    const auto badgeText = skin_->getColour(TSS::SkinColourId::kFooterPanelBackground);
+    const auto focusColour = skin_->getColour(TSS::SkinColourId::kNumberBoxTextFocus);
 
-    markerLook.backgroundOff = badgeFill;
-    markerLook.backgroundHover = badgeFill;
-    markerLook.backgroundClicked = badgeFill;
-    markerLook.textOff = badgeText;
-    markerLook.textHover = badgeText;
-    markerLook.textClicked = badgeText;
+    markerLook.textOff = focusColour;
+    markerLook.textOn = focusColour;
+    markerLook.textHover = focusColour;
+    markerLook.textClicked = focusColour;
+    markerLook.textDisabled = focusColour;
 
     return markerLook;
 }

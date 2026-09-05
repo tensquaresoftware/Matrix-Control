@@ -72,7 +72,8 @@ private:
     void applyNormalLookToActionButtons();
 
     void refreshDeviceGating();
-    // Marks the bank STORE / bank COPY would write to, with a footer-style badge fill.
+    // Red text on the current bank while Internal owns navigation focus and
+    // patch coordinates are established (same red as Internal NumberBoxes).
     void refreshCurrentBankMarker();
     TSS::ButtonLook makeCurrentBankMarkerLook() const;
     void refreshUtilityEnabled();
