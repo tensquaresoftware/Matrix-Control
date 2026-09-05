@@ -33,6 +33,9 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
+    /** Local bounds of COMPARE for MainComponent lock-film hole geometry; empty if absent. */
+    juce::Rectangle<int> getCompareButtonBounds() const;
+
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
     void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}

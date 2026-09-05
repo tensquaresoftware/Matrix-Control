@@ -135,6 +135,14 @@ PatchMutatorPanel::~PatchMutatorPanel()
     apvts_.state.removeListener(this);
 }
 
+juce::Rectangle<int> PatchMutatorPanel::getCompareButtonBounds() const
+{
+    if (compareButton_ == nullptr)
+        return {};
+
+    return compareButton_->getBounds();
+}
+
 void PatchMutatorPanel::valueTreePropertyChanged(juce::ValueTree&,
                                                  const juce::Identifier& property)
 {

@@ -1,10 +1,13 @@
 #pragma once
 
 #include <functional>
+#include <memory>
+#include <vector>
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "GUI/Helpers/LockDimmingFilm.h"
 #include "GUI/Layout/PanelDimensions.h"
 #include "Panels/MainComponent/HeaderPanel/HeaderPanel.h"
 #include "Panels/MainComponent/BodyPanel/BodyPanel.h"
@@ -23,7 +26,8 @@ namespace TSS
 
 class WidgetFactory;
 
-class MainComponent : public juce::Component
+class MainComponent : public juce::Component,
+                      private juce::ValueTree::Listener
 {
 public:
     MainComponent(TSS::Skin& skin,
@@ -31,12 +35,15 @@ public:
                   WidgetFactory& widgetFactory,
                   juce::AudioProcessorValueTreeState& apvts,
                   const Core::PatchFileService& patchFileService);
-    ~MainComponent() override = default;
+    ~MainComponent() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
     void setSkin(TSS::Skin& skin);
     void setUiScale(float uiScale);
+
+    /** Idempotent — call once from PluginEditor::createUiShell so the film is attached. */
+    void attachLockDimmingFilm(juce::AudioProcessorValueTreeState& apvts);
 
     HeaderPanel& getHeaderPanel() { return headerPanel; }
     BodyPanel& getBodyPanel() { return bodyPanel; }
@@ -59,9 +66,21 @@ public:
 #endif
 
 private:
+    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
+    void valueTreeRedirected(juce::ValueTree& tree) override;
+    void valueTreeChildAdded(juce::ValueTree&, juce::ValueTree&) override {}
+    void valueTreeChildRemoved(juce::ValueTree&, juce::ValueTree&, int) override {}
+    void valueTreeChildOrderChanged(juce::ValueTree&, int, int) override {}
+    void valueTreeParentChanged(juce::ValueTree&) override {}
+
+    void refreshLockDimmingFilm();
+    std::vector<juce::Rectangle<int>> buildLockDimmingFilmHoles(bool includeCompareHole) const;
+
     TSS::Skin* skin_;
     GuiLayoutDimensions layoutDimensions_;
     float uiScale_ = 1.0f;
+    juce::AudioProcessorValueTreeState* apvts_ = nullptr;
+    bool compareHoleRetryPending_ = false;
 #if JUCE_DEBUG
     bool uiElementsTestVisible_ = false;
     int uiElementsTestAreaY_ = 0;
@@ -70,6 +89,7 @@ private:
     HeaderPanel headerPanel;
     BodyPanel bodyPanel;
     FooterPanel footerPanel;
+    std::unique_ptr<TSS::LockDimmingFilm> lockDimmingFilm_;
 
     std::function<bool(const juce::KeyPress&)> editorialUndoRedoKeyHandler_;
 

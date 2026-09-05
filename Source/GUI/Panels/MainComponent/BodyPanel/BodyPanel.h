@@ -46,6 +46,9 @@ public:
     void setMasterInitConfirmationGate(TSS::ModuleHeader::InitConfirmationGate gate);
 
     PatchEditPanel& getPatchEditPanel() noexcept { return *patchEditPanel_; }
+    const PatchEditPanel& getPatchEditPanel() const noexcept { return *patchEditPanel_; }
+    SharedPanel& getSharedPanel() noexcept { return *sharedPanel_; }
+    const SharedPanel& getSharedPanel() const noexcept { return *sharedPanel_; }
 
 private:
     BodyPanelDimensions dims_;

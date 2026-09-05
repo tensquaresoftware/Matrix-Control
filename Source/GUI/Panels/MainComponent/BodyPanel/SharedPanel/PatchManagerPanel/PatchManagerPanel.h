@@ -39,6 +39,9 @@ public:
     void setSkin(TSS::ISkin& skin);
     void setUiScale(float uiScale);
 
+    PatchMutatorPanel& getPatchMutatorPanel() noexcept { return *patchMutatorPanel_; }
+    const PatchMutatorPanel& getPatchMutatorPanel() const noexcept { return *patchMutatorPanel_; }
+
 private:
     PatchManagerPanelDimensions dims_;
     TSS::ISkin* skin_;

@@ -42,6 +42,9 @@ public:
 
     void setBusReorderHandler(BusReorderHandler handler);
 
+    PatchManagerPanel& getPatchManagerPanel() noexcept { return *patchManagerPanel_; }
+    const PatchManagerPanel& getPatchManagerPanel() const noexcept { return *patchManagerPanel_; }
+
 private:
     SharedPanelDimensions dims_;
     TSS::ISkin* skin_ = nullptr;

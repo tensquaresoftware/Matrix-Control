@@ -241,6 +241,7 @@ set(PLUGIN_SOURCES
     Source/GUI/Helpers/ApvtsUndoableParameterAttachments.cpp
     Source/GUI/Helpers/CompareLockBinder.cpp
     Source/GUI/Helpers/ClipboardFeedbackButtonBinding.cpp
+    Source/GUI/Helpers/LockDimmingFilm.cpp
     Source/GUI/Factories/WidgetFactoryValidator.cpp
     Source/GUI/Layout/WidgetDimensionRegistry.cpp
     
@@ -451,6 +452,7 @@ if(MATRIX_BUILD_TESTS)
         Tests/Unit/DeviceVersionDisplayFormatTests.cpp
         Tests/Unit/DeviceAudioInputPreferenceTests.cpp
         Tests/Unit/EditorOutboundGateTests.cpp
+        Tests/Unit/LockDimmingFilmPolicyTests.cpp
         Tests/Unit/InitDefaultsTests.cpp
         Tests/Unit/InitTemplateLoaderTests.cpp
         Tests/Unit/ApvtsPatchMapperTests.cpp
