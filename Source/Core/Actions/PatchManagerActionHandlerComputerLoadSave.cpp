@@ -179,6 +179,18 @@ namespace Core
         return false;
     }
 
+    namespace
+    {
+        // Strip a matching Bank Utility export prefix ("Pxx. {Name}") before FILE NAMES reconcile.
+        // Non-matching stems (artistic "P99 - DJ", slot-only "P76", …) stay unchanged.
+        juce::String stemForFilenameReconcile(const juce::File& file)
+        {
+            const auto rawStem = file.getFileNameWithoutExtension();
+            const auto fromExport = PatchFileNameSanitizer::nameFromBankExportStem(rawStem);
+            return fromExport.isNotEmpty() ? fromExport : rawStem;
+        }
+    }
+
     PatchNameReconciliationResult PatchManagerActionHandler::reconcileLoadedPatchName(const juce::File& file)
     {
         const auto policy = static_cast<int>(apvts_.state.getProperty(
@@ -187,7 +199,7 @@ namespace Core
 
         return PatchFileNameReconciler::reconcile(
             *patchModel_,
-            file.getFileNameWithoutExtension(),
+            stemForFilenameReconcile(file),
             policy,
             pickNameReconciliation_);
     }
@@ -221,7 +233,7 @@ namespace Core
         patchModel_->setName(nameSource.getName());
         PatchFileNameReconciler::reconcile(
             *patchModel_,
-            file.getFileNameWithoutExtension(),
+            stemForFilenameReconcile(file),
             policy,
             {});
 

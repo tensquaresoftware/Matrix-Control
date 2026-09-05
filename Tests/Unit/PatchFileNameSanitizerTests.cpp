@@ -136,13 +136,17 @@ private:
         beginTest("bankExportFileStem_padsSlotAndAppendsSanitizedName");
 
         expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(3, "WARM PAD"),
-                     juce::String("P03 - WARM PAD"));
+                     juce::String("P03. WARM PAD"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(10, "NYLON 12"),
+                     juce::String("P10. NYLON 12"));
         expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(99, "lead"),
-                     juce::String("P99 - LEAD"));
+                     juce::String("P99. LEAD"));
         expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(0, "INIT"),
-                     juce::String("P00 - INIT"));
+                     juce::String("P00. INIT"));
         expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(1, "INIT"),
-                     juce::String("P01 - INIT"));
+                     juce::String("P01. INIT"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(5, "P99 - DJ"),
+                     juce::String("P05. P99 - DJ"));
     }
 
     void bankExportFileStem_omitsNameWhenSanitizedEmpty()
@@ -153,6 +157,8 @@ private:
                      juce::String("P00"));
         expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(7, "   "),
                      juce::String("P07"));
+        expectEquals(Core::PatchFileNameSanitizer::bankExportFileStem(76, ""),
+                     juce::String("P76"));
     }
 
     void bankExportFileStem_clampsOutOfRangeSlots()
@@ -210,11 +216,24 @@ private:
     {
         beginTest("nameFromBankExportStem_extractsNameAfterSlot");
 
-        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P10 - NYLON 12"),
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P10. NYLON 12"),
                      juce::String("NYLON 12"));
-        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P00 - GOODTIME.syx"),
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P00. GOODTIME.syx"),
                      juce::String("GOODTIME"));
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P05. P99 - DJ"),
+                     juce::String("P99 - DJ"));
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P76. AA.syx"),
+                     juce::String("AA"));
         expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P07"),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P76."),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P76. "),
+                     juce::String());
+        // Hyphen legacy / artistic bare stems are not bank-export prefixes.
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P10 - NYLON 12"),
+                     juce::String());
+        expectEquals(Core::PatchFileNameSanitizer::nameFromBankExportStem("P99 - DJ.syx"),
                      juce::String());
     }
 

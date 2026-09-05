@@ -325,7 +325,7 @@ private:
             42);
 
         expect(result.success);
-        expectEquals(target.getFileName(), juce::String("P42 - TEST.syx"));
+        expectEquals(target.getFileName(), juce::String("P42. TEST.syx"));
 
         juce::MemoryBlock savedSysEx;
         expect(target.loadFileAsData(savedSysEx));
@@ -339,7 +339,7 @@ private:
         beginTest("savePatchSysExFile_bankExportSlotIgnoredInHeader");
 
         const auto tempDir = createTempScanDir();
-        const auto target = tempDir.getChildFile("P42 - TEST.syx");
+        const auto target = tempDir.getChildFile("P42. TEST.syx");
 
         const auto result = service_.savePatchSysExFile(
             target,

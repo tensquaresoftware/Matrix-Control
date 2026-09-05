@@ -104,7 +104,7 @@ namespace Core
         if (sanitizedName.isEmpty())
             return slotLabel;
 
-        return slotLabel + " - " + sanitizedName;
+        return slotLabel + ". " + sanitizedName;
     }
 
     juce::String PatchFileNameSanitizer::formatBankPatchLabel(int bank, int patchNumber)
@@ -118,17 +118,14 @@ namespace Core
     {
         stem = stripPathAndSyxExtension(std::move(stem)).trim();
 
-        // "Pxx - Name" or "Pxx-Name" (tolerant), else slot-only "Pxx".
-        if (stem.length() >= 3
+        // Only "Pxx." (+ optional spaces after the dot). Slot-only "Pxx" and hyphen forms → empty.
+        if (stem.length() >= 4
             && stem[0] == 'P'
             && juce::CharacterFunctions::isDigit(stem[1])
-            && juce::CharacterFunctions::isDigit(stem[2]))
+            && juce::CharacterFunctions::isDigit(stem[2])
+            && stem[3] == '.')
         {
-            auto remainder = stem.substring(3).trim();
-            if (remainder.startsWithChar('-'))
-                remainder = remainder.substring(1).trim();
-
-            return sanitizeOsPathSegmentOrEmpty(remainder);
+            return sanitizeOsPathSegmentOrEmpty(stem.substring(4).trim());
         }
 
         return {};
