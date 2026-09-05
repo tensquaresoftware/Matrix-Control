@@ -1365,3 +1365,9 @@ Original review bullets below remain for history; status for U-10-owned residual
 - source_spec: `_bmad-output/implementation-artifacts/spec-master-edit-hide-matrix-6.md`
   summary: MasterEditGate hide-predicate tests live in DeviceAudioInputPreferenceTests.cpp rather than a dedicated Core test file.
   evidence: Blind Hunter — mixed suites; functional coverage exists, file split is cleanup only.
+
+## Deferred from: code review of spec-plugin-modals-always-on-top.md (2026-09-05)
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-plugin-modals-always-on-top.md`
+  summary: No automated regression check that raise-before/after runs around FileChoosers and Mutator Delete; z-order stays manual-smoke only.
+  evidence: Verification Gap review — dropping a raise would still leave build/lint/unit tests green; project GUI modality is validated manually.

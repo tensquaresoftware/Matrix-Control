@@ -46,19 +46,10 @@ void PluginEditor::setPatchFolderPickerBinding()
                 startDirectory = persistedFolder;
         }
 
-        juce::FileChooser chooser("Select patch folder",
-                                  startDirectory,
-                                  juce::String(),
-                                  true,
-                                  false,
-                                  safeThis.getComponent());
-
-        if (! chooser.browseForDirectory())
-            return {};
-
-        // OPEN may auto-load and show ASK ONCE next — raise UI before that modal stack.
-        raiseUiBeforeModalDialog(safeThis.getComponent());
-        return chooser.getResult();
+        // OPEN may auto-load and show ASK ONCE next — helper raises before/after picker.
+        return browseForDirectorySync(safeThis.getComponent(),
+                                      "Select patch folder",
+                                      startDirectory);
     });
 }
 
@@ -70,17 +61,9 @@ void PluginEditor::setMutatorExportFolderPickerBinding()
             if (safeThis == nullptr)
                 return {};
 
-            juce::FileChooser chooser("Select mutation export folder",
-                                      juce::File(),
-                                      juce::String(),
-                                      true,
-                                      false,
-                                      safeThis.getComponent());
-
-            if (chooser.browseForDirectory())
-                return chooser.getResult();
-
-            return {};
+            return browseForDirectorySync(safeThis.getComponent(),
+                                          "Select mutation export folder",
+                                          {});
         });
 }
 
@@ -299,20 +282,18 @@ void PluginEditor::setPatchSaveFilePickerBinding()
                 if (safeThis == nullptr)
                     return {};
 
-                juce::FileChooser chooser("Save patch as",
-                                          folder.getChildFile(stemForDialog + ".syx"),
-                                          "*.syx",
-                                          true,
-                                          false,
-                                          safeThis.getComponent());
+                const auto chosen = browseForFileToSaveSync(
+                    safeThis.getComponent(),
+                    "Save patch as",
+                    folder.getChildFile(stemForDialog + ".syx"),
+                    "*.syx");
 
-                if (! chooser.browseForFileToSave(true))
+                if (chosen == juce::File())
                     return {};
 
                 if (safeThis == nullptr)
                     return {};
 
-                const auto chosen = chooser.getResult();
                 const auto normalized = Core::PatchFileNameSanitizer::normalizeMatrixSaveStemOrEmpty(
                     chosen.getFileNameWithoutExtension());
 

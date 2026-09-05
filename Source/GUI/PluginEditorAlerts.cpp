@@ -68,6 +68,53 @@ void raiseUiBeforeModalDialog(juce::Component* associatedComponent)
    #endif
 }
 
+juce::File browseForDirectorySync(juce::Component* associatedComponent,
+                                  const juce::String& dialogTitle,
+                                  const juce::File& startDirectory)
+{
+    const juce::Component::SafePointer<juce::Component> safe(associatedComponent);
+    raiseUiBeforeModalDialog(safe.getComponent());
+
+    juce::FileChooser chooser(dialogTitle,
+                              startDirectory,
+                              juce::String(),
+                              true,
+                              false,
+                              safe.getComponent());
+
+    const bool ok = chooser.browseForDirectory();
+    raiseUiBeforeModalDialog(safe.getComponent());
+
+    if (! ok)
+        return {};
+
+    return chooser.getResult();
+}
+
+juce::File browseForFileToSaveSync(juce::Component* associatedComponent,
+                                   const juce::String& dialogTitle,
+                                   const juce::File& startFileOrDirectory,
+                                   const juce::String& filePatterns)
+{
+    const juce::Component::SafePointer<juce::Component> safe(associatedComponent);
+    raiseUiBeforeModalDialog(safe.getComponent());
+
+    juce::FileChooser chooser(dialogTitle,
+                              startFileOrDirectory,
+                              filePatterns,
+                              true,
+                              false,
+                              safe.getComponent());
+
+    const bool ok = chooser.browseForFileToSave(true);
+    raiseUiBeforeModalDialog(safe.getComponent());
+
+    if (! ok)
+        return {};
+
+    return chooser.getResult();
+}
+
 /** Visual LTR: Cancel -> [middle] -> primary (rightmost = default).
     Semantic codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
 
@@ -127,6 +174,8 @@ int showOrderedConfirmAlert(const OrderedConfirmAlertOptions& options)
 MutatorDeleteConfirmResult showMutatorDeleteConfirmAlert(juce::Component* associatedComponent)
 {
     namespace Dialog = PluginDisplayNames::Dialogs::MutatorDeleteConfirm;
+
+    raiseUiBeforeModalDialog(associatedComponent);
 
    #if JUCE_MODAL_LOOPS_PERMITTED
     juce::AlertWindow alert(Dialog::kTitle,

@@ -41,17 +41,12 @@ void PluginEditor::setBankExportFolderPickerBinding()
                     startDirectory = persistedFolder;
             }
 
-            juce::FileChooser chooser("Select bank export folder",
-                                      startDirectory,
-                                      juce::String(),
-                                      true,
-                                      false,
-                                      safeThis.getComponent());
-
-            if (! chooser.browseForDirectory())
+            const auto chosen = browseForDirectorySync(safeThis.getComponent(),
+                                                       "Select bank export folder",
+                                                       startDirectory);
+            if (chosen == juce::File())
                 return {};
 
-            const auto chosen = chooser.getResult();
             if (chosen.isDirectory())
             {
                 safeThis->pluginProcessor.getApvts().state.setProperty(
@@ -84,17 +79,12 @@ void PluginEditor::setBankImportFolderPickerBinding()
                     startDirectory = persistedFolder;
             }
 
-            juce::FileChooser chooser("Select bank import folder",
-                                      startDirectory,
-                                      juce::String(),
-                                      true,
-                                      false,
-                                      safeThis.getComponent());
-
-            if (! chooser.browseForDirectory())
+            const auto chosen = browseForDirectorySync(safeThis.getComponent(),
+                                                       "Select bank import folder",
+                                                       startDirectory);
+            if (chosen == juce::File())
                 return {};
 
-            const auto chosen = chooser.getResult();
             if (chosen.isDirectory())
             {
                 safeThis->pluginProcessor.getApvts().state.setProperty(

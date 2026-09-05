@@ -33,8 +33,20 @@ namespace PluginEditorInternal
     // Semantic result codes (stable across platforms): Cancel/Escape/OOR -> 0, primary -> 1, middle -> 2.
     int showOrderedConfirmAlert(const OrderedConfirmAlertOptions& options);
 
-    /** After a native FileChooser, raise the plugin UI so the next modal is not buried. */
+    /** Bring the plugin/standalone UI forward before (or after) a sync OS modal. */
     void raiseUiBeforeModalDialog(juce::Component* associatedComponent);
+
+    /** Raise → sync native directory FileChooser → raise. Empty File if cancelled. */
+    juce::File browseForDirectorySync(juce::Component* associatedComponent,
+                                      const juce::String& dialogTitle,
+                                      const juce::File& startDirectory);
+
+    /** Raise → sync native save FileChooser → raise. Empty File if cancelled.
+        Always warns when overwriting an existing file. */
+    juce::File browseForFileToSaveSync(juce::Component* associatedComponent,
+                                       const juce::String& dialogTitle,
+                                       const juce::File& startFileOrDirectory,
+                                       const juce::String& filePatterns);
 
     // ---- Mutator Delete confirm with an optional "Don't ask again" checkbox. ----
     struct MutatorDeleteConfirmResult
